@@ -106,7 +106,7 @@ export default function Timeline() {
 
   return (
     <div>
-      <PageHeader emoji="⏳" title={t('timelineTitle')} zh={t('timelineZh')} subtitle={t('timelineSubtitle')} />
+      <PageHeader emoji="⏳" title={t('timelineTitle')} subtitle={t('timelineSubtitle')} />
       <div className="card">
         <ProgressBar
           value={completedPoints.length}

@@ -75,7 +75,7 @@ function TopicModal({ topic, onClose }: { topic: Topic; onClose: () => void }) {
       ) : (
         <>
           <h2>
-            {topic.emoji} {L(topic.name)} {topic.accent && <span className="zh-accent">{topic.accent}</span>}
+            {topic.emoji} {L(topic.name)}
           </h2>
           <p className="muted">{L(topic.intro)}</p>
           {topic.lessons.map((lesson, i) => {
@@ -108,7 +108,7 @@ function TopicNode({ topic, onOpen }: { topic: Topic; onOpen: (t: Topic) => void
     <button className={completed ? 'topic-node completed' : 'topic-node'} disabled={!unlocked} onClick={() => onOpen(topic)}>
       <span className="topic-emoji">{unlocked ? topic.emoji : '🔒'}</span>
       <span style={{ flex: 1 }}>
-        <strong>{L(topic.name)}</strong> {topic.accent && <span className="zh-accent">{topic.accent}</span>}
+        <strong>{L(topic.name)}</strong>
         <span className="small muted"> · {topicLessonCount(locale, doneCount, topic.lessons.length)}</span>
         <div className="small muted">{unlocked ? L(topic.intro) : t('lockedTopic')}</div>
       </span>
@@ -129,7 +129,7 @@ export default function Knowledge() {
 
   return (
     <div>
-      <PageHeader emoji="🌳" title={t('knowledgeTitle')} zh={t('knowledgeZh')} subtitle={t('knowledgeSubtitle')} />
+      <PageHeader emoji="🌳" title={t('knowledgeTitle')} subtitle={t('knowledgeSubtitle')} />
       <div className="card">
         <ProgressBar value={completedLessons.length} max={totalLessons} label={knowledgeProgressLabel(locale, completedLessons.length, totalLessons)} />
       </div>

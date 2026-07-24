@@ -118,7 +118,7 @@ export default function Forest() {
 
   return (
     <div>
-      <PageHeader emoji="🌲" title={t('forestTitle')} zh={t('forestZh')} subtitle={t('forestSubtitle')} />
+      <PageHeader emoji="🌲" title={t('forestTitle')} subtitle={t('forestSubtitle')} />
 
       <ForestScene stageIndex={info.stageIndex} score={info.score} seedCaption={t('forestSeedCaption')} />
 

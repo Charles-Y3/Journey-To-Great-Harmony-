@@ -53,7 +53,7 @@ export default function Community() {
 
   return (
     <div>
-      <PageHeader emoji="👥" title={t('communityTitle')} zh={t('communityZh')} subtitle={t('communitySubtitle')} />
+      <PageHeader emoji="👥" title={t('communityTitle')} subtitle={t('communitySubtitle')} />
 
       {encouragersToday.length > 0 && (
         <div className="quote-card">

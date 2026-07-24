@@ -13,9 +13,7 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
     <Modal onClose={onClose}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: '3.2rem' }}>{card.emoji}</div>
-        <h2>
-          {L(card.title)} {card.accent && <span className="zh-accent">{card.accent}</span>}
-        </h2>
+        <h2>{L(card.title)}</h2>
         <p>
           <span className={card.rarity === 'legendary' ? 'pill pill-gold' : 'pill'}>{card.rarity}</span>{' '}
           <span className="pill">{card.category}</span>
@@ -35,7 +33,7 @@ export default function Collection() {
 
   return (
     <div>
-      <PageHeader emoji="🎴" title={t('collectionTitle')} zh={t('collectionZh')} subtitle={t('collectionSubtitle')} />
+      <PageHeader emoji="🎴" title={t('collectionTitle')} subtitle={t('collectionSubtitle')} />
 
       <div className="tab-row">
         <button className={tab === 'cards' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setTab('cards')}>

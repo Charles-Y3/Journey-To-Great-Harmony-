@@ -11,7 +11,7 @@ function MorningCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const setIntention = useJourney((s) => s.setIntention);
   const [text, setText] = useState('');
-  const { t, L, locale } = useT();
+  const { t, L } = useT();
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
 
   return (
@@ -19,7 +19,6 @@ function MorningCard({ today }: { today: string }) {
       <h3>{t('morningCardTitle')}</h3>
       <div className="quote-card" style={{ marginBottom: 14 }}>
         <p className="quote-text">“{L(quote.text)}”</p>
-        {locale === 'en' && quote.originalZh && <p className="quote-zh">{quote.originalZh}</p>}
         <p className="quote-author">— {L(quote.author)}</p>
       </div>
       {rec.intention ? (
@@ -178,7 +177,7 @@ export default function Practice() {
   const { t } = useT();
   return (
     <div>
-      <PageHeader emoji="🎯" title={t('practiceTitle')} zh={t('practiceZh')} subtitle={t('practiceSubtitle')} />
+      <PageHeader emoji="🎯" title={t('practiceTitle')} subtitle={t('practiceSubtitle')} />
       <MorningCard today={today} />
       <ChallengeCard today={today} />
       <EveningCard today={today} />

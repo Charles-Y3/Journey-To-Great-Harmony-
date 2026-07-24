@@ -187,9 +187,7 @@ export default function App() {
   return (
     <div className="app">
       <aside className="sidebar">
-        <h1 className="sidebar-title">
-          {t('appName')} <span className="sidebar-zh">大同</span>
-        </h1>
+        <h1 className="sidebar-title">{t('appName')}</h1>
         <p className="sidebar-tagline">{t('appTagline')}</p>
         <SidebarNavLinks />
         <div className="sidebar-footer">
@@ -201,7 +199,7 @@ export default function App() {
 
       <div className="main">
         <div className="topbar">
-          <div className="topbar-rank" title={locale === 'en' ? rank.name.zh : undefined}>
+          <div className="topbar-rank">
             <span>{rank.emoji}</span>
             <span>{L(rank.name)}</span>
           </div>

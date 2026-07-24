@@ -120,7 +120,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   const afterRank = rankIndexForXp(after.xp);
   if (afterRank > beforeRank) {
     const r = RANKS[afterRank];
-    out.push(celebration('rank', r.emoji, rankUpTitle(locale, L(r.name, locale)), locale === 'en' ? r.name.zh : undefined));
+    out.push(celebration('rank', r.emoji, rankUpTitle(locale, L(r.name, locale))));
   }
 
   const stats = statsFromData(after);

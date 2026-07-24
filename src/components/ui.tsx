@@ -74,12 +74,11 @@ export function CelebrationOverlay() {
   );
 }
 
-export function PageHeader({ emoji, title, zh, subtitle }: { emoji: string; title: string; zh?: string; subtitle: string }) {
+export function PageHeader({ emoji, title, subtitle }: { emoji: string; title: string; subtitle: string }) {
   return (
     <header className="page-header">
       <h1>
         <span className="page-emoji">{emoji}</span> {title}
-        {zh && <span className="zh-accent"> {zh}</span>}
       </h1>
       <p className="page-subtitle">{subtitle}</p>
     </header>

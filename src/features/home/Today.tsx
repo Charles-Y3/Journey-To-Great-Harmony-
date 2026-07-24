@@ -64,7 +64,6 @@ export default function Today() {
 
       <div className="quote-card">
         <p className="quote-text">“{L(quote.text)}”</p>
-        {locale === 'en' && quote.originalZh && <p className="quote-zh">{quote.originalZh}</p>}
         <p className="quote-author">— {L(quote.author)}</p>
       </div>
 

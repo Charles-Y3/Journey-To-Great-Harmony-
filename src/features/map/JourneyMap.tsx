@@ -14,7 +14,7 @@ export default function JourneyMap() {
 
   return (
     <div>
-      <PageHeader emoji="🗺️" title={t('mapTitle')} zh={t('mapZh')} subtitle={t('mapSubtitle')} />
+      <PageHeader emoji="🗺️" title={t('mapTitle')} subtitle={t('mapSubtitle')} />
 
       {REGIONS.map((region, i) => {
         const unlocked = xp >= region.unlockXp;

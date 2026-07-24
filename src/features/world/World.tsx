@@ -73,7 +73,7 @@ export default function World() {
 
   return (
     <div>
-      <PageHeader emoji="🌏" title={t('worldTitle')} zh={t('worldZh')} subtitle={t('worldSubtitle')} />
+      <PageHeader emoji="🌏" title={t('worldTitle')} subtitle={t('worldSubtitle')} />
 
       <WorldScene stageIndex={info.stageIndex} builtIds={builtIds} caption={t('worldSceneCaption')} />
 

@@ -113,7 +113,6 @@ export const UI = {
 
   // ── Practice ──────────────────────────────────────────────────────
   practiceTitle: localized('Daily Virtue Practice', '每日德行修习'),
-  practiceZh: localized('修行', '修行'),
   practiceSubtitle: localized(
     'Knowledge alone does not transform people. Practice does.',
     '知识本身并不能改变一个人，践行才能。',
@@ -149,7 +148,6 @@ export const UI = {
 
   // ── Knowledge ─────────────────────────────────────────────────────
   knowledgeTitle: localized('The Knowledge Path', '知识之路'),
-  knowledgeZh: localized('智慧之树', '智慧之树'),
   knowledgeSubtitle: localized(
     'A living tree of wisdom. Each completed topic unlocks the deeper ones beneath it.',
     '一棵生长中的智慧之树。完成每个主题，便能解锁其下更深的主题。',
@@ -173,7 +171,6 @@ export const UI = {
 
   // ── Timeline ──────────────────────────────────────────────────────
   timelineTitle: localized('The Wisdom Timeline', '智慧时间线'),
-  timelineZh: localized('智慧长河', '智慧长河'),
   timelineSubtitle: localized(
     "Understanding humanity's journey — how wisdom developed across thousands of years and every culture.",
     '理解人类的旅程 — 智慧如何在数千年间、在每种文化中发展。',
@@ -186,7 +183,6 @@ export const UI = {
 
   // ── Forest ────────────────────────────────────────────────────────
   forestTitle: localized('Virtue Forest', '德行森林'),
-  forestZh: localized('德之林', '德之林'),
   forestSubtitle: localized(
     'A living picture of your inner cultivation. It grows as you do.',
     '你内在修养的生动写照，随你一同成长。',
@@ -209,7 +205,6 @@ export const UI = {
 
   // ── Journey Map ───────────────────────────────────────────────────
   mapTitle: localized('Journey Map', '旅程地图'),
-  mapZh: localized('旅程', '旅程'),
   mapSubtitle: localized(
     'Your personal adventure. Each region is a stage of inner growth — unlock them as your wisdom deepens.',
     '属于你的冒险旅程。每个区域都是内在成长的一个阶段 — 随着智慧加深逐一解锁。',
@@ -219,7 +214,6 @@ export const UI = {
 
   // ── World ─────────────────────────────────────────────────────────
   worldTitle: localized('Great Harmony World', '大同世界'),
-  worldZh: localized('大同世界', '大同世界'),
   worldSubtitle: localized(
     "From individual growth to collective transformation. Every traveller's practice builds this shared world.",
     '从个人成长到集体转化。每位旅人的践行，都在建设这个共享的世界。',
@@ -244,7 +238,6 @@ export const UI = {
 
   // ── Community ─────────────────────────────────────────────────────
   communityTitle: localized('Community', '社群'),
-  communityZh: localized('同行者', '同行者'),
   communitySubtitle: localized(
     'Fellow travellers on the road to Great Harmony. Not a competition — an encouragement.',
     '通往大同之路上的同行者。这不是竞争，而是彼此鼓励。',
@@ -279,7 +272,6 @@ export const UI = {
 
   // ── Collection ────────────────────────────────────────────────────
   collectionTitle: localized('Collection', '收藏'),
-  collectionZh: localized('收藏', '收藏'),
   collectionSubtitle: localized(
     'Wisdom cards and achievement badges gathered along your journey.',
     '旅程中收集到的智慧卡牌与成就徽章。',

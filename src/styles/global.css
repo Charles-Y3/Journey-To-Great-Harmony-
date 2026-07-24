@@ -180,11 +180,6 @@ a {
   margin: 0;
 }
 
-.sidebar-zh {
-  color: var(--gold);
-  font-size: 1.15rem;
-}
-
 .sidebar-tagline {
   font-size: 0.72rem;
   color: var(--ink-soft);
@@ -362,11 +357,6 @@ a {
 
 .page-emoji {
   margin-right: 4px;
-}
-
-.zh-accent {
-  color: var(--gold);
-  font-weight: normal;
 }
 
 .page-subtitle {
@@ -601,12 +591,6 @@ input[type='text']:focus {
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-style: italic;
-  margin-bottom: 0.4em;
-}
-
-.quote-zh {
-  color: var(--jade-deep);
-  font-size: 1rem;
   margin-bottom: 0.4em;
 }
 
