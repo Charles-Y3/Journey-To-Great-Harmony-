@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { useJourney } from '../../state/store';
 import { forestInfo, statsFromData, type JourneyData } from '../../state/selectors';
 import { FOREST_STAGES } from '../../engine/progression';
 import { seededRandom } from '../../engine/progression';
-import { PageHeader, ProgressBar } from '../../components/ui';
+import { Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 
 // Distinct palette per stage so the scene visibly shifts from bare and dusty
@@ -58,6 +59,45 @@ function Sprout({ x, size }: { x: number; size: number }) {
   );
 }
 
+// A little life on top of the static scene: butterflies drift through the
+// canopy from Sprout onward, and a rabbit hops along the ground once the
+// forest is dense enough to shelter it (Forest stage on).
+function ForestCritters({ stageIndex }: { stageIndex: number }) {
+  if (stageIndex < 1) return null;
+  const butterflyCount = Math.min(5, 1 + stageIndex);
+  const butterflies = Array.from({ length: butterflyCount }, (_, i) => {
+    const y0 = 90 + seededRandom(`bfly-y-${i}`) * 70;
+    const sweep = 30 + seededRandom(`bfly-sweep-${i}`) * 40;
+    const x0 = 40 + seededRandom(`bfly-x-${i}`) * 500;
+    const dur = 9 + seededRandom(`bfly-dur-${i}`) * 8;
+    const path = `M${x0},${y0} q ${sweep} -22 ${sweep * 2} 0 t ${sweep * 2} 0 t ${-sweep * 2} 8 t ${-sweep * 2} -8`;
+    return { path, dur, size: 10 + seededRandom(`bfly-size-${i}`) * 4 };
+  });
+
+  return (
+    <g aria-hidden="true">
+      {butterflies.map((b, i) => (
+        <text key={`bfly-${i}`} fontSize={b.size}>
+          <animateMotion path={b.path} dur={`${b.dur}s`} repeatCount="indefinite" rotate="auto" />
+          🦋
+        </text>
+      ))}
+      {stageIndex >= 3 && (
+        <text fontSize={16}>
+          <animateMotion path="M80,258 L 220,258 L 80,258" dur="11s" repeatCount="indefinite" />
+          🐇
+        </text>
+      )}
+      {stageIndex >= 4 && (
+        <text fontSize={15}>
+          <animateMotion path="M540,262 L 380,262 L 540,262" dur="13s" repeatCount="indefinite" />
+          🦋
+        </text>
+      )}
+    </g>
+  );
+}
+
 function ForestScene({
   stageIndex,
   stageProgress,
@@ -69,21 +109,23 @@ function ForestScene({
 }) {
   const palette = STAGE_PALETTE[Math.min(stageIndex, STAGE_PALETTE.length - 1)];
 
-  // Each stage has its own distinct scene, not just "more of the same tree".
-  const sproutCount = stageIndex === 1 ? Math.round(3 + stageProgress * 5) : 0; // 3–8
+  // Each stage has its own distinct scene, not just "more of the same tree" —
+  // and floors are kept high enough that no stage reads as sparse (a
+  // "forest" with only a couple of trees in it looks like a mistake).
+  const sproutCount = stageIndex === 1 ? Math.round(4 + stageProgress * 5) : 0; // 4–9
   const treeCount =
     stageIndex === 2
-      ? Math.round(2 + stageProgress * 4) // 2–6: trees first appear here
+      ? Math.round(4 + stageProgress * 5) // 4–9: trees first appear here
       : stageIndex === 3
-        ? Math.round(6 + stageProgress * 5) // 6–11
+        ? Math.round(7 + stageProgress * 6) // 7–13
         : stageIndex >= 4
-          ? Math.min(14, 10 + Math.round(stageProgress * 4)) // 10–14
+          ? Math.min(16, 12 + Math.round(stageProgress * 4)) // 12–16
           : 0;
   const flowerCount =
     stageIndex === 3
-      ? Math.round(stageProgress * 8) // 0–8: flowers first appear late in Forest
+      ? Math.round(2 + stageProgress * 8) // 2–10: flowers first appear late in Forest
       : stageIndex >= 4
-        ? Math.round(10 + stageProgress * 12) // 10–22: the Garden bursts with colour
+        ? Math.round(12 + stageProgress * 12) // 12–24: the Garden bursts with colour
         : 0;
 
   const sprouts = Array.from({ length: sproutCount }, (_, i) => ({
@@ -161,6 +203,8 @@ function ForestScene({
           <rect x="278" y="200" width="44" height="5" fill="#b5443c" />
         </g>
       )}
+
+      <ForestCritters stageIndex={stageIndex} />
     </svg>
   );
 }
@@ -171,6 +215,7 @@ export default function Forest() {
   const info = forestInfo(d);
   const stats = statsFromData(d);
   const { t, L } = useT();
+  const [previewStage, setPreviewStage] = useState<number | null>(null);
 
   const stageProgress = info.next
     ? Math.max(0, Math.min(1, (info.score - info.stage.threshold) / (info.next.threshold - info.stage.threshold)))
@@ -190,18 +235,20 @@ export default function Forest() {
 
       <ForestScene stageIndex={info.stageIndex} stageProgress={stageProgress} seedCaption={t('forestSeedCaption')} />
 
-      <div className="stage-steps">
+      <div className="stage-steps forest-stage-grid">
         {FOREST_STAGES.map((s, i) => {
           let cls = 'stage-step';
           if (i < info.stageIndex) cls += ' reached';
           if (i === info.stageIndex) cls += ' current';
+          const unlocked = i <= info.stageIndex;
           return (
-            <span key={s.id} className={cls}>
-              {s.emoji} {L(s.name)}
-            </span>
+            <button key={s.id} type="button" className={cls} disabled={!unlocked} onClick={() => setPreviewStage(i)}>
+              {unlocked ? s.emoji : '🔒'} {L(s.name)}
+            </button>
           );
         })}
       </div>
+      <p className="small muted">{t('forestStagePreviewHint')}</p>
 
       <div className="card">
         {info.next ? (
@@ -226,6 +273,15 @@ export default function Forest() {
         </div>
         <p className="small muted">{t('forestFooter')}</p>
       </div>
+
+      {previewStage !== null && (
+        <Modal onClose={() => setPreviewStage(null)}>
+          <h2>
+            {FOREST_STAGES[previewStage].emoji} {L(FOREST_STAGES[previewStage].name)}
+          </h2>
+          <ForestScene stageIndex={previewStage} stageProgress={1} seedCaption={t('forestSeedCaption')} />
+        </Modal>
+      )}
     </div>
   );
 }

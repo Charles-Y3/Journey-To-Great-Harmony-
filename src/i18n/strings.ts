@@ -266,6 +266,10 @@ export const UI = {
   forestFactorReflections: localized('Reflections written', '写下反思'),
   forestFactorTimeline: localized('Timeline studies', '时间线研读'),
   forestFactorStreak: localized('Best streak', '最佳连续记录'),
+  forestStagePreviewHint: localized(
+    'Tap a reached stage above to see its scene up close.',
+    '轻点上方已达成的阶段，近看它的景象。',
+  ),
   forestFooter: localized(
     'Every lesson, challenge, reflection, and day of consistency adds growth. There is no shortcut — and no hurry, as the old saying goes: a journey of a thousand miles begins with a single step.',
     '每一课、每次挑战、每篇反思、每一天的坚持，都在增添成长。没有捷径，也无需匆忙。千里之行，始于足下。',
