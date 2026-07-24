@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { TIMELINE } from '../../data/timeline';
-import type { TimelinePoint, TimelineEra } from '../../data/types';
+import type { TimelinePoint, TimelineEra, TimelineLevel } from '../../data/types';
 import { useJourney } from '../../state/store';
-import { completedEraIds } from '../../state/selectors';
+import { completedEraIds, timelineStudiesToday, DAILY_TIMELINE_CAP, type JourneyData } from '../../state/selectors';
+import { useToday } from '../../state/store';
 import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import {
@@ -17,18 +18,24 @@ import {
 } from '../../i18n/strings';
 import { shuffledIndices } from '../../engine/quiz';
 
-function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => void }) {
-  const done = useJourney((s) => s.completedTimelinePoints.includes(point.id));
-  const completeTimelinePoint = useJourney((s) => s.completeTimelinePoint);
+function LevelBody({
+  level,
+  capReached,
+  onComplete,
+}: {
+  level: TimelineLevel;
+  capReached: boolean;
+  onComplete: (correctCount: number) => void;
+}) {
   const [quizStarted, setQuizStarted] = useState(false);
   const [qIndex, setQIndex] = useState(0);
-  const [order, setOrder] = useState<number[]>(() => shuffledIndices(point.quiz[0].options.en.length));
+  const [order, setOrder] = useState<number[]>(() => shuffledIndices(level.quiz[0].options.en.length));
   const [picked, setPicked] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const { t, L, locale } = useT();
 
-  const q = point.quiz[qIndex];
-  const finishedQuiz = qIndex >= point.quiz.length;
+  const q = level.quiz[qIndex];
+  const finishedQuiz = qIndex >= level.quiz.length;
   const answered = picked !== null;
   const correct = answered && order[picked] === q.answer;
 
@@ -47,45 +54,41 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
     const nextIndex = qIndex + 1;
     setPicked(null);
     setQIndex(nextIndex);
-    if (nextIndex < point.quiz.length) setOrder(shuffledIndices(point.quiz[nextIndex].options.en.length));
+    if (nextIndex < level.quiz.length) setOrder(shuffledIndices(level.quiz[nextIndex].options.en.length));
   }
 
   return (
-    <Modal onClose={onClose} wide>
-      <h2>
-        {point.emoji} {L(point.title)}
-      </h2>
-      <p className="small muted">{L(point.years)}</p>
-      <p>{L(point.background)}</p>
+    <div style={{ marginTop: 10 }}>
+      <p>{L(level.background)}</p>
 
       <h4>{t('keyFigures')}</h4>
-      <p className="small">{L(point.figures).join(' · ')}</p>
+      <p className="small">{L(level.figures).join(' · ')}</p>
       <h4>{t('importantTeachings')}</h4>
       <ul className="small">
-        {L(point.teachings).map((tItem) => (
+        {L(level.teachings).map((tItem) => (
           <li key={tItem}>{tItem}</li>
         ))}
       </ul>
       <h4>{t('relatedConcepts')}</h4>
       <p>
-        {L(point.concepts).map((c) => (
+        {L(level.concepts).map((c) => (
           <span key={c} className="pill" style={{ marginRight: 6, marginBottom: 6, display: 'inline-block' }}>
             {c}
           </span>
         ))}
       </p>
 
-      {done ? (
-        <p>
-          <span className="pill">{t('studiedLabel')}</span>
-        </p>
-      ) : !quizStarted ? (
-        <button className="btn btn-primary" onClick={() => setQuizStarted(true)}>
-          {takeQuizBtn(locale, point.quiz.length)}
-        </button>
+      {!quizStarted ? (
+        capReached ? (
+          <p className="small muted">{t('timelineDailyCapNote')}</p>
+        ) : (
+          <button className="btn btn-primary" onClick={() => setQuizStarted(true)}>
+            {takeQuizBtn(locale, level.quiz.length)}
+          </button>
+        )
       ) : !finishedQuiz ? (
         <div className="card" style={{ marginTop: 10 }}>
-          <p className="small muted">{questionProgress(locale, qIndex + 1, point.quiz.length)}</p>
+          <p className="small muted">{questionProgress(locale, qIndex + 1, level.quiz.length)}</p>
           <p>
             <strong>{L(q.q)}</strong>
           </p>
@@ -111,18 +114,70 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
           )}
           {correct && (
             <button className="btn btn-primary" style={{ marginTop: 8 }} onClick={next}>
-              {nextOrFinish(locale, qIndex + 1 >= point.quiz.length)}
+              {nextOrFinish(locale, qIndex + 1 >= level.quiz.length)}
             </button>
           )}
         </div>
       ) : (
         <div className="card" style={{ marginTop: 10 }}>
-          <p>{quizResult(locale, correctCount, point.quiz.length)}</p>
-          <button className="btn btn-primary" onClick={() => completeTimelinePoint(point.id, correctCount)}>
+          <p>{quizResult(locale, correctCount, level.quiz.length)}</p>
+          <button className="btn btn-primary" onClick={() => onComplete(correctCount)}>
             {completeStudyBtn(locale, 15 + correctCount * 5)}
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => void }) {
+  const timelinePointLevels = useJourney((s) => s.timelinePointLevels);
+  const completeTimelineLevel = useJourney((s) => s.completeTimelineLevel);
+  const today = useToday();
+  const data = useJourney() as unknown as JourneyData;
+  const levelsDone = timelinePointLevels[point.id] ?? 0;
+  const capReached = timelineStudiesToday(data, today) >= DAILY_TIMELINE_CAP;
+  const [openLevel, setOpenLevel] = useState<number | null>(levelsDone < 3 ? levelsDone : null);
+  const { t, L } = useT();
+
+  return (
+    <Modal onClose={onClose} wide>
+      <h2>
+        {point.emoji} {L(point.title)}
+      </h2>
+      <p className="small muted">{L(point.years)}</p>
+
+      {point.levels.map((lvl, i) => {
+        const done = i < levelsDone;
+        const locked = i > levelsDone;
+        const open = openLevel === i;
+        let cls = 'btn';
+        if (done) cls += ' quiz-option correct';
+        return (
+          <div key={i} className="card" style={{ marginBottom: 10 }}>
+            <button
+              className={cls}
+              style={{ width: '100%', textAlign: 'left' }}
+              disabled={locked}
+              onClick={() => setOpenLevel(open ? null : i)}
+            >
+              {done ? '✅' : locked ? '🔒' : '📖'} {L(lvl.label)}
+            </button>
+            {locked && <p className="small muted" style={{ marginTop: 6 }}>{t('timelineLevelLockedNote')}</p>}
+            {open && !locked && !done && (
+              <LevelBody level={lvl} capReached={capReached} onComplete={(correct) => completeTimelineLevel(point.id, i, correct)} />
+            )}
+            {open && done && (
+              <div style={{ marginTop: 10 }}>
+                <p>{L(lvl.background)}</p>
+                <p>
+                  <span className="pill">{t('studiedLabel')}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </Modal>
   );
 }

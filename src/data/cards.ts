@@ -1,4 +1,4 @@
-import type { WisdomCard, Stats } from './types';
+import type { WisdomCard, Stats, CardRarity } from './types';
 import { localized } from '../i18n/types';
 
 export const CARDS: WisdomCard[] = [
@@ -33,6 +33,17 @@ export const CARDS: WisdomCard[] = [
   { id: 'card-datong', title: localized('Datong — Great Harmony', '大同'), emoji: '🌏', rarity: 'legendary', category: 'teaching', text: localized('"When the Great Way prevails, the world is shared by all." The dream that unites every tradition you have studied.', '"大道之行也，天下为公。"这是你所研读的每一个传统，共同指向的梦想。'), unlockHint: localized('Complete every era on the Wisdom Timeline.', '完成智慧时间线上的每一个时代。') },
   { id: 'card-bridge', title: localized('The Bridge Builder', '造桥者'), emoji: '🌉', rarity: 'rare', category: 'story', text: localized('Every point of harmony you contribute is a plank in a bridge others will cross. Communities are built this way.', '你贡献的每一分和谐，都是他人将要跨越的桥上的一块木板。社群，正是这样建成的。'), unlockHint: localized('Contribute 500 harmony points to the world.', '为世界贡献500点和谐值。') },
 ];
+
+// Timeline-linked wisdom cards (see TimelinePoint.cardId) get harder to
+// unlock the rarer they are, now that the Wisdom Timeline has 3 levels per
+// point: a common card unlocks at level 1, rare needs level 2, and
+// legendary needs the full level-3 mastery study. See collectUnlocks() in
+// state/store.ts for where this is applied.
+export const RARITY_LEVEL_REQUIRED: Record<CardRarity, number> = {
+  common: 1,
+  rare: 2,
+  legendary: 3,
+};
 
 // Cards not tied to a specific lesson/timeline completion unlock via these rules.
 export const SPECIAL_CARD_RULES: { cardId: string; check: (s: Stats) => boolean }[] = [

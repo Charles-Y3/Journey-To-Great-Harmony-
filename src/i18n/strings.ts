@@ -220,6 +220,14 @@ export const UI = {
   relatedConcepts: localized('Related concepts', '相关概念'),
   studiedLabel: localized('Studied ✓', '已研读 ✓'),
   timelineScrollHint: localized('Scroll sideways to travel through time →', '向右滑动，穿越时间 →'),
+  timelineLevelLockedNote: localized(
+    'Complete the level above first to unlock this one.',
+    '请先完成上一关，才能解锁这一关。',
+  ),
+  timelineDailyCapNote: localized(
+    "You've reached today's study limit for the Wisdom Timeline — come back tomorrow for more.",
+    '你今天在智慧时间线上的研读额度已用完 — 明天再回来继续吧。',
+  ),
 
   // ── Forest ────────────────────────────────────────────────────────
   forestTitle: localized('Virtue Forest', '德行森林'),

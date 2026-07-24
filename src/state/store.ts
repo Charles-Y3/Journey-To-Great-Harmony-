@@ -20,7 +20,7 @@ import {
   type JourneyData,
 } from './selectors';
 import { BADGES, eraBadgeId, branchBadgeId, badgeById, MASTERABLE_BRANCHES } from '../data/badges';
-import { SPECIAL_CARD_RULES, cardById } from '../data/cards';
+import { SPECIAL_CARD_RULES, cardById, RARITY_LEVEL_REQUIRED } from '../data/cards';
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
 import { REGIONS } from '../data/journeyMap';
@@ -49,7 +49,7 @@ export interface Celebration {
 
 interface JourneyActions {
   completeLesson: (lessonId: string, answeredCorrectly: boolean) => void;
-  completeTimelinePoint: (pointId: string, correctCount: number) => void;
+  completeTimelineLevel: (pointId: string, levelIndex: number, correctCount: number) => void;
   setIntention: (text: string) => void;
   completeChallenge: (challengeId: string, note?: string) => void;
   submitReflection: (learned: string, virtue: string, improve: string) => void;
@@ -74,6 +74,7 @@ function initialData(): JourneyData {
     lastActiveDay: null,
     completedLessons: [],
     completedTimelinePoints: [],
+    timelinePointLevels: {},
     completedRegions: [],
     unlockedCards: [],
     unlockedBadges: [],
@@ -163,12 +164,16 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     }
   }
 
-  // Cards attached to completed timeline points
+  // Cards attached to timeline points: the rarer the card, the more of
+  // that point's 3 levels must be completed first (see RARITY_LEVEL_REQUIRED).
   for (const p of ALL_POINTS) {
-    if (p.cardId && after.completedTimelinePoints.includes(p.id) && !after.unlockedCards.includes(p.cardId)) {
+    if (!p.cardId || after.unlockedCards.includes(p.cardId)) continue;
+    const c = cardById(p.cardId);
+    if (!c) continue;
+    const levelsDone = after.timelinePointLevels[p.id] ?? 0;
+    if (levelsDone >= RARITY_LEVEL_REQUIRED[c.rarity]) {
       after.unlockedCards.push(p.cardId);
-      const c = cardById(p.cardId);
-      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
+      out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
     }
   }
 
@@ -224,6 +229,7 @@ function dataOf(s: JourneyState): JourneyData {
     lastActiveDay: s.lastActiveDay,
     completedLessons: s.completedLessons,
     completedTimelinePoints: s.completedTimelinePoints,
+    timelinePointLevels: s.timelinePointLevels,
     completedRegions: s.completedRegions,
     unlockedCards: s.unlockedCards,
     unlockedBadges: s.unlockedBadges,
@@ -272,12 +278,19 @@ export const useJourney = create<JourneyState>()(
             markActive(draft, today);
           }),
 
-        completeTimelinePoint: (pointId, correctCount) =>
+        completeTimelineLevel: (pointId, levelIndex, correctCount) =>
           apply((draft, today) => {
-            if (draft.completedTimelinePoints.includes(pointId)) return;
-            draft.completedTimelinePoints.push(pointId);
-            draft.xp += XP_FOR.timelinePoint + correctCount * XP_FOR.quizCorrect;
-            draft.harmonyPoints += HARMONY_FOR.timelinePoint + correctCount * HARMONY_FOR.quizCorrect;
+            const levelsDone = draft.timelinePointLevels[pointId] ?? 0;
+            if (levelIndex !== levelsDone) return; // levels must be completed in order, once each
+            draft.timelinePointLevels[pointId] = levelsDone + 1;
+            if (levelIndex === 0 && !draft.completedTimelinePoints.includes(pointId)) {
+              draft.completedTimelinePoints.push(pointId);
+            }
+            const rec = dayRec(draft, today);
+            rec.timelineStudies = (rec.timelineStudies ?? 0) + 1;
+            // Deeper levels carry a small bonus, rewarding the harder study.
+            draft.xp += XP_FOR.timelinePoint + correctCount * XP_FOR.quizCorrect + levelIndex * 10;
+            draft.harmonyPoints += HARMONY_FOR.timelinePoint + correctCount * HARMONY_FOR.quizCorrect + levelIndex * 6;
             draft.quizCorrect += correctCount;
             markActive(draft, today);
           }),

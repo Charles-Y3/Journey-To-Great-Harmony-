@@ -25,6 +25,7 @@ export interface JourneyData {
       challengeId?: string;
       reflection?: { learned: string; virtue: string; improve: string };
       lessons?: number;
+      timelineStudies?: number;
     }
   >;
   streakCurrent: number;
@@ -32,6 +33,8 @@ export interface JourneyData {
   lastActiveDay: string | null;
   completedLessons: string[];
   completedTimelinePoints: string[];
+  /** How many of a TimelinePoint's 3 levels have been completed, keyed by point id (0 if absent). */
+  timelinePointLevels: Record<string, number>;
   completedRegions: string[];
   unlockedCards: string[];
   unlockedBadges: string[];
@@ -79,6 +82,21 @@ export function isBranchMastered(completedLessons: string[], branch: Topic['bran
 /** Storage key for a branch's capstone reflection (kept distinct from era ids, which have no prefix). */
 export function branchCapstoneKey(branch: string): string {
   return `branch-${branch}`;
+}
+
+// A deliberate daily pace limit (see engine/progression.ts pacing notes):
+// without it, the whole Knowledge Path or Wisdom Timeline could be
+// finished in one sitting. Reaching the cap doesn't lock the reading —
+// only the XP-granting "complete" action — so learning stays accessible.
+export const DAILY_LESSON_CAP = 2;
+export const DAILY_TIMELINE_CAP = 2;
+
+export function lessonsCompletedToday(d: JourneyData, today: string): number {
+  return d.days[today]?.lessons ?? 0;
+}
+
+export function timelineStudiesToday(d: JourneyData, today: string): number {
+  return d.days[today]?.timelineStudies ?? 0;
 }
 
 export function statsFromData(d: JourneyData): Stats {

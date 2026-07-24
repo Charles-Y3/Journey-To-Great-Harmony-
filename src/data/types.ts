@@ -12,16 +12,28 @@ export interface QuizQuestion {
   answer: number; // index into options
 }
 
-export interface TimelinePoint {
-  id: string;
-  title: Localized<string>;
-  years: Localized<string>;
-  emoji: string;
+/**
+ * One depth tier of a TimelinePoint. Every point has exactly 3: a
+ * foundation everyone starts with, a deeper study unlocked by finishing
+ * the previous level, and a mastery tier with the hardest quiz — see
+ * `RARITY_LEVEL_REQUIRED` in data/cards.ts, which ties how many levels a
+ * point needs for its rarer wisdom cards to unlock.
+ */
+export interface TimelineLevel {
+  label: Localized<string>;
   background: Localized<string>;
   figures: Localized<string[]>;
   teachings: Localized<string[]>;
   concepts: Localized<string[]>;
   quiz: QuizQuestion[];
+}
+
+export interface TimelinePoint {
+  id: string;
+  title: Localized<string>;
+  years: Localized<string>;
+  emoji: string;
+  levels: [TimelineLevel, TimelineLevel, TimelineLevel];
   cardId?: string;
 }
 
