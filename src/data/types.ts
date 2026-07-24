@@ -131,6 +131,8 @@ export interface MapRegion {
   story: Localized<string>;
   challenge: Localized<string>;
   rewardXp: number;
+  /** A closing reflection shown only once the region's challenge is complete. */
+  epilogue: Localized<string>;
 }
 
 export interface WorldBuilding {

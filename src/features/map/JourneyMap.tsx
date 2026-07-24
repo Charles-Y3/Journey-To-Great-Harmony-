@@ -39,12 +39,17 @@ export default function JourneyMap() {
               </p>
               {unlocked && (
                 <>
-                  <p className="small" style={{ fontStyle: 'italic' }}>
+                  <p className="small" style={{ fontStyle: 'italic', whiteSpace: 'pre-line' }}>
                     {L(region.story)}
                   </p>
                   <p className="small">
                     <strong>{t('regionChallengeLabel')}:</strong> {L(region.challenge)}
                   </p>
+                  {completed && (
+                    <p className="small muted" style={{ whiteSpace: 'pre-line', marginTop: 8 }}>
+                      🖋️ {L(region.epilogue)}
+                    </p>
+                  )}
                   {completed ? (
                     <span className="pill">{regionCompletedPill(locale, region.rewardXp)}</span>
                   ) : met ? (
