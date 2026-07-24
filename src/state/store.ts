@@ -14,10 +14,12 @@ import {
   statsFromData,
   completedEraIds,
   completedTopicIds,
+  isBranchMastered,
+  branchCapstoneKey,
   worldInfo,
   type JourneyData,
 } from './selectors';
-import { BADGES, eraBadgeId, badgeById } from '../data/badges';
+import { BADGES, eraBadgeId, branchBadgeId, badgeById, MASTERABLE_BRANCHES } from '../data/badges';
 import { SPECIAL_CARD_RULES, cardById } from '../data/cards';
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
@@ -28,6 +30,7 @@ import {
   rankUpTitle,
   badgeEarnedTitle,
   eraBadgeTitle,
+  branchBadgeTitle,
   wisdomCardTitle,
   forestGrewTitle,
   forestGrewSubtitle,
@@ -52,6 +55,7 @@ interface JourneyActions {
   submitReflection: (learned: string, virtue: string, improve: string) => void;
   sendEncouragement: (peerId: string) => boolean;
   completeRegion: (regionId: string) => void;
+  submitCapstone: (key: string, text: string) => void;
   dismissCelebration: () => void;
   advanceDay: () => void;
   resetJourney: () => void;
@@ -79,6 +83,7 @@ function initialData(): JourneyData {
     startDay: todayKey(0),
     dayOffset: 0,
     seenCollectionCount: 0,
+    capstones: {},
   };
 }
 
@@ -135,13 +140,26 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     }
   }
 
-  // Era badges (granted when every point of an era is complete)
+  // Era badges (granted once every point of an era is complete AND its
+  // capstone reflection has been written)
   for (const eraId of completedEraIds(after.completedTimelinePoints)) {
     const id = eraBadgeId(eraId);
-    if (!after.unlockedBadges.includes(id)) {
+    if (!after.unlockedBadges.includes(id) && after.capstones[eraId]) {
       after.unlockedBadges.push(id);
       const b = badgeById(id);
       if (b) out.push(celebration('badge', b.emoji, eraBadgeTitle(locale, L(b.title, locale)), L(b.description, locale)));
+    }
+  }
+
+  // Branch-mastery badges (granted once every topic in a knowledge-tree
+  // branch is complete AND its capstone reflection has been written)
+  for (const branch of MASTERABLE_BRANCHES) {
+    const id = branchBadgeId(branch);
+    const key = branchCapstoneKey(branch);
+    if (!after.unlockedBadges.includes(id) && isBranchMastered(after.completedLessons, branch) && after.capstones[key]) {
+      after.unlockedBadges.push(id);
+      const b = badgeById(id);
+      if (b) out.push(celebration('badge', b.emoji, branchBadgeTitle(locale, L(b.title, locale)), L(b.description, locale)));
     }
   }
 
@@ -215,6 +233,7 @@ function dataOf(s: JourneyState): JourneyData {
     startDay: s.startDay,
     dayOffset: s.dayOffset,
     seenCollectionCount: s.seenCollectionCount,
+    capstones: s.capstones,
   };
 }
 
@@ -331,6 +350,15 @@ export const useJourney = create<JourneyState>()(
                 regionCompleteSubtitle(locale, region.rewardXp),
               ),
             ];
+          }),
+
+        submitCapstone: (key, text) =>
+          apply((draft, today) => {
+            if (draft.capstones[key]) return;
+            draft.capstones[key] = { text, day: today };
+            draft.xp += XP_FOR.capstone;
+            draft.harmonyPoints += HARMONY_FOR.capstone;
+            markActive(draft, today);
           }),
 
         dismissCelebration: () => set((s) => ({ celebrations: s.celebrations.slice(1) })),

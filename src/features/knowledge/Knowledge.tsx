@@ -2,18 +2,31 @@ import { useState } from 'react';
 import { TOPICS } from '../../data/knowledgeTree';
 import type { Topic, Lesson } from '../../data/types';
 import { useJourney } from '../../state/store';
-import { isTopicCompleted, isTopicUnlocked } from '../../state/selectors';
-import { Modal, PageHeader, ProgressBar } from '../../components/ui';
+import { isTopicCompleted, isTopicUnlocked, isBranchMastered, branchCapstoneKey } from '../../state/selectors';
+import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { knowledgeProgressLabel, topicLessonCount, backToTopic } from '../../i18n/strings';
+import {
+  knowledgeProgressLabel,
+  topicLessonCount,
+  backToTopic,
+  capstoneBranchPrompt,
+  capstoneEntryBtn,
+} from '../../i18n/strings';
+import { shuffledIndices } from '../../engine/quiz';
 
-function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; onDone: (correct: boolean) => void }) {
+function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; onDone: () => void }) {
+  const [order, setOrder] = useState(() => shuffledIndices(lesson.question.options.en.length));
   const [picked, setPicked] = useState<number | null>(null);
   const [reflectionText, setReflectionText] = useState('');
   const { t, L } = useT();
-  const answered = picked !== null;
-  const correct = picked === lesson.question.answer;
   const options = L(lesson.question.options);
+  const answered = picked !== null;
+  const correct = answered && order[picked] === lesson.question.answer;
+
+  function retry() {
+    setOrder(shuffledIndices(options.length));
+    setPicked(null);
+  }
 
   return (
     <div>
@@ -22,13 +35,12 @@ function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; o
 
       <h4>{t('checkUnderstanding')}</h4>
       <p className="small">{L(lesson.question.q)}</p>
-      {options.map((opt, i) => {
+      {order.map((origIdx, i) => {
         let cls = 'btn quiz-option';
-        if (answered && i === lesson.question.answer) cls += ' correct';
-        else if (answered && i === picked) cls += ' wrong';
+        if (answered && i === picked) cls += correct ? ' correct' : ' wrong';
         return (
-          <button key={i} className={cls} disabled={answered} onClick={() => setPicked(i)}>
-            {opt}
+          <button key={origIdx} className={cls} disabled={answered} onClick={() => setPicked(i)}>
+            {options[origIdx]}
           </button>
         );
       })}
@@ -37,13 +49,18 @@ function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; o
           {correct ? t('quizCorrectMsg') : t('quizWrongMsg')}
         </p>
       )}
+      {answered && !correct && (
+        <button className="btn" onClick={retry}>
+          {t('quizTryAgain')}
+        </button>
+      )}
 
-      {answered && !done && (
+      {correct && !done && (
         <>
           <h4>{t('reflectHeading')}</h4>
           <p className="small muted">{L(lesson.reflection)}</p>
           <textarea rows={2} value={reflectionText} onChange={(e) => setReflectionText(e.target.value)} placeholder={t('reflectionOptionalPlaceholder')} />
-          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone(correct)}>
+          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone()}>
             {t('completeLessonBtn')}
           </button>
         </>
@@ -70,7 +87,7 @@ function TopicModal({ topic, onClose }: { topic: Topic; onClose: () => void }) {
           <button className="btn" style={{ marginBottom: 12 }} onClick={() => setOpenLesson(null)}>
             {backToTopic(locale, L(topic.name))}
           </button>
-          <LessonView lesson={openLesson} done={completedLessons.includes(openLesson.id)} onDone={(correct) => completeLesson(openLesson.id, correct)} />
+          <LessonView lesson={openLesson} done={completedLessons.includes(openLesson.id)} onDone={() => completeLesson(openLesson.id, true)} />
         </>
       ) : (
         <>
@@ -119,8 +136,11 @@ function TopicNode({ topic, onOpen }: { topic: Topic; onOpen: (t: Topic) => void
 
 export default function Knowledge() {
   const completedLessons = useJourney((s) => s.completedLessons);
+  const capstones = useJourney((s) => s.capstones);
+  const submitCapstone = useJourney((s) => s.submitCapstone);
   const [open, setOpen] = useState<Topic | null>(null);
-  const { t, locale } = useT();
+  const [capstoneBranch, setCapstoneBranch] = useState<Topic | null>(null);
+  const { t, L, locale } = useT();
 
   const root = TOPICS.find((t) => t.id === 'wisdom')!;
   const branches: { id: Topic['branch'] }[] = [{ id: 'compassion' }, { id: 'character' }, { id: 'understanding' }];
@@ -141,6 +161,8 @@ export default function Knowledge() {
       {branches.map((branch) => {
         const branchTopic = TOPICS.find((tp) => tp.id === branch.id)!;
         const leaves = TOPICS.filter((tp) => tp.branch === branch.id && tp.id !== branch.id);
+        const mastered = isBranchMastered(completedLessons, branch.id);
+        const hasCapstone = !!capstones[branchCapstoneKey(branch.id)];
         return (
           <div className="tree-branch" key={branch.id}>
             <TopicNode topic={branchTopic} onOpen={setOpen} />
@@ -149,11 +171,27 @@ export default function Knowledge() {
                 <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
               ))}
             </div>
+            {mastered && !hasCapstone && (
+              <button className="btn" style={{ marginTop: 8 }} onClick={() => setCapstoneBranch(branchTopic)}>
+                🖋️ {capstoneEntryBtn(locale, L(branchTopic.name))}
+              </button>
+            )}
           </div>
         );
       })}
 
       {open && <TopicModal topic={open} onClose={() => setOpen(null)} />}
+      {capstoneBranch && (
+        <CapstoneModal
+          name={L(capstoneBranch.name)}
+          prompt={capstoneBranchPrompt(locale, L(capstoneBranch.name))}
+          onSubmit={(text) => {
+            submitCapstone(branchCapstoneKey(capstoneBranch.id), text);
+            setCapstoneBranch(null);
+          }}
+          onClose={() => setCapstoneBranch(null)}
+        />
+      )}
     </div>
   );
 }

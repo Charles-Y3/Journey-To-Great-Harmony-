@@ -91,9 +91,16 @@ export function communityFeed(today: string): FeedItem[] {
   return items;
 }
 
-/** The daily challenge rotates deterministically through the pool. */
-export function dailyChallengeIndex(today: string): number {
-  return Math.floor(seededRandom(`challenge:${today}`) * CHALLENGES.length);
+/**
+ * The daily challenge rotates deterministically through whichever tiers the
+ * user's rank has unlocked (see maxChallengeTierForRankIndex in
+ * engine/progression.ts) — higher ranks see deeper, harder challenges
+ * mixed in, not just a bigger number of the same gentle ones.
+ */
+export function dailyChallenge(today: string, maxTier: 1 | 2 | 3) {
+  const pool = CHALLENGES.filter((c) => c.tier <= maxTier);
+  const idx = Math.floor(seededRandom(`challenge:${maxTier}:${today}`) * pool.length);
+  return pool[idx];
 }
 
 export function dailyQuoteIndex(today: string, quoteCount: number): number {

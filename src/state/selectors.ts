@@ -41,6 +41,8 @@ export interface JourneyData {
   startDay: string;
   dayOffset: number;
   seenCollectionCount: number;
+  /** Longer written reflections required to fully "master" a timeline era or knowledge branch, keyed by era/branch id. */
+  capstones: Record<string, { text: string; day: string }>;
 }
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
@@ -66,6 +68,17 @@ export function completedEraIds(completedTimelinePoints: string[]): string[] {
   return TIMELINE.filter((era) => era.points.every((p) => completedTimelinePoints.includes(p.id))).map(
     (era) => era.id,
   );
+}
+
+/** True once every topic (root + leaves) belonging to a knowledge branch is completed. */
+export function isBranchMastered(completedLessons: string[], branch: Topic['branch']): boolean {
+  const topics = TOPICS.filter((t) => t.branch === branch);
+  return topics.length > 0 && topics.every((t) => isTopicCompleted(completedLessons, t));
+}
+
+/** Storage key for a branch's capstone reflection (kept distinct from era ids, which have no prefix). */
+export function branchCapstoneKey(branch: string): string {
+  return `branch-${branch}`;
 }
 
 export function statsFromData(d: JourneyData): Stats {

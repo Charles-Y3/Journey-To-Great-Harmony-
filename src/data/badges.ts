@@ -1,4 +1,4 @@
-import type { Badge } from './types';
+import type { Badge, Topic } from './types';
 import { localized, type Localized } from '../i18n/types';
 import { TIMELINE } from './timeline';
 import { ALL_LESSONS } from './knowledgeTree';
@@ -41,12 +41,43 @@ const ERA_BADGES: Badge[] = TIMELINE.map((era) => ({
   check: () => false,
 }));
 
-export const BADGES: Badge[] = [...STATIC_BADGES, ...ERA_BADGES];
+const BRANCH_MASTERY: { branch: Exclude<Topic['branch'], 'root'>; emoji: string; name: Localized<string> }[] = [
+  { branch: 'compassion', emoji: '💗', name: localized('Compassion Mastery', '慈悲圆满') },
+  { branch: 'character', emoji: '⛰️', name: localized('Character Mastery', '品格圆满') },
+  { branch: 'understanding', emoji: '🔆', name: localized('Understanding Mastery', '理解圆满') },
+];
+
+function branchBadgeDescription(branchName: Localized<string>): Localized<string> {
+  return localized(
+    `Master every topic in the "${branchName.en}" branch of the Knowledge Path and write its capstone reflection.`,
+    `修完知识之路「${branchName.zh}」分支的每一个主题，并写下该分支的圆满反思。`,
+  );
+}
+
+// One badge per knowledge-tree branch, e.g. "💗 Compassion Mastery".
+const BRANCH_BADGES: Badge[] = BRANCH_MASTERY.map((b) => ({
+  id: `b-branch-${b.branch}`,
+  title: b.name,
+  emoji: b.emoji,
+  description: branchBadgeDescription(b.name),
+  // Branch-mastery badges are granted directly by the engine once every
+  // topic in the branch is complete AND a capstone reflection exists.
+  check: () => false,
+}));
+
+export const BADGES: Badge[] = [...STATIC_BADGES, ...ERA_BADGES, ...BRANCH_BADGES];
 
 // Era badges are keyed by era id rather than a Stats predicate.
 export function eraBadgeId(eraId: string): string {
   return `b-era-${eraId}`;
 }
+
+// Branch-mastery badges are keyed by branch id rather than a Stats predicate.
+export function branchBadgeId(branch: string): string {
+  return `b-branch-${branch}`;
+}
+
+export const MASTERABLE_BRANCHES = BRANCH_MASTERY.map((b) => b.branch);
 
 export function badgeById(id: string): Badge | undefined {
   return BADGES.find((b) => b.id === id);

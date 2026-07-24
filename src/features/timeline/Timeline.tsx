@@ -1,33 +1,53 @@
 import { useState } from 'react';
 import { TIMELINE } from '../../data/timeline';
-import type { TimelinePoint } from '../../data/types';
+import type { TimelinePoint, TimelineEra } from '../../data/types';
 import { useJourney } from '../../state/store';
 import { completedEraIds } from '../../state/selectors';
-import { Modal, PageHeader, ProgressBar } from '../../components/ui';
+import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { timelineProgressLabel, questionProgress, nextOrFinish, takeQuizBtn, quizResult, completeStudyBtn } from '../../i18n/strings';
+import {
+  timelineProgressLabel,
+  questionProgress,
+  nextOrFinish,
+  takeQuizBtn,
+  quizResult,
+  completeStudyBtn,
+  capstoneEraPrompt,
+  capstoneEntryBtn,
+} from '../../i18n/strings';
+import { shuffledIndices } from '../../engine/quiz';
 
 function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => void }) {
   const done = useJourney((s) => s.completedTimelinePoints.includes(point.id));
   const completeTimelinePoint = useJourney((s) => s.completeTimelinePoint);
   const [quizStarted, setQuizStarted] = useState(false);
   const [qIndex, setQIndex] = useState(0);
+  const [order, setOrder] = useState<number[]>(() => shuffledIndices(point.quiz[0].options.en.length));
   const [picked, setPicked] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const { t, L, locale } = useT();
 
   const q = point.quiz[qIndex];
   const finishedQuiz = qIndex >= point.quiz.length;
+  const answered = picked !== null;
+  const correct = answered && order[picked] === q.answer;
 
   function pick(i: number) {
     if (picked !== null) return;
     setPicked(i);
-    if (i === q.answer) setCorrectCount((c) => c + 1);
+    if (order[i] === q.answer) setCorrectCount((c) => c + 1);
+  }
+
+  function retry() {
+    setOrder(shuffledIndices(q.options.en.length));
+    setPicked(null);
   }
 
   function next() {
+    const nextIndex = qIndex + 1;
     setPicked(null);
-    setQIndex((i) => i + 1);
+    setQIndex(nextIndex);
+    if (nextIndex < point.quiz.length) setOrder(shuffledIndices(point.quiz[nextIndex].options.en.length));
   }
 
   return (
@@ -69,17 +89,27 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
           <p>
             <strong>{L(q.q)}</strong>
           </p>
-          {L(q.options).map((opt, i) => {
+          {order.map((origIdx, i) => {
+            const opts = L(q.options);
             let cls = 'btn quiz-option';
-            if (picked !== null && i === q.answer) cls += ' correct';
-            else if (picked !== null && i === picked) cls += ' wrong';
+            if (answered && i === picked) cls += correct ? ' correct' : ' wrong';
             return (
-              <button key={i} className={cls} disabled={picked !== null} onClick={() => pick(i)}>
-                {opt}
+              <button key={origIdx} className={cls} disabled={answered} onClick={() => pick(i)}>
+                {opts[origIdx]}
               </button>
             );
           })}
-          {picked !== null && (
+          {answered && (
+            <p className="small" style={{ marginTop: 6 }}>
+              {correct ? t('quizCorrectMsg') : t('quizWrongMsg')}
+            </p>
+          )}
+          {answered && !correct && (
+            <button className="btn" style={{ marginTop: 4 }} onClick={retry}>
+              {t('quizTryAgain')}
+            </button>
+          )}
+          {correct && (
             <button className="btn btn-primary" style={{ marginTop: 8 }} onClick={next}>
               {nextOrFinish(locale, qIndex + 1 >= point.quiz.length)}
             </button>
@@ -99,7 +129,10 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
 
 export default function Timeline() {
   const completedPoints = useJourney((s) => s.completedTimelinePoints);
+  const capstones = useJourney((s) => s.capstones);
+  const submitCapstone = useJourney((s) => s.submitCapstone);
   const [open, setOpen] = useState<TimelinePoint | null>(null);
+  const [capstoneEra, setCapstoneEra] = useState<TimelineEra | null>(null);
   const { t, L, locale } = useT();
   const doneEras = completedEraIds(completedPoints);
   const totalPoints = TIMELINE.reduce((n, e) => n + e.points.length, 0);
@@ -124,10 +157,15 @@ export default function Timeline() {
               <div className="era-emoji">{era.emoji}</div>
               <h3 style={{ marginBottom: 2 }}>{L(era.name)}</h3>
               <div className="era-period">{L(era.period)}</div>
-              {eraDone && (
+              {eraDone && capstones[era.id] && (
                 <p style={{ margin: '8px 0 0' }}>
                   <span className="pill">🏅 {L(era.badgeTitle)}</span>
                 </p>
+              )}
+              {eraDone && !capstones[era.id] && (
+                <button className="btn" style={{ marginTop: 8 }} onClick={() => setCapstoneEra(era)}>
+                  🖋️ {capstoneEntryBtn(locale, L(era.name))}
+                </button>
               )}
               {era.points.map((p) => {
                 const done = completedPoints.includes(p.id);
@@ -144,6 +182,17 @@ export default function Timeline() {
       <p className="small muted">{t('timelineScrollHint')}</p>
 
       {open && <PointModal point={open} onClose={() => setOpen(null)} />}
+      {capstoneEra && (
+        <CapstoneModal
+          name={L(capstoneEra.name)}
+          prompt={capstoneEraPrompt(locale, L(capstoneEra.name))}
+          onSubmit={(text) => {
+            submitCapstone(capstoneEra.id, text);
+            setCapstoneEra(null);
+          }}
+          onClose={() => setCapstoneEra(null)}
+        />
+      )}
     </div>
   );
 }

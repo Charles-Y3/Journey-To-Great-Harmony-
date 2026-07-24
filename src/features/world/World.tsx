@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
+import { useProfile } from '../../state/profileStore';
 import { worldInfo, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
 import { PEERS } from '../../data/peers';
@@ -10,7 +11,7 @@ import { communityFeed } from '../../engine/community';
 import { seededRandom } from '../../engine/progression';
 import { PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { worldProgressLabel, buildingLockedNote } from '../../i18n/strings';
+import { worldProgressLabel, buildingLockedNote, yourContributionLabel } from '../../i18n/strings';
 
 type LocalizeFn = <T>(v: Localized<T>) => T;
 
@@ -195,6 +196,7 @@ export default function World() {
   const info = worldInfo(d, today);
   const feed = communityFeed(today);
   const { t, L, locale } = useT();
+  const myName = useProfile((s) => s.name);
 
   const [faceIndex, setFaceIndex] = useState(0);
   const peerBubble = useBubble(2800);
@@ -259,7 +261,7 @@ export default function World() {
         <div className="stat-grid">
           <div className="stat-tile">
             <div className="stat-value">{info.user}</div>
-            <div className="stat-name">{t('worldYourContribution')}</div>
+            <div className="stat-name">{yourContributionLabel(locale, myName)}</div>
           </div>
           <div className="stat-tile">
             <div className="stat-value">{info.community}</div>

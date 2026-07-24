@@ -1,7 +1,8 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useJourney } from '../state/store';
 import { useT } from '../i18n/useT';
-import { continueBtn } from '../i18n/strings';
+import { continueBtn, minLengthHint, capstoneSubmitBtn } from '../i18n/strings';
+import { XP_FOR } from '../engine/progression';
 
 export function ProgressBar({
   value,
@@ -71,6 +72,42 @@ export function CelebrationOverlay() {
         </button>
       </div>
     </div>
+  );
+}
+
+const CAPSTONE_MIN = 40;
+
+/** Shared modal for writing a longer "capstone" reflection that gates an era or branch-mastery badge. */
+export function CapstoneModal({
+  name,
+  prompt,
+  onSubmit,
+  onClose,
+}: {
+  name: string;
+  prompt: string;
+  onSubmit: (text: string) => void;
+  onClose: () => void;
+}) {
+  const [text, setText] = useState('');
+  const { t, locale } = useT();
+
+  return (
+    <Modal onClose={onClose}>
+      <h2>
+        {t('capstoneModalTitle')} · {name}
+      </h2>
+      <p>{prompt}</p>
+      <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('capstonePlaceholder')} />
+      <p className="small muted">{minLengthHint(locale, text.trim().length, CAPSTONE_MIN)}</p>
+      <button
+        className="btn btn-primary"
+        disabled={text.trim().length < CAPSTONE_MIN}
+        onClick={() => onSubmit(text.trim())}
+      >
+        {capstoneSubmitBtn(locale, XP_FOR.capstone)}
+      </button>
+    </Modal>
   );
 }
 

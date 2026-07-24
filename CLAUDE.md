@@ -64,15 +64,15 @@ Concretely:
 ## Persistence
 
 Progress (`src/state/store.ts`, key `journey-to-great-harmony`), language
-choice (`src/state/localeStore.ts`, key `journey-locale`), and the
-notification preference (`src/state/notificationStore.ts`, key
-`journey-notifications`) are three separate zustand `persist` stores, all
-backed by `localStorage` — deliberately separate so resetting one (e.g.
-"Reset journey" in Settings) never touches the others. This has been
-verified to survive a full browser process restart (not just a page
-reload), same browser/profile/origin. It does **not** sync across devices
-or browsers, and is lost if the user clears site data or uses a private
-window — there is no backend in v1.
+choice (`src/state/localeStore.ts`, key `journey-locale`), display name
+(`src/state/profileStore.ts`, key `journey-profile`), and the notification
+preference (`src/state/notificationStore.ts`, key `journey-notifications`)
+are four separate zustand `persist` stores, all backed by `localStorage` —
+deliberately separate so resetting one (e.g. "Reset journey" in Settings)
+never touches the others. This has been verified to survive a full browser
+process restart (not just a page reload), same browser/profile/origin. It
+does **not** sync across devices or browsers, and is lost if the user
+clears site data or uses a private window — there is no backend in v1.
 
 ## Notifications
 
@@ -84,3 +84,47 @@ these are plain `Notification` API calls with no service worker or push
 subscription behind them, so they only fire while the app is open in a
 tab (checked on load, every 5 minutes, and on tab focus) — not from a
 fully closed browser. Don't imply otherwise.
+
+## Difficulty / pacing features
+
+The journey is deliberately not trivially completable. Five mechanisms,
+layered together:
+
+- **Mastery-gated quizzes** (`src/engine/quiz.ts` `shuffledIndices()`):
+  every quiz in `Timeline.tsx` and `Knowledge.tsx` shuffles its option
+  order per attempt and requires a *correct* answer before the user can
+  continue — a wrong answer no longer reveals the right one or lets the
+  user proceed; it shows a "try again" button that reshuffles.
+- **Rank-tiered daily challenges**: `Challenge.tier` (1–3) in
+  `src/data/challenges.ts`; `maxChallengeTierForRankIndex()` in
+  `src/engine/progression.ts` caps which tiers are eligible for a given
+  rank; `dailyChallenge(today, maxTier)` in `src/engine/community.ts`
+  (replaces the old `dailyChallengeIndex`) picks deterministically from
+  the eligible pool only.
+- **Minimum-effort thresholds**: morning intentions and evening
+  reflections (`src/features/practice/Practice.tsx`) require a minimum
+  character count (`minLengthHint()` in `src/i18n/strings.ts`) before the
+  submit button enables.
+- **Capstone reflections gating badges**: completing every point in a
+  timeline era, or every topic in a knowledge-tree branch, no longer
+  auto-grants that era/branch badge. The user must also write a longer
+  capstone reflection (`CapstoneModal` in `src/components/ui.tsx`, min
+  40 chars) — entry points appear inline in `Timeline.tsx` (per era-card)
+  and `Knowledge.tsx` (under each branch's leaf list) once the
+  prerequisite is met. Capstones are stored in `JourneyData.capstones`
+  (`src/state/selectors.ts`), keyed by era id for eras and by
+  `branchCapstoneKey(branch)` (a `branch-` prefix) for knowledge
+  branches — the prefix avoids any id collision with timeline era ids.
+  `submitCapstone(key, text)` in `src/state/store.ts` records it and
+  awards `XP_FOR.capstone`/`HARMONY_FOR.capstone`; `collectUnlocks()`
+  only grants `eraBadgeId()`/`branchBadgeId()` badges once both the
+  completion condition *and* `capstones[key]` are true. Branch-mastery
+  badges (`b-branch-compassion`/`-character`/`-understanding`) are new in
+  `src/data/badges.ts` (`MASTERABLE_BRANCHES`, `branchBadgeId()`) — like
+  era badges, their `check()` always returns `false` since they're
+  granted directly by the engine, not via a `Stats` predicate.
+- **Pushed-out endgame thresholds**: rank XP thresholds
+  (`RANKS` in `src/engine/progression.ts`), world-stage harmony
+  thresholds (`WORLD_STAGES`/`BUILDINGS` in `src/data/world.ts`) were all
+  raised from their original v1 values so the top of each ladder takes
+  meaningfully longer to reach.

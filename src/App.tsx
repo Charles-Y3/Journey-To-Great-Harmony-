@@ -3,13 +3,15 @@ import { Link, NavLink, Route, Routes } from 'react-router-dom';
 import { useJourney, useToday } from './state/store';
 import { useLocale } from './state/localeStore';
 import { useNotifications } from './state/notificationStore';
+import { useProfile } from './state/profileStore';
 import { LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
-import { xpBarLabel, advancedDaysNote, newItemsAriaLabel } from './i18n/strings';
-import { rankForXp, nextRankForXp } from './engine/progression';
+import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel } from './i18n/strings';
+import { RANKS, rankForXp, nextRankForXp, rankIndexForXp } from './engine/progression';
 import { checkReminders, notificationPermission, requestNotificationPermission } from './engine/notifications';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
+import NameGate from './features/onboarding/NameGate';
 import Today from './features/home/Today';
 import Practice from './features/practice/Practice';
 import Knowledge from './features/knowledge/Knowledge';
@@ -148,6 +150,26 @@ function LanguageSection() {
   );
 }
 
+function NameSection() {
+  const { t } = useT();
+  const name = useProfile((s) => s.name);
+  const setName = useProfile((s) => s.setName);
+  const [text, setText] = useState(name ?? '');
+
+  return (
+    <div className="card">
+      <h3>{t('settingsNameTitle')}</h3>
+      <p className="small muted">{t('settingsNameDesc')}</p>
+      <div style={{ display: 'flex', gap: 8 }}>
+        <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('nameGatePlaceholder')} maxLength={40} />
+        <button className="btn" onClick={() => setName(text)}>
+          {t('settingsNameSave')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function NotificationsSection() {
   const { t } = useT();
   const enabled = useNotifications((s) => s.enabled);
@@ -185,6 +207,32 @@ function NotificationsSection() {
   );
 }
 
+function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
+  const { t, L, locale } = useT();
+  const currentIdx = rankIndexForXp(xp);
+  return (
+    <Modal onClose={onClose}>
+      <h2>{t('rankModalTitle')}</h2>
+      <p className="small muted">{t('rankModalSubtitle')}</p>
+      {RANKS.map((r, i) => {
+        let cls = 'rank-row';
+        if (i < currentIdx) cls += ' reached';
+        if (i === currentIdx) cls += ' current';
+        return (
+          <div key={r.id} className={cls}>
+            <span className="rank-row-emoji">{r.emoji}</span>
+            <span className="rank-row-body">
+              <strong>{L(r.name)}</strong>
+              <span className="small muted rank-row-xp">{rankXpLabel(locale, r.minXp)}</span>
+            </span>
+            {i === currentIdx && <span className="pill">{t('rankModalCurrent')}</span>}
+          </div>
+        );
+      })}
+    </Modal>
+  );
+}
+
 function SettingsModal({ onClose }: { onClose: () => void }) {
   const { t, locale } = useT();
   const reset = useJourney((s) => s.resetJourney);
@@ -196,6 +244,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
     <Modal onClose={onClose}>
       <h2>{t('settingsTitle')}</h2>
       <LanguageSection />
+      <NameSection />
       <NotificationsSection />
       <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
@@ -241,8 +290,10 @@ export default function App() {
   const streak = useJourney((s) => s.streakCurrent);
   const harmony = useJourney((s) => s.harmonyPoints);
   const hasChosenLocale = useLocale((s) => s.hasChosen);
+  const hasSetName = useProfile((s) => s.hasSetName);
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
+  const [showRankModal, setShowRankModal] = useState(false);
 
   // Check for a due evening-reflection or daily-streak reminder on load, on
   // an interval while the tab stays open, and whenever the tab regains
@@ -264,6 +315,10 @@ export default function App() {
     return <LanguageGate />;
   }
 
+  if (!hasSetName) {
+    return <NameGate />;
+  }
+
   const rank = rankForXp(xp);
   const next = nextRankForXp(xp);
 
@@ -282,10 +337,10 @@ export default function App() {
 
       <div className="main">
         <div className="topbar">
-          <div className="topbar-rank">
+          <button type="button" className="topbar-rank topbar-rank-btn" onClick={() => setShowRankModal(true)}>
             <span>{rank.emoji}</span>
             <span>{L(rank.name)}</span>
-          </div>
+          </button>
           <div className="topbar-xp">
             <ProgressBar
               value={next ? xp - rank.minXp : 1}
@@ -330,6 +385,7 @@ export default function App() {
 
       <CelebrationOverlay />
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
     </div>
   );
 }

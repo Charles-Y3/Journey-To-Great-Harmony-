@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { QUOTES } from '../../data/quotes';
-import { CHALLENGES } from '../../data/challenges';
-import { dailyQuoteIndex, dailyChallengeIndex } from '../../engine/community';
+import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
+import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from '../../state/selectors';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -16,7 +16,7 @@ export default function Today() {
   const rec = state.days[today] ?? {};
 
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
-  const challenge = CHALLENGES[dailyChallengeIndex(today)];
+  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(state.xp)));
   const stats = statsFromData(d);
   const forest = forestInfo(d);
   const world = worldInfo(d, today);

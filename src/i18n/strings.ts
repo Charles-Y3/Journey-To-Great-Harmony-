@@ -56,6 +56,14 @@ export const UI = {
     '大同之旅 v1 — 你的进度私密地保存在此浏览器中。',
   ),
 
+  // ── Settings: name ───────────────────────────────────────────────────
+  settingsNameTitle: localized('Name', '姓名'),
+  settingsNameDesc: localized(
+    'How fellow travellers see you in Community and the Great Harmony World.',
+    '这是同行者在社群与大同世界中看到你的名字。',
+  ),
+  settingsNameSave: localized('Save', '保存'),
+
   // ── Settings: notifications ─────────────────────────────────────────
   settingsNotifTitle: localized('Notifications', '通知'),
   settingsNotifDesc: localized(
@@ -91,6 +99,16 @@ export const UI = {
     'You can change this anytime in Settings.',
     '你可以随时在「设置」中更改语言。',
   ),
+
+  // ── Name onboarding gate ────────────────────────────────────────────
+  nameGateTitle: localized('What should we call you?', '我们该如何称呼你？'),
+  nameGateSubtitle: localized(
+    "This is how fellow travellers will know you in Community and the Great Harmony World.",
+    '这将是你在社群与大同世界中，被同行者认出的名字。',
+  ),
+  nameGatePlaceholder: localized('Your name', '你的名字'),
+  nameGateContinue: localized('Continue', '继续'),
+  nameGateSkip: localized('Skip for now', '暂时跳过'),
 
   // ── Modal / celebration ───────────────────────────────────────────
   close: localized('Close', '关闭'),
@@ -179,10 +197,8 @@ export const UI = {
   lockedPrevLesson: localized('complete the previous lesson first', '请先完成前一课'),
   checkUnderstanding: localized('Check your understanding', '检验你的理解'),
   quizCorrectMsg: localized('✅ Exactly right. (+5 XP)', '✅ 完全正确。(+5 经验)'),
-  quizWrongMsg: localized(
-    '🤔 Not quite — the answer is highlighted above.',
-    '🤔 还不太对 — 正确答案已在上方标示。',
-  ),
+  quizWrongMsg: localized('🤔 Not quite — give it another try.', '🤔 还不太对 — 再试一次吧。'),
+  quizTryAgain: localized('Try again', '再试一次'),
   reflectHeading: localized('Reflect', '反思'),
   reflectionOptionalPlaceholder: localized(
     'A sentence of honest reflection (optional)…',
@@ -319,6 +335,17 @@ export const UI = {
 
   // ── Ranks (fallback labels; see engine/progression.ts for full localized list) ──
   highestRankLabel: localized('highest rank', '最高段位'),
+  rankModalTitle: localized('Your Rank', '你的段位'),
+  rankModalSubtitle: localized(
+    'Every rank on the journey from Seeker to Wisdom Keeper. Progress is measured by consistency, not competition.',
+    '从求道者到守智者，旅程中的每一个段位。进步以坚持衡量，而非竞争。',
+  ),
+  rankModalCurrent: localized('You are here', '你在这里'),
+
+  // ── Capstone reflections ──────────────────────────────────────────────
+  capstoneModalTitle: localized('Capstone Reflection', '圆满反思'),
+  capstonePlaceholder: localized('Write your reflection here…', '在这里写下你的反思…'),
+  capstoneDoneLabel: localized('Capstone written ✓', '圆满反思已写下 ✓'),
 } satisfies Record<string, Localized<string>>;
 
 export type UiKey = keyof typeof UI;
@@ -490,8 +517,48 @@ export function newItemsAriaLabel(locale: Locale, count: number): string {
   return pick(locale, `${count} new`, `${count} 个新项目`, `${count} 個新項目`);
 }
 
+export function rankXpLabel(locale: Locale, minXp: number): string {
+  return pick(locale, minXp === 0 ? 'Starting rank' : `${minXp} XP`, minXp === 0 ? '起始段位' : `${minXp} 经验`, minXp === 0 ? '起始段位' : `${minXp} 經驗`);
+}
+
+export function yourContributionLabel(locale: Locale, name: string | null): string {
+  if (!name) return t('worldYourContribution', locale);
+  return pick(locale, `${name}'s contribution`, `${name} 的贡献`, `${name} 的貢獻`);
+}
+
+export function minLengthHint(locale: Locale, current: number, min: number): string {
+  if (current >= min) return pick(locale, '✓ Thank you for taking the time.', '✓ 感谢你用心写下这些。', '✓ 感謝你用心寫下這些。');
+  return pick(locale, `A little more — ${current}/${min} characters`, `再多写一点 — ${current}/${min} 字`, `再多寫一點 — ${current}/${min} 字`);
+}
+
 export function yourNoteLabel(locale: Locale, note: string): string {
   return pick(locale, `Your note: "${note}"`, `你的记录：「${note}」`, `你的記錄：「${note}」`);
+}
+
+export function capstoneEraPrompt(locale: Locale, eraName: string): string {
+  return pick(
+    locale,
+    `You've studied every point of the "${eraName}" era. Write a longer reflection on what it taught you to earn its era badge.`,
+    `你已经研读完「${eraName}」时代的每一个节点。写下一篇更完整的反思，谈谈它教会了你什么，即可获得该时代徽章。`,
+    `你已經研讀完「${eraName}」時代的每一個節點。寫下一篇更完整的反思，談談它教會了你什麼，即可獲得該時代徽章。`,
+  );
+}
+
+export function capstoneBranchPrompt(locale: Locale, branchName: string): string {
+  return pick(
+    locale,
+    `You've mastered every topic in the "${branchName}" branch. Write a longer reflection on how it has shaped you to earn its mastery badge.`,
+    `你已经修完「${branchName}」分支的每一个主题。写下一篇更完整的反思，谈谈它如何塑造了你，即可获得该分支的圆满徽章。`,
+    `你已經修完「${branchName}」分支的每一個主題。寫下一篇更完整的反思，談談它如何塑造了你，即可獲得該分支的圓滿徽章。`,
+  );
+}
+
+export function capstoneEntryBtn(locale: Locale, name: string): string {
+  return pick(locale, `Write capstone reflection: ${name}`, `写下圆满反思：${name}`, `寫下圓滿反思：${name}`);
+}
+
+export function capstoneSubmitBtn(locale: Locale, xp: number): string {
+  return pick(locale, `Submit capstone reflection (+${xp} XP)`, `提交圆满反思 (+${xp} 经验)`, `提交圓滿反思 (+${xp} 經驗)`);
 }
 
 // ── Celebration templates (store.ts) ──────────────────────────────────
@@ -511,6 +578,10 @@ export function badgeEarnedTitle(locale: Locale, badgeTitle: string): string {
 
 export function eraBadgeTitle(locale: Locale, badgeTitle: string): string {
   return pick(locale, `Era badge: ${badgeTitle}`, `时代徽章：${badgeTitle}`, `時代徽章：${badgeTitle}`);
+}
+
+export function branchBadgeTitle(locale: Locale, badgeTitle: string): string {
+  return pick(locale, `Mastery badge: ${badgeTitle}`, `圆满徽章：${badgeTitle}`, `圓滿徽章：${badgeTitle}`);
 }
 
 export function wisdomCardTitle(locale: Locale, cardTitle: string): string {

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
+import { useProfile } from '../../state/profileStore';
 import { peerStats, peerEncouragesToday } from '../../engine/community';
 import { statsFromData, forestInfo, type JourneyData } from '../../state/selectors';
 import { PEERS } from '../../data/peers';
@@ -24,6 +25,7 @@ export default function Community() {
   const [category, setCategory] = useState<Category>('wisdom');
   const [sentFlash, setSentFlash] = useState<string | null>(null);
   const { t, L, locale } = useT();
+  const myName = useProfile((s) => s.name);
 
   const stats = statsFromData(d);
   const forest = forestInfo(d);
@@ -44,7 +46,7 @@ export default function Community() {
   }
 
   const rows = [
-    { id: 'me', name: t('leaderboardYou'), emoji: '🧑‍🌾', me: true, score: scoreFor(category, true) },
+    { id: 'me', name: myName ?? t('leaderboardYou'), emoji: '🧑‍🌾', me: true, score: scoreFor(category, true) },
     ...peers.map((p, i) => ({ id: p.peer.id, name: L(p.peer.name), emoji: p.peer.emoji, me: false, score: scoreFor(category, false, i) })),
   ].sort((a, b) => b.score - a.score);
 

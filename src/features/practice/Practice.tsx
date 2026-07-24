@@ -2,16 +2,22 @@ import { useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
-import { dailyQuoteIndex, dailyChallengeIndex } from '../../engine/community';
+import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
+import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { yourNoteLabel, journalCount } from '../../i18n/strings';
+import { yourNoteLabel, journalCount, minLengthHint } from '../../i18n/strings';
+
+// Minimum effort required before a submission is accepted — trivial
+// one-word "done" entries don't count as real practice.
+const INTENTION_MIN = 8;
+const REFLECTION_MIN = 15;
 
 function MorningCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const setIntention = useJourney((s) => s.setIntention);
   const [text, setText] = useState('');
-  const { t, L } = useT();
+  const { t, L, locale } = useT();
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
 
   return (
@@ -29,7 +35,13 @@ function MorningCard({ today }: { today: string }) {
         <>
           <p className="small muted">{t('intentionPrompt')}</p>
           <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('intentionPlaceholder')} />
-          <button className="btn btn-primary" style={{ marginTop: 10 }} disabled={!text.trim()} onClick={() => setIntention(text.trim())}>
+          <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, text.trim().length, INTENTION_MIN)}</p>
+          <button
+            className="btn btn-primary"
+            style={{ marginTop: 6 }}
+            disabled={text.trim().length < INTENTION_MIN}
+            onClick={() => setIntention(text.trim())}
+          >
             {t('intentionBtn')}
           </button>
         </>
@@ -41,9 +53,10 @@ function MorningCard({ today }: { today: string }) {
 function ChallengeCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const completeChallenge = useJourney((s) => s.completeChallenge);
+  const xp = useJourney((s) => s.xp);
   const [note, setNote] = useState('');
   const { t, L, locale } = useT();
-  const challenge = CHALLENGES[dailyChallengeIndex(today)];
+  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(xp)));
 
   return (
     <div className="card">
@@ -76,7 +89,7 @@ function EveningCard({ today }: { today: string }) {
   const [learned, setLearned] = useState('');
   const [virtue, setVirtue] = useState('');
   const [improve, setImprove] = useState('');
-  const { t } = useT();
+  const { t, locale } = useT();
 
   return (
     <div className="card">
@@ -101,14 +114,16 @@ function EveningCard({ today }: { today: string }) {
           <p className="small muted">{t('reflectionIntro')}</p>
           <label className="small">{t('reflectionQ1')}</label>
           <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, learned.trim().length, REFLECTION_MIN)}</p>
           <label className="small">{t('reflectionQ2')}</label>
           <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, virtue.trim().length, REFLECTION_MIN)}</p>
           <label className="small">{t('reflectionQ3')}</label>
           <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, improve.trim().length, REFLECTION_MIN)}</p>
           <button
             className="btn btn-primary"
-            style={{ marginTop: 10 }}
-            disabled={!learned.trim() || !virtue.trim() || !improve.trim()}
+            disabled={learned.trim().length < REFLECTION_MIN || virtue.trim().length < REFLECTION_MIN || improve.trim().length < REFLECTION_MIN}
             onClick={() => submitReflection(learned.trim(), virtue.trim(), improve.trim())}
           >
             {t('reflectionBtn')}

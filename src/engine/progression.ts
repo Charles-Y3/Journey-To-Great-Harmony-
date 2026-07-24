@@ -9,15 +9,18 @@ export interface Rank {
   minXp: number;
 }
 
+// Thresholds climb more steeply from Cultivator onward — the top ranks are
+// meant to be a long-term aspiration (weeks to months of real daily
+// practice), not something a single binge session can reach.
 export const RANKS: Rank[] = [
   { id: 'seeker', name: localized('Seeker', '求道者'), emoji: '🔦', minXp: 0 },
   { id: 'explorer', name: localized('Explorer', '探索者'), emoji: '🧭', minXp: 100 },
-  { id: 'learner', name: localized('Learner', '学者'), emoji: '📖', minXp: 250 },
-  { id: 'practitioner', name: localized('Practitioner', '修行者'), emoji: '🥋', minXp: 500 },
-  { id: 'cultivator', name: localized('Cultivator', '耕耘者'), emoji: '🌱', minXp: 900 },
-  { id: 'contributor', name: localized('Contributor', '贡献者'), emoji: '🤝', minXp: 1400 },
-  { id: 'harmony-builder', name: localized('Harmony Builder', '大同建设者'), emoji: '🌉', minXp: 2100 },
-  { id: 'wisdom-keeper', name: localized('Wisdom Keeper', '守智者'), emoji: '🏮', minXp: 3000 },
+  { id: 'learner', name: localized('Learner', '学者'), emoji: '📖', minXp: 280 },
+  { id: 'practitioner', name: localized('Practitioner', '修行者'), emoji: '🥋', minXp: 600 },
+  { id: 'cultivator', name: localized('Cultivator', '耕耘者'), emoji: '🌱', minXp: 1100 },
+  { id: 'contributor', name: localized('Contributor', '贡献者'), emoji: '🤝', minXp: 1800 },
+  { id: 'harmony-builder', name: localized('Harmony Builder', '大同建设者'), emoji: '🌉', minXp: 2800 },
+  { id: 'wisdom-keeper', name: localized('Wisdom Keeper', '守智者'), emoji: '🏮', minXp: 4200 },
 ];
 
 export function rankIndexForXp(xp: number): number {
@@ -37,6 +40,18 @@ export function nextRankForXp(xp: number): Rank | null {
   return idx + 1 < RANKS.length ? RANKS[idx + 1] : null;
 }
 
+/**
+ * Which daily-challenge tiers a rank has unlocked (see Challenge.tier in
+ * data/challenges.ts): Seeker–Learner see only gentle tier-1 challenges,
+ * Practitioner–Contributor add moderate tier-2, and only Harmony Builder
+ * and Wisdom Keeper see the deep tier-3 challenges.
+ */
+export function maxChallengeTierForRankIndex(rankIndex: number): 1 | 2 | 3 {
+  if (rankIndex >= 6) return 3;
+  if (rankIndex >= 3) return 2;
+  return 1;
+}
+
 // ── Reward values ──────────────────────────────────────────────────────
 export const XP_FOR = {
   lesson: 20,
@@ -46,6 +61,7 @@ export const XP_FOR = {
   intention: 5,
   reflection: 10,
   encouragement: 2,
+  capstone: 40,
 } as const;
 
 // Harmony points: the user's contribution to the shared Great Harmony World.
@@ -58,6 +74,7 @@ export const HARMONY_FOR = {
   reflection: 8,
   encouragement: 5,
   region: 20,
+  capstone: 25,
 } as const;
 
 // ── Virtue Forest ──────────────────────────────────────────────────────

@@ -59,6 +59,8 @@ export interface Challenge {
   text: Localized<string>;
   virtue: Localized<string>;
   emoji: string;
+  /** 1 = everyday/gentle, 2 = moderate, 3 = deep — gated by rank, see engine/progression.ts. */
+  tier: 1 | 2 | 3;
 }
 
 export interface Quote {
