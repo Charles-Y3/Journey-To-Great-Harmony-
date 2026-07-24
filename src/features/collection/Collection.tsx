@@ -37,12 +37,20 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
   );
 }
 
+const RARITY_FILTERS: { id: 'all' | CardRarity; key: UiKey }[] = [
+  { id: 'all', key: 'rarityFilterAll' },
+  { id: 'common', key: 'rarityCommon' },
+  { id: 'rare', key: 'rarityRare' },
+  { id: 'legendary', key: 'rarityLegendary' },
+];
+
 export default function Collection() {
   const unlockedCards = useJourney((s) => s.unlockedCards);
   const unlockedBadges = useJourney((s) => s.unlockedBadges);
   const markCollectionSeen = useJourney((s) => s.markCollectionSeen);
   const [open, setOpen] = useState<WisdomCard | null>(null);
   const [tab, setTab] = useState<'cards' | 'badges'>('cards');
+  const [rarityFilter, setRarityFilter] = useState<'all' | CardRarity>('all');
   const { t, L, locale } = useT();
 
   // Clear the "new item" nav badge as soon as the user opens this tab —
@@ -50,6 +58,8 @@ export default function Collection() {
   useEffect(() => {
     markCollectionSeen();
   }, [markCollectionSeen, unlockedCards.length, unlockedBadges.length]);
+
+  const visibleCards = rarityFilter === 'all' ? CARDS : CARDS.filter((c) => c.rarity === rarityFilter);
 
   return (
     <div>
@@ -65,18 +75,31 @@ export default function Collection() {
       </div>
 
       {tab === 'cards' ? (
-        <div className="card-grid">
-          {CARDS.map((card) => {
-            const owned = unlockedCards.includes(card.id);
-            return (
-              <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && setOpen(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
-                <div className="wcard-emoji">{owned ? card.emoji : '❔'}</div>
-                <strong>{owned ? L(card.title) : t('lockedCardTitle')}</strong>
-                <span className="small muted">{owned ? t(RARITY_KEY[card.rarity]) : L(card.unlockHint)}</span>
-              </div>
-            );
-          })}
-        </div>
+        <>
+          <div className="tab-row rarity-filter-row">
+            {RARITY_FILTERS.map((f) => (
+              <button
+                key={f.id}
+                className={rarityFilter === f.id ? 'btn tab-btn active' : 'btn tab-btn'}
+                onClick={() => setRarityFilter(f.id)}
+              >
+                {t(f.key)}
+              </button>
+            ))}
+          </div>
+          <div className="card-grid">
+            {visibleCards.map((card) => {
+              const owned = unlockedCards.includes(card.id);
+              return (
+                <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && setOpen(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
+                  <div className="wcard-emoji">{owned ? card.emoji : '❔'}</div>
+                  <strong>{owned ? L(card.title) : t('lockedCardTitle')}</strong>
+                  <span className="small muted">{owned ? t(RARITY_KEY[card.rarity]) : L(card.unlockHint)}</span>
+                </div>
+              );
+            })}
+          </div>
+        </>
       ) : (
         <div className="card-grid">
           {BADGES.map((badge) => {

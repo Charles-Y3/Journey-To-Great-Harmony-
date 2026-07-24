@@ -344,6 +344,7 @@ export const UI = {
   categoryTeaching: localized('teaching', '教导'),
   categoryVirtue: localized('virtue', '德行'),
   categoryStory: localized('story', '故事'),
+  rarityFilterAll: localized('All', '全部'),
 
   // ── Ranks (fallback labels; see engine/progression.ts for full localized list) ──
   highestRankLabel: localized('highest rank', '最高段位'),
