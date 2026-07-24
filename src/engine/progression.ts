@@ -151,6 +151,18 @@ export function hashString(str: string): number {
     h ^= str.charCodeAt(i);
     h = Math.imul(h, 16777619);
   }
+  // A plain FNV-1a hash has weak avalanche behaviour for near-identical
+  // inputs — every seed in this codebase is shaped like `${label}-${i}`
+  // for i in a loop (tree/house/sprout/flower positions, walker layouts,
+  // peer stats…), so without a proper finalizer, sequential seeds like
+  // "tree-x-0".."tree-x-5" hashed to near-identical floats and everything
+  // seeded that way clustered in one spot instead of spreading out. This
+  // is the standard murmur3 fmix32 finalizer, which fixes that.
+  h ^= h >>> 16;
+  h = Math.imul(h, 0x85ebca6b);
+  h ^= h >>> 13;
+  h = Math.imul(h, 0xc2b2ae35);
+  h ^= h >>> 16;
   return h >>> 0;
 }
 

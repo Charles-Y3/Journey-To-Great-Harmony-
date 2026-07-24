@@ -109,18 +109,23 @@ function ForestScene({
 }) {
   const palette = STAGE_PALETTE[Math.min(stageIndex, STAGE_PALETTE.length - 1)];
 
-  // Each stage has its own distinct scene, not just "more of the same tree" —
-  // and floors are kept high enough that no stage reads as sparse (a
-  // "forest" with only a couple of trees in it looks like a mistake).
+  // Each stage has its own distinct scene, not just "more of the same tree".
+  // Tree and Forest in particular need to read as clearly different stages,
+  // not overlapping counts of similarly-sized trees: Tree stays a sparse
+  // handful of large, individually-notable trees, while Forest jumps to a
+  // visibly dense canopy of many smaller ones.
   const sproutCount = stageIndex === 1 ? Math.round(4 + stageProgress * 5) : 0; // 4–9
   const treeCount =
     stageIndex === 2
-      ? Math.round(4 + stageProgress * 5) // 4–9: trees first appear here
+      ? Math.round(3 + stageProgress * 3) // 3–6: a few young trees, still sparse
       : stageIndex === 3
-        ? Math.round(7 + stageProgress * 6) // 7–13
+        ? Math.round(14 + stageProgress * 8) // 14–22: a proper, dense forest
         : stageIndex >= 4
-          ? Math.min(16, 12 + Math.round(stageProgress * 4)) // 12–16
+          ? Math.min(18, 14 + Math.round(stageProgress * 4)) // 14–18
           : 0;
+  // Tree stage trees are individually bigger (a few notable trees); Forest
+  // stage trees are smaller on average so more can read as one dense canopy.
+  const treeSize = stageIndex === 2 ? { min: 0.95, span: 0.65 } : { min: 0.5, span: 0.55 };
   const flowerCount =
     stageIndex === 3
       ? Math.round(2 + stageProgress * 8) // 2–10: flowers first appear late in Forest
@@ -134,7 +139,7 @@ function ForestScene({
   }));
   const trees = Array.from({ length: treeCount }, (_, i) => ({
     x: 60 + seededRandom(`tree-x-${i}`) * 480,
-    size: 0.6 + seededRandom(`tree-s-${i}`) * 0.9,
+    size: treeSize.min + seededRandom(`tree-s-${i}`) * treeSize.span,
     kind: i,
   })).sort((a, b) => a.size - b.size);
   const flowers = Array.from({ length: flowerCount }, (_, i) => ({
