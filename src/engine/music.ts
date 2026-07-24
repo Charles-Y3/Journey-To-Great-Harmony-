@@ -46,52 +46,11 @@ function fadeOutAndStop(audioCtx: AudioContext, gain: GainNode, cleanup: () => v
   window.setTimeout(cleanup, (FADE_OUT + 0.1) * 1000);
 }
 
-/** A slowly shifting drone: three detuned tones through a filter with a slow LFO on its cutoff. */
-function buildDrone(audioCtx: AudioContext, out: AudioNode, baseFreq: number, level: number): ActiveTrack {
-  const gain = fadeInGain(audioCtx, level);
-  gain.connect(out);
-
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 900;
-  filter.Q.value = 0.7;
-  filter.connect(gain);
-
-  const ratios = [1, 1.5, 2]; // root, perfect fifth, octave
-  const oscs = ratios.map((ratio, i) => {
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = baseFreq * ratio;
-    osc.detune.value = (i - 1) * 5;
-    const oscGain = audioCtx.createGain();
-    oscGain.gain.value = 1 / ratios.length;
-    osc.connect(oscGain);
-    oscGain.connect(filter);
-    osc.start();
-    return osc;
-  });
-
-  const lfo = audioCtx.createOscillator();
-  lfo.frequency.value = 0.04;
-  const lfoGain = audioCtx.createGain();
-  lfoGain.gain.value = 260;
-  lfo.connect(lfoGain);
-  lfoGain.connect(filter.frequency);
-  lfo.start();
-
-  return {
-    stop() {
-      fadeOutAndStop(audioCtx, gain, () => {
-        oscs.forEach((o) => o.stop());
-        lfo.stop();
-      });
-    },
-  };
-}
-
-/** The drone plus soft, irregularly-spaced pentatonic bell tones. */
+/** Soft, irregularly-spaced pentatonic bell tones, with silence between —
+ * no continuous tone underneath. An earlier version kept a quiet drone
+ * running under the plucks at all times, which read as an unwanted low
+ * hum rather than part of the music; removed rather than just quieted. */
 function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const drone = buildDrone(audioCtx, out, 130.81, 0.22); // C3 drone, quieter under the bells
   const bellGain = fadeInGain(audioCtx, 0.3);
   bellGain.connect(out);
 
@@ -122,16 +81,18 @@ function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
     stop() {
       stopped = true;
       if (timeoutId !== null) window.clearTimeout(timeoutId);
-      drone.stop();
       fadeOutAndStop(audioCtx, bellGain, () => {});
     },
   };
 }
 
 /** A warm, layered pad: several softly detuned voices under a slow filter
- * sweep and a gentle vibrato-like wobble, for a "breathing" ambient bed —
- * replaces the old single-tone singing-bowl drone, which read as flat and
- * monotonous rather than calming. */
+ * sweep and a gentle vibrato-like wobble, for a "breathing" ambient bed.
+ * Uses the same root/fifth/octave ratios as a clean, consonant chord (no
+ * dissonant intervals close enough to beat against each other) — an
+ * earlier version included a near-third interval that beat against the
+ * other voices and read as a low humming/buzzing artifact rather than a
+ * calm tone. */
 function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, level: number): ActiveTrack {
   const gain = fadeInGain(audioCtx, level);
   gain.connect(out);
@@ -142,14 +103,14 @@ function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, leve
   filter.Q.value = 0.5;
   filter.connect(gain);
 
-  // Root, third, fifth, octave — a fuller chord than a bare drone, each
-  // voice very slightly detuned against the next for a soft chorus shimmer.
-  const ratios = [1, 1.26, 1.5, 2];
+  // Root, fifth, octave, octave+fifth — all pure harmonic ratios, so no
+  // two voices sit close enough in pitch to beat against each other.
+  const ratios = [1, 1.5, 2, 3];
   const oscs = ratios.map((ratio, i) => {
     const osc = audioCtx.createOscillator();
     osc.type = 'triangle';
     osc.frequency.value = baseFreq * ratio;
-    osc.detune.value = (i - 1.5) * 4;
+    osc.detune.value = (i - 1.5) * 2;
     const oscGain = audioCtx.createGain();
     oscGain.gain.value = 1 / ratios.length;
     osc.connect(oscGain);
@@ -171,7 +132,7 @@ function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, leve
   const vibrato = audioCtx.createOscillator();
   vibrato.frequency.value = 0.12;
   const vibratoGain = audioCtx.createGain();
-  vibratoGain.gain.value = 3;
+  vibratoGain.gain.value = 2;
   vibrato.connect(vibratoGain);
   oscs.forEach((o) => vibratoGain.connect(o.detune));
   vibrato.start();
@@ -188,10 +149,10 @@ function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, leve
 }
 
 /** Sparse, high, airy plucks with a soft stereo drift — wind chimes, not
- * looping noise. Replaces the old filtered-noise "rain" bed, which read as
- * harsh static rather than soothing. */
+ * looping noise, and no continuous tone bed underneath (an earlier version
+ * layered a quiet pad chord under the chimes, which read as an unwanted
+ * low hum rather than part of the music). */
 function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const pad = buildPad(audioCtx, out, 130.81, 0.14); // same warm chord, quieter, under the chimes
   const chimeGain = fadeInGain(audioCtx, 0.28);
   chimeGain.connect(out);
 
@@ -228,7 +189,6 @@ function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
     stop() {
       stopped = true;
       if (timeoutId !== null) window.clearTimeout(timeoutId);
-      pad.stop();
       fadeOutAndStop(audioCtx, chimeGain, () => {});
     },
   };

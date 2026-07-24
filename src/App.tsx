@@ -238,25 +238,25 @@ function ReminderSection() {
       <p className="small muted">{t('settingsReminderDesc')}</p>
 
       <div className="reminder-row">
-        <div>
-          <strong>{t('reminderMorningLabel')}</strong>
-          <div className="small muted">{t('reminderMorningDesc')}</div>
+        <strong>{t('reminderMorningLabel')}</strong>
+        <p className="small muted reminder-row-desc">{t('reminderMorningDesc')}</p>
+        <div className="reminder-row-controls">
+          <input type="time" value={morningTime} onChange={(e) => setMorningTime(e.target.value)} />
+          <button className="btn" onClick={() => addToCalendar('morning')}>
+            {t('settingsReminderAddBtn')}
+          </button>
         </div>
-        <input type="time" value={morningTime} onChange={(e) => setMorningTime(e.target.value)} />
-        <button className="btn" onClick={() => addToCalendar('morning')}>
-          {t('settingsReminderAddBtn')}
-        </button>
       </div>
 
       <div className="reminder-row">
-        <div>
-          <strong>{t('reminderEveningLabel')}</strong>
-          <div className="small muted">{t('reminderEveningDesc')}</div>
+        <strong>{t('reminderEveningLabel')}</strong>
+        <p className="small muted reminder-row-desc">{t('reminderEveningDesc')}</p>
+        <div className="reminder-row-controls">
+          <input type="time" value={eveningTime} onChange={(e) => setEveningTime(e.target.value)} />
+          <button className="btn" onClick={() => addToCalendar('evening')}>
+            {t('settingsReminderAddBtn')}
+          </button>
         </div>
-        <input type="time" value={eveningTime} onChange={(e) => setEveningTime(e.target.value)} />
-        <button className="btn" onClick={() => addToCalendar('evening')}>
-          {t('settingsReminderAddBtn')}
-        </button>
       </div>
 
       <p className="small muted" style={{ marginTop: 8 }}>

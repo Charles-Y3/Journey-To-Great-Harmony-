@@ -601,11 +601,12 @@ select:focus {
   margin-top: 4px;
 }
 
+/* Label/description stack full-width above the time+button controls,
+   rather than squeezing into a flex column beside them — on narrow
+   screens that used to force every word of the description onto its own
+   line. */
 .reminder-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 0;
+  padding: 12px 0;
   border-top: 1px solid var(--line);
 }
 
@@ -613,9 +614,20 @@ select:focus {
   border-top: none;
 }
 
-.reminder-row > div:first-child {
+.reminder-row-desc {
+  margin: 2px 0 10px;
+}
+
+.reminder-row-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.reminder-row-controls input[type='time'] {
   flex: 1;
-  min-width: 0;
+  min-width: 110px;
 }
 
 /* ── Progress bars ─────────────────────────────────────────────────── */
