@@ -1,26 +1,62 @@
 import type { WorldBuilding } from './types';
+import { localized, type Localized } from '../i18n/types';
 
 export interface WorldStage {
   id: string;
-  name: string;
-  zh?: string;
+  name: Localized<string>;
   emoji: string;
   threshold: number; // total (community + user) harmony points
-  description: string;
+  description: Localized<string>;
 }
 
 export const WORLD_STAGES: WorldStage[] = [
-  { id: 'village', name: 'Village', zh: '村', emoji: '🏘️', threshold: 0, description: 'A few homes by the river. Every great society began this way — with a handful of people choosing to grow.' },
-  { id: 'town', name: 'Town', zh: '镇', emoji: '🏡', threshold: 600, description: 'The village has grown into a town. Paths become streets; neighbours become a community.' },
-  { id: 'city', name: 'City', zh: '城', emoji: '🏙️', threshold: 1500, description: 'A flourishing city, alive with learning and care. Its strength is not its walls but its people.' },
-  { id: 'harmony', name: 'Harmony Society', zh: '大同', emoji: '🌏', threshold: 3000, description: 'The Great Harmony: a society where the world is shared by all, and every person\'s growth lifts everyone.' },
+  {
+    id: 'village',
+    name: localized('Village', '村庄'),
+    emoji: '🏘️',
+    threshold: 0,
+    description: localized(
+      'A few homes by the river. Every great society began this way — with a handful of people choosing to grow.',
+      '河边的几户人家。每一个伟大的社会，都是这样开始的 — 从少数几个选择成长的人开始。',
+    ),
+  },
+  {
+    id: 'town',
+    name: localized('Town', '城镇'),
+    emoji: '🏡',
+    threshold: 600,
+    description: localized(
+      'The village has grown into a town. Paths become streets; neighbours become a community.',
+      '村庄已成长为城镇。小径变成了街道，邻里变成了社群。',
+    ),
+  },
+  {
+    id: 'city',
+    name: localized('City', '城市'),
+    emoji: '🏙️',
+    threshold: 1500,
+    description: localized(
+      'A flourishing city, alive with learning and care. Its strength is not its walls but its people.',
+      '一座繁荣的城市，充满学习与关怀的气息。它的力量不在城墙，而在人民。',
+    ),
+  },
+  {
+    id: 'harmony',
+    name: localized('Harmony Society', '大同社会'),
+    emoji: '🌏',
+    threshold: 3000,
+    description: localized(
+      "The Great Harmony: a society where the world is shared by all, and every person's growth lifts everyone.",
+      '大同：一个天下为公的社会，每个人的成长都能提升所有人。',
+    ),
+  },
 ];
 
 export const BUILDINGS: WorldBuilding[] = [
-  { id: 'school', name: 'School', emoji: '🏫', threshold: 200, description: 'Built by lessons learned. Every mind that grows here teaches another.' },
-  { id: 'library', name: 'Library', emoji: '📚', threshold: 450, description: 'Built by wisdom gathered. The heritage of all traditions, open to all.' },
-  { id: 'garden', name: 'Community Garden', emoji: '🌳', threshold: 800, description: 'Built by patience and care. A green heart where the community gathers.' },
-  { id: 'care', name: 'Care Centre', emoji: '🏥', threshold: 1200, description: 'Built by compassion practised. Here, the old are cared for and no one is left behind.' },
-  { id: 'bridge', name: 'Great Bridge', emoji: '🌉', threshold: 1800, description: 'Built by encouragement given. It joins what was separate.' },
-  { id: 'hall', name: 'Cultural Hall', emoji: '🏛️', threshold: 2500, description: 'Built by all virtues together. A hall where every tradition\'s wisdom is celebrated.' },
+  { id: 'school', name: localized('School', '学校'), emoji: '🏫', threshold: 200, description: localized('Built by lessons learned. Every mind that grows here teaches another.', '由所学的课程建成。在此成长的每个心灵，都将教导他人。') },
+  { id: 'library', name: localized('Library', '图书馆'), emoji: '📚', threshold: 450, description: localized('Built by wisdom gathered. The heritage of all traditions, open to all.', '由汇聚的智慧建成。一切传统的遗产，向所有人敞开。') },
+  { id: 'garden', name: localized('Community Garden', '社区花园'), emoji: '🌳', threshold: 800, description: localized('Built by patience and care. A green heart where the community gathers.', '由耐心与关怀建成。一颗绿色的心，社群在此相聚。') },
+  { id: 'care', name: localized('Care Centre', '关怀中心'), emoji: '🏥', threshold: 1200, description: localized('Built by compassion practised. Here, the old are cared for and no one is left behind.', '由践行的慈悲建成。在此，老者得到照料，无人被遗落。') },
+  { id: 'bridge', name: localized('Great Bridge', '大桥'), emoji: '🌉', threshold: 1800, description: localized('Built by encouragement given. It joins what was separate.', '由给予的鼓励建成。它连接了曾经分离的事物。') },
+  { id: 'hall', name: localized('Cultural Hall', '文化殿堂'), emoji: '🏛️', threshold: 2500, description: localized("Built by all virtues together. A hall where every tradition's wisdom is celebrated.", '由所有德行共同建成。一座殿堂，礼赞着每个传统的智慧。') },
 ];

@@ -2,6 +2,7 @@ import { PEERS } from '../data/peers';
 import { CHALLENGES } from '../data/challenges';
 import type { Peer } from '../data/types';
 import { daysBetweenKeys, seededRandom } from './progression';
+import { localized, type Localized } from '../i18n/types';
 
 // The v1 community is a deterministic simulation seeded by the user's start
 // day, so the shared world visibly grows a little every real day. With real
@@ -63,18 +64,18 @@ export function peerEncouragesToday(peerId: string, lastSentDay: string | undefi
 
 export interface FeedItem {
   peer: Peer;
-  text: string;
+  text: Localized<string>;
 }
 
-const FEED_ACTIONS = [
-  'completed a lesson on the Knowledge Path 📖',
-  'finished today\'s virtue challenge 🎯',
-  'wrote an evening reflection 🪞',
-  'studied a point on the Wisdom Timeline ⏳',
-  'helped a neighbour today 🤲',
-  'sent encouragement to a fellow traveller 🌸',
-  'planted a tree in their Virtue Forest 🌳',
-  'set a morning intention 🌅',
+const FEED_ACTIONS: Localized<string>[] = [
+  localized('completed a lesson on the Knowledge Path 📖', '在知识之路上完成了一课 📖'),
+  localized("finished today's virtue challenge 🎯", '完成了今天的德行挑战 🎯'),
+  localized('wrote an evening reflection 🪞', '写下了一篇夜间反思 🪞'),
+  localized('studied a point on the Wisdom Timeline ⏳', '在智慧时间线上研读了一个节点 ⏳'),
+  localized('helped a neighbour today 🤲', '今天帮助了一位邻居 🤲'),
+  localized('sent encouragement to a fellow traveller 🌸', '为一位同行者送出了鼓励 🌸'),
+  localized('planted a tree in their Virtue Forest 🌳', '在自己的德行森林中种下了一棵树 🌳'),
+  localized('set a morning intention 🌅', '立下了晨间心愿 🌅'),
 ];
 
 /** Today's simulated community activity feed. */

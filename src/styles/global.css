@@ -76,6 +76,82 @@ a {
   color: var(--jade);
 }
 
+/* ── Language gate (first-run onboarding) ────────────────────────────── */
+.gate {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: radial-gradient(circle at 50% 0%, var(--jade-soft), var(--bg) 70%);
+}
+
+.gate-card {
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 40px 30px;
+}
+
+.gate-emoji {
+  font-size: 2.6rem;
+  margin-bottom: 8px;
+}
+
+.gate-title {
+  font-size: 1.5rem;
+  margin-bottom: 6px;
+}
+
+.gate-subtitle {
+  color: var(--ink-soft);
+  margin-bottom: 24px;
+}
+
+.gate-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.gate-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 1.05rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.gate-option:hover {
+  background: var(--jade-soft);
+  border-color: var(--jade);
+}
+
+.gate-flag {
+  font-size: 1.3rem;
+}
+
+.gate-native {
+  font-weight: 600;
+}
+
+.gate-footnote {
+  margin-top: 20px;
+  margin-bottom: 0;
+  font-size: 0.78rem;
+  color: var(--ink-soft);
+}
+
 /* ── App layout ────────────────────────────────────────────────────── */
 .app {
   display: flex;
@@ -213,27 +289,69 @@ a {
     padding: 16px 14px 90px;
   }
   .bottom-nav {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     background: var(--surface);
     border-top: 1px solid var(--line);
-    overflow-x: auto;
     z-index: 30;
-    padding: 4px 6px calc(4px + env(safe-area-inset-bottom));
-    gap: 2px;
+    padding: 4px 4px calc(4px + env(safe-area-inset-bottom));
   }
   .bottom-nav .nav-link {
     flex-direction: column;
     gap: 2px;
     font-size: 0.62rem;
-    padding: 6px 9px;
-    min-width: 58px;
+    padding: 6px 2px;
     text-align: center;
-    flex-shrink: 0;
+    justify-content: center;
+    border-radius: 8px;
   }
+}
+
+@media (max-width: 640px) {
+  .topbar {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+  .topbar-xp {
+    order: 3;
+    flex: 1 1 100%;
+    max-width: none;
+  }
+}
+
+/* ── More sheet (mobile "More" tab) ───────────────────────────────── */
+.more-sheet-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.more-sheet-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 8px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.more-sheet-item:hover {
+  background: var(--jade-soft);
+}
+
+.more-sheet-emoji {
+  font-size: 1.6rem;
 }
 
 /* ── Page & cards ──────────────────────────────────────────────────── */
@@ -384,6 +502,10 @@ input[type='text']:focus {
   font-size: 0.7rem;
   font-weight: 700;
   color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 0 6px;
 }
 
 /* ── Modals & celebrations ─────────────────────────────────────────── */

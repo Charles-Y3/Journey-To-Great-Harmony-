@@ -22,6 +22,19 @@ import { SPECIAL_CARD_RULES, cardById } from '../data/cards';
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
 import { REGIONS } from '../data/journeyMap';
+import { useLocale } from './localeStore';
+import { L } from '../i18n/L';
+import {
+  rankUpTitle,
+  badgeEarnedTitle,
+  eraBadgeTitle,
+  wisdomCardTitle,
+  forestGrewTitle,
+  forestGrewSubtitle,
+  worldStageTitle,
+  regionCompleteTitle,
+  regionCompleteSubtitle,
+} from '../i18n/strings';
 
 export interface Celebration {
   id: string;
@@ -100,13 +113,14 @@ function todayKeyMinusOne(key: string): string {
  */
 function collectUnlocks(before: JourneyData, after: JourneyData, today: string): Celebration[] {
   const out: Celebration[] = [];
+  const locale = useLocale.getState().locale;
 
   // Rank up
   const beforeRank = rankIndexForXp(before.xp);
   const afterRank = rankIndexForXp(after.xp);
   if (afterRank > beforeRank) {
     const r = RANKS[afterRank];
-    out.push(celebration('rank', r.emoji, `You are now ${aOrAn(r.name)} ${r.name}!`, r.zh));
+    out.push(celebration('rank', r.emoji, rankUpTitle(locale, L(r.name, locale)), locale === 'en' ? r.name.zh : undefined));
   }
 
   const stats = statsFromData(after);
@@ -115,7 +129,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   for (const b of BADGES) {
     if (!after.unlockedBadges.includes(b.id) && b.check(stats)) {
       after.unlockedBadges.push(b.id);
-      out.push(celebration('badge', b.emoji, `Badge earned: ${b.title}`, b.description));
+      out.push(celebration('badge', b.emoji, badgeEarnedTitle(locale, L(b.title, locale)), L(b.description, locale)));
     }
   }
 
@@ -125,7 +139,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (!after.unlockedBadges.includes(id)) {
       after.unlockedBadges.push(id);
       const b = badgeById(id);
-      if (b) out.push(celebration('badge', b.emoji, `Era badge: ${b.title}`, b.description));
+      if (b) out.push(celebration('badge', b.emoji, eraBadgeTitle(locale, L(b.title, locale)), L(b.description, locale)));
     }
   }
 
@@ -134,7 +148,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (p.cardId && after.completedTimelinePoints.includes(p.id) && !after.unlockedCards.includes(p.cardId)) {
       after.unlockedCards.push(p.cardId);
       const c = cardById(p.cardId);
-      if (c) out.push(celebration('card', c.emoji, `Wisdom Card: ${c.title}`, c.text));
+      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
     }
   }
 
@@ -144,7 +158,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (t.cardId && doneTopics.includes(t.id) && !after.unlockedCards.includes(t.cardId)) {
       after.unlockedCards.push(t.cardId);
       const c = cardById(t.cardId);
-      if (c) out.push(celebration('card', c.emoji, `Wisdom Card: ${c.title}`, c.text));
+      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
     }
   }
 
@@ -153,7 +167,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (!after.unlockedCards.includes(rule.cardId) && rule.check(stats)) {
       after.unlockedCards.push(rule.cardId);
       const c = cardById(rule.cardId);
-      if (c) out.push(celebration('card', c.emoji, `Wisdom Card: ${c.title}`, c.text));
+      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
     }
   }
 
@@ -162,7 +176,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   const afterForest = forestStageIndex(growthScore(stats));
   if (afterForest > beforeForest) {
     const f = FOREST_STAGES[afterForest];
-    out.push(celebration('forest', f.emoji, `Your forest grew: ${f.name}!`, 'Visit the Virtue Forest to see it.'));
+    out.push(celebration('forest', f.emoji, forestGrewTitle(locale, L(f.name, locale)), forestGrewSubtitle(locale)));
   }
 
   // World stage (only celebrate when the user's action crosses the threshold)
@@ -170,14 +184,10 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   const afterWorld = worldInfo(after, today).stageIndex;
   if (afterWorld > beforeWorld) {
     const w = worldInfo(after, today).stage;
-    out.push(celebration('world', w.emoji, `The community became a ${w.name}!`, w.description));
+    out.push(celebration('world', w.emoji, worldStageTitle(locale, L(w.name, locale)), L(w.description, locale)));
   }
 
   return out;
-}
-
-function aOrAn(word: string): string {
-  return /^[aeiou]/i.test(word) ? 'an' : 'a';
 }
 
 function snapshot(d: JourneyData): JourneyData {
@@ -309,12 +319,13 @@ export const useJourney = create<JourneyState>()(
             draft.xp += region.rewardXp;
             draft.harmonyPoints += HARMONY_FOR.region;
             markActive(draft, today);
+            const locale = useLocale.getState().locale;
             return [
               celebration(
                 'region',
                 region.emoji,
-                `${region.name} — completed!`,
-                `+${region.rewardXp} XP · The road continues.`,
+                regionCompleteTitle(locale, L(region.name, locale)),
+                regionCompleteSubtitle(locale, region.rewardXp),
               ),
             ];
           }),

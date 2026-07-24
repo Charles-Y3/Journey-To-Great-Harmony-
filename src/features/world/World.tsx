@@ -3,8 +3,10 @@ import { worldInfo, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
 import { communityFeed } from '../../engine/community';
 import { PageHeader, ProgressBar } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { worldProgressLabel, buildingLockedNote } from '../../i18n/strings';
 
-function WorldScene({ stageIndex, builtIds }: { stageIndex: number; builtIds: string[] }) {
+function WorldScene({ stageIndex, builtIds, caption }: { stageIndex: number; builtIds: string[]; caption: string }) {
   const houseCount = 3 + stageIndex * 3;
   const houses = Array.from({ length: houseCount }, (_, i) => ({
     x: 40 + (i * 520) / Math.max(1, houseCount - 1),
@@ -21,7 +23,7 @@ function WorldScene({ stageIndex, builtIds }: { stageIndex: number; builtIds: st
   };
 
   return (
-    <svg className="scene" viewBox="0 0 600 300" role="img" aria-label="The Great Harmony World">
+    <svg className="scene" viewBox="0 0 600 300" role="img" aria-label={caption}>
       <defs>
         <linearGradient id="wsky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#f7d9a8" />
@@ -54,7 +56,7 @@ function WorldScene({ stageIndex, builtIds }: { stageIndex: number; builtIds: st
       )}
 
       <text x="300" y="30" textAnchor="middle" fontSize="15" fill="#7a6437" fontStyle="italic">
-        The world grows because people grow.
+        {caption}
       </text>
     </svg>
   );
@@ -67,17 +69,13 @@ export default function World() {
   const info = worldInfo(d, today);
   const feed = communityFeed(today);
   const builtIds = info.buildings.filter((b) => b.built).map((b) => b.id);
+  const { t, L, locale } = useT();
 
   return (
     <div>
-      <PageHeader
-        emoji="🌏"
-        title="Great Harmony World"
-        zh="大同世界"
-        subtitle="From individual growth to collective transformation. Every traveller's practice builds this shared world."
-      />
+      <PageHeader emoji="🌏" title={t('worldTitle')} zh={t('worldZh')} subtitle={t('worldSubtitle')} />
 
-      <WorldScene stageIndex={info.stageIndex} builtIds={builtIds} />
+      <WorldScene stageIndex={info.stageIndex} builtIds={builtIds} caption={t('worldSceneCaption')} />
 
       <div className="stage-steps">
         {WORLD_STAGES.map((s, i) => {
@@ -86,7 +84,7 @@ export default function World() {
           if (i === info.stageIndex) cls += ' current';
           return (
             <span key={s.id} className={cls}>
-              {s.emoji} {s.name}
+              {s.emoji} {L(s.name)}
             </span>
           );
         })}
@@ -94,43 +92,39 @@ export default function World() {
 
       <div className="card">
         <h3>
-          {info.stage.emoji} {info.stage.name} {info.stage.zh && <span className="zh-accent">{info.stage.zh}</span>}
+          {info.stage.emoji} {L(info.stage.name)}
         </h3>
-        <p className="small muted">{info.stage.description}</p>
+        <p className="small muted">{L(info.stage.description)}</p>
         {info.next ? (
-          <ProgressBar
-            value={info.total}
-            max={info.next.threshold}
-            label={`${info.total} / ${info.next.threshold} harmony points to become a ${info.next.name}`}
-          />
+          <ProgressBar value={info.total} max={info.next.threshold} label={worldProgressLabel(locale, info.total, info.next.threshold, L(info.next.name))} />
         ) : (
-          <p className="pill">🌏 The Great Harmony has been reached — keep tending it.</p>
+          <p className="pill">{t('worldReached')}</p>
         )}
         <div className="stat-grid">
           <div className="stat-tile">
             <div className="stat-value">{info.user}</div>
-            <div className="stat-name">your contribution</div>
+            <div className="stat-name">{t('worldYourContribution')}</div>
           </div>
           <div className="stat-tile">
             <div className="stat-value">{info.community}</div>
-            <div className="stat-name">community contribution</div>
+            <div className="stat-name">{t('worldCommunityContribution')}</div>
           </div>
           <div className="stat-tile">
             <div className="stat-value">{info.total}</div>
-            <div className="stat-name">total harmony</div>
+            <div className="stat-name">{t('worldTotalHarmony')}</div>
           </div>
         </div>
       </div>
 
       <div className="card">
-        <h3>Civic buildings</h3>
+        <h3>{t('civicBuildingsTitle')}</h3>
         <div className="card-grid">
           {info.buildings.map((b) => (
             <div key={b.id} className={b.built ? 'badge-tile' : 'badge-tile locked'}>
               <div className="wcard-emoji">{b.emoji}</div>
-              <strong>{b.name}</strong>
+              <strong>{L(b.name)}</strong>
               <p className="small muted" style={{ margin: '4px 0 0' }}>
-                {b.built ? b.description : `Unlocks at ${b.threshold} total harmony points.`}
+                {b.built ? L(b.description) : buildingLockedNote(locale, b.threshold)}
               </p>
             </div>
           ))}
@@ -138,18 +132,17 @@ export default function World() {
       </div>
 
       <div className="card">
-        <h3>Today in the community</h3>
+        <h3>{t('todayInCommunity')}</h3>
         {feed.map((item, i) => (
           <div className="feed-item" key={i}>
             <span>{item.peer.emoji}</span>
             <span>
-              <strong>{item.peer.name}</strong> {item.text}
+              <strong>{L(item.peer.name)}</strong> {L(item.text)}
             </span>
           </div>
         ))}
         <p className="small muted" style={{ marginTop: 10 }}>
-          In this version your fellow travellers are simulated companions. With community accounts, this world will be
-          built by real people together.
+          {t('worldFooter')}
         </p>
       </div>
     </div>

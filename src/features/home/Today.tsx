@@ -5,10 +5,13 @@ import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallengeIndex } from '../../engine/community';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from '../../state/selectors';
 import { PageHeader } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { todaySubtitle, lessonsCompletedToday } from '../../i18n/strings';
 
 export default function Today() {
   const state = useJourney();
   const today = useToday();
+  const { t, L, locale } = useT();
   const d = state as unknown as JourneyData;
   const rec = state.days[today] ?? {};
 
@@ -22,37 +25,34 @@ export default function Today() {
     {
       done: !!rec.intention,
       emoji: '🌅',
-      title: 'Morning intention',
-      desc: rec.intention ? `"${rec.intention}"` : 'Receive today\'s wisdom and set your intention.',
+      title: t('taskMorningTitle'),
+      desc: rec.intention ? `“${rec.intention}”` : t('taskMorningDesc'),
       to: '/practice',
-      cta: 'Begin',
+      cta: t('ctaBegin'),
     },
     {
       done: (rec.lessons ?? 0) > 0,
       emoji: '📖',
-      title: 'Learn something',
-      desc:
-        (rec.lessons ?? 0) > 0
-          ? `${rec.lessons} lesson${rec.lessons === 1 ? '' : 's'} completed today`
-          : 'Complete a short lesson on the Knowledge Path or Timeline.',
+      title: t('taskLearnTitle'),
+      desc: (rec.lessons ?? 0) > 0 ? lessonsCompletedToday(locale, rec.lessons ?? 0) : t('taskLearnDesc'),
       to: '/knowledge',
-      cta: 'Learn',
+      cta: t('ctaLearn'),
     },
     {
       done: !!rec.challengeDone,
       emoji: challenge.emoji,
-      title: `Virtue challenge: ${challenge.virtue}`,
-      desc: challenge.text,
+      title: `${t('taskChallengePrefix')}: ${L(challenge.virtue)}`,
+      desc: L(challenge.text),
       to: '/practice',
-      cta: 'Practise',
+      cta: t('ctaPractise'),
     },
     {
       done: !!rec.reflection,
       emoji: '🪞',
-      title: 'Evening reflection',
-      desc: rec.reflection ? 'Reflection written — well done.' : 'Look back on the day with honesty and kindness.',
+      title: t('taskEveningTitle'),
+      desc: rec.reflection ? t('taskEveningDone') : t('taskEveningDesc'),
       to: '/practice',
-      cta: 'Reflect',
+      cta: t('ctaReflect'),
     },
   ];
 
@@ -60,71 +60,59 @@ export default function Today() {
 
   return (
     <div>
-      <PageHeader
-        emoji="🌅"
-        title="Today"
-        subtitle={`${today} · ${doneCount}/${tasks.length} daily practices complete`}
-      />
+      <PageHeader emoji="🌅" title={t('todayTitle')} subtitle={todaySubtitle(locale, today, doneCount, tasks.length)} />
 
       <div className="quote-card">
-        <p className="quote-text">“{quote.text}”</p>
-        {quote.zh && <p className="quote-zh">{quote.zh}</p>}
-        <p className="quote-author">— {quote.author}</p>
+        <p className="quote-text">“{L(quote.text)}”</p>
+        {locale === 'en' && quote.originalZh && <p className="quote-zh">{quote.originalZh}</p>}
+        <p className="quote-author">— {L(quote.author)}</p>
       </div>
 
       <div className="card">
-        <h3>Your 10-minute journey</h3>
-        {tasks.map((t) => (
-          <div key={t.title} className={t.done ? 'task-row task-done' : 'task-row'}>
-            <span className="task-check">{t.done ? '✅' : t.emoji}</span>
+        <h3>{t('todayJourneyCard')}</h3>
+        {tasks.map((tk) => (
+          <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
+            <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
             <div>
-              <div className="task-title">{t.title}</div>
-              <div className="task-desc">{t.desc}</div>
+              <div className="task-title">{tk.title}</div>
+              <div className="task-desc">{tk.desc}</div>
             </div>
-            {!t.done && (
-              <Link className="btn btn-primary task-action" to={t.to}>
-                {t.cta}
+            {!tk.done && (
+              <Link className="btn btn-primary task-action" to={tk.to}>
+                {tk.cta}
               </Link>
             )}
           </div>
         ))}
-        {doneCount === tasks.length && (
-          <p style={{ marginTop: 12 }} className="pill">
-            🎉 Full harmony today — your forest and the world both grew!
-          </p>
-        )}
+        {doneCount === tasks.length && <p className="pill" style={{ marginTop: 12 }}>{t('todayFullHarmony')}</p>}
       </div>
 
       <div className="stat-grid">
         <div className="stat-tile">
           <div className="stat-value">🔥 {stats.streakCurrent}</div>
-          <div className="stat-name">day streak</div>
+          <div className="stat-name">{t('statStreak')}</div>
         </div>
         <div className="stat-tile">
           <div className="stat-value">{forest.stage.emoji}</div>
           <div className="stat-name">
-            forest: {forest.stage.name} <Link to="/forest">visit</Link>
+            {t('statForest')}: {L(forest.stage.name)} <Link to="/forest">{t('statVisit')}</Link>
           </div>
         </div>
         <div className="stat-tile">
           <div className="stat-value">{world.stage.emoji}</div>
           <div className="stat-name">
-            world: {world.stage.name} <Link to="/world">visit</Link>
+            {t('statWorld')}: {L(world.stage.name)} <Link to="/world">{t('statVisit')}</Link>
           </div>
         </div>
         <div className="stat-tile">
           <div className="stat-value">{stats.xp}</div>
-          <div className="stat-name">wisdom XP</div>
+          <div className="stat-name">{t('statWisdomXp')}</div>
         </div>
       </div>
 
       <div className="card">
-        <h3>Keep exploring</h3>
-        <p className="small muted">
-          Study humanity's story on the <Link to="/timeline">Wisdom Timeline</Link>, walk the{' '}
-          <Link to="/map">Journey Map</Link>, cheer on fellow travellers in the{' '}
-          <Link to="/community">Community</Link>, or browse your <Link to="/collection">Collection</Link>.
-        </p>
+        <h3>{t('keepExploringTitle')}</h3>
+        <p className="small muted">{t('keepExploringBody')}</p>
       </div>
     </div>
   );

@@ -4,6 +4,8 @@ import type { TimelinePoint } from '../../data/types';
 import { useJourney } from '../../state/store';
 import { completedEraIds } from '../../state/selectors';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { timelineProgressLabel, questionProgress, nextOrFinish, takeQuizBtn, quizResult, completeStudyBtn } from '../../i18n/strings';
 
 function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => void }) {
   const done = useJourney((s) => s.completedTimelinePoints.includes(point.id));
@@ -12,6 +14,7 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
   const [qIndex, setQIndex] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  const { t, L, locale } = useT();
 
   const q = point.quiz[qIndex];
   const finishedQuiz = qIndex >= point.quiz.length;
@@ -30,22 +33,22 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
   return (
     <Modal onClose={onClose} wide>
       <h2>
-        {point.emoji} {point.title}
+        {point.emoji} {L(point.title)}
       </h2>
-      <p className="small muted">{point.years}</p>
-      <p>{point.background}</p>
+      <p className="small muted">{L(point.years)}</p>
+      <p>{L(point.background)}</p>
 
-      <h4>Key figures</h4>
-      <p className="small">{point.figures.join(' · ')}</p>
-      <h4>Important teachings</h4>
+      <h4>{t('keyFigures')}</h4>
+      <p className="small">{L(point.figures).join(' · ')}</p>
+      <h4>{t('importantTeachings')}</h4>
       <ul className="small">
-        {point.teachings.map((t) => (
-          <li key={t}>{t}</li>
+        {L(point.teachings).map((tItem) => (
+          <li key={tItem}>{tItem}</li>
         ))}
       </ul>
-      <h4>Related concepts</h4>
+      <h4>{t('relatedConcepts')}</h4>
       <p>
-        {point.concepts.map((c) => (
+        {L(point.concepts).map((c) => (
           <span key={c} className="pill" style={{ marginRight: 6, marginBottom: 6, display: 'inline-block' }}>
             {c}
           </span>
@@ -54,21 +57,19 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
 
       {done ? (
         <p>
-          <span className="pill">Studied ✓</span>
+          <span className="pill">{t('studiedLabel')}</span>
         </p>
       ) : !quizStarted ? (
         <button className="btn btn-primary" onClick={() => setQuizStarted(true)}>
-          Take the quiz ({point.quiz.length} questions)
+          {takeQuizBtn(locale, point.quiz.length)}
         </button>
       ) : !finishedQuiz ? (
         <div className="card" style={{ marginTop: 10 }}>
-          <p className="small muted">
-            Question {qIndex + 1} of {point.quiz.length}
-          </p>
+          <p className="small muted">{questionProgress(locale, qIndex + 1, point.quiz.length)}</p>
           <p>
-            <strong>{q.q}</strong>
+            <strong>{L(q.q)}</strong>
           </p>
-          {q.options.map((opt, i) => {
+          {L(q.options).map((opt, i) => {
             let cls = 'btn quiz-option';
             if (picked !== null && i === q.answer) cls += ' correct';
             else if (picked !== null && i === picked) cls += ' wrong';
@@ -80,20 +81,15 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
           })}
           {picked !== null && (
             <button className="btn btn-primary" style={{ marginTop: 8 }} onClick={next}>
-              {qIndex + 1 < point.quiz.length ? 'Next question' : 'Finish quiz'}
+              {nextOrFinish(locale, qIndex + 1 >= point.quiz.length)}
             </button>
           )}
         </div>
       ) : (
         <div className="card" style={{ marginTop: 10 }}>
-          <p>
-            You answered <strong>{correctCount}</strong> of {point.quiz.length} correctly.
-          </p>
-          <button
-            className="btn btn-primary"
-            onClick={() => completeTimelinePoint(point.id, correctCount)}
-          >
-            Complete this study (+{15 + correctCount * 5} XP)
+          <p>{quizResult(locale, correctCount, point.quiz.length)}</p>
+          <button className="btn btn-primary" onClick={() => completeTimelinePoint(point.id, correctCount)}>
+            {completeStudyBtn(locale, 15 + correctCount * 5)}
           </button>
         </div>
       )}
@@ -104,22 +100,18 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
 export default function Timeline() {
   const completedPoints = useJourney((s) => s.completedTimelinePoints);
   const [open, setOpen] = useState<TimelinePoint | null>(null);
+  const { t, L, locale } = useT();
   const doneEras = completedEraIds(completedPoints);
   const totalPoints = TIMELINE.reduce((n, e) => n + e.points.length, 0);
 
   return (
     <div>
-      <PageHeader
-        emoji="⏳"
-        title="The Wisdom Timeline"
-        zh="智慧长河"
-        subtitle="Understanding humanity's journey — how wisdom developed across thousands of years and every culture."
-      />
+      <PageHeader emoji="⏳" title={t('timelineTitle')} zh={t('timelineZh')} subtitle={t('timelineSubtitle')} />
       <div className="card">
         <ProgressBar
           value={completedPoints.length}
           max={totalPoints}
-          label={`${completedPoints.length}/${totalPoints} points studied · ${doneEras.length}/${TIMELINE.length} eras complete`}
+          label={timelineProgressLabel(locale, completedPoints.length, totalPoints, doneEras.length, TIMELINE.length)}
         />
       </div>
 
@@ -130,18 +122,18 @@ export default function Timeline() {
             <div className="era-card" key={era.id}>
               <div className="timeline-rail" />
               <div className="era-emoji">{era.emoji}</div>
-              <h3 style={{ marginBottom: 2 }}>{era.name}</h3>
-              <div className="era-period">{era.period}</div>
+              <h3 style={{ marginBottom: 2 }}>{L(era.name)}</h3>
+              <div className="era-period">{L(era.period)}</div>
               {eraDone && (
                 <p style={{ margin: '8px 0 0' }}>
-                  <span className="pill">🏅 {era.badgeTitle}</span>
+                  <span className="pill">🏅 {L(era.badgeTitle)}</span>
                 </p>
               )}
               {era.points.map((p) => {
                 const done = completedPoints.includes(p.id);
                 return (
                   <button key={p.id} className="btn point-btn" onClick={() => setOpen(p)}>
-                    {done ? '✅' : p.emoji} {p.title}
+                    {done ? '✅' : p.emoji} {L(p.title)}
                   </button>
                 );
               })}
@@ -149,7 +141,7 @@ export default function Timeline() {
           );
         })}
       </div>
-      <p className="small muted">Scroll sideways to travel through time →</p>
+      <p className="small muted">{t('timelineScrollHint')}</p>
 
       {open && <PointModal point={open} onClose={() => setOpen(null)} />}
     </div>

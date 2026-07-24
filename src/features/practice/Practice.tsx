@@ -4,41 +4,34 @@ import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallengeIndex } from '../../engine/community';
 import { PageHeader } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { yourNoteLabel, journalCount } from '../../i18n/strings';
 
 function MorningCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const setIntention = useJourney((s) => s.setIntention);
   const [text, setText] = useState('');
+  const { t, L, locale } = useT();
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
 
   return (
     <div className="card">
-      <h3>🌅 Morning Reflection</h3>
+      <h3>{t('morningCardTitle')}</h3>
       <div className="quote-card" style={{ marginBottom: 14 }}>
-        <p className="quote-text">“{quote.text}”</p>
-        {quote.zh && <p className="quote-zh">{quote.zh}</p>}
-        <p className="quote-author">— {quote.author}</p>
+        <p className="quote-text">“{L(quote.text)}”</p>
+        {locale === 'en' && quote.originalZh && <p className="quote-zh">{quote.originalZh}</p>}
+        <p className="quote-author">— {L(quote.author)}</p>
       </div>
       {rec.intention ? (
         <p>
-          <span className="pill">Intention set</span>&nbsp; “{rec.intention}”
+          <span className="pill">{t('intentionSetLabel')}</span>&nbsp; “{rec.intention}”
         </p>
       ) : (
         <>
-          <p className="small muted">What is your intention for today? One honest sentence is enough.</p>
-          <textarea
-            rows={2}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Today I will…"
-          />
-          <button
-            className="btn btn-primary"
-            style={{ marginTop: 10 }}
-            disabled={!text.trim()}
-            onClick={() => setIntention(text.trim())}
-          >
-            Set intention (+5 XP)
+          <p className="small muted">{t('intentionPrompt')}</p>
+          <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('intentionPlaceholder')} />
+          <button className="btn btn-primary" style={{ marginTop: 10 }} disabled={!text.trim()} onClick={() => setIntention(text.trim())}>
+            {t('intentionBtn')}
           </button>
         </>
       )}
@@ -50,35 +43,27 @@ function ChallengeCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const completeChallenge = useJourney((s) => s.completeChallenge);
   const [note, setNote] = useState('');
+  const { t, L, locale } = useT();
   const challenge = CHALLENGES[dailyChallengeIndex(today)];
 
   return (
     <div className="card">
       <h3>
-        {challenge.emoji} Daily Challenge <span className="pill pill-gold">{challenge.virtue}</span>
+        {challenge.emoji} {t('taskChallengePrefix')} <span className="pill pill-gold">{L(challenge.virtue)}</span>
       </h3>
-      <p>{challenge.text}</p>
+      <p>{L(challenge.text)}</p>
       {rec.challengeDone ? (
         <>
           <p>
-            <span className="pill">Challenge complete ✓</span>
+            <span className="pill">{t('challengeComplete')}</span>
           </p>
-          {rec.challengeNote && <p className="small muted">Your note: “{rec.challengeNote}”</p>}
+          {rec.challengeNote && <p className="small muted">{yourNoteLabel(locale, rec.challengeNote)}</p>}
         </>
       ) : (
         <>
-          <textarea
-            rows={2}
-            value={note}
-            onChange={(e) => setNote(e.target.value)}
-            placeholder="Optional: how did it go?"
-          />
-          <button
-            className="btn btn-primary"
-            style={{ marginTop: 10 }}
-            onClick={() => completeChallenge(challenge.id, note.trim() || undefined)}
-          >
-            I practised this today (+15 XP)
+          <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('challengeNotePlaceholder')} />
+          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => completeChallenge(challenge.id, note.trim() || undefined)}>
+            {t('challengeBtn')}
           </button>
         </>
       )}
@@ -92,33 +77,34 @@ function EveningCard({ today }: { today: string }) {
   const [learned, setLearned] = useState('');
   const [virtue, setVirtue] = useState('');
   const [improve, setImprove] = useState('');
+  const { t } = useT();
 
   return (
     <div className="card">
-      <h3>🪞 Evening Reflection</h3>
+      <h3>{t('eveningCardTitle')}</h3>
       {rec.reflection ? (
         <>
           <p>
-            <span className="pill">Reflection written ✓</span>
+            <span className="pill">{t('reflectionDone')}</span>
           </p>
           <p className="small">
-            <strong>Learned:</strong> {rec.reflection.learned}
+            <strong>{t('reflectionLearnedLabel')}:</strong> {rec.reflection.learned}
           </p>
           <p className="small">
-            <strong>Virtue practised:</strong> {rec.reflection.virtue}
+            <strong>{t('reflectionVirtueLabel')}:</strong> {rec.reflection.virtue}
           </p>
           <p className="small">
-            <strong>Tomorrow:</strong> {rec.reflection.improve}
+            <strong>{t('reflectionTomorrowLabel')}:</strong> {rec.reflection.improve}
           </p>
         </>
       ) : (
         <>
-          <p className="small muted">Three questions, honestly but kindly. A sentence each is plenty.</p>
-          <label className="small">What did I learn today?</label>
+          <p className="small muted">{t('reflectionIntro')}</p>
+          <label className="small">{t('reflectionQ1')}</label>
           <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
-          <label className="small">What virtue did I practise?</label>
+          <label className="small">{t('reflectionQ2')}</label>
           <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
-          <label className="small">How can I improve tomorrow?</label>
+          <label className="small">{t('reflectionQ3')}</label>
           <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
           <button
             className="btn btn-primary"
@@ -126,7 +112,7 @@ function EveningCard({ today }: { today: string }) {
             disabled={!learned.trim() || !virtue.trim() || !improve.trim()}
             onClick={() => submitReflection(learned.trim(), virtue.trim(), improve.trim())}
           >
-            Save reflection (+10 XP)
+            {t('reflectionBtn')}
           </button>
         </>
       )}
@@ -137,6 +123,7 @@ function EveningCard({ today }: { today: string }) {
 function Journal() {
   const days = useJourney((s) => s.days);
   const [open, setOpen] = useState(false);
+  const { t, L, locale } = useT();
   const entries = Object.entries(days)
     .filter(([, rec]) => rec.intention || rec.reflection || rec.challengeDone)
     .sort(([a], [b]) => (a < b ? 1 : -1));
@@ -144,11 +131,11 @@ function Journal() {
   if (entries.length === 0) return null;
   return (
     <div className="card">
-      <h3>📔 Journal</h3>
-      <p className="small muted">{entries.length} day{entries.length === 1 ? '' : 's'} recorded on your journey.</p>
+      <h3>{t('journalTitle')}</h3>
+      <p className="small muted">{journalCount(locale, entries.length)}</p>
       {!open ? (
         <button className="btn" onClick={() => setOpen(true)}>
-          Browse journal
+          {t('journalBrowse')}
         </button>
       ) : (
         <>
@@ -164,21 +151,21 @@ function Journal() {
                 )}
                 {rec.challengeDone && (
                   <p className="small" style={{ margin: '4px 0' }}>
-                    🎯 {ch ? `${ch.virtue} challenge` : 'Challenge'} completed
+                    🎯 {ch ? L(ch.virtue) : ''}
                     {rec.challengeNote ? ` — “${rec.challengeNote}”` : ''}
                   </p>
                 )}
                 {rec.reflection && (
                   <p className="small" style={{ margin: '4px 0' }}>
-                    🪞 Learned: {rec.reflection.learned} · Virtue: {rec.reflection.virtue} · Tomorrow:{' '}
-                    {rec.reflection.improve}
+                    🪞 {t('reflectionLearnedLabel')}: {rec.reflection.learned} · {t('reflectionVirtueLabel')}: {rec.reflection.virtue} ·{' '}
+                    {t('reflectionTomorrowLabel')}: {rec.reflection.improve}
                   </p>
                 )}
               </div>
             );
           })}
           <button className="btn" style={{ marginTop: 10 }} onClick={() => setOpen(false)}>
-            Close journal
+            {t('journalClose')}
           </button>
         </>
       )}
@@ -188,14 +175,10 @@ function Journal() {
 
 export default function Practice() {
   const today = useToday();
+  const { t } = useT();
   return (
     <div>
-      <PageHeader
-        emoji="🎯"
-        title="Daily Virtue Practice"
-        zh="修行"
-        subtitle="Knowledge alone does not transform people. Practice does."
-      />
+      <PageHeader emoji="🎯" title={t('practiceTitle')} zh={t('practiceZh')} subtitle={t('practiceSubtitle')} />
       <MorningCard today={today} />
       <ChallengeCard today={today} />
       <EveningCard today={today} />

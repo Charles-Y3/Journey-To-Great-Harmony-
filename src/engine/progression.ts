@@ -1,23 +1,23 @@
 import type { Stats } from '../data/types';
+import { localized, type Localized } from '../i18n/types';
 
 // ── Ranks ──────────────────────────────────────────────────────────────
 export interface Rank {
   id: string;
-  name: string;
-  zh?: string;
+  name: Localized<string>;
   emoji: string;
   minXp: number;
 }
 
 export const RANKS: Rank[] = [
-  { id: 'seeker', name: 'Seeker', zh: '求道者', emoji: '🔦', minXp: 0 },
-  { id: 'explorer', name: 'Explorer', zh: '探索者', emoji: '🧭', minXp: 100 },
-  { id: 'learner', name: 'Learner', zh: '学者', emoji: '📖', minXp: 250 },
-  { id: 'practitioner', name: 'Practitioner', zh: '修行者', emoji: '🥋', minXp: 500 },
-  { id: 'cultivator', name: 'Cultivator', zh: '耕耘者', emoji: '🌱', minXp: 900 },
-  { id: 'contributor', name: 'Contributor', zh: '贡献者', emoji: '🤝', minXp: 1400 },
-  { id: 'harmony-builder', name: 'Harmony Builder', zh: '大同建设者', emoji: '🌉', minXp: 2100 },
-  { id: 'wisdom-keeper', name: 'Wisdom Keeper', zh: '守智者', emoji: '🏮', minXp: 3000 },
+  { id: 'seeker', name: localized('Seeker', '求道者'), emoji: '🔦', minXp: 0 },
+  { id: 'explorer', name: localized('Explorer', '探索者'), emoji: '🧭', minXp: 100 },
+  { id: 'learner', name: localized('Learner', '学者'), emoji: '📖', minXp: 250 },
+  { id: 'practitioner', name: localized('Practitioner', '修行者'), emoji: '🥋', minXp: 500 },
+  { id: 'cultivator', name: localized('Cultivator', '耕耘者'), emoji: '🌱', minXp: 900 },
+  { id: 'contributor', name: localized('Contributor', '贡献者'), emoji: '🤝', minXp: 1400 },
+  { id: 'harmony-builder', name: localized('Harmony Builder', '大同建设者'), emoji: '🌉', minXp: 2100 },
+  { id: 'wisdom-keeper', name: localized('Wisdom Keeper', '守智者'), emoji: '🏮', minXp: 3000 },
 ];
 
 export function rankIndexForXp(xp: number): number {
@@ -63,18 +63,18 @@ export const HARMONY_FOR = {
 // ── Virtue Forest ──────────────────────────────────────────────────────
 export interface ForestStage {
   id: string;
-  name: string;
+  name: Localized<string>;
   emoji: string;
   threshold: number; // growth score required
 }
 
 export const FOREST_STAGES: ForestStage[] = [
-  { id: 'seed', name: 'Seed', emoji: '🌰', threshold: 0 },
-  { id: 'sprout', name: 'Sprout', emoji: '🌱', threshold: 10 },
-  { id: 'tree', name: 'Tree', emoji: '🌳', threshold: 30 },
-  { id: 'forest', name: 'Forest', emoji: '🌲', threshold: 70 },
-  { id: 'garden', name: 'Garden', emoji: '🌷', threshold: 130 },
-  { id: 'sanctuary', name: 'Sanctuary', emoji: '⛩️', threshold: 220 },
+  { id: 'seed', name: localized('Seed', '种子'), emoji: '🌰', threshold: 0 },
+  { id: 'sprout', name: localized('Sprout', '幼苗'), emoji: '🌱', threshold: 10 },
+  { id: 'tree', name: localized('Tree', '树木'), emoji: '🌳', threshold: 30 },
+  { id: 'forest', name: localized('Forest', '树林'), emoji: '🌲', threshold: 70 },
+  { id: 'garden', name: localized('Garden', '花园'), emoji: '🌷', threshold: 130 },
+  { id: 'sanctuary', name: localized('Sanctuary', '圣境'), emoji: '⛩️', threshold: 220 },
 ];
 
 export function growthScore(s: Stats): number {

@@ -3,6 +3,7 @@ import { forestInfo, statsFromData, type JourneyData } from '../../state/selecto
 import { FOREST_STAGES } from '../../engine/progression';
 import { seededRandom } from '../../engine/progression';
 import { PageHeader, ProgressBar } from '../../components/ui';
+import { useT } from '../../i18n/useT';
 
 function Tree({ x, size, kind }: { x: number; size: number; kind: number }) {
   const groundY = 240;
@@ -20,7 +21,7 @@ function Tree({ x, size, kind }: { x: number; size: number; kind: number }) {
   );
 }
 
-function ForestScene({ stageIndex, score }: { stageIndex: number; score: number }) {
+function ForestScene({ stageIndex, score, seedCaption }: { stageIndex: number; score: number; seedCaption: string }) {
   const treeCount = Math.min(14, stageIndex === 0 ? 0 : 1 + Math.floor(score / 12));
   const flowerCount = stageIndex >= 3 ? Math.min(20, Math.floor(score / 8)) : 0;
   const trees = Array.from({ length: treeCount }, (_, i) => ({
@@ -35,7 +36,7 @@ function ForestScene({ stageIndex, score }: { stageIndex: number; score: number 
   }));
 
   return (
-    <svg className="scene" viewBox="0 0 600 300" role="img" aria-label="Your virtue forest">
+    <svg className="scene" viewBox="0 0 600 300" role="img" aria-label={seedCaption}>
       <defs>
         <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="#bfe3f2" />
@@ -55,7 +56,7 @@ function ForestScene({ stageIndex, score }: { stageIndex: number; score: number 
           <ellipse cx="300" cy="252" rx="26" ry="9" fill="#8b6b43" />
           <circle cx="300" cy="246" r="7" fill="#6d4c2a" />
           <text x="300" y="215" textAnchor="middle" fontSize="14" fill="#557">
-            a seed, waiting for your care…
+            {seedCaption}
           </text>
         </g>
       )}
@@ -105,25 +106,21 @@ export default function Forest() {
   const d = state as unknown as JourneyData;
   const info = forestInfo(d);
   const stats = statsFromData(d);
+  const { t, L } = useT();
 
   const factors = [
-    { name: 'Lessons completed', emoji: '📖', value: stats.lessons },
-    { name: 'Challenges completed', emoji: '🎯', value: stats.challengesDone },
-    { name: 'Reflections written', emoji: '🪞', value: stats.reflections },
-    { name: 'Timeline studies', emoji: '⏳', value: stats.timelinePoints },
-    { name: 'Best streak', emoji: '🔥', value: stats.streakBest },
+    { name: t('forestFactorLessons'), emoji: '📖', value: stats.lessons },
+    { name: t('forestFactorChallenges'), emoji: '🎯', value: stats.challengesDone },
+    { name: t('forestFactorReflections'), emoji: '🪞', value: stats.reflections },
+    { name: t('forestFactorTimeline'), emoji: '⏳', value: stats.timelinePoints },
+    { name: t('forestFactorStreak'), emoji: '🔥', value: stats.streakBest },
   ];
 
   return (
     <div>
-      <PageHeader
-        emoji="🌲"
-        title="Virtue Forest"
-        zh="德之林"
-        subtitle="A living picture of your inner cultivation. It grows as you do."
-      />
+      <PageHeader emoji="🌲" title={t('forestTitle')} zh={t('forestZh')} subtitle={t('forestSubtitle')} />
 
-      <ForestScene stageIndex={info.stageIndex} score={info.score} />
+      <ForestScene stageIndex={info.stageIndex} score={info.score} seedCaption={t('forestSeedCaption')} />
 
       <div className="stage-steps">
         {FOREST_STAGES.map((s, i) => {
@@ -132,7 +129,7 @@ export default function Forest() {
           if (i === info.stageIndex) cls += ' current';
           return (
             <span key={s.id} className={cls}>
-              {s.emoji} {s.name}
+              {s.emoji} {L(s.name)}
             </span>
           );
         })}
@@ -142,12 +139,12 @@ export default function Forest() {
         {info.next ? (
           <>
             <h3>
-              Growing toward: {info.next.emoji} {info.next.name}
+              {t('forestGrowingToward')}: {info.next.emoji} {L(info.next.name)}
             </h3>
-            <ProgressBar value={info.score} max={info.next.threshold} label={`${info.score} / ${info.next.threshold} growth`} />
+            <ProgressBar value={info.score} max={info.next.threshold} label={`${info.score} / ${info.next.threshold}`} />
           </>
         ) : (
-          <h3>⛩️ Your forest has become a Sanctuary — tend it well.</h3>
+          <h3>{t('forestSanctuary')}</h3>
         )}
         <div className="stat-grid">
           {factors.map((f) => (
@@ -159,10 +156,7 @@ export default function Forest() {
             </div>
           ))}
         </div>
-        <p className="small muted">
-          Every lesson, challenge, reflection, and day of consistency adds growth. There is no shortcut — and no
-          hurry. 千里之行，始于足下。
-        </p>
+        <p className="small muted">{t('forestFooter')}</p>
       </div>
     </div>
   );

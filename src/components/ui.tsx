@@ -1,5 +1,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { useJourney } from '../state/store';
+import { useT } from '../i18n/useT';
+import { continueBtn } from '../i18n/strings';
 
 export function ProgressBar({
   value,
@@ -30,6 +32,7 @@ export function Modal({
   children: ReactNode;
   wide?: boolean;
 }) {
+  const { t } = useT();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -41,7 +44,7 @@ export function Modal({
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className={wide ? 'modal modal-wide' : 'modal'} onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label="Close">
+        <button className="modal-close" onClick={onClose} aria-label={t('close')}>
           ✕
         </button>
         {children}
@@ -54,6 +57,7 @@ export function Modal({
 export function CelebrationOverlay() {
   const celebrations = useJourney((s) => s.celebrations);
   const dismiss = useJourney((s) => s.dismissCelebration);
+  const { locale } = useT();
   if (celebrations.length === 0) return null;
   const c = celebrations[0];
   return (
@@ -63,7 +67,7 @@ export function CelebrationOverlay() {
         <h2>{c.title}</h2>
         {c.subtitle && <p className="celebrate-sub">{c.subtitle}</p>}
         <button className="btn btn-primary" onClick={dismiss}>
-          {celebrations.length > 1 ? `Continue (${celebrations.length - 1} more)` : 'Continue'}
+          {continueBtn(locale, celebrations.length - 1)}
         </button>
       </div>
     </div>

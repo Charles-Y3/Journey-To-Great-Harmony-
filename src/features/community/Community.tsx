@@ -4,14 +4,16 @@ import { peerStats, peerEncouragesToday } from '../../engine/community';
 import { statsFromData, forestInfo, type JourneyData } from '../../state/selectors';
 import { PEERS } from '../../data/peers';
 import { PageHeader } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { encouragementBanner, type UiKey } from '../../i18n/strings';
 
 type Category = 'wisdom' | 'practice' | 'compassion' | 'growth';
 
-const CATEGORIES: { id: Category; name: string; emoji: string; desc: string }[] = [
-  { id: 'wisdom', name: 'Wisdom', emoji: '📚', desc: 'Learning completed (XP)' },
-  { id: 'practice', name: 'Practice', emoji: '🔥', desc: 'Daily consistency (streak)' },
-  { id: 'compassion', name: 'Compassion', emoji: '❤️', desc: 'Challenges & encouragement given' },
-  { id: 'growth', name: 'Growth', emoji: '🌱', desc: 'Overall personal cultivation' },
+const CATEGORIES: { id: Category; emoji: string; nameKey: UiKey; descKey: UiKey }[] = [
+  { id: 'wisdom', emoji: '📚', nameKey: 'catWisdomName', descKey: 'catWisdomDesc' },
+  { id: 'practice', emoji: '🔥', nameKey: 'catPracticeName', descKey: 'catPracticeDesc' },
+  { id: 'compassion', emoji: '❤️', nameKey: 'catCompassionName', descKey: 'catCompassionDesc' },
+  { id: 'growth', emoji: '🌱', nameKey: 'catGrowthName', descKey: 'catGrowthDesc' },
 ];
 
 export default function Community() {
@@ -21,6 +23,7 @@ export default function Community() {
   const sendEncouragement = useJourney((s) => s.sendEncouragement);
   const [category, setCategory] = useState<Category>('wisdom');
   const [sentFlash, setSentFlash] = useState<string | null>(null);
+  const { t, L, locale } = useT();
 
   const stats = statsFromData(d);
   const forest = forestInfo(d);
@@ -41,44 +44,33 @@ export default function Community() {
   }
 
   const rows = [
-    { id: 'me', name: 'You', emoji: '🧑‍🌾', me: true, score: scoreFor(category, true) },
-    ...peers.map((p, i) => ({ id: p.peer.id, name: p.peer.name, emoji: p.peer.emoji, me: false, score: scoreFor(category, false, i) })),
+    { id: 'me', name: t('leaderboardYou'), emoji: '🧑‍🌾', me: true, score: scoreFor(category, true) },
+    ...peers.map((p, i) => ({ id: p.peer.id, name: L(p.peer.name), emoji: p.peer.emoji, me: false, score: scoreFor(category, false, i) })),
   ].sort((a, b) => b.score - a.score);
 
   const encouragersToday = PEERS.filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
+  const activeCategory = CATEGORIES.find((c) => c.id === category)!;
 
   return (
     <div>
-      <PageHeader
-        emoji="👥"
-        title="Community"
-        zh="同行者"
-        subtitle="Fellow travellers on the road to Great Harmony. Not a competition — an encouragement."
-      />
+      <PageHeader emoji="👥" title={t('communityTitle')} zh={t('communityZh')} subtitle={t('communitySubtitle')} />
 
       {encouragersToday.length > 0 && (
         <div className="quote-card">
-          <p style={{ margin: 0 }}>
-            🌸 {encouragersToday.map((p) => p.name).join(', ')}{' '}
-            {encouragersToday.length === 1 ? 'has' : 'have'} sent you encouragement for your kindness yesterday!
-          </p>
+          <p style={{ margin: 0 }}>{encouragementBanner(locale, encouragersToday.map((p) => L(p.name)))}</p>
         </div>
       )}
 
       <div className="card">
-        <h3>Leaderboards</h3>
+        <h3>{t('leaderboardsTitle')}</h3>
         <div className="tab-row">
           {CATEGORIES.map((c) => (
-            <button
-              key={c.id}
-              className={category === c.id ? 'btn tab-btn active' : 'btn tab-btn'}
-              onClick={() => setCategory(c.id)}
-            >
-              {c.emoji} {c.name}
+            <button key={c.id} className={category === c.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setCategory(c.id)}>
+              {c.emoji} {t(c.nameKey)}
             </button>
           ))}
         </div>
-        <p className="small muted">{CATEGORIES.find((c) => c.id === category)!.desc}</p>
+        <p className="small muted">{t(activeCategory.descKey)}</p>
         {rows.map((row, i) => (
           <div key={row.id} className={row.me ? 'leader-row me' : 'leader-row'}>
             <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
@@ -88,23 +80,21 @@ export default function Community() {
           </div>
         ))}
         <p className="small muted" style={{ marginTop: 8 }}>
-          Rankings measure consistency and contribution, never worth. Everyone here is walking the same road.
+          {t('leaderboardsFooter')}
         </p>
       </div>
 
       <div className="card">
-        <h3>Send encouragement 🌸</h3>
-        <p className="small muted">
-          Celebrate a fellow traveller. Encouragement costs nothing and builds the world (+2 XP, +5 harmony).
-        </p>
+        <h3>{t('sendEncouragementTitle')}</h3>
+        <p className="small muted">{t('sendEncouragementDesc')}</p>
         {peers.map((p) => {
           const sentToday = state.encouragedOn[p.peer.id] === today;
           return (
             <div key={p.peer.id} className="leader-row">
               <span>{p.peer.emoji}</span>
               <span>
-                <strong>{p.peer.name}</strong>
-                <div className="small muted">“{p.peer.motto}”</div>
+                <strong>{L(p.peer.name)}</strong>
+                <div className="small muted">“{L(p.peer.motto)}”</div>
               </span>
               <span className="leader-score">
                 <button
@@ -117,7 +107,7 @@ export default function Community() {
                     }
                   }}
                 >
-                  {sentToday ? (sentFlash === p.peer.id ? '🌸 Sent!' : '🌸 Sent today') : '🌸 Encourage'}
+                  {sentToday ? (sentFlash === p.peer.id ? t('encourageSentJust') : t('encourageSentToday')) : t('encourageBtn')}
                 </button>
               </span>
             </div>
@@ -126,12 +116,8 @@ export default function Community() {
       </div>
 
       <div className="card">
-        <h3>Groups</h3>
-        <p className="small muted">
-          🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles — travelling together with real friends and
-          family arrives with community accounts in a future version. For now, your simulated companions keep the
-          campfire warm.
-        </p>
+        <h3>{t('groupsTitle')}</h3>
+        <p className="small muted">{t('groupsBody')}</p>
       </div>
     </div>
   );

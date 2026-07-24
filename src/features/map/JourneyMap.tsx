@@ -2,21 +2,19 @@ import { useJourney } from '../../state/store';
 import { REGIONS } from '../../data/journeyMap';
 import { regionChallengeMet, type JourneyData } from '../../state/selectors';
 import { PageHeader } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { regionUnlockNote, regionCompletedPill, claimGroundBtn } from '../../i18n/strings';
 
 export default function JourneyMap() {
   const state = useJourney();
   const d = state as unknown as JourneyData;
   const completeRegion = useJourney((s) => s.completeRegion);
   const xp = state.xp;
+  const { t, L, locale } = useT();
 
   return (
     <div>
-      <PageHeader
-        emoji="🗺️"
-        title="Journey Map"
-        zh="旅程"
-        subtitle="Your personal adventure. Each region is a stage of inner growth — unlock them as your wisdom deepens."
-      />
+      <PageHeader emoji="🗺️" title={t('mapTitle')} zh={t('mapZh')} subtitle={t('mapSubtitle')} />
 
       {REGIONS.map((region, i) => {
         const unlocked = xp >= region.unlockXp;
@@ -33,28 +31,28 @@ export default function JourneyMap() {
             </div>
             <div className="region-body card" style={{ marginBottom: 8 }}>
               <h3 style={{ marginBottom: 2 }}>
-                {region.emoji} {region.name}
+                {region.emoji} {L(region.name)}
               </h3>
               <p className="small muted" style={{ marginBottom: 8 }}>
-                {region.tagline}
-                {!unlocked && ` · unlocks at ${region.unlockXp} XP (you have ${xp})`}
+                {L(region.tagline)}
+                {!unlocked && ` · ${regionUnlockNote(locale, region.unlockXp, xp)}`}
               </p>
               {unlocked && (
                 <>
                   <p className="small" style={{ fontStyle: 'italic' }}>
-                    {region.story}
+                    {L(region.story)}
                   </p>
                   <p className="small">
-                    <strong>Region challenge:</strong> {region.challenge}
+                    <strong>{t('regionChallengeLabel')}:</strong> {L(region.challenge)}
                   </p>
                   {completed ? (
-                    <span className="pill">Completed ✓ (+{region.rewardXp} XP)</span>
+                    <span className="pill">{regionCompletedPill(locale, region.rewardXp)}</span>
                   ) : met ? (
                     <button className="btn btn-primary" onClick={() => completeRegion(region.id)}>
-                      Claim this ground (+{region.rewardXp} XP)
+                      {claimGroundBtn(locale, region.rewardXp)}
                     </button>
                   ) : (
-                    <span className="pill pill-gold">Challenge in progress…</span>
+                    <span className="pill pill-gold">{t('regionInProgress')}</span>
                   )}
                 </>
               )}

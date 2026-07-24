@@ -4,21 +4,25 @@ import type { Topic, Lesson } from '../../data/types';
 import { useJourney } from '../../state/store';
 import { isTopicCompleted, isTopicUnlocked } from '../../state/selectors';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
+import { useT } from '../../i18n/useT';
+import { knowledgeProgressLabel, topicLessonCount, backToTopic } from '../../i18n/strings';
 
 function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; onDone: (correct: boolean) => void }) {
   const [picked, setPicked] = useState<number | null>(null);
   const [reflectionText, setReflectionText] = useState('');
+  const { t, L } = useT();
   const answered = picked !== null;
   const correct = picked === lesson.question.answer;
+  const options = L(lesson.question.options);
 
   return (
     <div>
-      <h3>{lesson.title}</h3>
-      <p style={{ whiteSpace: 'pre-line' }}>{lesson.reading}</p>
+      <h3>{L(lesson.title)}</h3>
+      <p style={{ whiteSpace: 'pre-line' }}>{L(lesson.reading)}</p>
 
-      <h4>Check your understanding</h4>
-      <p className="small">{lesson.question.q}</p>
-      {lesson.question.options.map((opt, i) => {
+      <h4>{t('checkUnderstanding')}</h4>
+      <p className="small">{L(lesson.question.q)}</p>
+      {options.map((opt, i) => {
         let cls = 'btn quiz-option';
         if (answered && i === lesson.question.answer) cls += ' correct';
         else if (answered && i === picked) cls += ' wrong';
@@ -30,28 +34,23 @@ function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; o
       })}
       {answered && (
         <p className="small" style={{ marginTop: 6 }}>
-          {correct ? '✅ Exactly right. (+5 XP)' : `🤔 Not quite — the answer is highlighted above.`}
+          {correct ? t('quizCorrectMsg') : t('quizWrongMsg')}
         </p>
       )}
 
       {answered && !done && (
         <>
-          <h4>Reflect</h4>
-          <p className="small muted">{lesson.reflection}</p>
-          <textarea
-            rows={2}
-            value={reflectionText}
-            onChange={(e) => setReflectionText(e.target.value)}
-            placeholder="A sentence of honest reflection (optional)…"
-          />
+          <h4>{t('reflectHeading')}</h4>
+          <p className="small muted">{L(lesson.reflection)}</p>
+          <textarea rows={2} value={reflectionText} onChange={(e) => setReflectionText(e.target.value)} placeholder={t('reflectionOptionalPlaceholder')} />
           <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone(correct)}>
-            Complete lesson (+20 XP)
+            {t('completeLessonBtn')}
           </button>
         </>
       )}
       {done && (
         <p style={{ marginTop: 10 }}>
-          <span className="pill">Lesson complete ✓</span>
+          <span className="pill">{t('lessonCompleteLabel')}</span>
         </p>
       )}
     </div>
@@ -62,40 +61,32 @@ function TopicModal({ topic, onClose }: { topic: Topic; onClose: () => void }) {
   const completedLessons = useJourney((s) => s.completedLessons);
   const completeLesson = useJourney((s) => s.completeLesson);
   const [openLesson, setOpenLesson] = useState<Lesson | null>(null);
+  const { t, L, locale } = useT();
 
   return (
     <Modal onClose={onClose} wide>
       {openLesson ? (
         <>
           <button className="btn" style={{ marginBottom: 12 }} onClick={() => setOpenLesson(null)}>
-            ← Back to {topic.name}
+            {backToTopic(locale, L(topic.name))}
           </button>
-          <LessonView
-            lesson={openLesson}
-            done={completedLessons.includes(openLesson.id)}
-            onDone={(correct) => completeLesson(openLesson.id, correct)}
-          />
+          <LessonView lesson={openLesson} done={completedLessons.includes(openLesson.id)} onDone={(correct) => completeLesson(openLesson.id, correct)} />
         </>
       ) : (
         <>
           <h2>
-            {topic.emoji} {topic.name} {topic.zh && <span className="zh-accent">{topic.zh}</span>}
+            {topic.emoji} {L(topic.name)} {topic.accent && <span className="zh-accent">{topic.accent}</span>}
           </h2>
-          <p className="muted">{topic.intro}</p>
+          <p className="muted">{L(topic.intro)}</p>
           {topic.lessons.map((lesson, i) => {
             const done = completedLessons.includes(lesson.id);
             const prevDone = i === 0 || completedLessons.includes(topic.lessons[i - 1].id);
             return (
-              <button
-                key={lesson.id}
-                className={done ? 'topic-node completed' : 'topic-node'}
-                disabled={!prevDone}
-                onClick={() => setOpenLesson(lesson)}
-              >
+              <button key={lesson.id} className={done ? 'topic-node completed' : 'topic-node'} disabled={!prevDone} onClick={() => setOpenLesson(lesson)}>
                 <span className="topic-emoji">{done ? '✅' : '📖'}</span>
                 <span>
-                  <strong>{lesson.title}</strong>
-                  {!prevDone && <span className="small muted"> — complete the previous lesson first</span>}
+                  <strong>{L(lesson.title)}</strong>
+                  {!prevDone && <span className="small muted"> — {t('lockedPrevLesson')}</span>}
                 </span>
               </button>
             );
@@ -108,21 +99,18 @@ function TopicModal({ topic, onClose }: { topic: Topic; onClose: () => void }) {
 
 function TopicNode({ topic, onOpen }: { topic: Topic; onOpen: (t: Topic) => void }) {
   const completedLessons = useJourney((s) => s.completedLessons);
+  const { L, t, locale } = useT();
   const unlocked = isTopicUnlocked(completedLessons, topic);
   const completed = isTopicCompleted(completedLessons, topic);
   const doneCount = topic.lessons.filter((l) => completedLessons.includes(l.id)).length;
 
   return (
-    <button
-      className={completed ? 'topic-node completed' : 'topic-node'}
-      disabled={!unlocked}
-      onClick={() => onOpen(topic)}
-    >
+    <button className={completed ? 'topic-node completed' : 'topic-node'} disabled={!unlocked} onClick={() => onOpen(topic)}>
       <span className="topic-emoji">{unlocked ? topic.emoji : '🔒'}</span>
       <span style={{ flex: 1 }}>
-        <strong>{topic.name}</strong> {topic.zh && <span className="zh-accent">{topic.zh}</span>}
-        <span className="small muted"> · {doneCount}/{topic.lessons.length} lessons</span>
-        <div className="small muted">{unlocked ? topic.intro : 'Complete the topic above to unlock.'}</div>
+        <strong>{L(topic.name)}</strong> {topic.accent && <span className="zh-accent">{topic.accent}</span>}
+        <span className="small muted"> · {topicLessonCount(locale, doneCount, topic.lessons.length)}</span>
+        <div className="small muted">{unlocked ? L(topic.intro) : t('lockedTopic')}</div>
       </span>
       {completed && <span>✓</span>}
     </button>
@@ -132,30 +120,18 @@ function TopicNode({ topic, onOpen }: { topic: Topic; onOpen: (t: Topic) => void
 export default function Knowledge() {
   const completedLessons = useJourney((s) => s.completedLessons);
   const [open, setOpen] = useState<Topic | null>(null);
+  const { t, locale } = useT();
 
   const root = TOPICS.find((t) => t.id === 'wisdom')!;
-  const branches: { id: Topic['branch']; title: string; note: string }[] = [
-    { id: 'compassion', title: 'Compassion 仁', note: 'The heart of the path' },
-    { id: 'character', title: 'Character 德', note: 'The backbone of the path' },
-    { id: 'understanding', title: 'Understanding 明', note: 'The eyes of the path' },
-  ];
+  const branches: { id: Topic['branch'] }[] = [{ id: 'compassion' }, { id: 'character' }, { id: 'understanding' }];
 
-  const totalLessons = TOPICS.reduce((n, t) => n + t.lessons.length, 0);
+  const totalLessons = TOPICS.reduce((n, tp) => n + tp.lessons.length, 0);
 
   return (
     <div>
-      <PageHeader
-        emoji="🌳"
-        title="The Knowledge Path"
-        zh="智慧之树"
-        subtitle="A living tree of wisdom. Each completed topic unlocks the deeper ones beneath it."
-      />
+      <PageHeader emoji="🌳" title={t('knowledgeTitle')} zh={t('knowledgeZh')} subtitle={t('knowledgeSubtitle')} />
       <div className="card">
-        <ProgressBar
-          value={completedLessons.length}
-          max={totalLessons}
-          label={`${completedLessons.length}/${totalLessons} lessons completed`}
-        />
+        <ProgressBar value={completedLessons.length} max={totalLessons} label={knowledgeProgressLabel(locale, completedLessons.length, totalLessons)} />
       </div>
 
       <div className="tree-branch">
@@ -163,8 +139,8 @@ export default function Knowledge() {
       </div>
 
       {branches.map((branch) => {
-        const branchTopic = TOPICS.find((t) => t.id === branch.id)!;
-        const leaves = TOPICS.filter((t) => t.branch === branch.id && t.id !== branch.id);
+        const branchTopic = TOPICS.find((tp) => tp.id === branch.id)!;
+        const leaves = TOPICS.filter((tp) => tp.branch === branch.id && tp.id !== branch.id);
         return (
           <div className="tree-branch" key={branch.id}>
             <TopicNode topic={branchTopic} onOpen={setOpen} />
