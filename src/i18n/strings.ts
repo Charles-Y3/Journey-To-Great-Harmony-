@@ -306,8 +306,8 @@ export const UI = {
   worldRotateLeft: localized('Look left', '向左看'),
   worldRotateRight: localized('Look right', '向右看'),
   worldFooter: localized(
-    'In this version your fellow travellers are simulated companions. With community accounts, this world will be built by real people together.',
-    '在此版本中，你的同行旅人是模拟的伙伴。未来有了社群账号后，这个世界将由真实的人们共同建设。',
+    "You'll always have fellow travellers here to grow alongside, cheering you on and building this world with you. With community accounts in a future version, you'll also be able to walk this road with real friends and family.",
+    '在这里，你永远都会有同行的旅人，与你一起成长，为你加油，一同建设这个世界。未来加入社群账号功能后，你也将能与真实的亲友一同走上这条路。',
   ),
 
   // ── Community ─────────────────────────────────────────────────────
@@ -340,8 +340,8 @@ export const UI = {
   catGrowthName: localized('Growth', '成长'),
   catGrowthDesc: localized('Overall personal cultivation', '整体的个人修养'),
   groupsBody: localized(
-    '🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles — travelling together with real friends and family arrives with community accounts in a future version. For now, your simulated companions keep the campfire warm.',
-    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈 — 与真实的亲友一同结伴同行，将在未来加入社群账号功能后实现。目前，就让模拟的伙伴们先为你守候这团篝火。',
+    '🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles are coming with community accounts in a future version, so you can walk this road together with real friends and family. Until then, you are never walking it alone — your fellow travellers here are always ready to learn, practise, and grow alongside you.',
+    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈，将在未来加入社群账号功能后到来，让你能与真实的亲友一同结伴同行。在那之前，你也从不孤单 — 这里的同行者，永远愿意与你一起学习、践行、共同成长。',
   ),
 
   // ── Collection ────────────────────────────────────────────────────
