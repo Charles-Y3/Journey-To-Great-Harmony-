@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { useJourney } from '../../state/store';
+import { useJourney, useToday } from '../../state/store';
 import { forestInfo, statsFromData, type JourneyData } from '../../state/selectors';
 import { FOREST_STAGES } from '../../engine/progression';
 import { seededRandom } from '../../engine/progression';
+import { CHALLENGES } from '../../data/challenges';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 
@@ -119,14 +120,25 @@ function ForestCritters({ stageIndex }: { stageIndex: number }) {
   );
 }
 
+function VirtueLeaf({ x }: { x: number }) {
+  return (
+    <g className="virtue-leaf">
+      <ellipse cx={x} cy={210} rx={7} ry={11} fill="#57b06f" transform={`rotate(-25 ${x} 210)`} opacity={0.9} />
+      <path d={`M${x} 201 q 2 8 0 18`} stroke="#2e7d5b" strokeWidth={1} fill="none" />
+    </g>
+  );
+}
+
 function ForestScene({
   stageIndex,
   stageProgress,
   seedCaption,
+  showVirtueLeaf,
 }: {
   stageIndex: number;
   stageProgress: number;
   seedCaption: string;
+  showVirtueLeaf?: boolean;
 }) {
   const palette = STAGE_PALETTE[Math.min(stageIndex, STAGE_PALETTE.length - 1)];
 
@@ -259,17 +271,22 @@ function ForestScene({
       )}
 
       <ForestCritters stageIndex={stageIndex} />
+      {showVirtueLeaf && <VirtueLeaf x={420} />}
     </svg>
   );
 }
 
 export default function Forest() {
   const state = useJourney();
+  const today = useToday();
   const d = state as unknown as JourneyData;
   const info = forestInfo(d);
   const stats = statsFromData(d);
   const { t, L } = useT();
   const [previewStage, setPreviewStage] = useState<number | null>(null);
+  const todayRec = d.days[today] ?? {};
+  const showVirtueLeaf = !!(todayRec.challengeDone && todayRec.challengeNote);
+  const todayChallenge = todayRec.challengeId ? CHALLENGES.find((c) => c.id === todayRec.challengeId) : undefined;
 
   const stageProgress = info.next
     ? Math.max(0, Math.min(1, (info.score - info.stage.threshold) / (info.next.threshold - info.stage.threshold)))
@@ -287,7 +304,18 @@ export default function Forest() {
     <div>
       <PageHeader emoji="🌲" title={t('forestTitle')} subtitle={t('forestSubtitle')} />
 
-      <ForestScene stageIndex={info.stageIndex} stageProgress={stageProgress} seedCaption={t('forestSeedCaption')} />
+      <ForestScene
+        stageIndex={info.stageIndex}
+        stageProgress={stageProgress}
+        seedCaption={t('forestSeedCaption')}
+        showVirtueLeaf={showVirtueLeaf}
+      />
+      {showVirtueLeaf && (
+        <p className="small muted" style={{ marginTop: 6 }}>
+          {t('forestVirtueLeaf')}
+          {todayChallenge ? ` (${L(todayChallenge.virtue)})` : ''}
+        </p>
+      )}
 
       <div className="stage-steps forest-stage-grid">
         {FOREST_STAGES.map((s, i) => {

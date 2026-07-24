@@ -10,6 +10,8 @@ export interface QuizQuestion {
   q: Localized<string>;
   options: Localized<string[]>;
   answer: number; // index into options
+  /** Optional formative hint shown on a wrong answer — never reveals the correct option. */
+  nudge?: Localized<string>;
 }
 
 /**

@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useJourney } from '../state/store';
 import { useT } from '../i18n/useT';
-import { continueBtn, minLengthHint, capstoneSubmitBtn } from '../i18n/strings';
+import { continueBtn, minLengthHint, capstoneSubmitBtn, type UiKey } from '../i18n/strings';
 import { XP_FOR } from '../engine/progression';
 import { meaningfulLength, TEXT_MIN } from '../engine/textQuality';
+import { playSfx } from '../engine/sfx';
 
 export function ProgressBar({
   value,
@@ -74,22 +76,54 @@ export function Modal({
   );
 }
 
+function ctaLabelKey(ctaTo: string): UiKey {
+  if (ctaTo === '/forest') return 'celebrateVisitForest';
+  if (ctaTo === '/world') return 'celebrateVisitWorld';
+  if (ctaTo === '/collection') return 'celebrateVisitCollection';
+  if (ctaTo === '/map') return 'celebrateVisitMap';
+  return 'celebrateContinue';
+}
+
 /** Shows queued celebrations (rank-ups, badges, cards, growth) one at a time. */
 export function CelebrationOverlay() {
   const celebrations = useJourney((s) => s.celebrations);
   const dismiss = useJourney((s) => s.dismissCelebration);
-  const { locale } = useT();
+  const { locale, t } = useT();
+
+  const headId = celebrations[0]?.id;
+  const headMajor = celebrations[0]?.major;
+  useEffect(() => {
+    if (headId && headMajor) playSfx('celebrate');
+  }, [headId, headMajor]);
+
   if (celebrations.length === 0) return null;
   const c = celebrations[0];
+  const major = !!c.major;
+
   return (
     <div className="modal-backdrop celebrate-backdrop" onClick={dismiss}>
-      <div className="celebrate" onClick={(e) => e.stopPropagation()}>
+      <div className={major ? 'celebrate celebrate--major' : 'celebrate'} onClick={(e) => e.stopPropagation()}>
+        {major && (
+          <div className="celebrate-bloom" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+            <span />
+          </div>
+        )}
         <div className="celebrate-emoji">{c.emoji}</div>
         <h2>{c.title}</h2>
         {c.subtitle && <p className="celebrate-sub">{c.subtitle}</p>}
-        <button className="btn btn-primary" onClick={dismiss}>
-          {continueBtn(locale, celebrations.length - 1)}
-        </button>
+        <div className="celebrate-actions">
+          {c.ctaTo && (
+            <Link className="btn btn-primary" to={c.ctaTo} onClick={dismiss}>
+              {t(ctaLabelKey(c.ctaTo))}
+            </Link>
+          )}
+          <button className={c.ctaTo ? 'btn' : 'btn btn-primary'} onClick={dismiss}>
+            {continueBtn(locale, celebrations.length - 1)}
+          </button>
+        </div>
       </div>
     </div>
   );

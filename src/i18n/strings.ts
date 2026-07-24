@@ -20,7 +20,7 @@ export const UI = {
   navForest: localized('Forest', '森林'),
   navMap: localized('Map', '地图'),
   navWorld: localized('World', '世界'),
-  navCommunity: localized('Community', '社群'),
+  navCommunity: localized('Companions', '同行'),
   navCollection: localized('Collection', '收藏'),
   navMore: localized('More', '更多'),
 
@@ -59,8 +59,8 @@ export const UI = {
   // ── Settings: name ───────────────────────────────────────────────────
   settingsNameTitle: localized('Name', '姓名'),
   settingsNameDesc: localized(
-    'How fellow travellers see you in Community and the Great Harmony World.',
-    '这是同行者在社群与大同世界中看到你的名字。',
+    'How Companions of the Way see you in the shared Great Harmony World.',
+    '这是「道上同行」在共享大同世界中看到你的名字。',
   ),
   settingsNameSave: localized('Save', '保存'),
 
@@ -125,8 +125,8 @@ export const UI = {
   // ── Name onboarding gate ────────────────────────────────────────────
   nameGateTitle: localized('What should we call you?', '我们该如何称呼你？'),
   nameGateSubtitle: localized(
-    "This is how fellow travellers will know you in Community and the Great Harmony World.",
-    '这将是你在社群与大同世界中，被同行者认出的名字。',
+    'This is how Companions of the Way will know you in the shared world.',
+    '这将是「道上同行」在共享世界中认出你的名字。',
   ),
   nameGatePlaceholder: localized('Your name', '你的名字'),
   nameGateContinue: localized('Continue', '继续'),
@@ -210,8 +210,20 @@ export const UI = {
   intentionBtn: localized('Set intention (+5 XP)', '立下心愿 (+5 经验)'),
   challengeComplete: localized('Challenge complete ✓', '挑战完成 ✓'),
   challengeNoteLabel: localized('Your note', '你的记录'),
-  challengeNotePlaceholder: localized('Optional: how did it go?', '选填：进行得如何？'),
+  challengeNotePlaceholder: localized(
+    'Optional: a few words so today’s practice is witnessed…',
+    '选填：写几句，让今天的践行被看见…',
+  ),
+  challengeNoteHint: localized(
+    'A short note turns the act into a living memory in your journal.',
+    '简短的一笔，会让这次践行成为日志里鲜活的记忆。',
+  ),
+  challengeBreathBtn: localized('Pause, then practise', '先静心，再践行'),
   challengeBtn: localized('I practised this today (+15 XP)', '我今天践行了 (+15 经验)'),
+  breathGateTitle: localized('One full breath', '一次完整的呼吸'),
+  breathGateInhale: localized('Breathe in…', '吸气…'),
+  breathGateExhale: localized('Breathe out…', '呼气…'),
+  breathGateReady: localized('Begin when ready', '准备好了就开始'),
   eveningCardTitle: localized('🪞 Evening Reflection', '🪞 夜间反思'),
   reflectionDone: localized('Reflection written ✓', '反思已写下 ✓'),
   reflectionLearnedLabel: localized('Learned', '学到了'),
@@ -221,15 +233,25 @@ export const UI = {
     'Three questions, honestly but kindly. A sentence each is plenty.',
     '三个问题，诚实而温柔地回答。每题一句话就够了。',
   ),
+  eveningIntentionEcho: localized('This morning you set out to:', '今早你立下的心愿是：'),
   reflectionQ1: localized('What did I learn today?', '我今天学到了什么？'),
   reflectionQ2: localized('What virtue did I practise?', '我践行了哪种德行？'),
   reflectionQ3: localized('How can I improve tomorrow?', '明天我可以如何做得更好？'),
+  reflectionQ3WithIntention: localized(
+    'How did today’s intention go — and how can tomorrow deepen it?',
+    '今天的心愿践行得如何 — 明天又可以如何加深？',
+  ),
   reflectionBtn: localized('Save reflection (+10 XP)', '保存反思 (+10 经验)'),
   eveningLockedNote: localized(
     'Evening Reflection opens at 5pm, once your day has actually happened — come back then.',
     '夜间反思在下午5点后开放，待今天真正过去一些再来吧。',
   ),
   journalTitle: localized('📔 Journal', '📔 日志'),
+  journalEmptyTitle: localized('Your journal waits', '你的日志静候着'),
+  journalEmptyDesc: localized(
+    'Set a morning intention, practise a virtue, or write an evening reflection — each entry becomes a page here.',
+    '立下晨间心愿、践行一种德行，或写下夜间反思 — 每一则都会成为这里的一页。',
+  ),
   journalBrowse: localized('Browse journal', '浏览日志'),
   journalClose: localized('Close journal', '关闭日志'),
   journalFilterAll: localized('All', '全部'),
@@ -239,6 +261,91 @@ export const UI = {
   journalFilterEmpty: localized('No entries of this kind yet.', '目前还没有这类记录。'),
   journalDateFilterAll: localized('All dates', '所有日期'),
   journalDateFilterFromPrefix: localized('From', '从'),
+  todayIntentionLabel: localized("Today’s intention", '今日心愿'),
+  yesterdayWroteLabel: localized('Yesterday you wrote', '昨日你写下'),
+  visitForestBanner: localized('Your forest grew — visit?', '你的森林成长了 — 去看看？'),
+  visitWorldBanner: localized('The world brightened — see it?', '世界更明亮了 — 去看看？'),
+  pacingIntroTitle: localized('A paced journey', '一段缓行的旅程'),
+  pacingIntroBody1: localized(
+    'This path is cultivation, not a binge. You can only complete a few lessons and timeline studies each day.',
+    '这条路是修养，不是狂刷。每天只能完成有限的几课与时间线研读。',
+  ),
+  pacingIntroBody2: localized(
+    'Quizzes ask you to understand before you continue — a wrong answer reshuffles; the right one is not shown.',
+    '测验要求你真正理解后才能继续 — 答错会重新洗牌，不会直接揭示正确答案。',
+  ),
+  pacingIntroBody3: localized(
+    'Evening reflection opens at 5pm, so looking back happens after the day has truly unfolded.',
+    '夜间反思在下午5点后开放，好让回顾发生在这一天真正展开之后。',
+  ),
+  pacingIntroBody4: localized(
+    'Go gently. The summit was never the point — becoming someone who walks is.',
+    '慢慢走。终点从来不是重点 — 成为能行走的人，才是。',
+  ),
+  pacingIntroContinue: localized('I understand', '我明白了'),
+  celebrateVisitForest: localized('Visit your forest', '前往你的森林'),
+  celebrateVisitWorld: localized('Visit the world', '前往大同世界'),
+  celebrateVisitCollection: localized('Open Collection', '打开收藏'),
+  celebrateVisitMap: localized('Open Map', '打开地图'),
+  mapArrivalTitle: localized('You have arrived', '你已抵达'),
+  mapArrivalContinue: localized('Continue', '继续'),
+  cardRevealTap: localized('Reveal', '揭开'),
+  collectionFirstPromise: localized(
+    'Locked cards wait for your practice. Complete lessons, timeline studies, and challenges — each unlock is a teaching received.',
+    '锁住的卡牌等待你的修习。完成课程、时间线研读与挑战 — 每一次解锁，都是一份领受的教导。',
+  ),
+  quizNudgeReread: localized(
+    'Pause and reread the teaching, then try again.',
+    '停下来重读教导，再试一次。',
+  ),
+  quizNudgeBreathe: localized(
+    'One breath, then return to what you just learned.',
+    '深呼吸一次，再回到你刚学到的内容。',
+  ),
+  quizNudgeLookAgain: localized(
+    'Look again at the key ideas above — the answer is in the teaching.',
+    '再看看上方的要点 — 答案就在教导之中。',
+  ),
+  quizRereadTeaching: localized('Reread teaching', '重读教导'),
+  knowledgeDailyCapWhy: localized(
+    'Paced on purpose — a few lessons a day keep wisdom from becoming rushed content.',
+    '有意放缓节奏 — 每天几课，免得智慧沦为赶进度的内容。',
+  ),
+  timelineDailyCapWhy: localized(
+    'Paced on purpose — the timeline is a lifelong road, not a race.',
+    '有意放缓节奏 — 时间线是一生的路，不是赛跑。',
+  ),
+  weeklyReviewTitle: localized('Weekly harmony review', '每周和谐回顾'),
+  weeklyReviewStreak: localized('Your streak', '你的连续记录'),
+  weeklyReviewQuote: localized('A teaching from this week', '本周的一则教导'),
+  weeklyReviewVirtue: localized('A virtue you practised', '你践行的德行'),
+  weeklyReviewThread: localized('From intention to tomorrow', '从心愿到明日'),
+  weeklyReviewEmpty: localized(
+    'A quiet week so far — set an intention to begin again.',
+    '这一周还很安静 — 立下一个心愿，重新开始。',
+  ),
+  weeklyReviewCta: localized('Set this week’s intention', '立下本周心愿'),
+  weeklyReviewContinue: localized('Begin the week', '开始这一周'),
+  forestVirtueLeaf: localized(
+    'Today’s practised virtue left a leaf in the forest.',
+    '今日践行的德行，在森林里留下了一片叶。',
+  ),
+  settingsExportTitle: localized('Backup & restore', '备份与恢复'),
+  settingsExportDesc: localized(
+    'Your journey is stored only in this browser. Download a backup so clearing site data or switching devices does not erase it. Import restores progress only — not language, name, or reminders.',
+    '你的旅程只保存在此浏览器中。下载备份，以免清除网站数据或更换设备时丢失。导入只会恢复进度 — 不会覆盖语言、姓名或提醒。',
+  ),
+  settingsExportBtn: localized('Download backup', '下载备份'),
+  settingsImportBtn: localized('Import backup…', '导入备份…'),
+  settingsImportConfirm: localized(
+    'Replace your current journey progress with this backup? This cannot be undone.',
+    '用这份备份替换当前的旅程进度？此操作无法撤销。',
+  ),
+  settingsImportSuccess: localized('Journey restored.', '旅程已恢复。'),
+  settingsImportError: localized(
+    'That file does not look like a valid journey backup.',
+    '这个文件看起来不是有效的旅程备份。',
+  ),
 
   // ── Knowledge ─────────────────────────────────────────────────────
   knowledgeTitle: localized('The Knowledge Path', '知识之路'),
@@ -354,20 +461,20 @@ export const UI = {
   ),
 
   // ── Community ─────────────────────────────────────────────────────
-  communityTitle: localized('Community', '社群'),
+  communityTitle: localized('Companions of the Way', '道上同行'),
   communitySubtitle: localized(
-    'Fellow travellers on the road to Great Harmony. Not a competition — an encouragement.',
-    '通往大同之路上的同行者。这不是竞争，而是彼此鼓励。',
+    'Archetypal fellow travellers on the road to Great Harmony — companions of the Way, not a contest of worth.',
+    '通往大同之路上的典型同行者 — 道上的伙伴，而非价值的较量。',
   ),
-  leaderboardsTitle: localized('Leaderboards', '排行榜'),
+  leaderboardsTitle: localized('Shared dedication', '共同的坚持'),
   leaderboardsFooter: localized(
-    'Rankings measure consistency and contribution, never worth. Everyone here is walking the same road.',
-    '排名衡量的是坚持与贡献，而非价值高低。这里的每个人都走在同一条路上。',
+    'These boards honour consistency and contribution, never worth. Everyone here walks the same road.',
+    '这些榜单致敬的是坚持与贡献，而非价值高低。这里的每个人都走在同一条路上。',
   ),
   sendEncouragementTitle: localized('Send encouragement 🌸', '送出鼓励 🌸'),
   sendEncouragementDesc: localized(
-    'Celebrate a fellow traveller. Encouragement costs nothing and builds the world (+2 XP, +5 harmony).',
-    '为同行者喝彩。鼓励不花费任何代价，还能建设世界 (+2 经验, +5 和谐)。',
+    'Celebrate a companion of the Way. Encouragement costs nothing and builds the world (+2 XP, +5 harmony).',
+    '为道上的同行者喝彩。鼓励不花费任何代价，还能建设世界 (+2 经验, +5 和谐)。',
   ),
   peerTierActive: localized('active', '活跃'),
   peerTierNormal: localized('regular', '常规'),
@@ -386,8 +493,8 @@ export const UI = {
   catGrowthName: localized('Growth', '成长'),
   catGrowthDesc: localized('Overall personal cultivation', '整体的个人修养'),
   groupsBody: localized(
-    '🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles are coming with community accounts in a future version, so you can walk this road together with real friends and family. Until then, you are never walking it alone — your fellow travellers here are always ready to learn, practise, and grow alongside you.',
-    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈，将在未来加入社群账号功能后到来，让你能与真实的亲友一同结伴同行。在那之前，你也从不孤单 — 这里的同行者，永远愿意与你一起学习、践行、共同成长。',
+    '🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles are coming with community accounts in a future version. Until then, these Companions of the Way are archetypal fellow travellers — always ready to learn, practise, and grow alongside you.',
+    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈，将在未来加入社群账号功能后到来。在那之前，这些「道上同行」是典型的旅伴形象 — 永远愿意与你一起学习、践行、共同成长。',
   ),
 
   // ── Collection ────────────────────────────────────────────────────

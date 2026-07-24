@@ -8,6 +8,7 @@ import type { CardRarity, WisdomCard } from '../../data/types';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { cardsTabLabel, badgesTabLabel, type UiKey } from '../../i18n/strings';
+import { playSfx } from '../../engine/sfx';
 
 const RARITY_KEY: Record<CardRarity, UiKey> = {
   common: 'rarityCommon',
@@ -22,9 +23,6 @@ const CATEGORY_KEY: Record<WisdomCard['category'], UiKey> = {
   story: 'categoryStory',
 };
 
-// Decorative twinkle positions for the legendary-only sparkle particles
-// around the portrait medallion. Purely cosmetic, so a fixed layout (not
-// seeded per-card) is fine.
 const SPARKLE_SPOTS = [
   { top: '10%', left: '18%', delay: '0s' },
   { top: '15%', left: '80%', delay: '0.4s' },
@@ -72,6 +70,32 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
   );
 }
 
+function CardReveal({ card, onDone }: { card: WisdomCard; onDone: () => void }) {
+  const { t, L } = useT();
+  useEffect(() => {
+    playSfx(card.rarity === 'legendary' ? 'celebrate' : 'chime');
+    const timer = window.setTimeout(onDone, card.rarity === 'legendary' ? 1600 : 1100);
+    return () => window.clearTimeout(timer);
+    // Intentionally only re-run when the revealed card identity changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [card.id]);
+
+  return (
+    <div className="modal-backdrop celebrate-backdrop" onClick={onDone}>
+      <div className={`card-reveal card-reveal-${card.rarity}`} onClick={(e) => e.stopPropagation()}>
+        <div className="card-reveal-inner">
+          <div className="card-reveal-emoji">{card.emoji}</div>
+          <h2>{L(card.title)}</h2>
+          <p className="small muted">{t(RARITY_KEY[card.rarity])}</p>
+          <button className="btn btn-primary" onClick={onDone}>
+            {t('cardRevealTap')}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 const RARITY_FILTERS: { id: 'all' | CardRarity; key: UiKey }[] = [
   { id: 'all', key: 'rarityFilterAll' },
   { id: 'common', key: 'rarityCommon' },
@@ -82,23 +106,36 @@ const RARITY_FILTERS: { id: 'all' | CardRarity; key: UiKey }[] = [
 export default function Collection() {
   const unlockedCards = useJourney((s) => s.unlockedCards);
   const unlockedBadges = useJourney((s) => s.unlockedBadges);
+  const revealedCards = useJourney((s) => s.revealedCards ?? []);
   const markCollectionSeen = useJourney((s) => s.markCollectionSeen);
+  const markCardRevealed = useJourney((s) => s.markCardRevealed);
   const [open, setOpen] = useState<WisdomCard | null>(null);
+  const [revealing, setRevealing] = useState<WisdomCard | null>(null);
   const [tab, setTab] = useState<'cards' | 'badges'>('cards');
   const [rarityFilter, setRarityFilter] = useState<'all' | CardRarity>('all');
   const { t, L, locale } = useT();
 
-  // Clear the "new item" nav badge as soon as the user opens this tab —
-  // covers both a fresh visit and an unlock happening while already here.
   useEffect(() => {
     markCollectionSeen();
   }, [markCollectionSeen, unlockedCards.length, unlockedBadges.length]);
 
   const visibleCards = rarityFilter === 'all' ? CARDS : CARDS.filter((c) => c.rarity === rarityFilter);
 
+  function openCard(card: WisdomCard) {
+    if (!revealedCards.includes(card.id)) {
+      setRevealing(card);
+      return;
+    }
+    setOpen(card);
+  }
+
   return (
     <div>
       <PageHeader emoji="🎴" title={t('collectionTitle')} subtitle={t('collectionSubtitle')} />
+
+      {unlockedCards.length === 0 && (
+        <p className="small muted" style={{ marginBottom: 12 }}>{t('collectionFirstPromise')}</p>
+      )}
 
       <div className="tab-row">
         <button className={tab === 'cards' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setTab('cards')}>
@@ -126,7 +163,7 @@ export default function Collection() {
             {visibleCards.map((card) => {
               const owned = unlockedCards.includes(card.id);
               return (
-                <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && setOpen(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
+                <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && openCard(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
                   <div className="wcard-emoji">{owned ? card.emoji : '❔'}</div>
                   <strong>{owned ? L(card.title) : t('lockedCardTitle')}</strong>
                   <span className="small muted">{owned ? t(RARITY_KEY[card.rarity]) : L(card.unlockHint)}</span>
@@ -152,7 +189,17 @@ export default function Collection() {
         </div>
       )}
 
-      {open && <CardModal card={open} onClose={() => setOpen(null)} />}
+      {revealing && (
+        <CardReveal
+          card={revealing}
+          onDone={() => {
+            markCardRevealed(revealing.id);
+            setOpen(revealing);
+            setRevealing(null);
+          }}
+        />
+      )}
+      {open && !revealing && <CardModal card={open} onClose={() => setOpen(null)} />}
     </div>
   );
 }

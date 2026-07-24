@@ -1,8 +1,9 @@
 import type { Peer } from './types';
 import { localized } from '../i18n/types';
 
-// Fictional fellow travellers who populate the simulated community in v1.
-// With real accounts (future version), these become real people.
+// Archetypal Companions of the Way who populate the simulated community in v1.
+// They are intentionally not framed as live users. With real accounts later,
+// living friends can join this road alongside them.
 //
 // Each peer has a `tier` (active/normal/occasional — how often they show up
 // in the feed, leaderboard, and World tab) and a `joinDay` (the community-age

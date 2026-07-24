@@ -46,6 +46,10 @@ export interface Celebration {
   emoji: string;
   title: string;
   subtitle?: string;
+  /** In-app route for a primary CTA button on the overlay. */
+  ctaTo?: string;
+  /** Major tier gets richer motion / SFX (rank, forest, world, legendary cards). */
+  major?: boolean;
 }
 
 interface JourneyActions {
@@ -61,7 +65,12 @@ interface JourneyActions {
   advanceDay: () => void;
   resetJourney: () => void;
   markCollectionSeen: () => void;
+  markCardRevealed: (cardId: string) => void;
+  importJourney: (data: JourneyData) => boolean;
 }
+
+/** Schema version stamped on exported backups. */
+export const JOURNEY_EXPORT_VERSION = 1;
 
 export type JourneyState = JourneyData & { celebrations: Celebration[] } & JourneyActions;
 
@@ -86,12 +95,27 @@ function initialData(): JourneyData {
     dayOffset: 0,
     seenCollectionCount: 0,
     capstones: {},
+    revealedCards: [],
   };
 }
 
 let celebrationSeq = 0;
-function celebration(kind: Celebration['kind'], emoji: string, title: string, subtitle?: string): Celebration {
-  return { id: `c${Date.now()}-${celebrationSeq++}`, kind, emoji, title, subtitle };
+function celebration(
+  kind: Celebration['kind'],
+  emoji: string,
+  title: string,
+  subtitle?: string,
+  opts?: { ctaTo?: string; major?: boolean },
+): Celebration {
+  return {
+    id: `c${Date.now()}-${celebrationSeq++}`,
+    kind,
+    emoji,
+    title,
+    subtitle,
+    ctaTo: opts?.ctaTo,
+    major: opts?.major,
+  };
 }
 
 /** Update streak fields for activity on `today`. Mutates the draft. */
@@ -129,7 +153,11 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   const afterRank = rankIndexForXp(after.xp);
   if (afterRank > beforeRank) {
     const r = RANKS[afterRank];
-    out.push(celebration('rank', r.emoji, rankUpTitle(locale, L(r.name, locale))));
+    out.push(
+      celebration('rank', r.emoji, rankUpTitle(locale, L(r.name, locale)), undefined, {
+        major: true,
+      }),
+    );
   }
 
   const stats = statsFromData(after);
@@ -138,7 +166,11 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   for (const b of BADGES) {
     if (!after.unlockedBadges.includes(b.id) && b.check(stats)) {
       after.unlockedBadges.push(b.id);
-      out.push(celebration('badge', b.emoji, badgeEarnedTitle(locale, L(b.title, locale)), L(b.description, locale)));
+      out.push(
+        celebration('badge', b.emoji, badgeEarnedTitle(locale, L(b.title, locale)), L(b.description, locale), {
+          ctaTo: '/collection',
+        }),
+      );
     }
   }
 
@@ -149,7 +181,12 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (!after.unlockedBadges.includes(id) && after.capstones[eraId]) {
       after.unlockedBadges.push(id);
       const b = badgeById(id);
-      if (b) out.push(celebration('badge', b.emoji, eraBadgeTitle(locale, L(b.title, locale)), L(b.description, locale)));
+      if (b)
+        out.push(
+          celebration('badge', b.emoji, eraBadgeTitle(locale, L(b.title, locale)), L(b.description, locale), {
+            ctaTo: '/collection',
+          }),
+        );
     }
   }
 
@@ -161,7 +198,12 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (!after.unlockedBadges.includes(id) && isBranchMastered(after.completedLessons, branch) && after.capstones[key]) {
       after.unlockedBadges.push(id);
       const b = badgeById(id);
-      if (b) out.push(celebration('badge', b.emoji, branchBadgeTitle(locale, L(b.title, locale)), L(b.description, locale)));
+      if (b)
+        out.push(
+          celebration('badge', b.emoji, branchBadgeTitle(locale, L(b.title, locale)), L(b.description, locale), {
+            ctaTo: '/collection',
+          }),
+        );
     }
   }
 
@@ -174,7 +216,12 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     const levelsDone = after.timelinePointLevels[p.id] ?? 0;
     if (levelsDone >= RARITY_LEVEL_REQUIRED[c.rarity]) {
       after.unlockedCards.push(p.cardId);
-      out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale)));
+      out.push(
+        celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale), {
+          ctaTo: '/collection',
+          major: c.rarity === 'legendary',
+        }),
+      );
     }
   }
 
@@ -184,7 +231,13 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (t.cardId && doneTopics.includes(t.id) && !after.unlockedCards.includes(t.cardId)) {
       after.unlockedCards.push(t.cardId);
       const c = cardById(t.cardId);
-      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale)));
+      if (c)
+        out.push(
+          celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale), {
+            ctaTo: '/collection',
+            major: c.rarity === 'legendary',
+          }),
+        );
     }
   }
 
@@ -193,7 +246,13 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (!after.unlockedCards.includes(rule.cardId) && rule.check(stats)) {
       after.unlockedCards.push(rule.cardId);
       const c = cardById(rule.cardId);
-      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale)));
+      if (c)
+        out.push(
+          celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale), {
+            ctaTo: '/collection',
+            major: c.rarity === 'legendary',
+          }),
+        );
     }
   }
 
@@ -202,7 +261,12 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   const afterForest = forestStageIndex(growthScore(stats));
   if (afterForest > beforeForest) {
     const f = FOREST_STAGES[afterForest];
-    out.push(celebration('forest', f.emoji, forestGrewTitle(locale, L(f.name, locale)), forestGrewSubtitle(locale)));
+    out.push(
+      celebration('forest', f.emoji, forestGrewTitle(locale, L(f.name, locale)), forestGrewSubtitle(locale), {
+        ctaTo: '/forest',
+        major: true,
+      }),
+    );
   }
 
   // World stage (only celebrate when the user's action crosses the threshold)
@@ -210,7 +274,12 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
   const afterWorld = worldInfo(after, today).stageIndex;
   if (afterWorld > beforeWorld) {
     const w = worldInfo(after, today).stage;
-    out.push(celebration('world', w.emoji, worldStageTitle(locale, L(w.name, locale)), L(w.description, locale)));
+    out.push(
+      celebration('world', w.emoji, worldStageTitle(locale, L(w.name, locale)), L(w.description, locale), {
+        ctaTo: '/world',
+        major: true,
+      }),
+    );
   }
 
   return out;
@@ -241,7 +310,21 @@ function dataOf(s: JourneyState): JourneyData {
     dayOffset: s.dayOffset,
     seenCollectionCount: s.seenCollectionCount,
     capstones: s.capstones,
+    revealedCards: s.revealedCards ?? [],
   };
+}
+
+function isJourneyData(value: unknown): value is JourneyData {
+  if (!value || typeof value !== 'object') return false;
+  const v = value as Record<string, unknown>;
+  return (
+    typeof v.xp === 'number' &&
+    typeof v.harmonyPoints === 'number' &&
+    typeof v.days === 'object' &&
+    v.days !== null &&
+    Array.isArray(v.completedLessons) &&
+    Array.isArray(v.unlockedCards)
+  );
 }
 
 export const useJourney = create<JourneyState>()(
@@ -368,6 +451,7 @@ export const useJourney = create<JourneyState>()(
                 region.emoji,
                 regionCompleteTitle(locale, L(region.name, locale)),
                 regionCompleteSubtitle(locale, region.rewardXp),
+                { ctaTo: '/map' },
               ),
             ];
           }),
@@ -393,11 +477,42 @@ export const useJourney = create<JourneyState>()(
             const total = s.unlockedCards.length + s.unlockedBadges.length;
             return total > s.seenCollectionCount ? { seenCollectionCount: total } : {};
           }),
+
+        markCardRevealed: (cardId) =>
+          set((s) => {
+            if (s.revealedCards?.includes(cardId)) return {};
+            return { revealedCards: [...(s.revealedCards ?? []), cardId] };
+          }),
+
+        importJourney: (data) => {
+          if (!isJourneyData(data)) return false;
+          const next: JourneyData = {
+            ...initialData(),
+            ...data,
+            days: data.days ?? {},
+            completedLessons: data.completedLessons ?? [],
+            completedTimelinePoints: data.completedTimelinePoints ?? [],
+            timelinePointLevels: data.timelinePointLevels ?? {},
+            completedRegions: data.completedRegions ?? [],
+            unlockedCards: data.unlockedCards ?? [],
+            unlockedBadges: data.unlockedBadges ?? [],
+            encouragedOn: data.encouragedOn ?? {},
+            capstones: data.capstones ?? {},
+            revealedCards: data.revealedCards ?? [],
+          };
+          set({ ...next, celebrations: [] });
+          return true;
+        },
       };
     },
     {
       name: 'journey-to-great-harmony',
-      version: 1,
+      version: 2,
+      migrate: (persisted) => {
+        const p = persisted as JourneyData & { revealedCards?: string[] };
+        if (!p.revealedCards) p.revealedCards = [];
+        return p;
+      },
       partialize: (s) => {
         const { celebrations: _celebrations, ...rest } = s as JourneyState & Record<string, unknown>;
         return rest;
@@ -410,4 +525,9 @@ export const useJourney = create<JourneyState>()(
 export function useToday(): string {
   const offset = useJourney((s) => s.dayOffset);
   return todayKey(offset);
+}
+
+/** Snapshot of persistable journey progress for backup download. */
+export function exportJourneyData(): JourneyData {
+  return dataOf(useJourney.getState());
 }

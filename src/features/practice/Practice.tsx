@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import type { JourneyData } from '../../state/selectors';
+import { forestInfo, worldInfo } from '../../state/selectors';
 import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
@@ -9,11 +11,22 @@ import { meaningfulLength, TEXT_MIN } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { yourNoteLabel, journalCount, minLengthHint, type UiKey } from '../../i18n/strings';
+import { playSfx } from '../../engine/sfx';
+import { useUi } from '../../state/uiStore';
+import { useTodayTasks } from '../home/useTodayTasks';
+import BreathGate from './BreathGate';
 
 // Evening reflection only opens from 5pm local time, up to midnight — it's
 // meant to be a look back on the day that's actually happened, not
 // something to front-load in the morning.
 const EVENING_OPEN_HOUR = 17;
+
+function practiceTimeOfDay(): 'morning' | 'day' | 'evening' {
+  const h = new Date().getHours();
+  if (h < 12) return 'morning';
+  if (h >= EVENING_OPEN_HOUR) return 'evening';
+  return 'day';
+}
 
 function MorningCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
@@ -23,7 +36,7 @@ function MorningCard({ today }: { today: string }) {
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
 
   return (
-    <div className="card">
+    <div className="card practice-card">
       <h3>{t('morningCardTitle')}</h3>
       <div className="quote-card" style={{ marginBottom: 14 }}>
         <p className="quote-text">“{L(quote.text)}”</p>
@@ -42,7 +55,10 @@ function MorningCard({ today }: { today: string }) {
             className="btn btn-primary"
             style={{ marginTop: 6 }}
             disabled={meaningfulLength(text) < TEXT_MIN.intention}
-            onClick={() => setIntention(text.trim())}
+            onClick={() => {
+              setIntention(text.trim());
+              playSfx('chime');
+            }}
           >
             {t('intentionBtn')}
           </button>
@@ -57,11 +73,18 @@ function ChallengeCard({ today }: { today: string }) {
   const completeChallenge = useJourney((s) => s.completeChallenge);
   const xp = useJourney((s) => s.xp);
   const [note, setNote] = useState('');
+  const [breathing, setBreathing] = useState(false);
+  const [breathDone, setBreathDone] = useState(false);
   const { t, L, locale } = useT();
   const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(xp)));
 
+  const onBreathReady = useCallback(() => {
+    setBreathing(false);
+    setBreathDone(true);
+  }, []);
+
   return (
-    <div className="card">
+    <div className="card practice-card">
       <h3>
         {challenge.emoji} {t('taskChallengePrefix')} <span className="pill pill-gold">{L(challenge.virtue)}</span>
       </h3>
@@ -73,10 +96,24 @@ function ChallengeCard({ today }: { today: string }) {
           </p>
           {rec.challengeNote && <p className="small muted">{yourNoteLabel(locale, rec.challengeNote)}</p>}
         </>
+      ) : breathing ? (
+        <BreathGate onReady={onBreathReady} />
+      ) : !breathDone ? (
+        <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => setBreathing(true)}>
+          {t('challengeBreathBtn')}
+        </button>
       ) : (
         <>
+          <p className="small muted">{t('challengeNoteHint')}</p>
           <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('challengeNotePlaceholder')} />
-          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => completeChallenge(challenge.id, note.trim() || undefined)}>
+          <button
+            className="btn btn-primary"
+            style={{ marginTop: 10 }}
+            onClick={() => {
+              completeChallenge(challenge.id, note.trim() || undefined);
+              playSfx('bell');
+            }}
+          >
             {t('challengeBtn')}
           </button>
         </>
@@ -93,9 +130,18 @@ function EveningCard({ today }: { today: string }) {
   const [improve, setImprove] = useState('');
   const { t, locale } = useT();
   const eveningOpen = new Date().getHours() >= EVENING_OPEN_HOUR;
+  const lastEveningSfxDay = useUi((s) => s.lastEveningSfxDay);
+  const setLastEveningSfxDay = useUi((s) => s.setLastEveningSfxDay);
+
+  useEffect(() => {
+    if (eveningOpen && lastEveningSfxDay !== today) {
+      playSfx('hush');
+      setLastEveningSfxDay(today);
+    }
+  }, [eveningOpen, today, lastEveningSfxDay, setLastEveningSfxDay]);
 
   return (
-    <div className="card">
+    <div className="card practice-card">
       <h3>{t('eveningCardTitle')}</h3>
       {rec.reflection ? (
         <>
@@ -116,6 +162,11 @@ function EveningCard({ today }: { today: string }) {
         <p className="small muted">{t('eveningLockedNote')}</p>
       ) : (
         <>
+          {rec.intention && (
+            <p className="evening-intention-echo">
+              {t('eveningIntentionEcho')} <em>“{rec.intention}”</em>
+            </p>
+          )}
           <p className="small muted">{t('reflectionIntro')}</p>
           <label className="small">{t('reflectionQ1')}</label>
           <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
@@ -123,13 +174,16 @@ function EveningCard({ today }: { today: string }) {
           <label className="small">{t('reflectionQ2')}</label>
           <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
           <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(virtue), TEXT_MIN.reflection)}</p>
-          <label className="small">{t('reflectionQ3')}</label>
+          <label className="small">{rec.intention ? t('reflectionQ3WithIntention') : t('reflectionQ3')}</label>
           <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
           <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(improve), TEXT_MIN.reflection)}</p>
           <button
             className="btn btn-primary"
             disabled={meaningfulLength(learned) < TEXT_MIN.reflection || meaningfulLength(virtue) < TEXT_MIN.reflection || meaningfulLength(improve) < TEXT_MIN.reflection}
-            onClick={() => submitReflection(learned.trim(), virtue.trim(), improve.trim())}
+            onClick={() => {
+              submitReflection(learned.trim(), virtue.trim(), improve.trim());
+              playSfx('hush');
+            }}
           >
             {t('reflectionBtn')}
           </button>
@@ -164,14 +218,20 @@ function Journal() {
   const allEntries = Object.entries(days)
     .filter(([, rec]) => rec.intention || rec.reflection || rec.challengeDone)
     .sort(([a], [b]) => (a < b ? 1 : -1));
-  // Day keys sort lexicographically the same as chronologically (YYYY-MM-DD),
-  // so a plain string >= comparison gives "this date onwards" rather than
-  // just that single day.
   const entries = allEntries.filter(([day, rec]) => matchesJournalFilter(rec, filter) && (dateFilter === 'all' || day >= dateFilter));
 
-  if (allEntries.length === 0) return null;
+  if (allEntries.length === 0) {
+    return (
+      <div className="card practice-card journal-empty">
+        <h3>{t('journalTitle')}</h3>
+        <p className="journal-empty-title">{t('journalEmptyTitle')}</p>
+        <p className="small muted">{t('journalEmptyDesc')}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="card">
+    <div className="card practice-card">
       <h3>{t('journalTitle')}</h3>
       <p className="small muted">{journalCount(locale, allEntries.length)}</p>
       {!open ? (
@@ -211,7 +271,14 @@ function Journal() {
                 {(filter === 'all' || filter === 'challenge') && rec.challengeDone && (
                   <p className="small" style={{ margin: '4px 0' }}>
                     🎯 {ch ? L(ch.virtue) : ''}
-                    {rec.challengeNote ? ` — “${rec.challengeNote}”` : ''}
+                    {rec.challengeNote ? (
+                      <>
+                        {' '}
+                        — <em>“{rec.challengeNote}”</em>
+                      </>
+                    ) : (
+                      ''
+                    )}
                   </p>
                 )}
                 {(filter === 'all' || filter === 'reflection') && rec.reflection && (
@@ -232,12 +299,47 @@ function Journal() {
   );
 }
 
+function GrowthVisitBanners({ today }: { today: string }) {
+  const { t } = useT();
+  const { doneCount, tasks } = useTodayTasks();
+  const state = useJourney();
+  const d = state as unknown as JourneyData;
+  const forest = forestInfo(d);
+  const world = worldInfo(d, today);
+  const full = doneCount === tasks.length && tasks.length > 0;
+
+  if (!full) return null;
+  return (
+    <div className="visit-banner-row">
+      <Link className="visit-banner" to="/forest">
+        {forest.stage.emoji} {t('visitForestBanner')}
+      </Link>
+      <Link className="visit-banner" to="/world">
+        {world.stage.emoji} {t('visitWorldBanner')}
+      </Link>
+    </div>
+  );
+}
+
 export default function Practice() {
   const today = useToday();
   const { t } = useT();
+  const time = practiceTimeOfDay();
+  const { doneCount, tasks } = useTodayTasks();
+  const lastFullHarmonySfxDay = useUi((s) => s.lastFullHarmonySfxDay);
+  const setLastFullHarmonySfxDay = useUi((s) => s.setLastFullHarmonySfxDay);
+
+  useEffect(() => {
+    if (doneCount === tasks.length && tasks.length > 0 && lastFullHarmonySfxDay !== today) {
+      playSfx('harmony');
+      setLastFullHarmonySfxDay(today);
+    }
+  }, [doneCount, tasks.length, today, lastFullHarmonySfxDay, setLastFullHarmonySfxDay]);
+
   return (
-    <div>
+    <div className="practice-page" data-time={time}>
       <PageHeader emoji="🎯" title={t('practiceTitle')} subtitle={t('practiceSubtitle')} />
+      <GrowthVisitBanners today={today} />
       <MorningCard today={today} />
       <ChallengeCard today={today} />
       <EveningCard today={today} />

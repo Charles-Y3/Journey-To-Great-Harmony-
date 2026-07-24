@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes } from 'react-router-dom';
-import { useJourney, useToday } from './state/store';
+import { useJourney, useToday, JOURNEY_EXPORT_VERSION, exportJourneyData } from './state/store';
+import type { JourneyData } from './state/selectors';
 import { useLocale } from './state/localeStore';
 import { useReminders } from './state/reminderStore';
 import { useUi } from './state/uiStore';
@@ -11,7 +12,7 @@ import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from '.
 import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
 import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel, welcomeBackTitle } from './i18n/strings';
-import { RANKS, rankForXp, nextRankForXp, rankIndexForXp } from './engine/progression';
+import { RANKS, rankForXp, nextRankForXp, rankIndexForXp, todayKey } from './engine/progression';
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
@@ -211,6 +212,87 @@ function ShareSection() {
         {copied ? t('shareCopiedConfirmation') : t('settingsShareBtn')}
       </button>
     </div>
+  );
+}
+
+function BackupSection() {
+  const { t } = useT();
+  const importJourney = useJourney((s) => s.importJourney);
+  const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+
+  function exportBackup() {
+    const payload = {
+      version: JOURNEY_EXPORT_VERSION,
+      exportedAt: todayKey(0),
+      journey: exportJourneyData(),
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `journey-to-great-harmony-backup-${payload.exportedAt}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function onImportFile(file: File | undefined) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result)) as { version?: number; journey?: JourneyData };
+        if (parsed.version !== JOURNEY_EXPORT_VERSION || !parsed.journey) {
+          setStatus('err');
+          return;
+        }
+        if (!window.confirm(t('settingsImportConfirm'))) return;
+        const ok = importJourney(parsed.journey);
+        setStatus(ok ? 'ok' : 'err');
+      } catch {
+        setStatus('err');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsExportTitle')}</h3>
+      <p className="small muted">{t('settingsExportDesc')}</p>
+      <button className="btn" style={{ marginRight: 8 }} onClick={exportBackup}>
+        {t('settingsExportBtn')}
+      </button>
+      <label className="btn" style={{ display: 'inline-block', cursor: 'pointer' }}>
+        {t('settingsImportBtn')}
+        <input
+          type="file"
+          accept="application/json,.json"
+          style={{ display: 'none' }}
+          onChange={(e) => {
+            onImportFile(e.target.files?.[0]);
+            e.target.value = '';
+          }}
+        />
+      </label>
+      {status === 'ok' && <p className="small" style={{ marginTop: 8 }}>{t('settingsImportSuccess')}</p>}
+      {status === 'err' && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsImportError')}</p>}
+    </div>
+  );
+}
+
+function PacingIntroModal({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+  return (
+    <Modal onClose={onClose}>
+      <h2>{t('pacingIntroTitle')}</h2>
+      <p>{t('pacingIntroBody1')}</p>
+      <p>{t('pacingIntroBody2')}</p>
+      <p>{t('pacingIntroBody3')}</p>
+      <p>{t('pacingIntroBody4')}</p>
+      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={onClose}>
+        {t('pacingIntroContinue')}
+      </button>
+    </Modal>
   );
 }
 
@@ -425,6 +507,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <ReminderSection />
       <MusicSection />
       <ShareSection />
+      <BackupSection />
       <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
         <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
@@ -473,12 +556,15 @@ export default function App() {
   const today = useToday();
   const lastWelcomeSeenDay = useUi((s) => s.lastWelcomeSeenDay);
   const setLastWelcomeSeenDay = useUi((s) => s.setLastWelcomeSeenDay);
+  const seenPacingIntro = useUi((s) => s.seenPacingIntro);
+  const setSeenPacingIntro = useUi((s) => s.setSeenPacingIntro);
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [showRankModal, setShowRankModal] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [showHarmonyInfo, setShowHarmonyInfo] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [showPacing, setShowPacing] = useState(false);
 
   // Once per calendar day (and only past the language/name gates), greet
   // the user with a quick progress + to-do summary instead of dropping
@@ -489,6 +575,12 @@ export default function App() {
       setLastWelcomeSeenDay(today);
     }
   }, [hasChosenLocale, hasSetName, today, lastWelcomeSeenDay, setLastWelcomeSeenDay]);
+
+  useEffect(() => {
+    if (hasChosenLocale && hasSetName && !seenPacingIntro) {
+      setShowPacing(true);
+    }
+  }, [hasChosenLocale, hasSetName, seenPacingIntro]);
 
   if (!hasChosenLocale) {
     return <LanguageGate />;
@@ -567,7 +659,15 @@ export default function App() {
       {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
       {showStreakInfo && <StreakInfoModal onClose={() => setShowStreakInfo(false)} />}
       {showHarmonyInfo && <HarmonyInfoModal onClose={() => setShowHarmonyInfo(false)} />}
-      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+      {showPacing && (
+        <PacingIntroModal
+          onClose={() => {
+            setSeenPacingIntro(true);
+            setShowPacing(false);
+          }}
+        />
+      )}
+      {showWelcome && !showPacing && <WelcomeModal onClose={() => setShowWelcome(false)} />}
     </div>
   );
 }

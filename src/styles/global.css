@@ -890,6 +890,7 @@ select:focus {
 }
 
 .celebrate {
+  position: relative;
   background: var(--surface);
   border-radius: var(--radius);
   text-align: center;
@@ -898,6 +899,36 @@ select:focus {
   width: 100%;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
   animation: pop-in 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+  overflow: hidden;
+}
+
+.celebrate--major {
+  padding: 42px 32px 32px;
+  box-shadow: 0 14px 48px rgba(40, 70, 50, 0.35);
+}
+
+.celebrate--major h2 {
+  font-size: 1.55rem;
+}
+
+.celebrate-bloom span {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold, #c9a227);
+  opacity: 0.55;
+  animation: bloom-float 2.2s ease-in-out infinite;
+}
+
+.celebrate-bloom span:nth-child(1) { top: 18%; left: 16%; animation-delay: 0s; }
+.celebrate-bloom span:nth-child(2) { top: 22%; right: 18%; animation-delay: 0.4s; }
+.celebrate-bloom span:nth-child(3) { bottom: 24%; left: 22%; animation-delay: 0.8s; }
+.celebrate-bloom span:nth-child(4) { bottom: 20%; right: 20%; animation-delay: 1.1s; }
+
+@keyframes bloom-float {
+  0%, 100% { transform: translateY(0) scale(0.8); opacity: 0.35; }
+  50% { transform: translateY(-10px) scale(1.15); opacity: 0.7; }
 }
 
 .celebrate-emoji {
@@ -905,8 +936,153 @@ select:focus {
   animation: bounce 0.8s ease infinite alternate;
 }
 
+.celebrate--major .celebrate-emoji {
+  font-size: 4rem;
+}
+
 .celebrate-sub {
   color: var(--ink-soft);
+}
+
+.celebrate-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/* Practice stillness */
+.practice-page[data-time='morning'] {
+  background: linear-gradient(180deg, rgba(255, 244, 220, 0.55) 0%, transparent 180px);
+  margin: -8px -4px 0;
+  padding: 8px 4px 0;
+  border-radius: 12px;
+}
+
+.practice-page[data-time='evening'] {
+  background: linear-gradient(180deg, rgba(210, 220, 235, 0.5) 0%, transparent 180px);
+  margin: -8px -4px 0;
+  padding: 8px 4px 0;
+  border-radius: 12px;
+}
+
+.practice-page .practice-card {
+  border-color: transparent;
+  box-shadow: none;
+  background: transparent;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  margin-bottom: 8px;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.evening-intention-echo {
+  background: rgba(201, 162, 39, 0.1);
+  border-left: 3px solid var(--gold, #c9a227);
+  padding: 8px 12px;
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+}
+
+.journal-empty-title {
+  font-style: italic;
+  margin: 4px 0 6px;
+}
+
+.breath-gate {
+  text-align: center;
+  padding: 18px 8px 8px;
+}
+
+.breath-circle {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, rgba(120, 180, 140, 0.45), rgba(70, 120, 90, 0.25));
+  transition: transform 2.5s ease-in-out;
+}
+
+.breath-circle-in { transform: scale(1.25); }
+.breath-circle-out { transform: scale(0.85); }
+
+.today-intention-strip,
+.yesterday-strip {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(90, 120, 90, 0.08);
+  font-size: 0.95rem;
+}
+
+.yesterday-strip {
+  background: rgba(90, 100, 120, 0.08);
+}
+
+.visit-banner-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.visit-banner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(201, 162, 39, 0.14);
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.9rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+}
+
+.visit-banner:hover {
+  background: rgba(201, 162, 39, 0.22);
+}
+
+.card-reveal {
+  background: var(--surface);
+  border-radius: var(--radius);
+  text-align: center;
+  padding: 40px 28px 28px;
+  max-width: 360px;
+  width: 100%;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  animation: card-flip-in 0.7s cubic-bezier(0.2, 1.2, 0.4, 1);
+}
+
+.card-reveal-legendary {
+  box-shadow: 0 14px 48px rgba(180, 140, 40, 0.4);
+}
+
+.card-reveal-emoji {
+  font-size: 3.6rem;
+  margin-bottom: 8px;
+  animation: bounce 0.8s ease infinite alternate;
+}
+
+@keyframes card-flip-in {
+  from {
+    transform: rotateY(85deg) scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: rotateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+.virtue-leaf {
+  animation: leaf-settle 1.2s ease-out;
+}
+
+@keyframes leaf-settle {
+  from { transform: translateY(-24px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes pop-in {

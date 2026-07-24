@@ -1,12 +1,16 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { QUOTES } from '../../data/quotes';
+import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex } from '../../engine/community';
+import { addDaysToKey, hashString } from '../../engine/progression';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from '../../state/selectors';
-import { PageHeader } from '../../components/ui';
+import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { todaySubtitle } from '../../i18n/strings';
 import { useTodayTasks } from './useTodayTasks';
+import { isoWeekKey, useUi } from '../../state/uiStore';
 
 export default function Today() {
   const state = useJourney();
@@ -19,6 +23,55 @@ export default function Today() {
   const forest = forestInfo(d);
   const world = worldInfo(d, today);
   const { tasks, doneCount } = useTodayTasks();
+  const rec = d.days[today] ?? {};
+  const yesterday = addDaysToKey(today, -1);
+  const yRec = d.days[yesterday] ?? {};
+  const yesterdayLine = yRec.reflection?.improve || yRec.intention;
+
+  const weekKey = isoWeekKey(today);
+  const lastWeeklyReviewWeek = useUi((s) => s.lastWeeklyReviewWeek);
+  const setLastWeeklyReviewWeek = useUi((s) => s.setLastWeeklyReviewWeek);
+  const [showWeekly, setShowWeekly] = useState(false);
+
+  // First open of a new ISO week: seed silently once, then show the review.
+  useEffect(() => {
+    if (lastWeeklyReviewWeek === null) {
+      setLastWeeklyReviewWeek(weekKey);
+      return;
+    }
+    if (lastWeeklyReviewWeek !== weekKey) {
+      setShowWeekly(true);
+    }
+  }, [weekKey, lastWeeklyReviewWeek, setLastWeeklyReviewWeek]);
+
+  const weekDays = useMemo(() => {
+    // Collect Mon–Sun keys for the current ISO week containing `today`.
+    const [y, m, day] = today.split('-').map(Number);
+    const date = new Date(y, m - 1, day);
+    const dow = (date.getDay() + 6) % 7; // Mon=0
+    const monday = addDaysToKey(today, -dow);
+    return Array.from({ length: 7 }, (_, i) => addDaysToKey(monday, i));
+  }, [today]);
+
+  const weekChallenge = useMemo(() => {
+    for (const day of [...weekDays].reverse()) {
+      const r = d.days[day];
+      if (r?.challengeId) {
+        const ch = CHALLENGES.find((c) => c.id === r.challengeId);
+        if (ch) return ch;
+      }
+    }
+    return null;
+  }, [d.days, weekDays]);
+
+  const weekQuote = QUOTES[Math.abs(hashString(`week-quote-${weekKey}`)) % QUOTES.length];
+  const weekIntention = weekDays.map((day) => d.days[day]?.intention).find(Boolean);
+  const weekImprove = [...weekDays].reverse().map((day) => d.days[day]?.reflection?.improve).find(Boolean);
+
+  function closeWeekly() {
+    setLastWeeklyReviewWeek(weekKey);
+    setShowWeekly(false);
+  }
 
   return (
     <div>
@@ -28,6 +81,18 @@ export default function Today() {
         <p className="quote-text">“{L(quote.text)}”</p>
         <p className="quote-author">— {L(quote.author)}</p>
       </div>
+
+      {rec.intention && (
+        <p className="today-intention-strip">
+          <strong>{t('todayIntentionLabel')}:</strong> “{rec.intention}”
+        </p>
+      )}
+
+      {yesterdayLine && (
+        <p className="yesterday-strip">
+          <strong>{t('yesterdayWroteLabel')}:</strong> “{yesterdayLine}”
+        </p>
+      )}
 
       <div className="card">
         <h3>{t('todayJourneyCard')}</h3>
@@ -45,7 +110,19 @@ export default function Today() {
             )}
           </div>
         ))}
-        {doneCount === tasks.length && <p className="pill" style={{ marginTop: 12 }}>{t('todayFullHarmony')}</p>}
+        {doneCount === tasks.length && (
+          <>
+            <p className="pill" style={{ marginTop: 12 }}>{t('todayFullHarmony')}</p>
+            <div className="visit-banner-row" style={{ marginTop: 10 }}>
+              <Link className="visit-banner" to="/forest">
+                {forest.stage.emoji} {t('visitForestBanner')}
+              </Link>
+              <Link className="visit-banner" to="/world">
+                {world.stage.emoji} {t('visitWorldBanner')}
+              </Link>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="stat-grid">
@@ -75,6 +152,40 @@ export default function Today() {
         <h3>{t('keepExploringTitle')}</h3>
         <p className="small muted">{t('keepExploringBody')}</p>
       </div>
+
+      {showWeekly && (
+        <Modal onClose={closeWeekly}>
+          <h2>{t('weeklyReviewTitle')}</h2>
+          <p className="small muted">
+            {t('weeklyReviewStreak')}: 🔥 {stats.streakCurrent}
+          </p>
+          <div className="quote-card" style={{ marginTop: 12 }}>
+            <p className="small muted" style={{ marginBottom: 4 }}>{t('weeklyReviewQuote')}</p>
+            <p className="quote-text">“{L(weekQuote.text)}”</p>
+            <p className="quote-author">— {L(weekQuote.author)}</p>
+          </div>
+          {weekChallenge ? (
+            <p style={{ marginTop: 12 }}>
+              <strong>{t('weeklyReviewVirtue')}:</strong> {weekChallenge.emoji} {L(weekChallenge.virtue)}
+            </p>
+          ) : (
+            <p className="small muted" style={{ marginTop: 12 }}>{t('weeklyReviewEmpty')}</p>
+          )}
+          {(weekIntention || weekImprove) && (
+            <p className="small" style={{ marginTop: 10 }}>
+              <strong>{t('weeklyReviewThread')}:</strong>
+              {weekIntention ? ` “${weekIntention}”` : ''}
+              {weekImprove ? ` → “${weekImprove}”` : ''}
+            </p>
+          )}
+          <Link className="btn btn-primary" style={{ marginTop: 16, display: 'inline-block' }} to="/practice" onClick={closeWeekly}>
+            {t('weeklyReviewCta')}
+          </Link>
+          <button className="btn" style={{ marginTop: 8, marginLeft: 8 }} onClick={closeWeekly}>
+            {t('weeklyReviewContinue')}
+          </button>
+        </Modal>
+      )}
     </div>
   );
 }

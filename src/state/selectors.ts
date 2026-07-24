@@ -46,6 +46,8 @@ export interface JourneyData {
   seenCollectionCount: number;
   /** Longer written reflections required to fully "master" a timeline era or knowledge branch, keyed by era/branch id. */
   capstones: Record<string, { text: string; day: string }>;
+  /** Card ids that have already played their first-open reveal animation. */
+  revealedCards: string[];
 }
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */

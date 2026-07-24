@@ -22,18 +22,26 @@ import {
 } from '../../i18n/strings';
 import { shuffledIndices } from '../../engine/quiz';
 
+const QUIZ_NUDGE_KEYS = ['quizNudgeReread', 'quizNudgeBreathe', 'quizNudgeLookAgain'] as const;
+
 function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done: boolean; onDone: () => void; capReached: boolean }) {
   const [order, setOrder] = useState(() => shuffledIndices(lesson.question.options.en.length));
   const [picked, setPicked] = useState<number | null>(null);
   const [reflectionText, setReflectionText] = useState('');
+  const [showQuiz, setShowQuiz] = useState(true);
+  const [nudgeIdx, setNudgeIdx] = useState(0);
   const { t, L } = useT();
   const options = L(lesson.question.options);
   const answered = picked !== null;
   const correct = answered && order[picked] === lesson.question.answer;
+  const nudge = lesson.question.nudge
+    ? L(lesson.question.nudge)
+    : t(QUIZ_NUDGE_KEYS[nudgeIdx % QUIZ_NUDGE_KEYS.length]);
 
   function retry() {
     setOrder(shuffledIndices(options.length));
     setPicked(null);
+    setNudgeIdx((n) => n + 1);
   }
 
   return (
@@ -41,25 +49,39 @@ function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done
       <h3>{L(lesson.title)}</h3>
       <p style={{ whiteSpace: 'pre-line' }}>{L(lesson.reading)}</p>
 
-      <h4>{t('checkUnderstanding')}</h4>
-      <p className="small">{L(lesson.question.q)}</p>
-      {order.map((origIdx, i) => {
-        let cls = 'btn quiz-option';
-        if (answered && i === picked) cls += correct ? ' correct' : ' wrong';
-        return (
-          <button key={origIdx} className={cls} disabled={answered} onClick={() => setPicked(i)}>
-            {options[origIdx]}
-          </button>
-        );
-      })}
-      {answered && (
-        <p className="small" style={{ marginTop: 6 }}>
-          {correct ? t('quizCorrectMsg') : t('quizWrongMsg')}
-        </p>
-      )}
-      {answered && !correct && (
-        <button className="btn" onClick={retry}>
-          {t('quizTryAgain')}
+      {showQuiz ? (
+        <>
+          <h4>{t('checkUnderstanding')}</h4>
+          <p className="small">{L(lesson.question.q)}</p>
+          {order.map((origIdx, i) => {
+            let cls = 'btn quiz-option';
+            if (answered && i === picked) cls += correct ? ' correct' : ' wrong';
+            return (
+              <button key={origIdx} className={cls} disabled={answered} onClick={() => setPicked(i)}>
+                {options[origIdx]}
+              </button>
+            );
+          })}
+          {answered && (
+            <p className="small" style={{ marginTop: 6 }}>
+              {correct ? t('quizCorrectMsg') : t('quizWrongMsg')}
+            </p>
+          )}
+          {answered && !correct && (
+            <>
+              <p className="small muted" style={{ marginTop: 4 }}>{nudge}</p>
+              <button className="btn" style={{ marginRight: 8 }} onClick={() => setShowQuiz(false)}>
+                {t('quizRereadTeaching')}
+              </button>
+              <button className="btn" onClick={retry}>
+                {t('quizTryAgain')}
+              </button>
+            </>
+          )}
+        </>
+      ) : (
+        <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => { setShowQuiz(true); retry(); }}>
+          {t('checkUnderstanding')}
         </button>
       )}
 
@@ -69,7 +91,10 @@ function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done
           <p className="small muted">{L(lesson.reflection)}</p>
           <textarea rows={2} value={reflectionText} onChange={(e) => setReflectionText(e.target.value)} placeholder={t('reflectionOptionalPlaceholder')} />
           {capReached ? (
-            <p className="small muted" style={{ marginTop: 10 }}>{t('knowledgeDailyCapNote')}</p>
+            <>
+              <p className="small muted" style={{ marginTop: 10 }}>{t('knowledgeDailyCapNote')}</p>
+              <p className="small muted">{t('knowledgeDailyCapWhy')}</p>
+            </>
           ) : (
             <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone()}>
               {t('completeLessonBtn')}

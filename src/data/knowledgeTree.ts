@@ -30,6 +30,10 @@ export const TOPICS: Topic[] = [
             ['智慧需要良好的记忆力', '智慧将理解与行动结合在一起', '智慧只能来自书本', '两者并无区别'],
           ),
           answer: 1,
+          nudge: localized(
+            'Remember: wisdom joins understanding with how you live — not with how much you can recite.',
+            '记住：智慧把理解与如何生活连在一起 — 而不是与你能背诵多少连在一起。',
+          ),
         },
         reflection: localized(
           'Think of the wisest person you know. What do they do — not just know — that makes them wise?',

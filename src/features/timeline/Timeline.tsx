@@ -28,16 +28,20 @@ function LevelBody({
   onComplete: (correctCount: number) => void;
 }) {
   const [quizStarted, setQuizStarted] = useState(false);
+  const [showTeaching, setShowTeaching] = useState(true);
   const [qIndex, setQIndex] = useState(0);
   const [order, setOrder] = useState<number[]>(() => shuffledIndices(level.quiz[0].options.en.length));
   const [picked, setPicked] = useState<number | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
+  const [nudgeIdx, setNudgeIdx] = useState(0);
   const { t, L, locale } = useT();
 
   const q = level.quiz[qIndex];
   const finishedQuiz = qIndex >= level.quiz.length;
   const answered = picked !== null;
   const correct = answered && order[picked] === q.answer;
+  const nudgeKeys = ['quizNudgeReread', 'quizNudgeBreathe', 'quizNudgeLookAgain'] as const;
+  const nudge = q.nudge ? L(q.nudge) : t(nudgeKeys[nudgeIdx % nudgeKeys.length]);
 
   function pick(i: number) {
     if (picked !== null) return;
@@ -48,6 +52,7 @@ function LevelBody({
   function retry() {
     setOrder(shuffledIndices(q.options.en.length));
     setPicked(null);
+    setNudgeIdx((n) => n + 1);
   }
 
   function next() {
@@ -59,28 +64,35 @@ function LevelBody({
 
   return (
     <div style={{ marginTop: 10 }}>
-      <p>{L(level.background)}</p>
+      {showTeaching && (
+        <>
+          <p>{L(level.background)}</p>
 
-      <h4>{t('keyFigures')}</h4>
-      <p className="small">{L(level.figures).join(' · ')}</p>
-      <h4>{t('importantTeachings')}</h4>
-      <ul className="small">
-        {L(level.teachings).map((tItem) => (
-          <li key={tItem}>{tItem}</li>
-        ))}
-      </ul>
-      <h4>{t('relatedConcepts')}</h4>
-      <p>
-        {L(level.concepts).map((c) => (
-          <span key={c} className="pill" style={{ marginRight: 6, marginBottom: 6, display: 'inline-block' }}>
-            {c}
-          </span>
-        ))}
-      </p>
+          <h4>{t('keyFigures')}</h4>
+          <p className="small">{L(level.figures).join(' · ')}</p>
+          <h4>{t('importantTeachings')}</h4>
+          <ul className="small">
+            {L(level.teachings).map((tItem) => (
+              <li key={tItem}>{tItem}</li>
+            ))}
+          </ul>
+          <h4>{t('relatedConcepts')}</h4>
+          <p>
+            {L(level.concepts).map((c) => (
+              <span key={c} className="pill" style={{ marginRight: 6, marginBottom: 6, display: 'inline-block' }}>
+                {c}
+              </span>
+            ))}
+          </p>
+        </>
+      )}
 
       {!quizStarted ? (
         capReached ? (
-          <p className="small muted">{t('timelineDailyCapNote')}</p>
+          <>
+            <p className="small muted">{t('timelineDailyCapNote')}</p>
+            <p className="small muted">{t('timelineDailyCapWhy')}</p>
+          </>
         ) : (
           <button className="btn btn-primary" onClick={() => setQuizStarted(true)}>
             {takeQuizBtn(locale, level.quiz.length)}
@@ -108,9 +120,23 @@ function LevelBody({
             </p>
           )}
           {answered && !correct && (
-            <button className="btn" style={{ marginTop: 4 }} onClick={retry}>
-              {t('quizTryAgain')}
-            </button>
+            <>
+              <p className="small muted" style={{ marginTop: 4 }}>{nudge}</p>
+              <button
+                className="btn"
+                style={{ marginTop: 4, marginRight: 8 }}
+                onClick={() => {
+                  setShowTeaching(true);
+                  setQuizStarted(false);
+                  retry();
+                }}
+              >
+                {t('quizRereadTeaching')}
+              </button>
+              <button className="btn" style={{ marginTop: 4 }} onClick={retry}>
+                {t('quizTryAgain')}
+              </button>
+            </>
           )}
           {correct && (
             <button className="btn btn-primary" style={{ marginTop: 8 }} onClick={next}>

@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { useJourney } from '../../state/store';
 import { REGIONS } from '../../data/journeyMap';
 import { regionChallengeMet, type JourneyData } from '../../state/selectors';
-import { PageHeader } from '../../components/ui';
+import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { regionUnlockNote, regionCompletedPill, claimGroundBtn } from '../../i18n/strings';
+import { playSfx } from '../../engine/sfx';
+import type { MapRegion } from '../../data/types';
 
 export default function JourneyMap() {
   const state = useJourney();
@@ -11,6 +14,13 @@ export default function JourneyMap() {
   const completeRegion = useJourney((s) => s.completeRegion);
   const xp = state.xp;
   const { t, L, locale } = useT();
+  const [arrival, setArrival] = useState<MapRegion | null>(null);
+
+  function claim(region: MapRegion) {
+    completeRegion(region.id);
+    playSfx('harmony');
+    setArrival(region);
+  }
 
   return (
     <div>
@@ -53,7 +63,7 @@ export default function JourneyMap() {
                   {completed ? (
                     <span className="pill">{regionCompletedPill(locale, region.rewardXp)}</span>
                   ) : met ? (
-                    <button className="btn btn-primary" onClick={() => completeRegion(region.id)}>
+                    <button className="btn btn-primary" onClick={() => claim(region)}>
                       {claimGroundBtn(locale, region.rewardXp)}
                     </button>
                   ) : (
@@ -65,6 +75,21 @@ export default function JourneyMap() {
           </div>
         );
       })}
+
+      {arrival && (
+        <Modal onClose={() => setArrival(null)}>
+          <h2>
+            {arrival.emoji} {t('mapArrivalTitle')}
+          </h2>
+          <h3 style={{ marginTop: 8 }}>{L(arrival.name)}</h3>
+          <p className="small" style={{ whiteSpace: 'pre-line', fontStyle: 'italic' }}>
+            {L(arrival.epilogue)}
+          </p>
+          <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={() => setArrival(null)}>
+            {t('mapArrivalContinue')}
+          </button>
+        </Modal>
+      )}
     </div>
   );
 }
