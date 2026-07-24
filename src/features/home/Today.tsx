@@ -1,62 +1,24 @@
 import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { QUOTES } from '../../data/quotes';
-import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
-import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
+import { dailyQuoteIndex } from '../../engine/community';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from '../../state/selectors';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { todaySubtitle, lessonsCompletedToday } from '../../i18n/strings';
+import { todaySubtitle } from '../../i18n/strings';
+import { useTodayTasks } from './useTodayTasks';
 
 export default function Today() {
   const state = useJourney();
   const today = useToday();
   const { t, L, locale } = useT();
   const d = state as unknown as JourneyData;
-  const rec = state.days[today] ?? {};
 
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
-  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(state.xp)));
   const stats = statsFromData(d);
   const forest = forestInfo(d);
   const world = worldInfo(d, today);
-
-  const tasks = [
-    {
-      done: !!rec.intention,
-      emoji: '🌅',
-      title: t('taskMorningTitle'),
-      desc: rec.intention ? `“${rec.intention}”` : t('taskMorningDesc'),
-      to: '/practice',
-      cta: t('ctaBegin'),
-    },
-    {
-      done: (rec.lessons ?? 0) > 0,
-      emoji: '📖',
-      title: t('taskLearnTitle'),
-      desc: (rec.lessons ?? 0) > 0 ? lessonsCompletedToday(locale, rec.lessons ?? 0) : t('taskLearnDesc'),
-      to: '/knowledge',
-      cta: t('ctaLearn'),
-    },
-    {
-      done: !!rec.challengeDone,
-      emoji: challenge.emoji,
-      title: `${t('taskChallengePrefix')}: ${L(challenge.virtue)}`,
-      desc: L(challenge.text),
-      to: '/practice',
-      cta: t('ctaPractise'),
-    },
-    {
-      done: !!rec.reflection,
-      emoji: '🪞',
-      title: t('taskEveningTitle'),
-      desc: rec.reflection ? t('taskEveningDone') : t('taskEveningDesc'),
-      to: '/practice',
-      cta: t('ctaReflect'),
-    },
-  ];
-
-  const doneCount = tasks.filter((t) => t.done).length;
+  const { tasks, doneCount } = useTodayTasks();
 
   return (
     <div>

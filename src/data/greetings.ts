@@ -22,6 +22,12 @@ export const PEER_GREETINGS: Record<string, Greeting> = {
   'p-leo': { lang: 'Italiano', text: 'Ciao!' },
   'p-hana': { lang: '日本語', text: 'こんにちは！' },
   'p-sam': { lang: 'English', text: 'Hello!' },
+  'p-noor': { lang: 'Türkçe', text: 'Merhaba!' },
+  'p-diego': { lang: 'Español', text: '¡Hola!' },
+  'p-yuki': { lang: '한국어', text: '안녕하세요!' },
+  'p-oskar': { lang: 'Русский', text: 'Привет!' },
+  'p-fatima': { lang: 'Kiswahili', text: 'Habari!' },
+  'p-chen': { lang: 'Français', text: 'Bonjour!' },
 };
 
 export function greetingFor(peer: Peer): Greeting {

@@ -92,16 +92,24 @@ process restart (not just a page reload), same browser/profile/origin. It
 does **not** sync across devices or browsers, and is lost if the user
 clears site data or uses a private window — there is no backend in v1.
 
-## Notifications
+## Reminders
 
-`src/engine/notifications.ts` + `src/state/notificationStore.ts` implement
-opt-in browser Notification reminders (evening-reflection nudge after
-19:00 local time, daily-streak nudge after 12:00 if nothing done yet),
-toggled in Settings. Be honest about the real limitation in any UI copy:
-these are plain `Notification` API calls with no service worker or push
-subscription behind them, so they only fire while the app is open in a
-tab (checked on load, every 5 minutes, and on tab focus) — not from a
-fully closed browser. Don't imply otherwise.
+`src/engine/calendarReminder.ts` + `src/state/reminderStore.ts`
+(`journey-reminders`) implement calendar-based reminders, shown in
+Settings as `ReminderSection` (`src/App.tsx`). This replaced an earlier
+in-app browser-Notification version: that only ever fired while the tab
+happened to be open near the reminder time (no service worker/push
+subscription), so it silently did nothing once the tab or phone screen
+was closed. The current approach sidesteps that entirely by generating a
+downloadable `.ics` file (`buildReminderIcs`/`downloadIcs`) for a daily
+recurring event — one for the morning (set your intention, default
+08:00) and one for the evening (reflect, default 19:00) — that the user
+adds to their own phone/computer calendar app. That gives a real
+OS-level notification even with the browser fully closed, at the cost of
+no live link back into the app: changing the time in Settings only takes
+effect if the user re-taps "Add to Calendar" and re-imports it. Be
+upfront about that manual-re-add limitation in any UI copy — don't imply
+the calendar event updates itself.
 
 ## Difficulty / pacing features
 

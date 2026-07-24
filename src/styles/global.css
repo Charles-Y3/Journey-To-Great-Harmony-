@@ -507,6 +507,12 @@ a {
   color: var(--gold);
 }
 
+.pill-tier {
+  background: var(--surface-2);
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+
 /* ── Buttons & inputs ──────────────────────────────────────────────── */
 .btn {
   font-family: var(--font-body);
@@ -593,6 +599,23 @@ select:focus {
 .music-track-select {
   width: 100%;
   margin-top: 4px;
+}
+
+.reminder-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.reminder-row:first-of-type {
+  border-top: none;
+}
+
+.reminder-row > div:first-child {
+  flex: 1;
+  min-width: 0;
 }
 
 /* ── Progress bars ─────────────────────────────────────────────────── */

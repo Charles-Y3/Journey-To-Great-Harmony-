@@ -31,6 +31,20 @@ export function peerXp(peer: Peer, startDay: string, today: string): number {
   return Math.floor(30 + noise + peer.pace * days * 46);
 }
 
+/**
+ * The peers currently "in" the community: joined by now (peer.joinDay) and,
+ * for the occasional few who eventually move on, not yet past their
+ * departDay. This is the single source of truth every other function in
+ * this module (and the World/Community UI) reads the peer roster through —
+ * never PEERS directly — so the visible community grows as joinDay
+ * thresholds pass and quietly loses a traveller once in a while, rather
+ * than being a fixed cast for the app's entire lifetime.
+ */
+export function visiblePeers(startDay: string, today: string): Peer[] {
+  const days = communityAge(startDay, today);
+  return PEERS.filter((p) => days >= p.joinDay && (p.departDay === undefined || days < p.departDay));
+}
+
 export interface PeerStats {
   peer: Peer;
   xp: number;
@@ -42,7 +56,7 @@ export interface PeerStats {
 
 export function peerStats(startDay: string, today: string): PeerStats[] {
   const days = communityAge(startDay, today);
-  return PEERS.map((peer) => {
+  return visiblePeers(startDay, today).map((peer) => {
     const xp = peerXp(peer, startDay, today);
     return {
       peer,
@@ -78,12 +92,22 @@ const FEED_ACTIONS: Localized<string>[] = [
   localized('set a morning intention 🌅', '立下了晨间心愿 🌅'),
 ];
 
+// How much more often each tier shows up in the daily feed — active
+// travellers post updates far more often than the occasional ones.
+const TIER_FEED_WEIGHT: Record<Peer['tier'], number> = { active: 4, normal: 2, occasional: 1 };
+
 /** Today's simulated community activity feed. */
-export function communityFeed(today: string): FeedItem[] {
+export function communityFeed(startDay: string, today: string): FeedItem[] {
+  const pool: Peer[] = [];
+  for (const peer of visiblePeers(startDay, today)) {
+    for (let w = 0; w < TIER_FEED_WEIGHT[peer.tier]; w++) pool.push(peer);
+  }
+  if (pool.length === 0) return [];
+
   const items: FeedItem[] = [];
   const count = 4 + Math.floor(seededRandom(`feedn:${today}`) * 3);
   for (let i = 0; i < count; i++) {
-    const peer = PEERS[Math.floor(seededRandom(`feedp:${today}:${i}`) * PEERS.length)];
+    const peer = pool[Math.floor(seededRandom(`feedp:${today}:${i}`) * pool.length)];
     const action = FEED_ACTIONS[Math.floor(seededRandom(`feeda:${today}:${i}`) * FEED_ACTIONS.length)];
     if (items.some((it) => it.peer.id === peer.id && it.text === action)) continue;
     items.push({ peer, text: action });

@@ -154,4 +154,10 @@ export interface Peer {
   emoji: string;
   motto: Localized<string>;
   pace: number; // relative daily progress speed, ~0.6–1.4
+  /** How often this traveller shows up in the feed/leaderboard/world. */
+  tier: 'active' | 'normal' | 'occasional';
+  /** Community-age day (see communityAge()) this peer becomes visible. 0 = present from the start. */
+  joinDay: number;
+  /** Community-age day this peer stops appearing, simulating them moving on. Only ever set for 'occasional' peers. */
+  departDay?: number;
 }

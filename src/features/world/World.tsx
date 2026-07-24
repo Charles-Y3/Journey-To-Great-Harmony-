@@ -4,11 +4,10 @@ import { useProfile } from '../../state/profileStore';
 import { useSound } from '../../state/soundStore';
 import { worldInfo, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
-import { PEERS } from '../../data/peers';
 import { greetingFor } from '../../data/greetings';
 import type { Peer, WorldBuilding } from '../../data/types';
 import { localized, type Localized, type Locale } from '../../i18n/types';
-import { communityFeed } from '../../engine/community';
+import { communityFeed, visiblePeers } from '../../engine/community';
 import { seededRandom } from '../../engine/progression';
 import { speakGreeting, speakAppText } from '../../engine/speech';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
@@ -188,20 +187,26 @@ interface WalkerLayout {
   delay: number;
 }
 
-// Deterministic (peer.id-seeded) so everyone has a consistent "home range"
-// across visits rather than jumping around on every re-render. Percentages
-// are relative to the full strip, so peers may roam across face boundaries.
-const WALKERS: WalkerLayout[] = PEERS.map((peer, i) => {
-  // Kept within 64–78% so walkers stay on the hills/ground (houses sit at
-  // ~77%) and never reach the river band, which starts around 82%.
-  const lane = 64 + (i % 4) * 4 + seededRandom(`walk-top-${peer.id}`) * 2;
-  const spread = 12 + seededRandom(`walk-spread-${peer.id}`) * 30;
-  const x0 = 2 + seededRandom(`walk-x0-${peer.id}`) * Math.max(1, 96 - spread);
-  const x1 = Math.min(98, x0 + spread);
-  const duration = 20 + seededRandom(`walk-dur-${peer.id}`) * 16;
-  const delay = -seededRandom(`walk-delay-${peer.id}`) * duration;
-  return { peer, top: lane, x0, x1, duration, delay };
-});
+// Deterministic (peer.id-seeded, not array-position-seeded) so a given
+// peer keeps the same "home range" across visits regardless of who else is
+// currently visible — the roster grows and occasionally loses a traveller
+// over time (see visiblePeers() in engine/community.ts), so a lane based on
+// array index would otherwise reshuffle everyone's walk whenever the cast
+// changes. Percentages are relative to the full strip, so peers may roam
+// across face boundaries.
+function buildWalkers(peers: Peer[]): WalkerLayout[] {
+  return peers.map((peer) => {
+    // Kept within 64–78% so walkers stay on the hills/ground (houses sit at
+    // ~77%) and never reach the river band, which starts around 82%.
+    const lane = 64 + Math.floor(seededRandom(`walk-lane-${peer.id}`) * 4) * 4 + seededRandom(`walk-top-${peer.id}`) * 2;
+    const spread = 12 + seededRandom(`walk-spread-${peer.id}`) * 30;
+    const x0 = 2 + seededRandom(`walk-x0-${peer.id}`) * Math.max(1, 96 - spread);
+    const x1 = Math.min(98, x0 + spread);
+    const duration = 20 + seededRandom(`walk-dur-${peer.id}`) * 16;
+    const delay = -seededRandom(`walk-delay-${peer.id}`) * duration;
+    return { peer, top: lane, x0, x1, duration, delay };
+  });
+}
 
 /** Tracks which bubble (peer greeting or building info) is showing, auto-dismissing after a delay. */
 function useBubble(durationMs: number) {
@@ -220,10 +225,20 @@ function useBubble(durationMs: number) {
   return { activeId, trigger };
 }
 
-function WorldWalkers({ onGreet, speakingId, L }: { onGreet: (peerId: string) => void; speakingId: string | null; L: LocalizeFn }) {
+function WorldWalkers({
+  walkers,
+  onGreet,
+  speakingId,
+  L,
+}: {
+  walkers: WalkerLayout[];
+  onGreet: (peerId: string) => void;
+  speakingId: string | null;
+  L: LocalizeFn;
+}) {
   return (
     <div className="world-walkers">
-      {WALKERS.map(({ peer, top, x0, x1, duration, delay }) => {
+      {walkers.map(({ peer, top, x0, x1, duration, delay }) => {
         const greeting = greetingFor(peer);
         const speaking = speakingId === peer.id;
         return (
@@ -320,7 +335,9 @@ export default function World() {
   const today = useToday();
   const d = state as unknown as JourneyData;
   const info = worldInfo(d, today);
-  const feed = communityFeed(today);
+  const feed = communityFeed(state.startDay, today);
+  const peers = visiblePeers(state.startDay, today);
+  const walkers = buildWalkers(peers);
   const { t, L, locale } = useT();
   const myName = useProfile((s) => s.name);
   const speechMuted = useSound((s) => s.speechMuted);
@@ -347,7 +364,7 @@ export default function World() {
   function greet(peerId: string) {
     peerBubble.trigger(peerId);
     if (!speechMuted) {
-      const peer = PEERS.find((p) => p.id === peerId);
+      const peer = peers.find((p) => p.id === peerId);
       if (peer) speakGreeting(greetingFor(peer));
     }
   }
@@ -373,7 +390,7 @@ export default function World() {
         >
           <WorldGround stageIndex={info.stageIndex} />
           <WorldBuildings buildings={info.buildings} activeId={buildingBubble.activeId} onSelect={buildingBubble.trigger} L={L} locale={locale} />
-          <WorldWalkers onGreet={greet} speakingId={peerBubble.activeId} L={L} />
+          <WorldWalkers walkers={walkers} onGreet={greet} speakingId={peerBubble.activeId} L={L} />
         </div>
         <button type="button" className="world-rotate world-rotate-left" onClick={() => rotate(-1)} aria-label={t('worldRotateLeft')}>
           ◀

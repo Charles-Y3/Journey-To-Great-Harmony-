@@ -2,15 +2,17 @@ import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes } from 'react-router-dom';
 import { useJourney, useToday } from './state/store';
 import { useLocale } from './state/localeStore';
-import { useNotifications } from './state/notificationStore';
+import { useReminders } from './state/reminderStore';
+import { useUi } from './state/uiStore';
 import { useProfile } from './state/profileStore';
+import { useTodayTasks } from './features/home/useTodayTasks';
 import { useSound, type MusicTrackId } from './state/soundStore';
 import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
 import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
-import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel } from './i18n/strings';
+import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel, welcomeBackTitle } from './i18n/strings';
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp } from './engine/progression';
-import { checkReminders, notificationPermission, requestNotificationPermission } from './engine/notifications';
+import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
@@ -175,39 +177,91 @@ function NameSection() {
   );
 }
 
-function NotificationsSection() {
+function ShareSection() {
   const { t } = useT();
-  const enabled = useNotifications((s) => s.enabled);
-  const setEnabled = useNotifications((s) => s.setEnabled);
-  const [permission, setPermission] = useState(notificationPermission());
+  const [copied, setCopied] = useState(false);
 
-  async function handleToggle() {
-    if (enabled) {
-      setEnabled(false);
+  async function share() {
+    const url = window.location.origin;
+    const title = t('appName');
+    const message = t('shareMessage');
+    if (navigator.share) {
+      try {
+        await navigator.share({ title, text: message, url });
+      } catch {
+        // User cancelled the share sheet — not an error, nothing to do.
+      }
       return;
     }
-    const perm = await requestNotificationPermission();
-    setPermission(perm);
-    if (perm === 'granted') {
-      setEnabled(true);
-      checkReminders();
+    try {
+      await navigator.clipboard.writeText(`${message} ${url}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Clipboard access can fail (permissions, insecure context) — the
+      // button simply won't confirm; nothing else to fall back to here.
     }
   }
 
   return (
     <div className="card">
-      <h3>{t('settingsNotifTitle')}</h3>
-      <p className="small muted">{t('settingsNotifDesc')}</p>
-      {permission === 'unsupported' ? (
-        <p className="small muted">{t('settingsNotifUnsupported')}</p>
-      ) : (
-        <>
-          <button className={enabled ? 'btn btn-primary' : 'btn'} onClick={handleToggle}>
-            {enabled ? t('settingsNotifOn') : t('settingsNotifOff')}
-          </button>
-          {permission === 'denied' && !enabled && <p className="small muted">{t('settingsNotifDenied')}</p>}
-        </>
-      )}
+      <h3>{t('settingsShareTitle')}</h3>
+      <p className="small muted">{t('settingsShareDesc')}</p>
+      <button className="btn" onClick={share}>
+        {copied ? t('shareCopiedConfirmation') : t('settingsShareBtn')}
+      </button>
+    </div>
+  );
+}
+
+function ReminderSection() {
+  const { t } = useT();
+  const morningTime = useReminders((s) => s.morningTime);
+  const setMorningTime = useReminders((s) => s.setMorningTime);
+  const eveningTime = useReminders((s) => s.eveningTime);
+  const setEveningTime = useReminders((s) => s.setEveningTime);
+
+  function addToCalendar(kind: 'morning' | 'evening') {
+    const time = kind === 'morning' ? morningTime : eveningTime;
+    const ics = buildReminderIcs({
+      uid: `journey-${kind}-reminder@great-harmony`,
+      summary: t(kind === 'morning' ? 'reminderMorningSummary' : 'reminderEveningSummary'),
+      description: t(kind === 'morning' ? 'reminderMorningDesc' : 'reminderEveningDesc'),
+      time,
+    });
+    downloadIcs(`${kind}-reminder.ics`, ics);
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsReminderTitle')}</h3>
+      <p className="small muted">{t('settingsReminderDesc')}</p>
+
+      <div className="reminder-row">
+        <div>
+          <strong>{t('reminderMorningLabel')}</strong>
+          <div className="small muted">{t('reminderMorningDesc')}</div>
+        </div>
+        <input type="time" value={morningTime} onChange={(e) => setMorningTime(e.target.value)} />
+        <button className="btn" onClick={() => addToCalendar('morning')}>
+          {t('settingsReminderAddBtn')}
+        </button>
+      </div>
+
+      <div className="reminder-row">
+        <div>
+          <strong>{t('reminderEveningLabel')}</strong>
+          <div className="small muted">{t('reminderEveningDesc')}</div>
+        </div>
+        <input type="time" value={eveningTime} onChange={(e) => setEveningTime(e.target.value)} />
+        <button className="btn" onClick={() => addToCalendar('evening')}>
+          {t('settingsReminderAddBtn')}
+        </button>
+      </div>
+
+      <p className="small muted" style={{ marginTop: 8 }}>
+        {t('settingsReminderFootnote')}
+      </p>
     </div>
   );
 }
@@ -299,6 +353,37 @@ function MusicSection() {
   );
 }
 
+function WelcomeModal({ onClose }: { onClose: () => void }) {
+  const { t, L, locale } = useT();
+  const name = useProfile((s) => s.name);
+  const streak = useJourney((s) => s.streakCurrent);
+  const xp = useJourney((s) => s.xp);
+  const rank = rankForXp(xp);
+  const { tasks, doneCount } = useTodayTasks();
+
+  return (
+    <Modal onClose={onClose}>
+      <h2>{name ? welcomeBackTitle(locale, name) : t('welcomeBackTitleAnon')}</h2>
+      <p className="small muted">
+        {rank.emoji} {L(rank.name)} · 🔥 {streak} {t('statStreak')}
+      </p>
+      <h4>{t('welcomeBackTasksHeading')}</h4>
+      {tasks.map((tk) => (
+        <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
+          <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
+          <div>
+            <div className="task-title">{tk.title}</div>
+          </div>
+        </div>
+      ))}
+      {doneCount === tasks.length && <p className="pill" style={{ marginTop: 10 }}>{t('todayFullHarmony')}</p>}
+      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={onClose}>
+        {t('welcomeBackContinue')}
+      </button>
+    </Modal>
+  );
+}
+
 function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   const { t, L, locale } = useT();
   const currentIdx = rankIndexForXp(xp);
@@ -337,8 +422,9 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <h2>{t('settingsTitle')}</h2>
       <LanguageSection />
       <NameSection />
-      <NotificationsSection />
+      <ReminderSection />
       <MusicSection />
+      <ShareSection />
       <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
         <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
@@ -384,27 +470,25 @@ export default function App() {
   const harmony = useJourney((s) => s.harmonyPoints);
   const hasChosenLocale = useLocale((s) => s.hasChosen);
   const hasSetName = useProfile((s) => s.hasSetName);
+  const today = useToday();
+  const lastWelcomeSeenDay = useUi((s) => s.lastWelcomeSeenDay);
+  const setLastWelcomeSeenDay = useUi((s) => s.setLastWelcomeSeenDay);
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [showRankModal, setShowRankModal] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [showHarmonyInfo, setShowHarmonyInfo] = useState(false);
+  const [showWelcome, setShowWelcome] = useState(false);
 
-  // Check for a due evening-reflection or daily-streak reminder on load, on
-  // an interval while the tab stays open, and whenever the tab regains
-  // focus (covers a laptop reopened or a background tab switched back to).
+  // Once per calendar day (and only past the language/name gates), greet
+  // the user with a quick progress + to-do summary instead of dropping
+  // them straight onto the Today page with no orientation.
   useEffect(() => {
-    checkReminders();
-    const interval = window.setInterval(checkReminders, 5 * 60 * 1000);
-    const onVisible = () => {
-      if (document.visibilityState === 'visible') checkReminders();
-    };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      window.clearInterval(interval);
-      document.removeEventListener('visibilitychange', onVisible);
-    };
-  }, []);
+    if (hasChosenLocale && hasSetName && lastWelcomeSeenDay !== today) {
+      setShowWelcome(true);
+      setLastWelcomeSeenDay(today);
+    }
+  }, [hasChosenLocale, hasSetName, today, lastWelcomeSeenDay, setLastWelcomeSeenDay]);
 
   if (!hasChosenLocale) {
     return <LanguageGate />;
@@ -483,6 +567,7 @@ export default function App() {
       {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
       {showStreakInfo && <StreakInfoModal onClose={() => setShowStreakInfo(false)} />}
       {showHarmonyInfo && <HarmonyInfoModal onClose={() => setShowHarmonyInfo(false)} />}
+      {showWelcome && <WelcomeModal onClose={() => setShowWelcome(false)} />}
     </div>
   );
 }

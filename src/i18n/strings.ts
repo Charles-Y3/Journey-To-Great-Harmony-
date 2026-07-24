@@ -64,19 +64,23 @@ export const UI = {
   ),
   settingsNameSave: localized('Save', '保存'),
 
-  // ── Settings: notifications ─────────────────────────────────────────
-  settingsNotifTitle: localized('Notifications', '通知'),
-  settingsNotifDesc: localized(
-    "Get a gentle reminder for your evening reflection, and to keep today's practice from slipping. Reminders only work while this app is open in a browser tab.",
-    '为你的夜间反思送上温和的提醒，也提醒你别错过今天的修习。提醒仅在此应用于浏览器标签页中保持开启时才会生效。',
+  // ── Settings: reminders (calendar-based) ────────────────────────────
+  settingsReminderTitle: localized('Reminders', '提醒'),
+  settingsReminderDesc: localized(
+    'Add a daily reminder to your phone or computer\'s own calendar app — a real notification, even with this app fully closed. Pick a time, then tap "Add to Calendar".',
+    '将每日提醒加入你手机或电脑自带的日历应用 — 即便本应用完全关闭，也能收到真正的通知。选好时间后，点击「加入日历」即可。',
   ),
-  settingsNotifOn: localized('🔔 Reminders on', '🔔 提醒已开启'),
-  settingsNotifOff: localized('🔕 Enable reminders', '🔕 开启提醒'),
-  settingsNotifDenied: localized(
-    "Notifications are blocked in your browser. Allow them in your browser's site settings to turn this on.",
-    '你的浏览器已阻止通知。请在浏览器的网站设置中允许通知，才能开启此功能。',
+  reminderMorningLabel: localized('🌅 Morning: set your intention', '🌅 早晨：立下心愿'),
+  reminderMorningDesc: localized('A moment to set your goal for the day.', '花一点时间，为今天立下目标。'),
+  reminderMorningSummary: localized('Set your morning intention 🌅', '立下你的晨间心愿 🌅'),
+  reminderEveningLabel: localized('🪞 Evening: reflect', '🪞 夜晚：反思'),
+  reminderEveningDesc: localized('A moment to look back on how today went.', '花一点时间，回顾今天过得如何。'),
+  reminderEveningSummary: localized('Evening reflection time 🪞', '夜间反思时间 🪞'),
+  settingsReminderAddBtn: localized('Add to Calendar', '加入日历'),
+  settingsReminderFootnote: localized(
+    "This downloads a small calendar file (.ics) that repeats daily. If you change the time above, tap \"Add to Calendar\" again to update it.",
+    '这会下载一个每日重复的日历文件（.ics）。若你更改了上方的时间，请再次点击「加入日历」以更新。',
   ),
-  settingsNotifUnsupported: localized("Your browser doesn't support notifications.", '你的浏览器不支持通知功能。'),
 
   // ── Settings: ambient music ──────────────────────────────────────────
   settingsMusicTitle: localized('Background Music', '背景音乐'),
@@ -93,15 +97,17 @@ export const UI = {
     "Browsers only allow audio to start after you tap a button, so music won't resume automatically when you reopen the app — just pick a track again.",
     '浏览器只允许在你点击按钮之后才播放音效，因此重新打开应用时音乐不会自动恢复 — 只需再次选择曲目即可。',
   ),
-  notifyEveningTitle: localized('🪞 Evening Reflection', '🪞 夜间反思'),
-  notifyEveningBody: localized(
-    'Take a quiet moment to reflect on your day in Journey to Great Harmony.',
-    '花一点安静的时间，在《大同之旅》中回顾你的一天吧。',
+  // ── Settings: share ──────────────────────────────────────────────────
+  settingsShareTitle: localized('Share', '分享'),
+  settingsShareDesc: localized(
+    'Know someone who might enjoy this journey too? Share the app with them.',
+    '有朋友可能也会喜欢这段旅程吗？把这个应用分享给他们吧。',
   ),
-  notifyStreakTitle: localized('🔥 Keep your streak alive', '🔥 别让连续记录中断'),
-  notifyStreakBody: localized(
-    "You haven't practised today yet — a few minutes keeps your journey going.",
-    '你今天还没有修习 — 只需几分钟，就能延续你的旅程。',
+  settingsShareBtn: localized('📤 Share this app', '📤 分享这个应用'),
+  shareCopiedConfirmation: localized('✓ Link copied!', '✓ 链接已复制！'),
+  shareMessage: localized(
+    "I'm on a journey through humanity's wisdom traditions with Journey to Great Harmony — thought you might like it too:",
+    '我正透过《大同之旅》探索人类的智慧传统 — 想你可能也会喜欢：',
   ),
 
   // ── Language onboarding gate ──────────────────────────────────────
@@ -174,6 +180,9 @@ export const UI = {
     '🎉 Full harmony today — your forest and the world both grew!',
     '🎉 今日圆满和谐 — 你的森林与世界都成长了！',
   ),
+  welcomeBackTitleAnon: localized('👋 Welcome back', '👋 欢迎回来'),
+  welcomeBackTasksHeading: localized("Today's journey", '今日的旅程'),
+  welcomeBackContinue: localized("Let's go", '出发吧'),
   statStreak: localized('day streak', '天连续记录'),
   statForest: localized('forest', '森林'),
   statWorld: localized('world', '世界'),
@@ -360,6 +369,9 @@ export const UI = {
     'Celebrate a fellow traveller. Encouragement costs nothing and builds the world (+2 XP, +5 harmony).',
     '为同行者喝彩。鼓励不花费任何代价，还能建设世界 (+2 经验, +5 和谐)。',
   ),
+  peerTierActive: localized('active', '活跃'),
+  peerTierNormal: localized('regular', '常规'),
+  peerTierOccasional: localized('occasional', '偶尔'),
   encourageSentJust: localized('🌸 Sent!', '🌸 已送出！'),
   encourageSentToday: localized('🌸 Sent today', '🌸 今日已送出'),
   encourageBtn: localized('🌸 Encourage', '🌸 鼓励'),
@@ -604,6 +616,10 @@ export function minLengthHint(locale: Locale, current: number, min: number): str
 
 export function yourNoteLabel(locale: Locale, note: string): string {
   return pick(locale, `Your note: "${note}"`, `你的记录：「${note}」`, `你的記錄：「${note}」`);
+}
+
+export function welcomeBackTitle(locale: Locale, name: string): string {
+  return pick(locale, `👋 Welcome back, ${name}`, `👋 欢迎回来，${name}`, `👋 歡迎回來，${name}`);
 }
 
 export function capstoneEraPrompt(locale: Locale, eraName: string): string {

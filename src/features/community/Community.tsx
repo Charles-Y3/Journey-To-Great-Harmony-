@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
-import { peerStats, peerEncouragesToday } from '../../engine/community';
+import { peerStats, peerEncouragesToday, visiblePeers } from '../../engine/community';
 import { statsFromData, forestInfo, type JourneyData } from '../../state/selectors';
-import { PEERS } from '../../data/peers';
+import type { Peer } from '../../data/types';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { encouragementBanner, type UiKey } from '../../i18n/strings';
+
+const TIER_KEY: Record<Peer['tier'], UiKey> = {
+  active: 'peerTierActive',
+  normal: 'peerTierNormal',
+  occasional: 'peerTierOccasional',
+};
 
 type Category = 'wisdom' | 'practice' | 'compassion' | 'growth';
 
@@ -50,7 +56,7 @@ export default function Community() {
     ...peers.map((p, i) => ({ id: p.peer.id, name: L(p.peer.name), emoji: p.peer.emoji, me: false, score: scoreFor(category, false, i) })),
   ].sort((a, b) => b.score - a.score);
 
-  const encouragersToday = PEERS.filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
+  const encouragersToday = visiblePeers(state.startDay, today).filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
   const activeCategory = CATEGORIES.find((c) => c.id === category)!;
 
   return (
@@ -95,7 +101,7 @@ export default function Community() {
             <div key={p.peer.id} className="leader-row">
               <span className="leader-emoji">{p.peer.emoji}</span>
               <span className="leader-info">
-                <strong>{L(p.peer.name)}</strong>
+                <strong>{L(p.peer.name)}</strong> <span className="pill pill-tier">{t(TIER_KEY[p.peer.tier])}</span>
                 <div className="small muted">“{L(p.peer.motto)}”</div>
               </span>
               <span className="leader-score">
