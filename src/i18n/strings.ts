@@ -231,6 +231,10 @@ export const UI = {
   worldTotalHarmony: localized('total harmony', '和谐总量'),
   civicBuildingsTitle: localized('Civic buildings', '公共建筑'),
   todayInCommunity: localized('Today in the community', '今日社群动态'),
+  worldWalkersHint: localized(
+    'Tap a traveller to hear them say hello.',
+    '点击一位旅人，听听他们如何打招呼。',
+  ),
   worldFooter: localized(
     'In this version your fellow travellers are simulated companions. With community accounts, this world will be built by real people together.',
     '在此版本中，你的同行旅人是模拟的伙伴。未来有了社群账号后，这个世界将由真实的人们共同建设。',
@@ -447,6 +451,10 @@ export function continueBtn(locale: Locale, remaining: number): string {
 
 export function backToTopic(locale: Locale, topicName: string): string {
   return locale === 'en' ? `← Back to ${topicName}` : `← 返回「${topicName}」`;
+}
+
+export function newItemsAriaLabel(locale: Locale, count: number): string {
+  return pick(locale, `${count} new`, `${count} 个新项目`, `${count} 個新項目`);
 }
 
 export function yourNoteLabel(locale: Locale, note: string): string {

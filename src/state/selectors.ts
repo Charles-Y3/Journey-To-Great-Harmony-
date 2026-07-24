@@ -40,6 +40,12 @@ export interface JourneyData {
   quizCorrect: number;
   startDay: string;
   dayOffset: number;
+  seenCollectionCount: number;
+}
+
+/** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
+export function newCollectionCount(d: JourneyData): number {
+  return Math.max(0, d.unlockedCards.length + d.unlockedBadges.length - d.seenCollectionCount);
 }
 
 export function isTopicCompleted(completedLessons: string[], topic: Topic): boolean {

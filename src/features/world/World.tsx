@@ -1,10 +1,18 @@
+import { useEffect, useRef, useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { worldInfo, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
+import { PEERS } from '../../data/peers';
+import { greetingFor } from '../../data/greetings';
+import type { Peer } from '../../data/types';
+import type { Localized } from '../../i18n/types';
 import { communityFeed } from '../../engine/community';
+import { seededRandom } from '../../engine/progression';
 import { PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { worldProgressLabel, buildingLockedNote } from '../../i18n/strings';
+
+type LocalizeFn = <T>(v: Localized<T>) => T;
 
 function WorldScene({ stageIndex, builtIds, caption }: { stageIndex: number; builtIds: string[]; caption: string }) {
   const houseCount = 3 + stageIndex * 3;
@@ -62,6 +70,66 @@ function WorldScene({ stageIndex, builtIds, caption }: { stageIndex: number; bui
   );
 }
 
+interface WalkerLayout {
+  peer: Peer;
+  top: number;
+  x0: number;
+  x1: number;
+  duration: number;
+  delay: number;
+}
+
+// Deterministic (peer.id-seeded) so everyone has a consistent "home range"
+// across visits rather than jumping around on every re-render.
+const WALKERS: WalkerLayout[] = PEERS.map((peer, i) => {
+  const lane = 64 + (i % 4) * 6.5 + seededRandom(`walk-top-${peer.id}`) * 3;
+  const spread = 20 + seededRandom(`walk-spread-${peer.id}`) * 55;
+  const x0 = 4 + seededRandom(`walk-x0-${peer.id}`) * Math.max(1, 92 - spread);
+  const x1 = Math.min(94, x0 + spread);
+  const duration = 15 + seededRandom(`walk-dur-${peer.id}`) * 12;
+  const delay = -seededRandom(`walk-delay-${peer.id}`) * duration;
+  return { peer, top: lane, x0, x1, duration, delay };
+});
+
+function WorldWalkers({ onGreet, speakingId, L }: { onGreet: (peerId: string) => void; speakingId: string | null; L: LocalizeFn }) {
+  return (
+    <div className="world-walkers">
+      {WALKERS.map(({ peer, top, x0, x1, duration, delay }) => {
+        const greeting = greetingFor(peer);
+        const speaking = speakingId === peer.id;
+        return (
+          <button
+            key={peer.id}
+            type="button"
+            className={speaking ? 'world-walker speaking' : 'world-walker'}
+            style={{
+              top: `${top}%`,
+              '--x0': `${x0}%`,
+              '--x1': `${x1}%`,
+              animationDuration: `${duration}s`,
+              animationDelay: `${delay}s`,
+            } as React.CSSProperties}
+            onClick={() => onGreet(peer.id)}
+            aria-label={L(peer.name)}
+            title={L(peer.name)}
+          >
+            <span className="world-walker-emoji" aria-hidden="true">
+              {peer.emoji}
+            </span>
+            {speaking && (
+              <span className="world-bubble" role="status">
+                <strong>{L(peer.name)}</strong>
+                <span className="world-bubble-text">{greeting.text}</span>
+                <span className="world-bubble-lang">{greeting.lang}</span>
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 export default function World() {
   const state = useJourney();
   const today = useToday();
@@ -71,11 +139,30 @@ export default function World() {
   const builtIds = info.buildings.filter((b) => b.built).map((b) => b.id);
   const { t, L, locale } = useT();
 
+  const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const timeoutRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
+  function handleGreet(peerId: string) {
+    if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
+    setSpeakingId(peerId);
+    timeoutRef.current = window.setTimeout(() => setSpeakingId(null), 2800);
+  }
+
   return (
     <div>
       <PageHeader emoji="🌏" title={t('worldTitle')} subtitle={t('worldSubtitle')} />
 
-      <WorldScene stageIndex={info.stageIndex} builtIds={builtIds} caption={t('worldSceneCaption')} />
+      <div className="world-stage">
+        <WorldScene stageIndex={info.stageIndex} builtIds={builtIds} caption={t('worldSceneCaption')} />
+        <WorldWalkers onGreet={handleGreet} speakingId={speakingId} L={L} />
+      </div>
+      <p className="small muted world-walkers-hint">{t('worldWalkersHint')}</p>
 
       <div className="stage-steps">
         {WORLD_STAGES.map((s, i) => {

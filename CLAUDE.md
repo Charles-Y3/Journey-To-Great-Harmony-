@@ -32,6 +32,14 @@ Concretely:
   optional decorative fields (`Topic.accent`, `WisdomCard.accent`,
   `Quote.originalZh`) left over from that design; they are not rendered
   anywhere and should stay that way — don't wire them back up.
+- One deliberate, narrow exception exists: the wandering peers on the
+  Great Harmony World tab (`src/features/world/World.tsx`) each greet
+  the user in a different real-world language when clicked
+  (`src/data/greetings.ts`, `PEER_GREETINGS`), regardless of the app's
+  language setting. This is content, not chrome — the entire feature is
+  "show off many world languages" — so it does not go through
+  `Localized`/`t()`/`L()`. Don't localize it away; don't extend this
+  pattern to anything else without a similarly explicit reason.
 - After adding or editing any `Localized` content, run `npm run gen:i18n`
   to regenerate `src/i18n/zhHant.generated.json` (the Simplified→Traditional
   lookup table, built via `opencc-js` at build time so the ~1MB conversion

@@ -55,6 +55,7 @@ interface JourneyActions {
   dismissCelebration: () => void;
   advanceDay: () => void;
   resetJourney: () => void;
+  markCollectionSeen: () => void;
 }
 
 export type JourneyState = JourneyData & { celebrations: Celebration[] } & JourneyActions;
@@ -77,6 +78,7 @@ function initialData(): JourneyData {
     quizCorrect: 0,
     startDay: todayKey(0),
     dayOffset: 0,
+    seenCollectionCount: 0,
   };
 }
 
@@ -212,6 +214,7 @@ function dataOf(s: JourneyState): JourneyData {
     quizCorrect: s.quizCorrect,
     startDay: s.startDay,
     dayOffset: s.dayOffset,
+    seenCollectionCount: s.seenCollectionCount,
   };
 }
 
@@ -335,6 +338,12 @@ export const useJourney = create<JourneyState>()(
         advanceDay: () => set((s) => ({ dayOffset: s.dayOffset + 1 })),
 
         resetJourney: () => set({ ...initialData(), celebrations: [] }),
+
+        markCollectionSeen: () =>
+          set((s) => {
+            const total = s.unlockedCards.length + s.unlockedBadges.length;
+            return total > s.seenCollectionCount ? { seenCollectionCount: total } : {};
+          }),
       };
     },
     {

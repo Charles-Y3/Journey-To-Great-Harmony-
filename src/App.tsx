@@ -4,7 +4,7 @@ import { useJourney, useToday } from './state/store';
 import { useLocale } from './state/localeStore';
 import { LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
-import { xpBarLabel, advancedDaysNote } from './i18n/strings';
+import { xpBarLabel, advancedDaysNote, newItemsAriaLabel } from './i18n/strings';
 import { rankForXp, nextRankForXp } from './engine/progression';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
@@ -47,13 +47,32 @@ const MORE_ITEMS = [
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
 ];
 
+/** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
+function useNewCollectionCount(): number {
+  return useJourney((s) => Math.max(0, s.unlockedCards.length + s.unlockedBadges.length - s.seenCollectionCount));
+}
+
+function NavBadge({ count }: { count: number }) {
+  const { locale } = useT();
+  if (count <= 0) return null;
+  return (
+    <span className="nav-badge" aria-label={newItemsAriaLabel(locale, count)}>
+      {count > 9 ? '9+' : count}
+    </span>
+  );
+}
+
 function SidebarNavLinks() {
   const { t } = useT();
+  const newCollectionCount = useNewCollectionCount();
   return (
     <>
       {SIDEBAR_NAV.map((item) => (
         <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
-          <span className="nav-emoji">{item.emoji}</span>
+          <span className="nav-emoji">
+            {item.emoji}
+            {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
+          </span>
           <span>{t(item.key)}</span>
         </NavLink>
       ))}
@@ -63,6 +82,7 @@ function SidebarNavLinks() {
 
 function MoreSheet({ onClose }: { onClose: () => void }) {
   const { t } = useT();
+  const newCollectionCount = useNewCollectionCount();
   return (
     <Modal onClose={onClose}>
       <h2>{t('moreSheetTitle')}</h2>
@@ -70,7 +90,10 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
       <div className="more-sheet-grid">
         {MORE_ITEMS.map((item) => (
           <Link key={item.to} to={item.to} className="more-sheet-item" onClick={onClose}>
-            <span className="more-sheet-emoji">{item.emoji}</span>
+            <span className="more-sheet-emoji">
+              {item.emoji}
+              {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
+            </span>
             <span>{t(item.key)}</span>
           </Link>
         ))}
@@ -82,6 +105,7 @@ function MoreSheet({ onClose }: { onClose: () => void }) {
 function BottomNav() {
   const { t } = useT();
   const [showMore, setShowMore] = useState(false);
+  const newCollectionCount = useNewCollectionCount();
   return (
     <>
       <nav className="bottom-nav">
@@ -92,7 +116,10 @@ function BottomNav() {
           </NavLink>
         ))}
         <button className="nav-link" onClick={() => setShowMore(true)}>
-          <span className="nav-emoji">➕</span>
+          <span className="nav-emoji">
+            ➕
+            <NavBadge count={newCollectionCount} />
+          </span>
           <span>{t('navMore')}</span>
         </button>
       </nav>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useJourney } from '../../state/store';
 import { CARDS } from '../../data/cards';
 import { BADGES } from '../../data/badges';
@@ -27,9 +27,16 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
 export default function Collection() {
   const unlockedCards = useJourney((s) => s.unlockedCards);
   const unlockedBadges = useJourney((s) => s.unlockedBadges);
+  const markCollectionSeen = useJourney((s) => s.markCollectionSeen);
   const [open, setOpen] = useState<WisdomCard | null>(null);
   const [tab, setTab] = useState<'cards' | 'badges'>('cards');
   const { t, L, locale } = useT();
+
+  // Clear the "new item" nav badge as soon as the user opens this tab —
+  // covers both a fresh visit and an unlock happening while already here.
+  useEffect(() => {
+    markCollectionSeen();
+  }, [markCollectionSeen, unlockedCards.length, unlockedBadges.length]);
 
   return (
     <div>

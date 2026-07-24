@@ -209,9 +209,28 @@ a {
 }
 
 .nav-emoji {
+  position: relative;
+  display: inline-block;
   font-size: 1.1rem;
   width: 1.4em;
   text-align: center;
+}
+
+.nav-badge {
+  position: absolute;
+  top: -6px;
+  right: -2px;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: var(--seal);
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+  box-shadow: 0 0 0 2px var(--surface);
 }
 
 .sidebar-footer {
@@ -346,6 +365,8 @@ a {
 }
 
 .more-sheet-emoji {
+  position: relative;
+  display: inline-block;
   font-size: 1.6rem;
 }
 
@@ -751,6 +772,140 @@ input[type='text']:focus {
   background: var(--surface);
   box-shadow: var(--shadow);
   display: block;
+}
+
+/* ── World: wandering, clickable peers ────────────────────────────── */
+.world-stage {
+  position: relative;
+}
+
+.world-walkers {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: var(--radius);
+  pointer-events: none;
+}
+
+.world-walker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  pointer-events: auto;
+  animation: world-walk linear infinite, world-bob 0.6s ease-in-out infinite;
+  filter: drop-shadow(0 2px 2px rgba(30, 20, 5, 0.3));
+}
+
+.world-walker-emoji {
+  display: block;
+}
+
+.world-walker:hover .world-walker-emoji,
+.world-walker:focus-visible .world-walker-emoji {
+  transform: scale(1.18);
+}
+
+.world-walker-emoji {
+  transition: transform 0.15s ease;
+}
+
+.world-walker.speaking {
+  animation-play-state: paused;
+  z-index: 5;
+}
+
+@keyframes world-walk {
+  0%,
+  100% {
+    left: var(--x0);
+  }
+  50% {
+    left: var(--x1);
+  }
+}
+
+@keyframes world-bob {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) translateY(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) translateY(-3px);
+  }
+}
+
+.world-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  padding: 6px 10px;
+  min-width: 84px;
+  max-width: 160px;
+  white-space: normal;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--ink);
+  animation: world-bubble-in 0.18s ease-out;
+}
+
+.world-bubble::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--surface);
+}
+
+.world-bubble strong {
+  display: block;
+  font-size: 0.68rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.world-bubble-text {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--jade-deep);
+}
+
+.world-bubble-lang {
+  display: block;
+  font-size: 0.64rem;
+  color: var(--gold);
+  margin-top: 1px;
+}
+
+@keyframes world-bubble-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px) scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.world-walkers-hint {
+  margin-top: 8px;
+  margin-bottom: 16px;
 }
 
 .stage-steps {
