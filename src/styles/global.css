@@ -713,6 +713,10 @@ select:focus {
   overflow: hidden;
 }
 
+/* Fixed dark chip + light text regardless of theme or rarity gradient, so
+   the year stays legible against every hero background (a translucent-white
+   chip used to nearly vanish against the light common/rare/legendary
+   gradients in light mode). */
 .card-modal-year {
   position: absolute;
   top: 14px;
@@ -720,8 +724,8 @@ select:focus {
   font-family: var(--font-display);
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--ink-soft);
-  background: rgba(255, 255, 255, 0.35);
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
   padding: 3px 10px;
   border-radius: 999px;
   z-index: 1;
@@ -839,6 +843,15 @@ select:focus {
 
 .card-modal-body h4 {
   margin-top: 18px;
+}
+
+.card-modal-body h4:first-child {
+  margin-top: 0;
+}
+
+.card-modal-quote {
+  font-style: italic;
+  font-size: 1.05rem;
 }
 
 .celebrate {

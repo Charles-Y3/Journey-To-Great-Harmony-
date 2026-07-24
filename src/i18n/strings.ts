@@ -395,6 +395,8 @@ export const UI = {
   categoryVirtue: localized('virtue', '德行'),
   categoryStory: localized('story', '故事'),
   rarityFilterAll: localized('All', '全部'),
+  cardSummaryHeading: localized('Summary', '简介'),
+  cardQuoteHeading: localized('Quote', '语录'),
   cardDetailHeading: localized('Did you know?', '你知道吗？'),
 
   // ── Ranks (fallback labels; see engine/progression.ts for full localized list) ──
@@ -592,7 +594,12 @@ export function yourContributionLabel(locale: Locale, name: string | null): stri
 
 export function minLengthHint(locale: Locale, current: number, min: number): string {
   if (current >= min) return pick(locale, '✓ Thank you for taking the time.', '✓ 感谢你用心写下这些。', '✓ 感謝你用心寫下這些。');
-  return pick(locale, `A little more — ${current}/${min} characters`, `再多写一点 — ${current}/${min} 字`, `再多寫一點 — ${current}/${min} 字`);
+  return pick(
+    locale,
+    `Write a few honest, meaningful words — ${current}/${min} characters counted so far`,
+    `请写下几句真诚、有意义的话 — 目前已计入 ${current}/${min} 字`,
+    `請寫下幾句真誠、有意義的話 — 目前已計入 ${current}/${min} 字`,
+  );
 }
 
 export function yourNoteLabel(locale: Locale, note: string): string {

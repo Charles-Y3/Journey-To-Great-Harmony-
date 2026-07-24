@@ -61,13 +61,12 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
         </p>
       </div>
       <div className="card-modal-body">
-        <p style={{ fontStyle: 'italic', fontSize: '1.05rem' }}>{L(card.text)}</p>
-        {card.detail && (
-          <>
-            <h4>{t('cardDetailHeading')}</h4>
-            <p className="small muted">{L(card.detail)}</p>
-          </>
-        )}
+        <h4>{t('cardSummaryHeading')}</h4>
+        <p>{L(card.summary)}</p>
+        <h4>{t('cardQuoteHeading')}</h4>
+        <p className="card-modal-quote">“{L(card.quote)}”</p>
+        <h4>{t('cardDetailHeading')}</h4>
+        <p className="small muted">{L(card.didYouKnow)}</p>
       </div>
     </Modal>
   );

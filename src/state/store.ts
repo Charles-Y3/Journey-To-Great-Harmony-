@@ -174,7 +174,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     const levelsDone = after.timelinePointLevels[p.id] ?? 0;
     if (levelsDone >= RARITY_LEVEL_REQUIRED[c.rarity]) {
       after.unlockedCards.push(p.cardId);
-      out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
+      out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale)));
     }
   }
 
@@ -184,7 +184,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (t.cardId && doneTopics.includes(t.id) && !after.unlockedCards.includes(t.cardId)) {
       after.unlockedCards.push(t.cardId);
       const c = cardById(t.cardId);
-      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
+      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale)));
     }
   }
 
@@ -193,7 +193,7 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     if (!after.unlockedCards.includes(rule.cardId) && rule.check(stats)) {
       after.unlockedCards.push(rule.cardId);
       const c = cardById(rule.cardId);
-      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.text, locale)));
+      if (c) out.push(celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale)));
     }
   }
 

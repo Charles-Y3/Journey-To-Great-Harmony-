@@ -92,10 +92,13 @@ export interface WisdomCard {
   emoji: string;
   rarity: CardRarity;
   category: 'figure' | 'teaching' | 'virtue' | 'story';
-  text: Localized<string>;
+  /** A quick, plain-language summary — no embedded quote. */
+  summary: Localized<string>;
+  /** A well-known quote by the figure, or one fitting the virtue/story/teaching. Rendered already quoted — don't include quotation marks in the text itself. */
+  quote: Localized<string>;
   unlockHint: Localized<string>;
-  /** An extra fact or bit of lore shown in the full-screen card modal, beyond the main `text`. */
-  detail?: Localized<string>;
+  /** An extra fact or bit of lore shown in the full-screen card modal. */
+  didYouKnow: Localized<string>;
 }
 
 export interface Stats {
