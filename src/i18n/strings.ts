@@ -114,6 +114,18 @@ export const UI = {
   close: localized('Close', '关闭'),
   celebrateContinue: localized('Continue', '继续'),
 
+  // ── Topbar info modals ─────────────────────────────────────────────
+  streakInfoTitle: localized('🔥 Daily Streak', '🔥 每日连续记录'),
+  streakInfoBody: localized(
+    "This is how many days in a row you've done at least one practice — a morning intention, a virtue challenge, a lesson, or an evening reflection. Missing a whole day resets it to zero, but your best streak ever is remembered separately (see Badges in your Collection).",
+    '这是你连续多少天，至少完成了一项修习 — 晨间心愿、德行挑战、课程，或夜间反思。若整整一天都没有修习，它会归零，但你有史以来最佳的连续记录，会被单独记住（见「收藏」中的徽章）。',
+  ),
+  harmonyInfoTitle: localized('🌏 Your Harmony Contribution', '🌏 你的和谐贡献'),
+  harmonyInfoBody: localized(
+    'This is how many harmony points you have personally contributed to the shared Great Harmony World — earned through lessons, challenges, reflections, and encouragement sent to fellow travellers. It adds to the community\'s own growth to advance the World through Village, Town, City, and finally Harmony Society (see the World tab).',
+    '这是你个人为共享的大同世界，贡献了多少和谐点 — 通过课程、挑战、反思，以及向同行者送出的鼓励所获得。它与社群自身的成长相加，共同推动世界从村庄、城镇、城市，最终迈向大同社会（详见「世界」页面）。',
+  ),
+
   // ── Today ─────────────────────────────────────────────────────────
   todayTitle: localized('Today', '今日'),
   todayJourneyCard: localized('Your 10-minute journey', '你的十分钟旅程'),

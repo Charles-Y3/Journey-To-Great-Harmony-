@@ -207,6 +207,26 @@ function NotificationsSection() {
   );
 }
 
+function StreakInfoModal({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+  return (
+    <Modal onClose={onClose}>
+      <h2>{t('streakInfoTitle')}</h2>
+      <p>{t('streakInfoBody')}</p>
+    </Modal>
+  );
+}
+
+function HarmonyInfoModal({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+  return (
+    <Modal onClose={onClose}>
+      <h2>{t('harmonyInfoTitle')}</h2>
+      <p>{t('harmonyInfoBody')}</p>
+    </Modal>
+  );
+}
+
 function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   const { t, L, locale } = useT();
   const currentIdx = rankIndexForXp(xp);
@@ -294,6 +314,8 @@ export default function App() {
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [showRankModal, setShowRankModal] = useState(false);
+  const [showStreakInfo, setShowStreakInfo] = useState(false);
+  const [showHarmonyInfo, setShowHarmonyInfo] = useState(false);
 
   // Check for a due evening-reflection or daily-streak reminder on load, on
   // an interval while the tab stays open, and whenever the tab regains
@@ -349,12 +371,12 @@ export default function App() {
             />
           </div>
           <div className="topbar-right">
-            <span className="streak-flame" title={t('statStreak')}>
+            <button type="button" className="streak-flame streak-flame-btn" onClick={() => setShowStreakInfo(true)} aria-label={t('statStreak')}>
               🔥 {streak}
-            </span>
-            <span className="pill" title={t('worldYourContribution')}>
+            </button>
+            <button type="button" className="pill pill-btn" onClick={() => setShowHarmonyInfo(true)} aria-label={t('worldYourContribution')}>
               🌏 {harmony}
-            </span>
+            </button>
             <button
               className="btn"
               style={{ padding: '5px 10px' }}
@@ -386,6 +408,8 @@ export default function App() {
       <CelebrationOverlay />
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
+      {showStreakInfo && <StreakInfoModal onClose={() => setShowStreakInfo(false)} />}
+      {showHarmonyInfo && <HarmonyInfoModal onClose={() => setShowHarmonyInfo(false)} />}
     </div>
   );
 }
