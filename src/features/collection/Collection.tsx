@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useJourney } from '../../state/store';
 import { CARDS } from '../../data/cards';
 import { BADGES } from '../../data/badges';
+import { ALL_POINTS } from '../../data/timeline';
+import { CARD_ART } from '../../data/cardArt';
 import type { CardRarity, WisdomCard } from '../../data/types';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -34,9 +36,15 @@ const SPARKLE_SPOTS = [
 
 function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void }) {
   const { t, L } = useT();
+  const Art = CARD_ART[card.id];
+  const timelinePoint = ALL_POINTS.find((p) => p.cardId === card.id);
   return (
-    <Modal onClose={onClose} fullscreen>
+    <Modal onClose={onClose} fullscreen className={`modal-rarity-${card.rarity}`}>
       <div className={`card-modal-hero card-modal-hero-${card.rarity}`}>
+        {timelinePoint && <span className="card-modal-year">{L(timelinePoint.years)}</span>}
+        <span className="card-modal-icon-badge" aria-hidden="true">
+          {card.emoji}
+        </span>
         {card.rarity === 'legendary' &&
           SPARKLE_SPOTS.map((s, i) => (
             <span key={i} className="card-modal-sparkle" style={{ top: s.top, left: s.left, animationDelay: s.delay }} aria-hidden="true">
@@ -44,7 +52,7 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
             </span>
           ))}
         <div className={`card-modal-portrait card-modal-portrait-${card.rarity}`}>
-          <span className="card-modal-portrait-emoji">{card.emoji}</span>
+          <div className="card-modal-portrait-inner">{Art ? <Art /> : <span className="card-modal-portrait-emoji">{card.emoji}</span>}</div>
         </div>
         <h2 style={{ marginBottom: 4 }}>{L(card.title)}</h2>
         <p style={{ marginBottom: 0 }}>

@@ -30,12 +30,15 @@ export function Modal({
   children,
   wide,
   fullscreen,
+  className,
 }: {
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
   /** Near-fullscreen presentation for content meant to be the whole show (e.g. a Wisdom Card). */
   fullscreen?: boolean;
+  /** Extra class(es) appended to the modal panel, e.g. for rarity-tinted borders. */
+  className?: string;
 }) {
   const { t } = useT();
   useEffect(() => {
@@ -49,6 +52,7 @@ export function Modal({
   let cls = 'modal';
   if (fullscreen) cls += ' modal-fullscreen';
   else if (wide) cls += ' modal-wide';
+  if (className) cls += ` ${className}`;
 
   return (
     <div className="modal-backdrop" onClick={onClose}>

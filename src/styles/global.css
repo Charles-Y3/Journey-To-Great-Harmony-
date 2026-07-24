@@ -603,7 +603,9 @@ input[type='text']:focus {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(20, 14, 5, 0.55);
+  background: rgba(15, 11, 4, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -640,6 +642,21 @@ input[type='text']:focus {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border: 2px solid var(--line);
+}
+
+/* Rarity-tinted border for the Wisdom Card reveal, echoing the grid's
+   per-rarity card colours so the border isn't just a generic frame. */
+.modal-rarity-common {
+  border-color: var(--line);
+}
+
+.modal-rarity-rare {
+  border-color: var(--amethyst);
+}
+
+.modal-rarity-legendary {
+  border-color: var(--gold);
 }
 
 .modal-close {
@@ -664,6 +681,30 @@ input[type='text']:focus {
   overflow: hidden;
 }
 
+.card-modal-year {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.35);
+  padding: 3px 10px;
+  border-radius: 999px;
+  z-index: 1;
+}
+
+.card-modal-icon-badge {
+  position: absolute;
+  top: 10px;
+  right: 44px;
+  font-size: 1.5rem;
+  line-height: 1;
+  z-index: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.25));
+}
+
 .card-modal-hero-common {
   background: linear-gradient(160deg, var(--surface), var(--surface-2));
 }
@@ -682,12 +723,28 @@ input[type='text']:focus {
   height: 128px;
   margin: 0 auto 16px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--surface);
   border: 3px solid var(--line);
   box-shadow: var(--shadow);
+}
+
+/* Separate from .card-modal-portrait itself (which stays overflow:visible)
+   so the legendary ::before ring below, positioned outside this box via a
+   negative inset, is never clipped by the art's own circular mask. */
+.card-modal-portrait-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-modal-portrait-inner svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .card-modal-portrait-emoji {
