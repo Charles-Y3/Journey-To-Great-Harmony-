@@ -59,9 +59,12 @@ function Sprout({ x, size }: { x: number; size: number }) {
   );
 }
 
-// A little life on top of the static scene: butterflies drift through the
-// canopy from Sprout onward, and a rabbit hops along the ground once the
-// forest is dense enough to shelter it (Forest stage on).
+// A little life on top of the static scene, with a different animal cast
+// per stage so Tree and Forest read as distinct places, not the same scene
+// with more trees: a squirrel keeps to the Tree stage's few big trunks, a
+// rabbit and a deer share the Forest stage's denser canopy, a bee joins the
+// butterflies once the Oasis's flowers bloom, and a crane visits the
+// Sanctuary's shrine.
 function ForestCritters({ stageIndex }: { stageIndex: number }) {
   if (stageIndex < 1) return null;
   const butterflyCount = Math.min(5, 1 + stageIndex);
@@ -82,16 +85,34 @@ function ForestCritters({ stageIndex }: { stageIndex: number }) {
           🦋
         </text>
       ))}
-      {stageIndex >= 3 && (
-        <text fontSize={16}>
-          <animateMotion path="M80,258 L 220,258 L 80,258" dur="11s" repeatCount="indefinite" />
-          🐇
+      {stageIndex === 2 && (
+        <text fontSize={14}>
+          <animateMotion path="M260,240 q 20 -30 40 0 q 20 -30 40 0 q -20 30 -40 0 q -20 30 -40 0" dur="10s" repeatCount="indefinite" />
+          🐿️
         </text>
       )}
+      {stageIndex === 3 && (
+        <>
+          <text fontSize={16}>
+            <animateMotion path="M80,258 L 220,258 L 80,258" dur="11s" repeatCount="indefinite" />
+            🐇
+          </text>
+          <text fontSize={18}>
+            <animateMotion path="M420,256 L 300,256 L 420,256" dur="15s" repeatCount="indefinite" />
+            🦌
+          </text>
+        </>
+      )}
       {stageIndex >= 4 && (
-        <text fontSize={15}>
+        <text fontSize={13}>
+          <animateMotion path="M120,250 q 30 -18 60 0 t 60 0 t -60 4 t -60 -4" dur="8s" repeatCount="indefinite" />
+          🐝
+        </text>
+      )}
+      {stageIndex >= 5 && (
+        <text fontSize={17}>
           <animateMotion path="M540,262 L 380,262 L 540,262" dur="13s" repeatCount="indefinite" />
-          🦋
+          🦢
         </text>
       )}
     </g>
@@ -130,7 +151,7 @@ function ForestScene({
     stageIndex === 3
       ? Math.round(2 + stageProgress * 8) // 2–10: flowers first appear late in Forest
       : stageIndex >= 4
-        ? Math.round(12 + stageProgress * 12) // 12–24: the Garden bursts with colour
+        ? Math.round(12 + stageProgress * 12) // 12–24: the Oasis bursts with colour
         : 0;
 
   const sprouts = Array.from({ length: sproutCount }, (_, i) => ({
@@ -181,6 +202,34 @@ function ForestScene({
       {trees.map((t, i) => (
         <Tree key={i} x={t.x} size={t.size} kind={t.kind} />
       ))}
+
+      {/* Tree stage: a mossy resting rock beside the few big trunks — a
+          landmark of its own, not just "fewer trees than Forest". */}
+      {stageIndex === 2 && (
+        <g>
+          <ellipse cx="150" cy="252" rx="20" ry="10" fill="#8a8f7a" />
+          <ellipse cx="150" cy="246" rx="16" ry="9" fill="#a3a88f" />
+        </g>
+      )}
+
+      {/* Forest stage: scattered fern/undergrowth tufts make the ground
+          itself read as dense woodland floor, distinct from Tree's bare
+          grass and Oasis's flowerbeds. */}
+      {stageIndex === 3 &&
+        Array.from({ length: 10 }, (_, i) => {
+          const x = 30 + seededRandom(`fern-x-${i}`) * 540;
+          const y = 246 + seededRandom(`fern-y-${i}`) * 28;
+          return (
+            <path
+              key={`fern-${i}`}
+              d={`M${x} ${y} q -6 -10 -2 -16 M${x} ${y} q 0 -12 0 -18 M${x} ${y} q 6 -10 2 -16`}
+              stroke="#3c8d5a"
+              strokeWidth="1.6"
+              fill="none"
+              strokeLinecap="round"
+            />
+          );
+        })}
 
       {flowers.map((f, i) => (
         <g key={i}>

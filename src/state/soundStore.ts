@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-export type MusicTrackId = 'bowl' | 'bells' | 'rain';
+export type MusicTrackId = 'pad' | 'bells' | 'chimes';
 
 interface SoundState {
   /** Mutes the wandering peers' spoken greetings on the Great Harmony World tab. */

@@ -590,6 +590,11 @@ select:focus {
   min-width: 140px;
 }
 
+.music-track-select {
+  width: 100%;
+  margin-top: 4px;
+}
+
 /* ── Progress bars ─────────────────────────────────────────────────── */
 .progress {
   position: relative;
@@ -1073,6 +1078,10 @@ select:focus {
   transition: background 0.6s ease;
 }
 
+.world-viewport-preview {
+  margin: 10px 0;
+}
+
 .world-sun {
   position: absolute;
   top: 10%;
@@ -1426,9 +1435,8 @@ select:focus {
   color: #fff;
 }
 
-/* Forest's stage steps become clickable buttons that preview each stage's
-   scene; World's remain plain (non-interactive) spans, so this reset only
-   targets the <button> variant, not .stage-step generally. */
+/* Forest's and World's stage steps are clickable buttons that preview each
+   stage's scene, so this reset targets the <button> variant of .stage-step. */
 button.stage-step {
   font-family: inherit;
   cursor: pointer;
@@ -1570,6 +1578,17 @@ button.stage-step:disabled {
   border-radius: 999px;
   padding: 6px 14px;
   font-size: 0.85rem;
+}
+
+/* The four leaderboard categories always show two-per-row, rather than
+   wrapping to a fifth line or spilling into an uneven flex-wrap layout. */
+.leaderboard-tab-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.leaderboard-tab-row .tab-btn {
+  text-align: center;
 }
 
 .tab-btn.active {

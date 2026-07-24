@@ -11,7 +11,7 @@ import { localized, type Localized, type Locale } from '../../i18n/types';
 import { communityFeed } from '../../engine/community';
 import { seededRandom } from '../../engine/progression';
 import { speakGreeting, speakAppText } from '../../engine/speech';
-import { PageHeader, ProgressBar } from '../../components/ui';
+import { Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { worldProgressLabel, buildingLockedNote, yourContributionLabel } from '../../i18n/strings';
 
@@ -45,11 +45,11 @@ const BUILDING_SPOTS: Record<string, { x: number; emoji: string }> = {
   hall: { x: 2050, emoji: '🏛️' },
 };
 
-// A distinct look per world stage, so Village/Town/City/Harmony Society
+// A distinct look per world stage, so Village/Town/City/World stage
 // don't all read as "the same houses, just more of them": earthy dawn
 // tones for the Village, richer warm tones for the Town, an ordered grey
 // stone palette (plus a wall) for the City, and a radiant jade-gold glow
-// (plus lanterns) for the Harmony Society.
+// (plus lanterns) for the World stage.
 const STAGE_GROUND_PALETTE = [
   { hill1: '#d8c9a3', hill2: '#cdbb96', ground: '#cbbb92', roofs: ['#b5443c', '#a8583c'] },
   { hill1: '#dfc9a0', hill2: '#d6b98e', ground: '#c9b283', roofs: ['#b5443c', '#c9962e', '#a8583c'] },
@@ -57,33 +57,95 @@ const STAGE_GROUND_PALETTE = [
   { hill1: '#d9e6c8', hill2: '#c8e0c4', ground: '#bcdcb0', roofs: ['#c9962e', '#2e7d5b', '#b5443c'] },
 ];
 
-function WorldGround({ stageIndex }: { stageIndex: number }) {
+// One unmistakable landmark + a bit of moving life per stage, so a glance at
+// the skyline tells the stages apart even before you notice the palette:
+// a well and a hen for the Village, a market stall and a handcart for the
+// Town, a clock tower and a bicycle for the City, and a lantern-hung
+// pavilion with a drifting dove for the World stage.
+function WorldLandmark({ stageIndex, x }: { stageIndex: number; x: number }) {
+  if (stageIndex === 0) {
+    return (
+      <g transform={`translate(${x} 232)`}>
+        <ellipse cx={0} cy={2} rx={16} ry={5} fill="#8a7452" opacity="0.5" />
+        <rect x={-11} y={-16} width={22} height={16} rx={2} fill="#a89066" stroke="#7a6440" />
+        <path d="M -14 -16 L 0 -28 L 14 -16 Z" fill="#5c6270" />
+        <rect x={-1.5} y={-24} width={3} height={10} fill="#6d4c2a" />
+        <text fontSize={11}>
+          <animateMotion path="M-40,10 q 20 4 40 0 t 40 0" dur="14s" repeatCount="indefinite" />
+          🐓
+        </text>
+      </g>
+    );
+  }
+  if (stageIndex === 1) {
+    return (
+      <g transform={`translate(${x} 232)`}>
+        <rect x={-16} y={-14} width={32} height={14} fill="#e8dcc0" stroke="#b09b6d" />
+        <path d="M -20 -14 L -20 -24 L 20 -24 L 20 -14 Z" fill="#c9962e" />
+        <rect x={-20} y={-24} width={40} height={4} fill="#b5443c" />
+        <text fontSize={12}>
+          <animateMotion path="M-60,8 L 60,8 L -60,8" dur="16s" repeatCount="indefinite" />
+          🛒
+        </text>
+      </g>
+    );
+  }
+  if (stageIndex === 2) {
+    return (
+      <g transform={`translate(${x} 232)`}>
+        <rect x={-7} y={-46} width={14} height={46} fill="#8a8f98" stroke="#5c6270" />
+        <circle cx={0} cy={-46} r={9} fill="#fdf6e3" stroke="#5c6270" />
+        <line x1={0} y1={-46} x2={0} y2={-51} stroke="#5c6270" strokeWidth="1.4" />
+        <line x1={0} y1={-46} x2={4} y2={-44} stroke="#5c6270" strokeWidth="1.4" />
+        <text fontSize={13}>
+          <animateMotion path="M-70,6 L 70,6 L -70,6" dur="12s" repeatCount="indefinite" />
+          🚲
+        </text>
+      </g>
+    );
+  }
+  return (
+    <g transform={`translate(${x} 232)`}>
+      <rect x={-4} y={-38} width={8} height={38} fill="#b5443c" />
+      <path d="M -22 -38 L 22 -38 L 16 -46 L -16 -46 Z" fill="#c9962e" />
+      <circle cx={0} cy={-52} r={7} fill="#f2d98a" opacity="0.9" />
+      <path d="M -7 -52 A 7 7 0 0 1 7 -52" stroke="#fff1cf" strokeWidth="1.2" fill="none" opacity="0.8" />
+      <text fontSize={14}>
+        <animateMotion path="M-50,-30 q 25 -14 50 0 t 50 0" dur="15s" repeatCount="indefinite" />
+        🕊️
+      </text>
+    </g>
+  );
+}
+
+function WorldGround({ stageIndex, width = STRIP_WIDTH, faceCount = FACE_COUNT }: { stageIndex: number; width?: number; faceCount?: number }) {
   const palette = STAGE_GROUND_PALETTE[Math.min(stageIndex, STAGE_GROUND_PALETTE.length - 1)];
-  const houseCount = Math.min(56, (3 + stageIndex * 3) * FACE_COUNT);
+  const houseCount = Math.min(56, (3 + stageIndex * 3) * faceCount);
   const houses = Array.from({ length: houseCount }, (_, i) => ({
-    x: 40 + seededRandom(`house-x-${i}`) * (STRIP_WIDTH - 80),
+    x: 40 + seededRandom(`house-x-${i}`) * (width - 80),
     size: 0.8 + seededRandom(`house-s-${i}`) * 0.55,
     roof: palette.roofs[i % palette.roofs.length],
     tall: stageIndex >= 2 && seededRandom(`house-tall-${i}`) > 0.6,
   }));
-  const hills = Array.from({ length: FACE_COUNT }, (_, f) => f).flatMap((f) => [
-    { cx: f * FACE_WIDTH + 120, cy: 250, rx: 230, ry: 60, fill: palette.hill1 },
-    { cx: f * FACE_WIDTH + 480, cy: 255, rx: 260, ry: 70, fill: palette.hill2 },
+  const faceWidth = width / faceCount;
+  const hills = Array.from({ length: faceCount }, (_, f) => f).flatMap((f) => [
+    { cx: f * faceWidth + 120, cy: 250, rx: 230, ry: 60, fill: palette.hill1 },
+    { cx: f * faceWidth + 480, cy: 255, rx: 260, ry: 70, fill: palette.hill2 },
   ]);
-  const riverSegments = STRIP_WIDTH / 300;
+  const riverSegments = width / 300;
   let riverPath = 'M0 250 q 150 14 300 4 ';
   for (let i = 1; i < riverSegments; i++) riverPath += 't 300 6 ';
-  riverPath += `v 40 h -${STRIP_WIDTH} z`;
+  riverPath += `v 40 h -${width} z`;
 
   return (
-    <svg className="world-ground" viewBox={`0 0 ${STRIP_WIDTH} 300`} preserveAspectRatio="none">
+    <svg className="world-ground" viewBox={`0 0 ${width} 300`} preserveAspectRatio="none">
       {hills.map((h, i) => (
         <ellipse key={i} cx={h.cx} cy={h.cy} rx={h.rx} ry={h.ry} fill={h.fill} />
       ))}
-      <rect y="245" width={STRIP_WIDTH} height="55" fill={palette.ground} />
+      <rect y="245" width={width} height="55" fill={palette.ground} />
       <path d={riverPath} fill="#9fc6de" opacity="0.8" />
-      {/* City and Harmony Society sit behind a low wall — a visible sign of a more built-up stage. */}
-      {stageIndex >= 2 && <rect y="238" width={STRIP_WIDTH} height="6" fill="#8a8f98" opacity="0.7" />}
+      {/* City and World stage sit behind a low wall — a visible sign of a more built-up stage. */}
+      {stageIndex >= 2 && <rect y="238" width={width} height="6" fill="#8a8f98" opacity="0.7" />}
       {houses.map((h, i) => (
         <g key={i} transform={`translate(${h.x} 232) scale(${h.size})`}>
           {h.tall ? (
@@ -101,9 +163,9 @@ function WorldGround({ stageIndex }: { stageIndex: number }) {
           )}
         </g>
       ))}
-      {/* Harmony Society: paper lanterns strung along the skyline. */}
+      {/* World stage: paper lanterns strung along the skyline. */}
       {stageIndex >= 3 &&
-        Array.from({ length: Math.round(STRIP_WIDTH / 140) }, (_, i) => {
+        Array.from({ length: Math.round(width / 140) }, (_, i) => {
           const x = 60 + i * 140 + seededRandom(`lantern-x-${i}`) * 40;
           return (
             <g key={`lantern-${i}`}>
@@ -112,6 +174,7 @@ function WorldGround({ stageIndex }: { stageIndex: number }) {
             </g>
           );
         })}
+      <WorldLandmark stageIndex={stageIndex} x={faceWidth / 2} />
     </svg>
   );
 }
@@ -243,7 +306,7 @@ function WorldBuildings({
 }
 
 // Distinct sky per stage, so a Village dawn, a Town afternoon, a City's
-// clearer blue, and the Harmony Society's golden-rose glow don't all look
+// clearer blue, and the World stage's golden-rose glow don't all look
 // like the same backdrop with different houses in front of it.
 const STAGE_SKY = [
   'linear-gradient(to bottom, #f7d9a8, #fdf2dc)',
@@ -266,6 +329,7 @@ export default function World() {
   const [faceIndex, setFaceIndex] = useState(0);
   const [captionIndex, setCaptionIndex] = useState(0);
   const [captionHighlight, setCaptionHighlight] = useState(false);
+  const [previewStage, setPreviewStage] = useState<number | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
@@ -342,13 +406,15 @@ export default function World() {
           let cls = 'stage-step';
           if (i < info.stageIndex) cls += ' reached';
           if (i === info.stageIndex) cls += ' current';
+          const unlocked = i <= info.stageIndex;
           return (
-            <span key={s.id} className={cls}>
-              {s.emoji} {L(s.name)}
-            </span>
+            <button key={s.id} type="button" className={cls} disabled={!unlocked} onClick={() => setPreviewStage(i)}>
+              {unlocked ? s.emoji : '🔒'} {L(s.name)}
+            </button>
           );
         })}
       </div>
+      <p className="small muted">{t('worldStagePreviewHint')}</p>
 
       <div className="card">
         <h3>
@@ -405,6 +471,18 @@ export default function World() {
           {t('worldFooter')}
         </p>
       </div>
+
+      {previewStage !== null && (
+        <Modal onClose={() => setPreviewStage(null)}>
+          <h2>
+            {WORLD_STAGES[previewStage].emoji} {L(WORLD_STAGES[previewStage].name)}
+          </h2>
+          <div className="world-viewport world-viewport-preview" style={{ background: STAGE_SKY[Math.min(previewStage, STAGE_SKY.length - 1)] }}>
+            <WorldGround stageIndex={previewStage} width={FACE_WIDTH} faceCount={1} />
+          </div>
+          <p className="small muted">{L(WORLD_STAGES[previewStage].description)}</p>
+        </Modal>
+      )}
     </div>
   );
 }

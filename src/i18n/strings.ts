@@ -85,9 +85,9 @@ export const UI = {
     '在你修习时可循环播放的免费舒缓背景音乐。由你的浏览器即时生成 — 无需下载，无需账号。',
   ),
   musicTrackOff: localized('Off', '关闭'),
-  musicTrackBowl: localized('🎐 Singing Bowl', '🎐 颂钵'),
+  musicTrackPad: localized('🎐 Calm Pad', '🎐 静谧长音'),
   musicTrackBells: localized('🔔 Temple Bells', '🔔 寺钟'),
-  musicTrackRain: localized('🌧️ Gentle Rain', '🌧️ 细雨'),
+  musicTrackChimes: localized('🎋 Wind Chimes', '🎋 风铃'),
   musicVolumeLabel: localized('Volume', '音量'),
   settingsMusicAutoplayNote: localized(
     "Browsers only allow audio to start after you tap a button, so music won't resume automatically when you reopen the app — just pick a track again.",
@@ -142,8 +142,8 @@ export const UI = {
   ),
   harmonyInfoTitle: localized('🌏 Your Harmony Contribution', '🌏 你的和谐贡献'),
   harmonyInfoBody: localized(
-    'This is how many harmony points you have personally contributed to the shared Great Harmony World — earned through lessons, challenges, reflections, and encouragement sent to fellow travellers. It adds to the community\'s own growth to advance the World through Village, Town, City, and finally Harmony Society (see the World tab).',
-    '这是你个人为共享的大同世界，贡献了多少和谐点 — 通过课程、挑战、反思，以及向同行者送出的鼓励所获得。它与社群自身的成长相加，共同推动世界从村庄、城镇、城市，最终迈向大同社会（详见「世界」页面）。',
+    'This is how many harmony points you have personally contributed to the shared Great Harmony World — earned through lessons, challenges, reflections, and encouragement sent to fellow travellers. It adds to the community\'s own growth to advance it through four stages: Village, Town, City, and World (see the World tab).',
+    '这是你个人为共享的大同世界，贡献了多少和谐点 — 通过课程、挑战、反思，以及向同行者送出的鼓励所获得。它与社群自身的成长相加，共同推动世界经历四个阶段：村庄、城镇、城市，最终迈向「世界」（详见「世界」页面）。',
   ),
 
   // ── Today ─────────────────────────────────────────────────────────
@@ -335,6 +335,10 @@ export const UI = {
   ),
   worldRotateLeft: localized('Look left', '向左看'),
   worldRotateRight: localized('Look right', '向右看'),
+  worldStagePreviewHint: localized(
+    'Tap a reached stage above to see its scene up close.',
+    '轻点上方已达成的阶段，近看它的景象。',
+  ),
   worldFooter: localized(
     "You'll always have fellow travellers here to grow alongside, cheering you on and building this world with you. With community accounts in a future version, you'll also be able to walk this road with real friends and family.",
     '在这里，你永远都会有同行的旅人，与你一起成长，为你加油，一同建设这个世界。未来加入社群账号功能后，你也将能与真实的亲友一同走上这条路。',

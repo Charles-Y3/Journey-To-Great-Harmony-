@@ -6,7 +6,7 @@ import { useNotifications } from './state/notificationStore';
 import { useProfile } from './state/profileStore';
 import { useSound, type MusicTrackId } from './state/soundStore';
 import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
-import { LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
+import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
 import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel } from './i18n/strings';
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp } from './engine/progression';
@@ -143,7 +143,7 @@ function LanguageSection() {
       <h3>{t('settingsLanguageTitle')}</h3>
       <p className="small muted">{t('settingsLanguageDesc')}</p>
       <div className="tab-row">
-        {LOCALES.map((l: Locale) => (
+        {VISIBLE_LOCALES.map((l: Locale) => (
           <button key={l} className={l === locale ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setLocale(l)}>
             {LOCALE_LABELS[l].flagEmoji} {LOCALE_LABELS[l].native}
           </button>
@@ -232,11 +232,13 @@ function HarmonyInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-const MUSIC_TRACKS: { id: MusicTrackId; key: 'musicTrackBowl' | 'musicTrackBells' | 'musicTrackRain' }[] = [
-  { id: 'bowl', key: 'musicTrackBowl' },
+const MUSIC_TRACKS: { id: MusicTrackId; key: 'musicTrackPad' | 'musicTrackBells' | 'musicTrackChimes' }[] = [
+  { id: 'pad', key: 'musicTrackPad' },
   { id: 'bells', key: 'musicTrackBells' },
-  { id: 'rain', key: 'musicTrackRain' },
+  { id: 'chimes', key: 'musicTrackChimes' },
 ];
+
+const MUSIC_OFF = '__off__';
 
 function MusicSection() {
   const { t } = useT();
@@ -264,16 +266,18 @@ function MusicSection() {
     <div className="card">
       <h3>{t('settingsMusicTitle')}</h3>
       <p className="small muted">{t('settingsMusicDesc')}</p>
-      <div className="tab-row">
-        <button className={!musicTrack ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTrack(null)}>
-          {t('musicTrackOff')}
-        </button>
+      <select
+        className="music-track-select"
+        value={musicTrack ?? MUSIC_OFF}
+        onChange={(e) => selectTrack(e.target.value === MUSIC_OFF ? null : (e.target.value as MusicTrackId))}
+      >
+        <option value={MUSIC_OFF}>{t('musicTrackOff')}</option>
         {MUSIC_TRACKS.map((tr) => (
-          <button key={tr.id} className={musicTrack === tr.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTrack(tr.id)}>
+          <option key={tr.id} value={tr.id}>
             {t(tr.key)}
-          </button>
+          </option>
         ))}
-      </div>
+      </select>
       {musicTrack && (
         <div style={{ marginTop: 10 }}>
           <label className="small muted">{t('musicVolumeLabel')}</label>

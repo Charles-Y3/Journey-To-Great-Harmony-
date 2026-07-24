@@ -8,6 +8,12 @@ export type Locale = 'en' | 'zh-Hans' | 'zh-Hant';
 
 export const LOCALES: Locale[] = ['en', 'zh-Hans', 'zh-Hant'];
 
+// User-selectable locales — deliberately excludes 'zh-Hans': content is
+// still authored in Simplified Chinese internally (see the note above) and
+// zh-Hans stays a valid Locale for that, but it's hidden as a pickable
+// language so the language gate and Settings only ever offer two choices.
+export const VISIBLE_LOCALES: Locale[] = ['en', 'zh-Hant'];
+
 export const LOCALE_LABELS: Record<Locale, { name: string; native: string; flagEmoji: string }> = {
   en: { name: 'English', native: 'English', flagEmoji: '🇬🇧' },
   'zh-Hans': { name: 'Simplified Chinese', native: '简体中文', flagEmoji: '🇨🇳' },

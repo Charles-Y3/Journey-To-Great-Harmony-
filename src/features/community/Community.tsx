@@ -65,7 +65,7 @@ export default function Community() {
 
       <div className="card">
         <h3>{t('leaderboardsTitle')}</h3>
-        <div className="tab-row">
+        <div className="tab-row leaderboard-tab-row">
           {CATEGORIES.map((c) => (
             <button key={c.id} className={category === c.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setCategory(c.id)}>
               {c.emoji} {t(c.nameKey)}

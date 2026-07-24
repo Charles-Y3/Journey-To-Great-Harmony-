@@ -42,7 +42,7 @@ export const WORLD_STAGES: WorldStage[] = [
   },
   {
     id: 'harmony',
-    name: localized('Harmony Society', '大同社会'),
+    name: localized('World', '世界'),
     emoji: '🌏',
     threshold: 4500,
     description: localized(

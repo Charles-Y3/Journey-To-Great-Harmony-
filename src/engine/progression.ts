@@ -90,7 +90,7 @@ export const FOREST_STAGES: ForestStage[] = [
   { id: 'sprout', name: localized('Sprout', '幼苗'), emoji: '🌱', threshold: 10 },
   { id: 'tree', name: localized('Tree', '树木'), emoji: '🌳', threshold: 30 },
   { id: 'forest', name: localized('Forest', '树林'), emoji: '🌲', threshold: 70 },
-  { id: 'garden', name: localized('Garden', '花园'), emoji: '🌷', threshold: 130 },
+  { id: 'oasis', name: localized('Oasis', '绿洲'), emoji: '🌷', threshold: 130 },
   { id: 'sanctuary', name: localized('Sanctuary', '圣境'), emoji: '⛩️', threshold: 220 },
 ];
 

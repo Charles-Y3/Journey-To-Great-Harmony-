@@ -128,55 +128,116 @@ function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
   };
 }
 
-/** Filtered, looping noise for a soft rain/breeze bed, with a slowly wandering bandpass filter. */
-function buildRain(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const gain = fadeInGain(audioCtx, 0.22);
+/** A warm, layered pad: several softly detuned voices under a slow filter
+ * sweep and a gentle vibrato-like wobble, for a "breathing" ambient bed —
+ * replaces the old single-tone singing-bowl drone, which read as flat and
+ * monotonous rather than calming. */
+function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, level: number): ActiveTrack {
+  const gain = fadeInGain(audioCtx, level);
   gain.connect(out);
 
-  const bufferSeconds = 4;
-  const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * bufferSeconds, audioCtx.sampleRate);
-  const data = buffer.getChannelData(0);
-  let last = 0;
-  for (let i = 0; i < data.length; i++) {
-    const white = Math.random() * 2 - 1;
-    last = (last + 0.02 * white) / 1.02; // brown-ish noise: smoother, less hissy than white noise
-    data[i] = last * 3.2;
-  }
-  const source = audioCtx.createBufferSource();
-  source.buffer = buffer;
-  source.loop = true;
-
   const filter = audioCtx.createBiquadFilter();
-  filter.type = 'bandpass';
+  filter.type = 'lowpass';
   filter.frequency.value = 700;
-  filter.Q.value = 0.6;
-
-  const lfo = audioCtx.createOscillator();
-  lfo.frequency.value = 0.03;
-  const lfoGain = audioCtx.createGain();
-  lfoGain.gain.value = 350;
-  lfo.connect(lfoGain);
-  lfoGain.connect(filter.frequency);
-  lfo.start();
-
-  source.connect(filter);
+  filter.Q.value = 0.5;
   filter.connect(gain);
-  source.start();
+
+  // Root, third, fifth, octave — a fuller chord than a bare drone, each
+  // voice very slightly detuned against the next for a soft chorus shimmer.
+  const ratios = [1, 1.26, 1.5, 2];
+  const oscs = ratios.map((ratio, i) => {
+    const osc = audioCtx.createOscillator();
+    osc.type = 'triangle';
+    osc.frequency.value = baseFreq * ratio;
+    osc.detune.value = (i - 1.5) * 4;
+    const oscGain = audioCtx.createGain();
+    oscGain.gain.value = 1 / ratios.length;
+    osc.connect(oscGain);
+    oscGain.connect(filter);
+    osc.start();
+    return osc;
+  });
+
+  const filterLfo = audioCtx.createOscillator();
+  filterLfo.frequency.value = 0.05;
+  const filterLfoGain = audioCtx.createGain();
+  filterLfoGain.gain.value = 220;
+  filterLfo.connect(filterLfoGain);
+  filterLfoGain.connect(filter.frequency);
+  filterLfo.start();
+
+  // A slow, subtle vibrato across all voices via detune, so the chord feels
+  // like it's gently breathing rather than perfectly static.
+  const vibrato = audioCtx.createOscillator();
+  vibrato.frequency.value = 0.12;
+  const vibratoGain = audioCtx.createGain();
+  vibratoGain.gain.value = 3;
+  vibrato.connect(vibratoGain);
+  oscs.forEach((o) => vibratoGain.connect(o.detune));
+  vibrato.start();
 
   return {
     stop() {
       fadeOutAndStop(audioCtx, gain, () => {
-        source.stop();
-        lfo.stop();
+        oscs.forEach((o) => o.stop());
+        filterLfo.stop();
+        vibrato.stop();
       });
     },
   };
 }
 
+/** Sparse, high, airy plucks with a soft stereo drift — wind chimes, not
+ * looping noise. Replaces the old filtered-noise "rain" bed, which read as
+ * harsh static rather than soothing. */
+function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
+  const pad = buildPad(audioCtx, out, 130.81, 0.14); // same warm chord, quieter, under the chimes
+  const chimeGain = fadeInGain(audioCtx, 0.28);
+  chimeGain.connect(out);
+
+  const pentatonic = [1046.5, 1174.66, 1318.51, 1567.98, 1760.0]; // C D E G A (6th octave)
+  let stopped = false;
+  let timeoutId: number | null = null;
+
+  function ring() {
+    if (stopped) return;
+    const notes = Math.random() < 0.3 ? 2 : 1; // occasionally two chimes ring close together
+    for (let n = 0; n < notes; n++) {
+      const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      const pan = audioCtx.createStereoPanner();
+      pan.pan.value = Math.random() * 1.6 - 0.8;
+      const env = audioCtx.createGain();
+      const now = audioCtx.currentTime + n * 0.12;
+      env.gain.setValueAtTime(0, now);
+      env.gain.linearRampToValueAtTime(0.22, now + 0.02);
+      env.gain.exponentialRampToValueAtTime(0.001, now + 2.6);
+      osc.frequency.value = freq;
+      osc.connect(env);
+      env.connect(pan);
+      pan.connect(chimeGain);
+      osc.start(now);
+      osc.stop(now + 2.7);
+    }
+    timeoutId = window.setTimeout(ring, 2600 + Math.random() * 3800);
+  }
+  timeoutId = window.setTimeout(ring, 900);
+
+  return {
+    stop() {
+      stopped = true;
+      if (timeoutId !== null) window.clearTimeout(timeoutId);
+      pad.stop();
+      fadeOutAndStop(audioCtx, chimeGain, () => {});
+    },
+  };
+}
+
 const BUILDERS: Record<MusicTrackId, (audioCtx: AudioContext, out: AudioNode) => ActiveTrack> = {
-  bowl: (audioCtx, out) => buildDrone(audioCtx, out, 98, 0.3), // G2 singing-bowl-like drone
+  pad: (audioCtx, out) => buildPad(audioCtx, out, 98, 0.3), // G2-rooted warm pad
   bells: buildBells,
-  rain: buildRain,
+  chimes: buildChimes,
 };
 
 export function playMusicTrack(id: MusicTrackId): void {
