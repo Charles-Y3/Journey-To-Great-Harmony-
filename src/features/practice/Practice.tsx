@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
+import type { JourneyData } from '../../state/selectors';
 import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
@@ -7,7 +8,7 @@ import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progr
 import { meaningfulLength } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { yourNoteLabel, journalCount, minLengthHint } from '../../i18n/strings';
+import { yourNoteLabel, journalCount, minLengthHint, type UiKey } from '../../i18n/strings';
 
 // Evening reflection only opens from 5pm local time, up to midnight — it's
 // meant to be a look back on the day that's actually happened, not
@@ -143,42 +144,68 @@ function EveningCard({ today }: { today: string }) {
   );
 }
 
+type JournalFilter = 'all' | 'intention' | 'challenge' | 'reflection';
+
+const JOURNAL_FILTERS: { id: JournalFilter; emoji: string; key: UiKey }[] = [
+  { id: 'all', emoji: '📔', key: 'journalFilterAll' },
+  { id: 'intention', emoji: '🌅', key: 'journalFilterIntentions' },
+  { id: 'challenge', emoji: '🎯', key: 'journalFilterChallenges' },
+  { id: 'reflection', emoji: '🪞', key: 'journalFilterReflections' },
+];
+
+function matchesJournalFilter(rec: JourneyData['days'][string], filter: JournalFilter): boolean {
+  if (filter === 'intention') return !!rec.intention;
+  if (filter === 'challenge') return !!rec.challengeDone;
+  if (filter === 'reflection') return !!rec.reflection;
+  return true;
+}
+
 function Journal() {
   const days = useJourney((s) => s.days);
   const [open, setOpen] = useState(false);
+  const [filter, setFilter] = useState<JournalFilter>('all');
   const { t, L, locale } = useT();
-  const entries = Object.entries(days)
+  const allEntries = Object.entries(days)
     .filter(([, rec]) => rec.intention || rec.reflection || rec.challengeDone)
     .sort(([a], [b]) => (a < b ? 1 : -1));
+  const entries = allEntries.filter(([, rec]) => matchesJournalFilter(rec, filter));
 
-  if (entries.length === 0) return null;
+  if (allEntries.length === 0) return null;
   return (
     <div className="card">
       <h3>{t('journalTitle')}</h3>
-      <p className="small muted">{journalCount(locale, entries.length)}</p>
+      <p className="small muted">{journalCount(locale, allEntries.length)}</p>
       {!open ? (
         <button className="btn" onClick={() => setOpen(true)}>
           {t('journalBrowse')}
         </button>
       ) : (
         <>
+          <div className="tab-row" style={{ marginTop: 10 }}>
+            {JOURNAL_FILTERS.map((f) => (
+              <button key={f.id} className={filter === f.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setFilter(f.id)}>
+                {f.emoji} {t(f.key)}
+              </button>
+            ))}
+          </div>
+          {entries.length === 0 && <p className="small muted">{t('journalFilterEmpty')}</p>}
           {entries.map(([day, rec]) => {
             const ch = rec.challengeId ? CHALLENGES.find((c) => c.id === rec.challengeId) : undefined;
             return (
               <div key={day} style={{ borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 10 }}>
                 <strong>{day}</strong>
-                {rec.intention && (
+                {(filter === 'all' || filter === 'intention') && rec.intention && (
                   <p className="small" style={{ margin: '4px 0' }}>
                     🌅 “{rec.intention}”
                   </p>
                 )}
-                {rec.challengeDone && (
+                {(filter === 'all' || filter === 'challenge') && rec.challengeDone && (
                   <p className="small" style={{ margin: '4px 0' }}>
                     🎯 {ch ? L(ch.virtue) : ''}
                     {rec.challengeNote ? ` — “${rec.challengeNote}”` : ''}
                   </p>
                 )}
-                {rec.reflection && (
+                {(filter === 'all' || filter === 'reflection') && rec.reflection && (
                   <p className="small" style={{ margin: '4px 0' }}>
                     🪞 {t('reflectionLearnedLabel')}: {rec.reflection.learned} · {t('reflectionVirtueLabel')}: {rec.reflection.virtue} ·{' '}
                     {t('reflectionTomorrowLabel')}: {rec.reflection.improve}

@@ -76,8 +76,8 @@ export default function Community() {
         {rows.map((row, i) => (
           <div key={row.id} className={row.me ? 'leader-row me' : 'leader-row'}>
             <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
-            <span>{row.emoji}</span>
-            <span>{row.name}</span>
+            <span className="leader-emoji">{row.emoji}</span>
+            <span className="leader-info">{row.name}</span>
             <span className="leader-score">{row.score}</span>
           </div>
         ))}
@@ -93,14 +93,14 @@ export default function Community() {
           const sentToday = state.encouragedOn[p.peer.id] === today;
           return (
             <div key={p.peer.id} className="leader-row">
-              <span>{p.peer.emoji}</span>
-              <span>
+              <span className="leader-emoji">{p.peer.emoji}</span>
+              <span className="leader-info">
                 <strong>{L(p.peer.name)}</strong>
                 <div className="small muted">“{L(p.peer.motto)}”</div>
               </span>
               <span className="leader-score">
                 <button
-                  className="btn"
+                  className="btn btn-encourage"
                   disabled={sentToday}
                   onClick={() => {
                     if (sendEncouragement(p.peer.id)) {

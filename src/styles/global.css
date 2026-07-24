@@ -1316,11 +1316,29 @@ button.stage-step:disabled {
   text-align: center;
   font-weight: 700;
   color: var(--ink-soft);
+  flex-shrink: 0;
+}
+
+.leader-emoji {
+  flex-shrink: 0;
+}
+
+/* Takes all remaining row width so every row's trailing column (score or
+   the Encourage button) gets the same amount of space and renders
+   identically, regardless of how long a given name/motto happens to be. */
+.leader-info {
+  flex: 1;
+  min-width: 0;
 }
 
 .leader-score {
   margin-left: auto;
   font-weight: 600;
+  flex-shrink: 0;
+}
+
+.btn-encourage {
+  white-space: nowrap;
 }
 
 .tab-row {

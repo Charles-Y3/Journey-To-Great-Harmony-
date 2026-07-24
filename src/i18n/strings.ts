@@ -219,6 +219,11 @@ export const UI = {
   journalTitle: localized('📔 Journal', '📔 日志'),
   journalBrowse: localized('Browse journal', '浏览日志'),
   journalClose: localized('Close journal', '关闭日志'),
+  journalFilterAll: localized('All', '全部'),
+  journalFilterIntentions: localized('Intentions', '心愿'),
+  journalFilterChallenges: localized('Challenges', '挑战'),
+  journalFilterReflections: localized('Reflections', '反思'),
+  journalFilterEmpty: localized('No entries of this kind yet.', '目前还没有这类记录。'),
 
   // ── Knowledge ─────────────────────────────────────────────────────
   knowledgeTitle: localized('The Knowledge Path', '知识之路'),
