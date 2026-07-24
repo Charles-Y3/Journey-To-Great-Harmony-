@@ -31,6 +31,8 @@ export function Modal({
   wide,
   fullscreen,
   className,
+  hideCloseButton,
+  closeOnContentClick,
 }: {
   onClose: () => void;
   children: ReactNode;
@@ -39,6 +41,10 @@ export function Modal({
   fullscreen?: boolean;
   /** Extra class(es) appended to the modal panel, e.g. for rarity-tinted borders. */
   className?: string;
+  /** Omit the "✕" button — for content simple/large enough that tapping anywhere should close it instead. */
+  hideCloseButton?: boolean;
+  /** Let a click anywhere on the panel close it, instead of only the backdrop (pairs with hideCloseButton). */
+  closeOnContentClick?: boolean;
 }) {
   const { t } = useT();
   useEffect(() => {
@@ -56,10 +62,12 @@ export function Modal({
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className={cls} onClick={(e) => e.stopPropagation()}>
-        <button className="modal-close" onClick={onClose} aria-label={t('close')}>
-          ✕
-        </button>
+      <div className={cls} onClick={closeOnContentClick ? onClose : (e) => e.stopPropagation()}>
+        {!hideCloseButton && (
+          <button className="modal-close" onClick={onClose} aria-label={t('close')}>
+            ✕
+          </button>
+        )}
         {children}
       </div>
     </div>

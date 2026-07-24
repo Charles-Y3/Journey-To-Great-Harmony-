@@ -162,8 +162,12 @@ export function regionChallengeMet(regionId: string, d: JourneyData): boolean {
       return s.reflections >= 3;
     case 'mountain':
       return s.streakBest >= 5;
+    case 'garden':
+      return s.streakBest >= 10;
     case 'river':
       return s.challengesDone >= 15 && s.encouragementsSent >= 5;
+    case 'bridge':
+      return s.encouragementsSent >= 10 && rankIndexForXp(s.xp) >= RANKS.findIndex((r) => r.id === 'cultivator');
     case 'city':
       return (
         rankIndexForXp(s.xp) >= RANKS.findIndex((r) => r.id === 'contributor') &&

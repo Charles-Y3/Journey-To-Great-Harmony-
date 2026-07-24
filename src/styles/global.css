@@ -563,6 +563,33 @@ input[type='text']:focus {
   border-color: transparent;
 }
 
+select {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+}
+
+select:focus {
+  outline: 2px solid var(--jade);
+  border-color: transparent;
+}
+
+.journal-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.journal-filter-select {
+  flex: 1;
+  min-width: 140px;
+}
+
 /* ── Progress bars ─────────────────────────────────────────────────── */
 .progress {
   position: relative;
@@ -698,7 +725,7 @@ input[type='text']:focus {
 .card-modal-icon-badge {
   position: absolute;
   top: 10px;
-  right: 44px;
+  right: 14px;
   font-size: 1.5rem;
   line-height: 1;
   z-index: 1;
@@ -1032,7 +1059,16 @@ input[type='text']:focus {
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   background: linear-gradient(to bottom, #f7d9a8, #fdf2dc);
-  aspect-ratio: 8 / 5;
+  /* Must match WorldGround's own SVG aspect ratio (600:300 = 2:1) exactly.
+     It was widened to 8:5 for a caption-overlap fix, but that letterboxed
+     the ground SVG inside this taller box — the SVG then rendered smaller
+     than the container with empty space above/below, so the percentage-
+     based .world-walkers layer (positioned assuming the ground fills the
+     whole box) no longer lined up with where the hills/river were actually
+     drawn, and walkers appeared to be standing in the river. The caption
+     overlap is now fixed by rendering it below the viewport instead (see
+     World.tsx), so the extra height is no longer needed. */
+  aspect-ratio: 2 / 1;
   width: 100%;
   transition: background 0.6s ease;
 }
@@ -1081,6 +1117,18 @@ input[type='text']:focus {
   font-style: italic;
   margin-top: 8px;
   margin-bottom: 4px;
+  padding: 2px 10px;
+  border-radius: 8px;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Briefly flashed when the sun is tapped and the caption is read aloud,
+   so sighted users get a visual cue matching the spoken words, not
+   just an audio change. */
+.world-scene-caption.highlight {
+  background: var(--gold-soft);
+  color: var(--gold);
+  font-weight: 600;
 }
 
 .world-mute-btn {

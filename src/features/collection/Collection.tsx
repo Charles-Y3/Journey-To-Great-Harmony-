@@ -39,7 +39,7 @@ function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void })
   const Art = CARD_ART[card.id];
   const timelinePoint = ALL_POINTS.find((p) => p.cardId === card.id);
   return (
-    <Modal onClose={onClose} fullscreen className={`modal-rarity-${card.rarity}`}>
+    <Modal onClose={onClose} fullscreen className={`modal-rarity-${card.rarity}`} hideCloseButton closeOnContentClick>
       <div className={`card-modal-hero card-modal-hero-${card.rarity}`}>
         {timelinePoint && <span className="card-modal-year">{L(timelinePoint.years)}</span>}
         <span className="card-modal-icon-badge" aria-hidden="true">

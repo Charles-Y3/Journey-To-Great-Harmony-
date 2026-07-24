@@ -10,7 +10,7 @@ import type { Peer, WorldBuilding } from '../../data/types';
 import { localized, type Localized, type Locale } from '../../i18n/types';
 import { communityFeed } from '../../engine/community';
 import { seededRandom } from '../../engine/progression';
-import { speakGreeting } from '../../engine/speech';
+import { speakGreeting, speakAppText } from '../../engine/speech';
 import { PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { worldProgressLabel, buildingLockedNote, yourContributionLabel } from '../../i18n/strings';
@@ -129,7 +129,9 @@ interface WalkerLayout {
 // across visits rather than jumping around on every re-render. Percentages
 // are relative to the full strip, so peers may roam across face boundaries.
 const WALKERS: WalkerLayout[] = PEERS.map((peer, i) => {
-  const lane = 64 + (i % 4) * 6.5 + seededRandom(`walk-top-${peer.id}`) * 3;
+  // Kept within 64–78% so walkers stay on the hills/ground (houses sit at
+  // ~77%) and never reach the river band, which starts around 82%.
+  const lane = 64 + (i % 4) * 4 + seededRandom(`walk-top-${peer.id}`) * 2;
   const spread = 12 + seededRandom(`walk-spread-${peer.id}`) * 30;
   const x0 = 2 + seededRandom(`walk-x0-${peer.id}`) * Math.max(1, 96 - spread);
   const x1 = Math.min(98, x0 + spread);
@@ -263,8 +265,16 @@ export default function World() {
 
   const [faceIndex, setFaceIndex] = useState(0);
   const [captionIndex, setCaptionIndex] = useState(0);
+  const [captionHighlight, setCaptionHighlight] = useState(false);
+  const highlightTimeoutRef = useRef<number | null>(null);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
+
+  useEffect(() => {
+    return () => {
+      if (highlightTimeoutRef.current) window.clearTimeout(highlightTimeoutRef.current);
+    };
+  }, []);
 
   function rotate(dir: 1 | -1) {
     setFaceIndex((f) => (f + dir + FACE_COUNT) % FACE_COUNT);
@@ -278,17 +288,21 @@ export default function World() {
     }
   }
 
+  function clickSun() {
+    const nextIndex = (captionIndex + 1) % SUN_CAPTIONS.length;
+    setCaptionIndex(nextIndex);
+    if (!speechMuted) speakAppText(L(SUN_CAPTIONS[nextIndex]), locale);
+    if (highlightTimeoutRef.current) window.clearTimeout(highlightTimeoutRef.current);
+    setCaptionHighlight(true);
+    highlightTimeoutRef.current = window.setTimeout(() => setCaptionHighlight(false), 2800);
+  }
+
   return (
     <div>
       <PageHeader emoji="🌏" title={t('worldTitle')} subtitle={t('worldSubtitle')} />
 
       <div className="world-viewport" style={{ background: STAGE_SKY[Math.min(info.stageIndex, STAGE_SKY.length - 1)] }}>
-        <button
-          type="button"
-          className="world-sun"
-          onClick={() => setCaptionIndex((i) => (i + 1) % SUN_CAPTIONS.length)}
-          aria-label={t('worldSunHint')}
-        />
+        <button type="button" className="world-sun" onClick={clickSun} aria-label={t('worldSunHint')} />
         <div
           className="world-strip"
           style={{ width: `${FACE_COUNT * 100}%`, transform: `translateX(-${faceIndex * (100 / FACE_COUNT)}%)` }}
@@ -318,7 +332,9 @@ export default function World() {
           ))}
         </div>
       </div>
-      <p className="small muted world-scene-caption">{L(SUN_CAPTIONS[captionIndex])}</p>
+      <p className={captionHighlight ? 'small muted world-scene-caption highlight' : 'small muted world-scene-caption'}>
+        {L(SUN_CAPTIONS[captionIndex])}
+      </p>
       <p className="small muted world-walkers-hint">{t('worldWalkersHint')}</p>
 
       <div className="stage-steps">

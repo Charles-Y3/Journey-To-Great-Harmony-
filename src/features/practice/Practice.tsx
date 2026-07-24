@@ -164,11 +164,12 @@ function Journal() {
   const days = useJourney((s) => s.days);
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState<JournalFilter>('all');
+  const [dateFilter, setDateFilter] = useState<string>('all');
   const { t, L, locale } = useT();
   const allEntries = Object.entries(days)
     .filter(([, rec]) => rec.intention || rec.reflection || rec.challengeDone)
     .sort(([a], [b]) => (a < b ? 1 : -1));
-  const entries = allEntries.filter(([, rec]) => matchesJournalFilter(rec, filter));
+  const entries = allEntries.filter(([day, rec]) => matchesJournalFilter(rec, filter) && (dateFilter === 'all' || day === dateFilter));
 
   if (allEntries.length === 0) return null;
   return (
@@ -181,12 +182,22 @@ function Journal() {
         </button>
       ) : (
         <>
-          <div className="tab-row" style={{ marginTop: 10 }}>
-            {JOURNAL_FILTERS.map((f) => (
-              <button key={f.id} className={filter === f.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setFilter(f.id)}>
-                {f.emoji} {t(f.key)}
-              </button>
-            ))}
+          <div className="journal-filter-row">
+            <select className="journal-filter-select" value={filter} onChange={(e) => setFilter(e.target.value as JournalFilter)}>
+              {JOURNAL_FILTERS.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.emoji} {t(f.key)}
+                </option>
+              ))}
+            </select>
+            <select className="journal-filter-select" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
+              <option value="all">{t('journalDateFilterAll')}</option>
+              {allEntries.map(([day]) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </select>
           </div>
           {entries.length === 0 && <p className="small muted">{t('journalFilterEmpty')}</p>}
           {entries.map(([day, rec]) => {
