@@ -77,6 +77,22 @@ export const UI = {
     '你的浏览器已阻止通知。请在浏览器的网站设置中允许通知，才能开启此功能。',
   ),
   settingsNotifUnsupported: localized("Your browser doesn't support notifications.", '你的浏览器不支持通知功能。'),
+
+  // ── Settings: ambient music ──────────────────────────────────────────
+  settingsMusicTitle: localized('Background Music', '背景音乐'),
+  settingsMusicDesc: localized(
+    'Free, gentle ambient music you can loop while you practise. Generated in your browser — no download, no account needed.',
+    '在你修习时可循环播放的免费舒缓背景音乐。由你的浏览器即时生成 — 无需下载，无需账号。',
+  ),
+  musicTrackOff: localized('Off', '关闭'),
+  musicTrackBowl: localized('🎐 Singing Bowl', '🎐 颂钵'),
+  musicTrackBells: localized('🔔 Temple Bells', '🔔 寺钟'),
+  musicTrackRain: localized('🌧️ Gentle Rain', '🌧️ 细雨'),
+  musicVolumeLabel: localized('Volume', '音量'),
+  settingsMusicAutoplayNote: localized(
+    "Browsers only allow audio to start after you tap a button, so music won't resume automatically when you reopen the app — just pick a track again.",
+    '浏览器只允许在你点击按钮之后才播放音效，因此重新打开应用时音乐不会自动恢复 — 只需再次选择曲目即可。',
+  ),
   notifyEveningTitle: localized('🪞 Evening Reflection', '🪞 夜间反思'),
   notifyEveningBody: localized(
     'Take a quiet moment to reflect on your day in Journey to Great Harmony.',

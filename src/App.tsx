@@ -4,6 +4,8 @@ import { useJourney, useToday } from './state/store';
 import { useLocale } from './state/localeStore';
 import { useNotifications } from './state/notificationStore';
 import { useProfile } from './state/profileStore';
+import { useSound, type MusicTrackId } from './state/soundStore';
+import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
 import { LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
 import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel } from './i18n/strings';
@@ -121,7 +123,7 @@ function BottomNav() {
         ))}
         <button className="nav-link" onClick={() => setShowMore(true)}>
           <span className="nav-emoji">
-            ➕
+            🗂️
             <NavBadge count={newCollectionCount} />
           </span>
           <span>{t('navMore')}</span>
@@ -227,6 +229,69 @@ function HarmonyInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+const MUSIC_TRACKS: { id: MusicTrackId; key: 'musicTrackBowl' | 'musicTrackBells' | 'musicTrackRain' }[] = [
+  { id: 'bowl', key: 'musicTrackBowl' },
+  { id: 'bells', key: 'musicTrackBells' },
+  { id: 'rain', key: 'musicTrackRain' },
+];
+
+function MusicSection() {
+  const { t } = useT();
+  const musicTrack = useSound((s) => s.musicTrack);
+  const setMusicTrack = useSound((s) => s.setMusicTrack);
+  const musicVolume = useSound((s) => s.musicVolume);
+  const setMusicVolume = useSound((s) => s.setMusicVolume);
+
+  function selectTrack(id: MusicTrackId | null) {
+    setMusicTrack(id);
+    if (id) {
+      playMusicTrack(id);
+      applyMusicVolume(musicVolume);
+    } else {
+      stopMusic();
+    }
+  }
+
+  function handleVolume(v: number) {
+    setMusicVolume(v);
+    applyMusicVolume(v);
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsMusicTitle')}</h3>
+      <p className="small muted">{t('settingsMusicDesc')}</p>
+      <div className="tab-row">
+        <button className={!musicTrack ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTrack(null)}>
+          {t('musicTrackOff')}
+        </button>
+        {MUSIC_TRACKS.map((tr) => (
+          <button key={tr.id} className={musicTrack === tr.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTrack(tr.id)}>
+            {t(tr.key)}
+          </button>
+        ))}
+      </div>
+      {musicTrack && (
+        <div style={{ marginTop: 10 }}>
+          <label className="small muted">{t('musicVolumeLabel')}</label>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.05}
+            value={musicVolume}
+            onChange={(e) => handleVolume(Number(e.target.value))}
+            style={{ width: '100%' }}
+          />
+        </div>
+      )}
+      <p className="small muted" style={{ marginTop: 8 }}>
+        {t('settingsMusicAutoplayNote')}
+      </p>
+    </div>
+  );
+}
+
 function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   const { t, L, locale } = useT();
   const currentIdx = rankIndexForXp(xp);
@@ -266,6 +331,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <LanguageSection />
       <NameSection />
       <NotificationsSection />
+      <MusicSection />
       <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
         <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
