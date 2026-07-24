@@ -94,6 +94,8 @@ export interface WisdomCard {
   category: 'figure' | 'teaching' | 'virtue' | 'story';
   text: Localized<string>;
   unlockHint: Localized<string>;
+  /** An extra fact or bit of lore shown in the full-screen card modal, beyond the main `text`. */
+  detail?: Localized<string>;
 }
 
 export interface Stats {

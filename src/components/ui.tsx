@@ -29,10 +29,13 @@ export function Modal({
   onClose,
   children,
   wide,
+  fullscreen,
 }: {
   onClose: () => void;
   children: ReactNode;
   wide?: boolean;
+  /** Near-fullscreen presentation for content meant to be the whole show (e.g. a Wisdom Card). */
+  fullscreen?: boolean;
 }) {
   const { t } = useT();
   useEffect(() => {
@@ -43,9 +46,13 @@ export function Modal({
     return () => window.removeEventListener('keydown', onKey);
   }, [onClose]);
 
+  let cls = 'modal';
+  if (fullscreen) cls += ' modal-fullscreen';
+  else if (wide) cls += ' modal-wide';
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className={wide ? 'modal modal-wide' : 'modal'} onClick={(e) => e.stopPropagation()}>
+      <div className={cls} onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose} aria-label={t('close')}>
           ✕
         </button>

@@ -385,6 +385,7 @@ export const UI = {
   categoryVirtue: localized('virtue', '德行'),
   categoryStory: localized('story', '故事'),
   rarityFilterAll: localized('All', '全部'),
+  cardDetailHeading: localized('Did you know?', '你知道吗？'),
 
   // ── Ranks (fallback labels; see engine/progression.ts for full localized list) ──
   highestRankLabel: localized('highest rank', '最高段位'),

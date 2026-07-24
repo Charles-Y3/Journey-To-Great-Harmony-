@@ -20,18 +20,46 @@ const CATEGORY_KEY: Record<WisdomCard['category'], UiKey> = {
   story: 'categoryStory',
 };
 
+// Decorative twinkle positions for the legendary-only sparkle particles
+// around the portrait medallion. Purely cosmetic, so a fixed layout (not
+// seeded per-card) is fine.
+const SPARKLE_SPOTS = [
+  { top: '10%', left: '18%', delay: '0s' },
+  { top: '15%', left: '80%', delay: '0.4s' },
+  { top: '50%', left: '6%', delay: '0.9s' },
+  { top: '55%', left: '92%', delay: '0.2s' },
+  { top: '85%', left: '28%', delay: '1.3s' },
+  { top: '82%', left: '68%', delay: '0.7s' },
+];
+
 function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void }) {
   const { t, L } = useT();
   return (
-    <Modal onClose={onClose}>
-      <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: '3.2rem' }}>{card.emoji}</div>
-        <h2>{L(card.title)}</h2>
-        <p>
+    <Modal onClose={onClose} fullscreen>
+      <div className={`card-modal-hero card-modal-hero-${card.rarity}`}>
+        {card.rarity === 'legendary' &&
+          SPARKLE_SPOTS.map((s, i) => (
+            <span key={i} className="card-modal-sparkle" style={{ top: s.top, left: s.left, animationDelay: s.delay }} aria-hidden="true">
+              ✨
+            </span>
+          ))}
+        <div className={`card-modal-portrait card-modal-portrait-${card.rarity}`}>
+          <span className="card-modal-portrait-emoji">{card.emoji}</span>
+        </div>
+        <h2 style={{ marginBottom: 4 }}>{L(card.title)}</h2>
+        <p style={{ marginBottom: 0 }}>
           <span className={card.rarity === 'legendary' ? 'pill pill-gold' : 'pill'}>{t(RARITY_KEY[card.rarity])}</span>{' '}
           <span className="pill">{t(CATEGORY_KEY[card.category])}</span>
         </p>
-        <p style={{ fontStyle: 'italic' }}>{L(card.text)}</p>
+      </div>
+      <div className="card-modal-body">
+        <p style={{ fontStyle: 'italic', fontSize: '1.05rem' }}>{L(card.text)}</p>
+        {card.detail && (
+          <>
+            <h4>{t('cardDetailHeading')}</h4>
+            <p className="small muted">{L(card.detail)}</p>
+          </>
+        )}
       </div>
     </Modal>
   );
