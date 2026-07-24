@@ -56,6 +56,30 @@ export const UI = {
     '大同之旅 v1 — 你的进度私密地保存在此浏览器中。',
   ),
 
+  // ── Settings: notifications ─────────────────────────────────────────
+  settingsNotifTitle: localized('Notifications', '通知'),
+  settingsNotifDesc: localized(
+    "Get a gentle reminder for your evening reflection, and to keep today's practice from slipping. Reminders only work while this app is open in a browser tab.",
+    '为你的夜间反思送上温和的提醒，也提醒你别错过今天的修习。提醒仅在此应用于浏览器标签页中保持开启时才会生效。',
+  ),
+  settingsNotifOn: localized('🔔 Reminders on', '🔔 提醒已开启'),
+  settingsNotifOff: localized('🔕 Enable reminders', '🔕 开启提醒'),
+  settingsNotifDenied: localized(
+    "Notifications are blocked in your browser. Allow them in your browser's site settings to turn this on.",
+    '你的浏览器已阻止通知。请在浏览器的网站设置中允许通知，才能开启此功能。',
+  ),
+  settingsNotifUnsupported: localized("Your browser doesn't support notifications.", '你的浏览器不支持通知功能。'),
+  notifyEveningTitle: localized('🪞 Evening Reflection', '🪞 夜间反思'),
+  notifyEveningBody: localized(
+    'Take a quiet moment to reflect on your day in Journey to Great Harmony.',
+    '花一点安静的时间，在《大同之旅》中回顾你的一天吧。',
+  ),
+  notifyStreakTitle: localized('🔥 Keep your streak alive', '🔥 别让连续记录中断'),
+  notifyStreakBody: localized(
+    "You haven't practised today yet — a few minutes keeps your journey going.",
+    '你今天还没有修习 — 只需几分钟，就能延续你的旅程。',
+  ),
+
   // ── Language onboarding gate ──────────────────────────────────────
   gateWelcome: localized('Welcome', '欢迎'),
   gateSubtitle: localized(
@@ -283,6 +307,13 @@ export const UI = {
   wisdomCardsTab: localized('🎴 Wisdom Cards', '🎴 智慧卡牌'),
   badgesTab: localized('🏅 Badges', '🏅 徽章'),
   lockedCardTitle: localized('???', '？？？'),
+  rarityCommon: localized('common', '普通'),
+  rarityRare: localized('rare', '稀有'),
+  rarityLegendary: localized('legendary', '传说'),
+  categoryFigure: localized('figure', '人物'),
+  categoryTeaching: localized('teaching', '教导'),
+  categoryVirtue: localized('virtue', '德行'),
+  categoryStory: localized('story', '故事'),
 
   // ── Ranks (fallback labels; see engine/progression.ts for full localized list) ──
   highestRankLabel: localized('highest rank', '最高段位'),

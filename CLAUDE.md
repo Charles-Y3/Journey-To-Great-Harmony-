@@ -46,3 +46,32 @@ Concretely:
   dictionary never ships to the browser). Commit the regenerated file.
 - Before shipping any user-facing change, sanity check it in all three
   languages (Settings → Language, or the first-run gate), not just English.
+- Watch for raw enum-like data fields rendered directly as text (e.g.
+  `WisdomCard.rarity`/`.category` used to leak literal English words like
+  "common"/"legendary" into every locale — see `RARITY_KEY`/`CATEGORY_KEY`
+  in `src/features/collection/Collection.tsx` for the fix pattern: map the
+  enum value to a `UiKey` and render via `t()`, never the raw value).
+
+## Persistence
+
+Progress (`src/state/store.ts`, key `journey-to-great-harmony`), language
+choice (`src/state/localeStore.ts`, key `journey-locale`), and the
+notification preference (`src/state/notificationStore.ts`, key
+`journey-notifications`) are three separate zustand `persist` stores, all
+backed by `localStorage` — deliberately separate so resetting one (e.g.
+"Reset journey" in Settings) never touches the others. This has been
+verified to survive a full browser process restart (not just a page
+reload), same browser/profile/origin. It does **not** sync across devices
+or browsers, and is lost if the user clears site data or uses a private
+window — there is no backend in v1.
+
+## Notifications
+
+`src/engine/notifications.ts` + `src/state/notificationStore.ts` implement
+opt-in browser Notification reminders (evening-reflection nudge after
+19:00 local time, daily-streak nudge after 12:00 if nothing done yet),
+toggled in Settings. Be honest about the real limitation in any UI copy:
+these are plain `Notification` API calls with no service worker or push
+subscription behind them, so they only fire while the app is open in a
+tab (checked on load, every 5 minutes, and on tab focus) — not from a
+fully closed browser. Don't imply otherwise.

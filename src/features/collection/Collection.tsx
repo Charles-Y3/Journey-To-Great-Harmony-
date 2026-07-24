@@ -2,21 +2,34 @@ import { useEffect, useState } from 'react';
 import { useJourney } from '../../state/store';
 import { CARDS } from '../../data/cards';
 import { BADGES } from '../../data/badges';
-import type { WisdomCard } from '../../data/types';
+import type { CardRarity, WisdomCard } from '../../data/types';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { cardsTabLabel, badgesTabLabel } from '../../i18n/strings';
+import { cardsTabLabel, badgesTabLabel, type UiKey } from '../../i18n/strings';
+
+const RARITY_KEY: Record<CardRarity, UiKey> = {
+  common: 'rarityCommon',
+  rare: 'rarityRare',
+  legendary: 'rarityLegendary',
+};
+
+const CATEGORY_KEY: Record<WisdomCard['category'], UiKey> = {
+  figure: 'categoryFigure',
+  teaching: 'categoryTeaching',
+  virtue: 'categoryVirtue',
+  story: 'categoryStory',
+};
 
 function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void }) {
-  const { L } = useT();
+  const { t, L } = useT();
   return (
     <Modal onClose={onClose}>
       <div style={{ textAlign: 'center' }}>
         <div style={{ fontSize: '3.2rem' }}>{card.emoji}</div>
         <h2>{L(card.title)}</h2>
         <p>
-          <span className={card.rarity === 'legendary' ? 'pill pill-gold' : 'pill'}>{card.rarity}</span>{' '}
-          <span className="pill">{card.category}</span>
+          <span className={card.rarity === 'legendary' ? 'pill pill-gold' : 'pill'}>{t(RARITY_KEY[card.rarity])}</span>{' '}
+          <span className="pill">{t(CATEGORY_KEY[card.category])}</span>
         </p>
         <p style={{ fontStyle: 'italic' }}>{L(card.text)}</p>
       </div>
@@ -59,7 +72,7 @@ export default function Collection() {
               <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && setOpen(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
                 <div className="wcard-emoji">{owned ? card.emoji : '❔'}</div>
                 <strong>{owned ? L(card.title) : t('lockedCardTitle')}</strong>
-                <span className="small muted">{owned ? card.rarity : L(card.unlockHint)}</span>
+                <span className="small muted">{owned ? t(RARITY_KEY[card.rarity]) : L(card.unlockHint)}</span>
               </div>
             );
           })}

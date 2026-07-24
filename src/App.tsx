@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, NavLink, Route, Routes } from 'react-router-dom';
 import { useJourney, useToday } from './state/store';
 import { useLocale } from './state/localeStore';
+import { useNotifications } from './state/notificationStore';
 import { LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
 import { xpBarLabel, advancedDaysNote, newItemsAriaLabel } from './i18n/strings';
 import { rankForXp, nextRankForXp } from './engine/progression';
+import { checkReminders, notificationPermission, requestNotificationPermission } from './engine/notifications';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
 import Today from './features/home/Today';
@@ -146,6 +148,43 @@ function LanguageSection() {
   );
 }
 
+function NotificationsSection() {
+  const { t } = useT();
+  const enabled = useNotifications((s) => s.enabled);
+  const setEnabled = useNotifications((s) => s.setEnabled);
+  const [permission, setPermission] = useState(notificationPermission());
+
+  async function handleToggle() {
+    if (enabled) {
+      setEnabled(false);
+      return;
+    }
+    const perm = await requestNotificationPermission();
+    setPermission(perm);
+    if (perm === 'granted') {
+      setEnabled(true);
+      checkReminders();
+    }
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsNotifTitle')}</h3>
+      <p className="small muted">{t('settingsNotifDesc')}</p>
+      {permission === 'unsupported' ? (
+        <p className="small muted">{t('settingsNotifUnsupported')}</p>
+      ) : (
+        <>
+          <button className={enabled ? 'btn btn-primary' : 'btn'} onClick={handleToggle}>
+            {enabled ? t('settingsNotifOn') : t('settingsNotifOff')}
+          </button>
+          {permission === 'denied' && !enabled && <p className="small muted">{t('settingsNotifDenied')}</p>}
+        </>
+      )}
+    </div>
+  );
+}
+
 function SettingsModal({ onClose }: { onClose: () => void }) {
   const { t, locale } = useT();
   const reset = useJourney((s) => s.resetJourney);
@@ -157,6 +196,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
     <Modal onClose={onClose}>
       <h2>{t('settingsTitle')}</h2>
       <LanguageSection />
+      <NotificationsSection />
       <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
         <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
@@ -203,6 +243,22 @@ export default function App() {
   const hasChosenLocale = useLocale((s) => s.hasChosen);
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
+
+  // Check for a due evening-reflection or daily-streak reminder on load, on
+  // an interval while the tab stays open, and whenever the tab regains
+  // focus (covers a laptop reopened or a background tab switched back to).
+  useEffect(() => {
+    checkReminders();
+    const interval = window.setInterval(checkReminders, 5 * 60 * 1000);
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') checkReminders();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, []);
 
   if (!hasChosenLocale) {
     return <LanguageGate />;
