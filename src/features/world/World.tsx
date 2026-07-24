@@ -1,19 +1,32 @@
 import { useEffect, useRef, useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
+import { useSound } from '../../state/soundStore';
 import { worldInfo, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
 import { PEERS } from '../../data/peers';
 import { greetingFor } from '../../data/greetings';
 import type { Peer, WorldBuilding } from '../../data/types';
-import type { Localized, Locale } from '../../i18n/types';
+import { localized, type Localized, type Locale } from '../../i18n/types';
 import { communityFeed } from '../../engine/community';
 import { seededRandom } from '../../engine/progression';
+import { speakGreeting } from '../../engine/speech';
 import { PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { worldProgressLabel, buildingLockedNote, yourContributionLabel } from '../../i18n/strings';
 
 type LocalizeFn = <T>(v: Localized<T>) => T;
+
+// Sayings the sun's caption cycles through when clicked — a small bit of
+// life on top of the World scene, separate from the "how do I use this"
+// hint text below it.
+const SUN_CAPTIONS: Localized<string>[] = [
+  localized('The world grows because people grow.', '世界因人的成长而成长。'),
+  localized('Every small act of harmony ripples outward.', '每一个和谐的小小举动，都会向外荡漾。'),
+  localized('A shared world is built one person at a time.', '共享的世界，是一个人、一个人建成的。'),
+  localized('Great Harmony begins with a single kind act.', '大同，始于一次善举。'),
+  localized('No one builds this world alone.', '没有人是独自建成这个世界的。'),
+];
 
 // The world is a wide "strip" of FACE_COUNT scenes (600 SVG units each) that
 // the viewport shows one face of at a time — rotating left/right pans along
@@ -32,15 +45,30 @@ const BUILDING_SPOTS: Record<string, { x: number; emoji: string }> = {
   hall: { x: 2050, emoji: '🏛️' },
 };
 
+// A distinct look per world stage, so Village/Town/City/Harmony Society
+// don't all read as "the same houses, just more of them": earthy dawn
+// tones for the Village, richer warm tones for the Town, an ordered grey
+// stone palette (plus a wall) for the City, and a radiant jade-gold glow
+// (plus lanterns) for the Harmony Society.
+const STAGE_GROUND_PALETTE = [
+  { hill1: '#d8c9a3', hill2: '#cdbb96', ground: '#cbbb92', roofs: ['#b5443c', '#a8583c'] },
+  { hill1: '#dfc9a0', hill2: '#d6b98e', ground: '#c9b283', roofs: ['#b5443c', '#c9962e', '#a8583c'] },
+  { hill1: '#c7c9cf', hill2: '#b9bcc4', ground: '#aeb2ba', roofs: ['#5c6270', '#7a5230', '#3b6ea5'] },
+  { hill1: '#d9e6c8', hill2: '#c8e0c4', ground: '#bcdcb0', roofs: ['#c9962e', '#2e7d5b', '#b5443c'] },
+];
+
 function WorldGround({ stageIndex }: { stageIndex: number }) {
+  const palette = STAGE_GROUND_PALETTE[Math.min(stageIndex, STAGE_GROUND_PALETTE.length - 1)];
   const houseCount = Math.min(56, (3 + stageIndex * 3) * FACE_COUNT);
   const houses = Array.from({ length: houseCount }, (_, i) => ({
     x: 40 + seededRandom(`house-x-${i}`) * (STRIP_WIDTH - 80),
     size: 0.8 + seededRandom(`house-s-${i}`) * 0.55,
+    roof: palette.roofs[i % palette.roofs.length],
+    tall: stageIndex >= 2 && seededRandom(`house-tall-${i}`) > 0.6,
   }));
   const hills = Array.from({ length: FACE_COUNT }, (_, f) => f).flatMap((f) => [
-    { cx: f * FACE_WIDTH + 120, cy: 250, rx: 230, ry: 60, fill: '#d8c9a3' },
-    { cx: f * FACE_WIDTH + 480, cy: 255, rx: 260, ry: 70, fill: '#cdbb96' },
+    { cx: f * FACE_WIDTH + 120, cy: 250, rx: 230, ry: 60, fill: palette.hill1 },
+    { cx: f * FACE_WIDTH + 480, cy: 255, rx: 260, ry: 70, fill: palette.hill2 },
   ]);
   const riverSegments = STRIP_WIDTH / 300;
   let riverPath = 'M0 250 q 150 14 300 4 ';
@@ -52,15 +80,38 @@ function WorldGround({ stageIndex }: { stageIndex: number }) {
       {hills.map((h, i) => (
         <ellipse key={i} cx={h.cx} cy={h.cy} rx={h.rx} ry={h.ry} fill={h.fill} />
       ))}
-      <rect y="245" width={STRIP_WIDTH} height="55" fill="#cbbb92" />
+      <rect y="245" width={STRIP_WIDTH} height="55" fill={palette.ground} />
       <path d={riverPath} fill="#9fc6de" opacity="0.8" />
+      {/* City and Harmony Society sit behind a low wall — a visible sign of a more built-up stage. */}
+      {stageIndex >= 2 && <rect y="238" width={STRIP_WIDTH} height="6" fill="#8a8f98" opacity="0.7" />}
       {houses.map((h, i) => (
         <g key={i} transform={`translate(${h.x} 232) scale(${h.size})`}>
-          <rect x={-12} y={-18} width={24} height={18} fill="#e8dcc0" stroke="#b09b6d" />
-          <path d="M -15 -18 L 0 -30 L 15 -18 Z" fill="#b5443c" />
-          <rect x={-4} y={-10} width={8} height={10} fill="#7a5230" />
+          {h.tall ? (
+            <>
+              <rect x={-10} y={-30} width={20} height={30} fill="#e2ddd2" stroke="#9a9186" />
+              <rect x={-6} y={-16} width={5} height={6} fill="#5c6270" />
+              <rect x={1} y={-16} width={5} height={6} fill="#5c6270" />
+            </>
+          ) : (
+            <>
+              <rect x={-12} y={-18} width={24} height={18} fill="#e8dcc0" stroke="#b09b6d" />
+              <path d="M -15 -18 L 0 -30 L 15 -18 Z" fill={h.roof} />
+              <rect x={-4} y={-10} width={8} height={10} fill="#7a5230" />
+            </>
+          )}
         </g>
       ))}
+      {/* Harmony Society: paper lanterns strung along the skyline. */}
+      {stageIndex >= 3 &&
+        Array.from({ length: Math.round(STRIP_WIDTH / 140) }, (_, i) => {
+          const x = 60 + i * 140 + seededRandom(`lantern-x-${i}`) * 40;
+          return (
+            <g key={`lantern-${i}`}>
+              <line x1={x} y1="0" x2={x} y2="60" stroke="#d8a943" strokeWidth="0.8" opacity="0.5" />
+              <ellipse cx={x} cy="66" rx="7" ry="9" fill="#e2a13c" opacity="0.9" />
+            </g>
+          );
+        })}
     </svg>
   );
 }
@@ -189,6 +240,16 @@ function WorldBuildings({
   );
 }
 
+// Distinct sky per stage, so a Village dawn, a Town afternoon, a City's
+// clearer blue, and the Harmony Society's golden-rose glow don't all look
+// like the same backdrop with different houses in front of it.
+const STAGE_SKY = [
+  'linear-gradient(to bottom, #f7d9a8, #fdf2dc)',
+  'linear-gradient(to bottom, #bfe0f2, #fdf6e3)',
+  'linear-gradient(to bottom, #8fb9e0, #e7eef5)',
+  'linear-gradient(to bottom, #f2c9df, #fff1cf)',
+];
+
 export default function World() {
   const state = useJourney();
   const today = useToday();
@@ -197,8 +258,11 @@ export default function World() {
   const feed = communityFeed(today);
   const { t, L, locale } = useT();
   const myName = useProfile((s) => s.name);
+  const speechMuted = useSound((s) => s.speechMuted);
+  const setSpeechMuted = useSound((s) => s.setSpeechMuted);
 
   const [faceIndex, setFaceIndex] = useState(0);
+  const [captionIndex, setCaptionIndex] = useState(0);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
 
@@ -206,26 +270,47 @@ export default function World() {
     setFaceIndex((f) => (f + dir + FACE_COUNT) % FACE_COUNT);
   }
 
+  function greet(peerId: string) {
+    peerBubble.trigger(peerId);
+    if (!speechMuted) {
+      const peer = PEERS.find((p) => p.id === peerId);
+      if (peer) speakGreeting(greetingFor(peer));
+    }
+  }
+
   return (
     <div>
       <PageHeader emoji="🌏" title={t('worldTitle')} subtitle={t('worldSubtitle')} />
 
-      <div className="world-viewport">
-        <span className="world-sun" aria-hidden="true" />
+      <div className="world-viewport" style={{ background: STAGE_SKY[Math.min(info.stageIndex, STAGE_SKY.length - 1)] }}>
+        <button
+          type="button"
+          className="world-sun"
+          onClick={() => setCaptionIndex((i) => (i + 1) % SUN_CAPTIONS.length)}
+          aria-label={t('worldSunHint')}
+        />
         <div
           className="world-strip"
           style={{ width: `${FACE_COUNT * 100}%`, transform: `translateX(-${faceIndex * (100 / FACE_COUNT)}%)` }}
         >
           <WorldGround stageIndex={info.stageIndex} />
           <WorldBuildings buildings={info.buildings} activeId={buildingBubble.activeId} onSelect={buildingBubble.trigger} L={L} locale={locale} />
-          <WorldWalkers onGreet={peerBubble.trigger} speakingId={peerBubble.activeId} L={L} />
+          <WorldWalkers onGreet={greet} speakingId={peerBubble.activeId} L={L} />
         </div>
-        <p className="world-caption">{t('worldSceneCaption')}</p>
         <button type="button" className="world-rotate world-rotate-left" onClick={() => rotate(-1)} aria-label={t('worldRotateLeft')}>
           ◀
         </button>
         <button type="button" className="world-rotate world-rotate-right" onClick={() => rotate(1)} aria-label={t('worldRotateRight')}>
           ▶
+        </button>
+        <button
+          type="button"
+          className="world-mute-btn"
+          onClick={() => setSpeechMuted(!speechMuted)}
+          aria-label={t(speechMuted ? 'worldUnmuteSpeech' : 'worldMuteSpeech')}
+          title={t(speechMuted ? 'worldUnmuteSpeech' : 'worldMuteSpeech')}
+        >
+          {speechMuted ? '🔇' : '🔊'}
         </button>
         <div className="world-face-dots">
           {Array.from({ length: FACE_COUNT }, (_, i) => (
@@ -233,6 +318,7 @@ export default function World() {
           ))}
         </div>
       </div>
+      <p className="small muted world-scene-caption">{L(SUN_CAPTIONS[captionIndex])}</p>
       <p className="small muted world-walkers-hint">{t('worldWalkersHint')}</p>
 
       <div className="stage-steps">

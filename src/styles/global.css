@@ -862,20 +862,31 @@ input[type='text']:focus {
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   background: linear-gradient(to bottom, #f7d9a8, #fdf2dc);
-  aspect-ratio: 2 / 1;
+  aspect-ratio: 8 / 5;
   width: 100%;
+  transition: background 0.6s ease;
 }
 
 .world-sun {
   position: absolute;
-  top: 12%;
+  top: 10%;
   right: 12%;
   width: 8%;
   aspect-ratio: 1;
   border-radius: 50%;
   background: #f2a83c;
   opacity: 0.9;
-  z-index: 0;
+  z-index: 4;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: 0 0 16px rgba(242, 168, 60, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.world-sun:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 22px rgba(242, 168, 60, 0.7);
 }
 
 .world-strip {
@@ -893,24 +904,36 @@ input[type='text']:focus {
   height: 100%;
 }
 
-.world-caption {
-  position: absolute;
-  top: 8px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 4;
-  margin: 0;
-  font-size: 0.8rem;
+/* Rendered as a normal paragraph below the viewport (not an overlay) so a
+   building's info bubble never collides with it — see World.tsx. */
+.world-scene-caption {
+  text-align: center;
   font-style: italic;
-  color: #7a6437;
-  background: rgba(255, 255, 255, 0.55);
-  padding: 3px 12px;
-  border-radius: 999px;
-  white-space: nowrap;
-  max-width: 82%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  pointer-events: none;
+  margin-top: 8px;
+  margin-bottom: 4px;
+}
+
+.world-mute-btn {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.world-mute-btn:hover {
+  background: rgba(255, 255, 255, 0.9);
 }
 
 .world-rotate {

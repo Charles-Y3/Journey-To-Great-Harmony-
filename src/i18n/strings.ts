@@ -286,10 +286,9 @@ export const UI = {
     "From individual growth to collective transformation. Every traveller's practice builds this shared world.",
     '从个人成长到集体转化。每位旅人的践行，都在建设这个共享的世界。',
   ),
-  worldSceneCaption: localized(
-    'The world grows because people grow.',
-    '世界因人的成长而成长。',
-  ),
+  worldSunHint: localized('Tap the sun for a new saying', '轻点太阳，换一句箴言'),
+  worldMuteSpeech: localized('Mute travellers’ voices', '静音旅人的声音'),
+  worldUnmuteSpeech: localized('Unmute travellers’ voices', '取消静音旅人的声音'),
   worldReached: localized(
     '🌏 The Great Harmony has been reached — keep tending it.',
     '🌏 大同已经实现 — 请继续用心守护它。',
