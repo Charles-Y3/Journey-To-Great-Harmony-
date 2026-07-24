@@ -51,6 +51,15 @@ Concretely:
   "common"/"legendary" into every locale — see `RARITY_KEY`/`CATEGORY_KEY`
   in `src/features/collection/Collection.tsx` for the fix pattern: map the
   enum value to a `UiKey` and render via `t()`, never the raw value).
+- Also watch for a Chinese phrase hardcoded directly inside an English
+  `localized()` string as a "flourish" (it happened once, in
+  `forestFooter`) — grep is `*.tsx`-only in most sweeps, so `.ts` string
+  files need checking separately. Not every embedded Chinese character is
+  wrong, though: teaching the actual Hanzi for a named term in English
+  prose (e.g. "Dao 道 (the Way)", "Ren 仁 (humaneness)") is intentional and
+  fine throughout `src/data/timeline.ts` and `src/data/knowledgeTree.ts` —
+  the lessons are explicitly teaching those terms. The bug pattern is a
+  decorative, un-cited full sentence tacked onto unrelated English text.
 
 ## Persistence
 

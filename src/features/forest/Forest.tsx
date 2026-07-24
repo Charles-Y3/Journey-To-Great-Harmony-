@@ -5,6 +5,17 @@ import { seededRandom } from '../../engine/progression';
 import { PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 
+// Distinct palette per stage so the scene visibly shifts from bare and dusty
+// (Seed) to lush and serene (Sanctuary), not just "the same green".
+const STAGE_PALETTE = [
+  { hill1: '#e3d9bd', hill2: '#dcd0ae', ground: '#cdbe94' }, // seed — dusty, waiting
+  { hill1: '#d7e6bf', hill2: '#cfdfae', ground: '#b9d29a' }, // sprout — fresh green arriving
+  { hill1: '#cfe6c2', hill2: '#c2dfb4', ground: '#a9d29a' }, // tree — established green
+  { hill1: '#c3e0b7', hill2: '#b6d9a8', ground: '#9bc98d' }, // forest — deeper, denser
+  { hill1: '#bfe3c4', hill2: '#a9d9b0', ground: '#8fc79b' }, // garden — lush, colourful
+  { hill1: '#cbe8d9', hill2: '#a9ddc4', ground: '#8bc9ad' }, // sanctuary — serene jade
+];
+
 function Tree({ x, size, kind }: { x: number; size: number; kind: number }) {
   const groundY = 240;
   const trunkH = 22 * size;
@@ -21,9 +32,64 @@ function Tree({ x, size, kind }: { x: number; size: number; kind: number }) {
   );
 }
 
-function ForestScene({ stageIndex, score, seedCaption }: { stageIndex: number; score: number; seedCaption: string }) {
-  const treeCount = Math.min(14, stageIndex === 0 ? 0 : 1 + Math.floor(score / 12));
-  const flowerCount = stageIndex >= 3 ? Math.min(20, Math.floor(score / 8)) : 0;
+// A young seedling: a bent stem with two small leaves — visually distinct
+// from the full rounded-crown Tree, so the Sprout stage actually reads as
+// "just sprouting" rather than "a smaller tree".
+function Sprout({ x, size }: { x: number; size: number }) {
+  const groundY = 240;
+  return (
+    <g>
+      <path d={`M${x} ${groundY} q ${-3 * size} ${-9 * size} 0 ${-15 * size}`} stroke="#3c8d63" strokeWidth={2.4 * size} fill="none" strokeLinecap="round" />
+      <path
+        d={`M${x} ${groundY - 7 * size} q ${-7 * size} ${-3 * size} ${-9 * size} ${2 * size}`}
+        stroke="#57b06f"
+        strokeWidth={2 * size}
+        fill="none"
+        strokeLinecap="round"
+      />
+      <path
+        d={`M${x} ${groundY - 10 * size} q ${7 * size} ${-3 * size} ${9 * size} ${2 * size}`}
+        stroke="#57b06f"
+        strokeWidth={2 * size}
+        fill="none"
+        strokeLinecap="round"
+      />
+    </g>
+  );
+}
+
+function ForestScene({
+  stageIndex,
+  stageProgress,
+  seedCaption,
+}: {
+  stageIndex: number;
+  stageProgress: number;
+  seedCaption: string;
+}) {
+  const palette = STAGE_PALETTE[Math.min(stageIndex, STAGE_PALETTE.length - 1)];
+
+  // Each stage has its own distinct scene, not just "more of the same tree".
+  const sproutCount = stageIndex === 1 ? Math.round(3 + stageProgress * 5) : 0; // 3–8
+  const treeCount =
+    stageIndex === 2
+      ? Math.round(2 + stageProgress * 4) // 2–6: trees first appear here
+      : stageIndex === 3
+        ? Math.round(6 + stageProgress * 5) // 6–11
+        : stageIndex >= 4
+          ? Math.min(14, 10 + Math.round(stageProgress * 4)) // 10–14
+          : 0;
+  const flowerCount =
+    stageIndex === 3
+      ? Math.round(stageProgress * 8) // 0–8: flowers first appear late in Forest
+      : stageIndex >= 4
+        ? Math.round(10 + stageProgress * 12) // 10–22: the Garden bursts with colour
+        : 0;
+
+  const sprouts = Array.from({ length: sproutCount }, (_, i) => ({
+    x: 60 + seededRandom(`sprout-x-${i}`) * 480,
+    size: 0.8 + seededRandom(`sprout-s-${i}`) * 0.6,
+  }));
   const trees = Array.from({ length: treeCount }, (_, i) => ({
     x: 60 + seededRandom(`tree-x-${i}`) * 480,
     size: 0.6 + seededRandom(`tree-s-${i}`) * 0.9,
@@ -46,10 +112,10 @@ function ForestScene({ stageIndex, score, seedCaption }: { stageIndex: number; s
       <rect width="600" height="240" fill="url(#sky)" />
       <circle cx="520" cy="52" r="26" fill="#f2c94c" opacity="0.9" />
       {/* hills */}
-      <ellipse cx="120" cy="250" rx="230" ry="60" fill="#cfe6c2" />
-      <ellipse cx="480" cy="255" rx="260" ry="70" fill="#c2dfb4" />
+      <ellipse cx="120" cy="250" rx="230" ry="60" fill={palette.hill1} />
+      <ellipse cx="480" cy="255" rx="260" ry="70" fill={palette.hill2} />
       {/* ground */}
-      <rect y="240" width="600" height="60" fill="#a9d29a" />
+      <rect y="240" width="600" height="60" fill={palette.ground} />
 
       {stageIndex === 0 && (
         <g>
@@ -61,11 +127,9 @@ function ForestScene({ stageIndex, score, seedCaption }: { stageIndex: number; s
         </g>
       )}
 
-      {stageIndex >= 1 && treeCount === 0 && (
-        <g>
-          <path d="M300 250 q -3 -18 0 -26 q 3 8 0 26" stroke="#3c8d63" strokeWidth="4" fill="none" />
-        </g>
-      )}
+      {sprouts.map((s, i) => (
+        <Sprout key={i} x={s.x} size={s.size} />
+      ))}
 
       {trees.map((t, i) => (
         <Tree key={i} x={t.x} size={t.size} kind={t.kind} />
@@ -108,6 +172,10 @@ export default function Forest() {
   const stats = statsFromData(d);
   const { t, L } = useT();
 
+  const stageProgress = info.next
+    ? Math.max(0, Math.min(1, (info.score - info.stage.threshold) / (info.next.threshold - info.stage.threshold)))
+    : 1;
+
   const factors = [
     { name: t('forestFactorLessons'), emoji: '📖', value: stats.lessons },
     { name: t('forestFactorChallenges'), emoji: '🎯', value: stats.challengesDone },
@@ -120,7 +188,7 @@ export default function Forest() {
     <div>
       <PageHeader emoji="🌲" title={t('forestTitle')} subtitle={t('forestSubtitle')} />
 
-      <ForestScene stageIndex={info.stageIndex} score={info.score} seedCaption={t('forestSeedCaption')} />
+      <ForestScene stageIndex={info.stageIndex} stageProgress={stageProgress} seedCaption={t('forestSeedCaption')} />
 
       <div className="stage-steps">
         {FOREST_STAGES.map((s, i) => {

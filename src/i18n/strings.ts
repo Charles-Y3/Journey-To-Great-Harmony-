@@ -223,7 +223,7 @@ export const UI = {
   forestFactorTimeline: localized('Timeline studies', '时间线研读'),
   forestFactorStreak: localized('Best streak', '最佳连续记录'),
   forestFooter: localized(
-    'Every lesson, challenge, reflection, and day of consistency adds growth. There is no shortcut — and no hurry. 千里之行，始于足下。',
+    'Every lesson, challenge, reflection, and day of consistency adds growth. There is no shortcut — and no hurry, as the old saying goes: a journey of a thousand miles begins with a single step.',
     '每一课、每次挑战、每篇反思、每一天的坚持，都在增添成长。没有捷径，也无需匆忙。千里之行，始于足下。',
   ),
 
@@ -256,9 +256,11 @@ export const UI = {
   civicBuildingsTitle: localized('Civic buildings', '公共建筑'),
   todayInCommunity: localized('Today in the community', '今日社群动态'),
   worldWalkersHint: localized(
-    'Tap a traveller to hear them say hello.',
-    '点击一位旅人，听听他们如何打招呼。',
+    'Tap a traveller to hear them say hello, or tap a building to learn about it. Use the arrows to look around the world.',
+    '点击一位旅人，听听他们如何打招呼；点击一座建筑，了解它的故事。使用箭头环顾这个世界。',
   ),
+  worldRotateLeft: localized('Look left', '向左看'),
+  worldRotateRight: localized('Look right', '向右看'),
   worldFooter: localized(
     'In this version your fellow travellers are simulated companions. With community accounts, this world will be built by real people together.',
     '在此版本中，你的同行旅人是模拟的伙伴。未来有了社群账号后，这个世界将由真实的人们共同建设。',

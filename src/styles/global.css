@@ -774,17 +774,173 @@ input[type='text']:focus {
   display: block;
 }
 
-/* ── World: wandering, clickable peers ────────────────────────────── */
-.world-stage {
+/* ── World: rotatable viewport, wandering peers, clickable buildings ─ */
+.world-viewport {
   position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  background: linear-gradient(to bottom, #f7d9a8, #fdf2dc);
+  aspect-ratio: 2 / 1;
+  width: 100%;
+}
+
+.world-sun {
+  position: absolute;
+  top: 12%;
+  right: 12%;
+  width: 8%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #f2a83c;
+  opacity: 0.9;
+  z-index: 0;
+}
+
+.world-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transition: transform 0.5s ease;
+  z-index: 1;
+}
+
+.world-ground {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.world-caption {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 4;
+  margin: 0;
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #7a6437;
+  background: rgba(255, 255, 255, 0.55);
+  padding: 3px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  max-width: 82%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+
+.world-rotate {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ink);
+  font-size: 0.95rem;
+  cursor: pointer;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.world-rotate:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.world-rotate-left {
+  left: 8px;
+}
+
+.world-rotate-right {
+  right: 8px;
+}
+
+.world-face-dots {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 5px;
+  z-index: 4;
+}
+
+.world-face-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.65);
+  transition: width 0.2s ease, background 0.2s ease;
+}
+
+.world-face-dot.active {
+  background: var(--jade);
+  width: 16px;
+}
+
+.world-walkers,
+.world-buildings {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.world-buildings {
+  z-index: 3;
 }
 
 .world-walkers {
+  z-index: 2;
+}
+
+.world-building {
   position: absolute;
-  inset: 0;
-  overflow: hidden;
-  border-radius: var(--radius);
-  pointer-events: none;
+  top: 60%;
+  transform: translate(-50%, -50%);
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.world-building-platform {
+  position: absolute;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%);
+}
+
+.world-building-emoji {
+  position: relative;
+  font-size: 2.2rem;
+  filter: drop-shadow(0 3px 3px rgba(30, 20, 5, 0.35));
+  transition: transform 0.15s ease;
+}
+
+.world-building:hover .world-building-emoji,
+.world-building:focus-visible .world-building-emoji {
+  transform: scale(1.12);
+}
+
+.world-building.locked .world-building-emoji {
+  opacity: 0.4;
+  filter: grayscale(1) drop-shadow(0 2px 2px rgba(30, 20, 5, 0.2));
 }
 
 .world-walker {
@@ -890,6 +1046,19 @@ input[type='text']:focus {
   font-size: 0.64rem;
   color: var(--gold);
   margin-top: 1px;
+}
+
+.world-bubble-wide {
+  max-width: 220px;
+  min-width: 140px;
+}
+
+.world-bubble-desc {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: var(--ink);
+  line-height: 1.35;
 }
 
 @keyframes world-bubble-in {
