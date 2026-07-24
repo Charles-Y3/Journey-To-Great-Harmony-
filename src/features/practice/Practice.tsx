@@ -169,7 +169,10 @@ function Journal() {
   const allEntries = Object.entries(days)
     .filter(([, rec]) => rec.intention || rec.reflection || rec.challengeDone)
     .sort(([a], [b]) => (a < b ? 1 : -1));
-  const entries = allEntries.filter(([day, rec]) => matchesJournalFilter(rec, filter) && (dateFilter === 'all' || day === dateFilter));
+  // Day keys sort lexicographically the same as chronologically (YYYY-MM-DD),
+  // so a plain string >= comparison gives "this date onwards" rather than
+  // just that single day.
+  const entries = allEntries.filter(([day, rec]) => matchesJournalFilter(rec, filter) && (dateFilter === 'all' || day >= dateFilter));
 
   if (allEntries.length === 0) return null;
   return (
@@ -194,7 +197,7 @@ function Journal() {
               <option value="all">{t('journalDateFilterAll')}</option>
               {allEntries.map(([day]) => (
                 <option key={day} value={day}>
-                  {day}
+                  {t('journalDateFilterFromPrefix')} {day}
                 </option>
               ))}
             </select>

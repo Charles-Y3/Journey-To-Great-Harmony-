@@ -225,6 +225,7 @@ export const UI = {
   journalFilterReflections: localized('Reflections', '反思'),
   journalFilterEmpty: localized('No entries of this kind yet.', '目前还没有这类记录。'),
   journalDateFilterAll: localized('All dates', '所有日期'),
+  journalDateFilterFromPrefix: localized('From', '从'),
 
   // ── Knowledge ─────────────────────────────────────────────────────
   knowledgeTitle: localized('The Knowledge Path', '知识之路'),

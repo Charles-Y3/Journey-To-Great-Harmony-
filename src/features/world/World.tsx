@@ -76,7 +76,7 @@ function WorldGround({ stageIndex }: { stageIndex: number }) {
   riverPath += `v 40 h -${STRIP_WIDTH} z`;
 
   return (
-    <svg className="world-ground" viewBox={`0 0 ${STRIP_WIDTH} 300`} preserveAspectRatio="xMidYMid meet">
+    <svg className="world-ground" viewBox={`0 0 ${STRIP_WIDTH} 300`} preserveAspectRatio="none">
       {hills.map((h, i) => (
         <ellipse key={i} cx={h.cx} cy={h.cy} rx={h.rx} ry={h.ry} fill={h.fill} />
       ))}
