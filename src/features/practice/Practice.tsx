@@ -4,9 +4,15 @@ import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
 import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
+import { meaningfulLength } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { yourNoteLabel, journalCount, minLengthHint } from '../../i18n/strings';
+
+// Evening reflection only opens from 5pm local time, up to midnight — it's
+// meant to be a look back on the day that's actually happened, not
+// something to front-load in the morning.
+const EVENING_OPEN_HOUR = 17;
 
 // Minimum effort required before a submission is accepted — trivial
 // one-word "done" entries don't count as real practice.
@@ -35,11 +41,11 @@ function MorningCard({ today }: { today: string }) {
         <>
           <p className="small muted">{t('intentionPrompt')}</p>
           <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('intentionPlaceholder')} />
-          <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, text.trim().length, INTENTION_MIN)}</p>
+          <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, meaningfulLength(text), INTENTION_MIN)}</p>
           <button
             className="btn btn-primary"
             style={{ marginTop: 6 }}
-            disabled={text.trim().length < INTENTION_MIN}
+            disabled={meaningfulLength(text) < INTENTION_MIN}
             onClick={() => setIntention(text.trim())}
           >
             {t('intentionBtn')}
@@ -90,6 +96,7 @@ function EveningCard({ today }: { today: string }) {
   const [virtue, setVirtue] = useState('');
   const [improve, setImprove] = useState('');
   const { t, locale } = useT();
+  const eveningOpen = new Date().getHours() >= EVENING_OPEN_HOUR;
 
   return (
     <div className="card">
@@ -109,21 +116,23 @@ function EveningCard({ today }: { today: string }) {
             <strong>{t('reflectionTomorrowLabel')}:</strong> {rec.reflection.improve}
           </p>
         </>
+      ) : !eveningOpen ? (
+        <p className="small muted">{t('eveningLockedNote')}</p>
       ) : (
         <>
           <p className="small muted">{t('reflectionIntro')}</p>
           <label className="small">{t('reflectionQ1')}</label>
           <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, learned.trim().length, REFLECTION_MIN)}</p>
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(learned), REFLECTION_MIN)}</p>
           <label className="small">{t('reflectionQ2')}</label>
           <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, virtue.trim().length, REFLECTION_MIN)}</p>
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(virtue), REFLECTION_MIN)}</p>
           <label className="small">{t('reflectionQ3')}</label>
           <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, improve.trim().length, REFLECTION_MIN)}</p>
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(improve), REFLECTION_MIN)}</p>
           <button
             className="btn btn-primary"
-            disabled={learned.trim().length < REFLECTION_MIN || virtue.trim().length < REFLECTION_MIN || improve.trim().length < REFLECTION_MIN}
+            disabled={meaningfulLength(learned) < REFLECTION_MIN || meaningfulLength(virtue) < REFLECTION_MIN || meaningfulLength(improve) < REFLECTION_MIN}
             onClick={() => submitReflection(learned.trim(), virtue.trim(), improve.trim())}
           >
             {t('reflectionBtn')}

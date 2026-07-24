@@ -52,8 +52,9 @@ export function checkReminders(): void {
 
   const hasActivityToday = !!(rec?.intention || rec?.challengeDone || rec?.reflection || (rec?.lessons ?? 0) > 0);
 
-  // Evening reflection nudge: from 19:00, once, if not yet reflected today.
-  if (hour >= 19 && !rec?.reflection && notif.lastEveningPromptDay !== today) {
+  // Evening reflection nudge: from 17:00 (when the reflection form itself
+  // opens — see Practice.tsx EVENING_OPEN_HOUR), once, if not yet reflected.
+  if (hour >= 17 && !rec?.reflection && notif.lastEveningPromptDay !== today) {
     fireNotification(t('notifyEveningTitle', locale), t('notifyEveningBody', locale));
     notif.markEveningPrompted(today);
   }

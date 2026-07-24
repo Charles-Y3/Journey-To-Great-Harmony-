@@ -184,6 +184,10 @@ export const UI = {
   reflectionQ2: localized('What virtue did I practise?', '我践行了哪种德行？'),
   reflectionQ3: localized('How can I improve tomorrow?', '明天我可以如何做得更好？'),
   reflectionBtn: localized('Save reflection (+10 XP)', '保存反思 (+10 经验)'),
+  eveningLockedNote: localized(
+    'Evening Reflection opens at 5pm, once your day has actually happened — come back then.',
+    '夜间反思在下午5点后开放，待今天真正过去一些再来吧。',
+  ),
   journalTitle: localized('📔 Journal', '📔 日志'),
   journalBrowse: localized('Browse journal', '浏览日志'),
   journalClose: localized('Close journal', '关闭日志'),
