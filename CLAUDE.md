@@ -1,5 +1,23 @@
 # Journey to Great Harmony — repo notes
 
+## Token efficiency (do not violate)
+
+**Be frugal with tokens/context in every session.** Concretely:
+
+- Don't re-read whole files you've already read this session unless you
+  edited them elsewhere or the summary/context is stale — trust prior reads.
+- Prefer targeted `Grep`/`Read` with offsets over reading entire large files
+  (e.g. `strings.ts`, `store.ts`, `World.tsx`) when only one section matters.
+- Don't spawn Explore/general-purpose subagents for lookups you can do in
+  1-2 direct tool calls — subagents cost a fresh context load.
+- Skip verbose narration between tool calls; one short sentence at key
+  moments (found something, changed direction, blocked) is enough.
+- Verify with the smallest sufficient check: a targeted `tsc --noEmit` or
+  one Playwright assertion beats re-running the full build/manual sweep
+  when only a small, isolated change was made.
+- Batch independent reads/edits into parallel tool calls instead of
+  sequential round-trips.
+
 ## i18n rule (do not violate)
 
 **Every user-facing string in this app must follow the user's chosen
