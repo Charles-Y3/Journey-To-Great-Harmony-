@@ -125,6 +125,10 @@ export const UI = {
   nameGatePlaceholder: localized('Your name', '你的名字'),
   nameGateContinue: localized('Continue', '继续'),
   nameGateSkip: localized('Skip for now', '暂时跳过'),
+  nameJunkHint: localized(
+    'Please enter a real name — not just a repeated character.',
+    '请输入一个真实的名字 — 而不只是重复的字符。',
+  ),
 
   // ── Modal / celebration ───────────────────────────────────────────
   close: localized('Close', '关闭'),

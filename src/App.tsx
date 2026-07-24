@@ -11,6 +11,7 @@ import { useT } from './i18n/useT';
 import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel } from './i18n/strings';
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp } from './engine/progression';
 import { checkReminders, notificationPermission, requestNotificationPermission } from './engine/notifications';
+import { isJunkName } from './engine/textQuality';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
 import NameGate from './features/onboarding/NameGate';
@@ -157,6 +158,7 @@ function NameSection() {
   const name = useProfile((s) => s.name);
   const setName = useProfile((s) => s.setName);
   const [text, setText] = useState(name ?? '');
+  const junk = text.trim() !== '' && isJunkName(text);
 
   return (
     <div className="card">
@@ -164,10 +166,11 @@ function NameSection() {
       <p className="small muted">{t('settingsNameDesc')}</p>
       <div style={{ display: 'flex', gap: 8 }}>
         <input type="text" value={text} onChange={(e) => setText(e.target.value)} placeholder={t('nameGatePlaceholder')} maxLength={40} />
-        <button className="btn" onClick={() => setName(text)}>
+        <button className="btn" disabled={junk} onClick={() => setName(text)}>
           {t('settingsNameSave')}
         </button>
       </div>
+      {junk && <p className="small muted">{t('nameJunkHint')}</p>}
     </div>
   );
 }

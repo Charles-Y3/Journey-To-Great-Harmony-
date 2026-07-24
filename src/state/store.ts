@@ -24,6 +24,7 @@ import { SPECIAL_CARD_RULES, cardById, RARITY_LEVEL_REQUIRED } from '../data/car
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
 import { REGIONS } from '../data/journeyMap';
+import { isMeaningful, TEXT_MIN } from '../engine/textQuality';
 import { useLocale } from './localeStore';
 import { L } from '../i18n/L';
 import {
@@ -297,6 +298,7 @@ export const useJourney = create<JourneyState>()(
 
         setIntention: (text) =>
           apply((draft, today) => {
+            if (!isMeaningful(text, TEXT_MIN.intention)) return;
             const rec = dayRec(draft, today);
             const firstTime = !rec.intention;
             rec.intention = text;
@@ -321,6 +323,11 @@ export const useJourney = create<JourneyState>()(
 
         submitReflection: (learned, virtue, improve) =>
           apply((draft, today) => {
+            if (
+              !isMeaningful(learned, TEXT_MIN.reflection) ||
+              !isMeaningful(virtue, TEXT_MIN.reflection) ||
+              !isMeaningful(improve, TEXT_MIN.reflection)
+            ) return;
             const rec = dayRec(draft, today);
             const firstTime = !rec.reflection;
             rec.reflection = { learned, virtue, improve };
@@ -368,6 +375,7 @@ export const useJourney = create<JourneyState>()(
         submitCapstone: (key, text) =>
           apply((draft, today) => {
             if (draft.capstones[key]) return;
+            if (!isMeaningful(text, TEXT_MIN.capstone)) return;
             draft.capstones[key] = { text, day: today };
             draft.xp += XP_FOR.capstone;
             draft.harmonyPoints += HARMONY_FOR.capstone;

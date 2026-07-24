@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { isJunkName } from '../engine/textQuality';
 
 interface ProfileState {
   name: string | null;
@@ -14,7 +15,11 @@ export const useProfile = create<ProfileState>()(
     (set) => ({
       name: null,
       hasSetName: false,
-      setName: (name) => set({ name: name && name.trim() ? name.trim().slice(0, 40) : null, hasSetName: true }),
+      setName: (name) => {
+        const trimmed = name?.trim() ?? '';
+        if (trimmed && isJunkName(trimmed)) return; // reject junk, keep prior name
+        set({ name: trimmed ? trimmed.slice(0, 40) : null, hasSetName: true });
+      },
     }),
     { name: 'journey-profile', version: 1 },
   ),

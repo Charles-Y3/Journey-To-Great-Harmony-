@@ -3,7 +3,7 @@ import { useJourney } from '../state/store';
 import { useT } from '../i18n/useT';
 import { continueBtn, minLengthHint, capstoneSubmitBtn } from '../i18n/strings';
 import { XP_FOR } from '../engine/progression';
-import { meaningfulLength } from '../engine/textQuality';
+import { meaningfulLength, TEXT_MIN } from '../engine/textQuality';
 
 export function ProgressBar({
   value,
@@ -95,8 +95,6 @@ export function CelebrationOverlay() {
   );
 }
 
-const CAPSTONE_MIN = 40;
-
 /** Shared modal for writing a longer "capstone" reflection that gates an era or branch-mastery badge. */
 export function CapstoneModal({
   name,
@@ -119,10 +117,10 @@ export function CapstoneModal({
       </h2>
       <p>{prompt}</p>
       <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('capstonePlaceholder')} />
-      <p className="small muted">{minLengthHint(locale, meaningfulLength(text), CAPSTONE_MIN)}</p>
+      <p className="small muted">{minLengthHint(locale, meaningfulLength(text), TEXT_MIN.capstone)}</p>
       <button
         className="btn btn-primary"
-        disabled={meaningfulLength(text) < CAPSTONE_MIN}
+        disabled={meaningfulLength(text) < TEXT_MIN.capstone}
         onClick={() => onSubmit(text.trim())}
       >
         {capstoneSubmitBtn(locale, XP_FOR.capstone)}

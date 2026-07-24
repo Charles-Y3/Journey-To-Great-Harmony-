@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useProfile } from '../../state/profileStore';
 import { useT } from '../../i18n/useT';
+import { isJunkName } from '../../engine/textQuality';
 
 /**
  * Second onboarding step, shown once after the language gate: asks the
@@ -12,6 +13,7 @@ export default function NameGate() {
   const { t } = useT();
   const setName = useProfile((s) => s.setName);
   const [text, setText] = useState('');
+  const junk = text.trim() !== '' && isJunkName(text);
 
   return (
     <div className="gate">
@@ -27,11 +29,12 @@ export default function NameGate() {
           maxLength={40}
           autoFocus
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && text.trim()) setName(text);
+            if (e.key === 'Enter' && text.trim() && !isJunkName(text)) setName(text);
           }}
         />
+        {junk && <p className="small muted">{t('nameJunkHint')}</p>}
         <div className="gate-options" style={{ marginTop: 16 }}>
-          <button className="btn btn-primary" disabled={!text.trim()} onClick={() => setName(text)}>
+          <button className="btn btn-primary" disabled={!text.trim() || junk} onClick={() => setName(text)}>
             {t('nameGateContinue')}
           </button>
           <button className="btn" onClick={() => setName(null)}>
