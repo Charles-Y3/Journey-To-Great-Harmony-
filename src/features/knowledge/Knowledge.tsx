@@ -1,8 +1,16 @@
 import { useState } from 'react';
 import { TOPICS } from '../../data/knowledgeTree';
 import type { Topic, Lesson } from '../../data/types';
-import { useJourney } from '../../state/store';
-import { isTopicCompleted, isTopicUnlocked, isBranchMastered, branchCapstoneKey } from '../../state/selectors';
+import { useJourney, useToday } from '../../state/store';
+import {
+  isTopicCompleted,
+  isTopicUnlocked,
+  isBranchMastered,
+  branchCapstoneKey,
+  lessonsCompletedToday,
+  DAILY_LESSON_CAP,
+  type JourneyData,
+} from '../../state/selectors';
 import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import {
@@ -14,7 +22,7 @@ import {
 } from '../../i18n/strings';
 import { shuffledIndices } from '../../engine/quiz';
 
-function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; onDone: () => void }) {
+function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done: boolean; onDone: () => void; capReached: boolean }) {
   const [order, setOrder] = useState(() => shuffledIndices(lesson.question.options.en.length));
   const [picked, setPicked] = useState<number | null>(null);
   const [reflectionText, setReflectionText] = useState('');
@@ -60,9 +68,13 @@ function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; o
           <h4>{t('reflectHeading')}</h4>
           <p className="small muted">{L(lesson.reflection)}</p>
           <textarea rows={2} value={reflectionText} onChange={(e) => setReflectionText(e.target.value)} placeholder={t('reflectionOptionalPlaceholder')} />
-          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone()}>
-            {t('completeLessonBtn')}
-          </button>
+          {capReached ? (
+            <p className="small muted" style={{ marginTop: 10 }}>{t('knowledgeDailyCapNote')}</p>
+          ) : (
+            <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone()}>
+              {t('completeLessonBtn')}
+            </button>
+          )}
         </>
       )}
       {done && (
@@ -74,7 +86,7 @@ function LessonView({ lesson, done, onDone }: { lesson: Lesson; done: boolean; o
   );
 }
 
-function TopicModal({ topic, onClose }: { topic: Topic; onClose: () => void }) {
+function TopicModal({ topic, onClose, capReached }: { topic: Topic; onClose: () => void; capReached: boolean }) {
   const completedLessons = useJourney((s) => s.completedLessons);
   const completeLesson = useJourney((s) => s.completeLesson);
   const [openLesson, setOpenLesson] = useState<Lesson | null>(null);
@@ -87,7 +99,12 @@ function TopicModal({ topic, onClose }: { topic: Topic; onClose: () => void }) {
           <button className="btn" style={{ marginBottom: 12 }} onClick={() => setOpenLesson(null)}>
             {backToTopic(locale, L(topic.name))}
           </button>
-          <LessonView lesson={openLesson} done={completedLessons.includes(openLesson.id)} onDone={() => completeLesson(openLesson.id, true)} />
+          <LessonView
+            lesson={openLesson}
+            done={completedLessons.includes(openLesson.id)}
+            onDone={() => completeLesson(openLesson.id, true)}
+            capReached={capReached}
+          />
         </>
       ) : (
         <>
@@ -141,6 +158,9 @@ export default function Knowledge() {
   const [open, setOpen] = useState<Topic | null>(null);
   const [capstoneBranch, setCapstoneBranch] = useState<Topic | null>(null);
   const { t, L, locale } = useT();
+  const today = useToday();
+  const data = useJourney() as unknown as JourneyData;
+  const capReached = lessonsCompletedToday(data, today) >= DAILY_LESSON_CAP;
 
   const root = TOPICS.find((t) => t.id === 'wisdom')!;
   const branches: { id: Topic['branch'] }[] = [{ id: 'compassion' }, { id: 'character' }, { id: 'understanding' }];
@@ -152,6 +172,7 @@ export default function Knowledge() {
       <PageHeader emoji="🌳" title={t('knowledgeTitle')} subtitle={t('knowledgeSubtitle')} />
       <div className="card">
         <ProgressBar value={completedLessons.length} max={totalLessons} label={knowledgeProgressLabel(locale, completedLessons.length, totalLessons)} />
+        {capReached && <p className="small muted" style={{ marginTop: 8 }}>{t('knowledgeDailyCapNote')}</p>}
       </div>
 
       <div className="tree-branch">
@@ -180,7 +201,7 @@ export default function Knowledge() {
         );
       })}
 
-      {open && <TopicModal topic={open} onClose={() => setOpen(null)} />}
+      {open && <TopicModal topic={open} onClose={() => setOpen(null)} capReached={capReached} />}
       {capstoneBranch && (
         <CapstoneModal
           name={L(capstoneBranch.name)}

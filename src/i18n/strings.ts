@@ -208,6 +208,10 @@ export const UI = {
   lessonCompleteLabel: localized('Lesson complete ✓', '本课已完成 ✓'),
   backTo: localized('Back to', '返回'),
   lockedTopic: localized('Complete the topic above to unlock.', '完成上方主题即可解锁。'),
+  knowledgeDailyCapNote: localized(
+    "You've reached today's lesson limit — come back tomorrow to continue.",
+    '你今天的课程额度已用完 — 明天再回来继续吧。',
+  ),
 
   // ── Timeline ──────────────────────────────────────────────────────
   timelineTitle: localized('The Wisdom Timeline', '智慧时间线'),

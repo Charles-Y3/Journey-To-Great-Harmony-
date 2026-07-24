@@ -36,6 +36,26 @@ export const TOPICS: Topic[] = [
           '想一想你所认识的最有智慧的人。是他们做了什么 — 而不仅仅是知道什么 — 让他们显得有智慧？',
         ),
       },
+      {
+        id: 'wisdom-2',
+        title: localized('Wisdom in Action', '行动中的智慧'),
+        reading: localized(
+          "Wisdom has three interwoven aspects, each explored further ahead on this path: compassion (the heart's connection to others), character (integrity under pressure), and understanding (clear sight of self and world). None is complete alone — compassion without character collapses into sentimentality with no follow-through; character without compassion hardens into rigid coldness; understanding without either becomes clever but empty. The Confucian ideal of ren 仁 in fact requires all three moving together: care, discipline, and clear judgment.",
+          '智慧有三个相互交织的面向，在这条路的前方会各自展开：慈悲（心与他人的连结）、品格（压力之下的正直），以及理解（对自己与世界的清晰看见）。三者缺一都不完整 — 没有品格的慈悲，会沦为毫无实际行动的多愁善感；没有慈悲的品格，会硬化为僵冷无情；没有前两者的理解，则会变得聪明却空洞。孔子「仁」的理想，其实正要求这三者同时运作：关怀、自律，与清明的判断力。',
+        ),
+        question: {
+          q: localized('Why is compassion without character incomplete, according to this lesson?', '根据本课，为何没有品格的慈悲是不完整的？'),
+          options: localized(
+            ['It collapses into sentimentality with no follow-through', 'It becomes too disciplined', 'It requires no clear judgment', "There's no difference"],
+            ['它会沦为毫无实际行动的多愁善感', '它变得过于自律', '它不需要清明的判断力', '两者并无区别'],
+          ),
+          answer: 0,
+        },
+        reflection: localized(
+          'Of the three — compassion, character, understanding — which do you feel is currently your strongest, and which most needs your attention?',
+          '在慈悲、品格与理解这三者之中，你觉得目前哪一项是你最擅长的？哪一项最需要你的关注？',
+        ),
+      },
     ],
   },
 
@@ -72,6 +92,26 @@ export const TOPICS: Topic[] = [
           '什么时候有人曾对你展现真正的慈悲？这如何改变了你对人的看法？',
         ),
       },
+      {
+        id: 'compassion-2',
+        title: localized('From Feeling to World', '从感受到世界'),
+        reading: localized(
+          "Compassion has a natural direction: outward, from the people nearest you to those you may never meet. The Confucian idea that \"love has gradations\" (爱有差等) does not excuse neglecting strangers — it recognizes that compassion is trained first in the family, then extended ring by ring, like ripples on a pond, until — in the vision of Datong 大同 — even a stranger's parents are cared for as one's own. Mencius warned against the opposite error too: a compassion so abstract it loves \"humanity\" while ignoring the person actually in front of you is not yet real compassion at all.",
+          '慈悲有其自然的方向：向外扩展，从离你最近的人，直到你或许永远不会遇见的人。儒家"爱有差等"的观念，并非为忽视陌生人开脱 — 它承认的是，慈悲首先在家庭中被训练，然后如池塘中的涟漪般，一圈一圈向外延伸，直到 — 在大同的理想中 — 连陌生人的父母，也被当作自己的亲人般照料。孟子也警惕另一种相反的错误：一种如此抽象、以至于爱着"人类"却忽视了眼前这个真实之人的慈悲，其实还算不上真正的慈悲。',
+        ),
+        question: {
+          q: localized('According to "love has gradations" (爱有差等), how should compassion be trained?', '根据"爱有差等"的观念，慈悲应当如何被培育？'),
+          options: localized(
+            ['First in the family, then extended outward ring by ring', 'Only toward strangers, never family', 'Equally to everyone from birth, with no order', 'It should not be trained at all'],
+            ['先在家庭中培育，再一圈一圈向外延伸', '只对陌生人，绝不对家人', '从出生起就毫无次序地平等对待所有人', '根本不需要被培育'],
+          ),
+          answer: 0,
+        },
+        reflection: localized(
+          "Whose 'ring' — family, neighbours, or strangers — most needs more of your compassion right now?",
+          '家人、邻居，还是陌生人 — 哪一个"圈层"，此刻最需要你多一分慈悲？',
+        ),
+      },
     ],
   },
   {
@@ -106,6 +146,26 @@ export const TOPICS: Topic[] = [
           '这一周，你可以每天对自己信守的一个小小承诺是什么？',
         ),
       },
+      {
+        id: 'character-2',
+        title: localized('Character Under Pressure', '压力之下的品格'),
+        reading: localized(
+          "True character rarely shows itself when life is easy — it reveals itself at the moment something might be gained by abandoning it: the unwitnessed shortcut, the lie that would go undetected, the blame that could be quietly redirected. Confucius said the junzi 君子 is \"anxious lest he fail in his duty,\" while the small-minded person is anxious only about being caught. Aristotle's answer was similar: courage is not the absence of fear but acting rightly in spite of it. Character, then, is not the trait of never being tempted — it is the trained habit of choosing rightly precisely when temptation is real and no one is watching.",
+          '真正的品格，很少在生活顺遂时显现 — 它显现的时刻，是当放弃它就能有所得、而无人会察觉之时：无人目睹的捷径、不会被发现的谎言、可以悄悄转嫁给他人的过失。孔子说，君子"忧道不忧贫"，唯恐自己未能尽责；而小人所忧虑的，只是被人发现。亚里士多德的答案与此相似：勇气不是没有恐惧，而是纵然恐惧仍能正确行事。因此，品格并非"从不受诱惑"的特质 — 它是一种被训练出来的习惯：正是在诱惑真实存在、且无人注视之时，依然选择做对的事。',
+        ),
+        question: {
+          q: localized('According to this lesson, when does true character actually reveal itself?', '根据本课，真正的品格究竟在何时显现？'),
+          options: localized(
+            ['In the moment something could be gained by abandoning it, unwitnessed', 'Only in public ceremonies', 'Only when a person is praised', 'It never truly reveals itself'],
+            ['在无人察觉、放弃它便能有所得的那一刻', '只在公开的仪式中', '只在受到称赞时', '它从不会真正显现'],
+          ),
+          answer: 0,
+        },
+        reflection: localized(
+          'Recall a recent moment when no one would have noticed if you had cut a corner. What did you choose, and why?',
+          '回想最近一次，即便你抄了近路也不会有人发现的时刻。你当时做了怎样的选择？为什么？',
+        ),
+      },
     ],
   },
   {
@@ -138,6 +198,26 @@ export const TOPICS: Topic[] = [
         reflection: localized(
           'What is one assumption about someone in your life that might deserve a second look?',
           '在你生活中，有哪一个关于某人的假设，也许值得你再重新审视一次？',
+        ),
+      },
+      {
+        id: 'understanding-2',
+        title: localized('Seeing Past Your Own Certainty', '看穿自己的确定'),
+        reading: localized(
+          'The hardest thing to see clearly is your own blind spot — by definition, you cannot see what you cannot see. Confucius offered a practical remedy: surround yourself with people willing to disagree honestly, since "a gentleman helps others realize what is good in them, and does not help them towards what is bad." Socrates\' method depended entirely on this: he sought out people confident in their answers precisely because confidence, not doubt, most often hides an unexamined assumption. Real understanding therefore requires a strange discipline — treating your own certainty as a signal to look closer, not a reason to stop looking.',
+          '最难看清的，是自己的盲点 — 因为根据定义，你无法看见自己看不见的东西。孔子提供了一个切实的方法：让自己身边围绕着愿意诚实提出异议的人，因为"君子成人之美，不成人之恶"。苏格拉底的方法，正是完全建立在这一点之上：他专门寻找那些对自己答案深信不疑的人，正因为往往是自信、而非怀疑，最常掩藏着一个未经省察的假设。因此，真正的理解，需要一种奇特的自律 — 把自己的确定感，当作需要再仔细看看的信号，而非可以停止探究的理由。',
+        ),
+        question: {
+          q: localized('According to this lesson, what should strong personal certainty prompt you to do?', '根据本课，强烈的个人确定感应当促使你做什么？'),
+          options: localized(
+            ['Look closer, since certainty often hides an unexamined assumption', 'Stop investigating immediately', 'Assume you are correct without question', 'Avoid people who disagree with you'],
+            ['更仔细地查看，因为确定感常常掩藏着未经省察的假设', '立刻停止探究', '不加质疑地认定自己是对的', '避开与你意见不同的人'],
+          ),
+          answer: 0,
+        },
+        reflection: localized(
+          'What is something you feel very certain about, that you have not examined in years?',
+          '有什么事，是你深信不疑、却已多年未曾重新审视过的？',
         ),
       },
     ],
