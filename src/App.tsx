@@ -322,7 +322,12 @@ function ReminderSection() {
         <strong>{t('reminderMorningLabel')}</strong>
         <p className="small muted reminder-row-desc">{t('reminderMorningDesc')}</p>
         <div className="reminder-row-controls">
-          <input type="time" value={morningTime} onChange={(e) => setMorningTime(e.target.value)} />
+          <input
+            type="time"
+            className="settings-control-select"
+            value={morningTime}
+            onChange={(e) => setMorningTime(e.target.value)}
+          />
           <button className="btn" onClick={() => addToCalendar('morning')}>
             {t('settingsReminderAddBtn')}
           </button>
@@ -333,7 +338,12 @@ function ReminderSection() {
         <strong>{t('reminderEveningLabel')}</strong>
         <p className="small muted reminder-row-desc">{t('reminderEveningDesc')}</p>
         <div className="reminder-row-controls">
-          <input type="time" value={eveningTime} onChange={(e) => setEveningTime(e.target.value)} />
+          <input
+            type="time"
+            className="settings-control-select"
+            value={eveningTime}
+            onChange={(e) => setEveningTime(e.target.value)}
+          />
           <button className="btn" onClick={() => addToCalendar('evening')}>
             {t('settingsReminderAddBtn')}
           </button>
@@ -402,7 +412,7 @@ function MusicSection() {
       <h3>{t('settingsMusicTitle')}</h3>
       <p className="small muted">{t('settingsMusicDesc')}</p>
       <select
-        className="music-track-select"
+        className="music-track-select settings-control-select"
         value={musicTrack ?? MUSIC_OFF}
         onChange={(e) => selectTrack(e.target.value === MUSIC_OFF ? null : (e.target.value as MusicTrackId))}
       >
@@ -507,10 +517,7 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <MusicSection />
       <ShareSection />
       <BackupSection />
-      <div className="card">
-        <h3>{t('settingsInstallTitle')}</h3>
-        <p className="small muted">{t('settingsInstallDesc')}</p>
-      </div>
+      <InstallSection />
       <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
         <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
@@ -565,6 +572,84 @@ function OfflineBanner() {
   }, []);
   if (!offline) return null;
   return <div className="offline-banner">{t('offlineBanner')}</div>;
+}
+
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+};
+
+function isIosDevice(): boolean {
+  const ua = navigator.userAgent;
+  const iOS = /iPad|iPhone|iPod/.test(ua);
+  const iPadOs = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+  return iOS || iPadOs;
+}
+
+function isStandaloneDisplay(): boolean {
+  return (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    // iOS Safari
+    Boolean((navigator as Navigator & { standalone?: boolean }).standalone)
+  );
+}
+
+function InstallSection() {
+  const { t } = useT();
+  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installed, setInstalled] = useState(isStandaloneDisplay());
+  const [iosHint, setIosHint] = useState(false);
+  const [fallbackHint, setFallbackHint] = useState(false);
+
+  useEffect(() => {
+    const onBip = (e: Event) => {
+      e.preventDefault();
+      setDeferred(e as BeforeInstallPromptEvent);
+    };
+    const onInstalled = () => {
+      setInstalled(true);
+      setDeferred(null);
+    };
+    window.addEventListener('beforeinstallprompt', onBip);
+    window.addEventListener('appinstalled', onInstalled);
+    return () => {
+      window.removeEventListener('beforeinstallprompt', onBip);
+      window.removeEventListener('appinstalled', onInstalled);
+    };
+  }, []);
+
+  async function install() {
+    setIosHint(false);
+    setFallbackHint(false);
+    if (installed) return;
+    if (deferred) {
+      await deferred.prompt();
+      await deferred.userChoice;
+      setDeferred(null);
+      return;
+    }
+    if (isIosDevice()) {
+      setIosHint(true);
+      return;
+    }
+    setFallbackHint(true);
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsInstallTitle')}</h3>
+      <p className="small muted">{t('settingsInstallDesc')}</p>
+      {installed ? (
+        <p className="pill">{t('settingsInstallDone')}</p>
+      ) : (
+        <button className="btn btn-primary" onClick={() => void install()}>
+          {t('settingsInstallBtn')}
+        </button>
+      )}
+      {iosHint && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsInstallIosHint')}</p>}
+      {fallbackHint && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsInstallFallbackHint')}</p>}
+    </div>
+  );
 }
 
 export default function App() {

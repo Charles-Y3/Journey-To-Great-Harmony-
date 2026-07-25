@@ -1,6 +1,6 @@
 import type { Stats, Topic } from '../data/types';
-import { TOPICS } from '../data/knowledgeTree';
-import { TIMELINE } from '../data/timeline';
+import { ALL_LESSONS, TOPICS } from '../data/knowledgeTree';
+import { ALL_POINTS, TIMELINE } from '../data/timeline';
 import {
   RANKS,
   rankIndexForXp,
@@ -170,6 +170,12 @@ export function regionChallengeMet(regionId: string, d: JourneyData): boolean {
       return s.challengesDone >= 15 && s.encouragementsSent >= 5;
     case 'bridge':
       return s.encouragementsSent >= 10 && rankIndexForXp(s.xp) >= RANKS.findIndex((r) => r.id === 'cultivator');
+    case 'scrolls':
+      return s.lessons >= ALL_LESSONS.length;
+    case 'horizon':
+      return s.timelinePoints >= ALL_POINTS.length;
+    case 'sanctuary':
+      return s.streakBest >= 21 && s.reflections >= 20;
     case 'city':
       return (
         rankIndexForXp(s.xp) >= RANKS.findIndex((r) => r.id === 'contributor') &&

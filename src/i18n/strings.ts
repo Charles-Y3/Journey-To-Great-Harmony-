@@ -20,7 +20,7 @@ export const UI = {
   navForest: localized('Forest', '森林'),
   navMap: localized('Map', '地图'),
   navWorld: localized('World', '世界'),
-  navCommunity: localized('Companions', '同行'),
+  navCommunity: localized('Companions', '同修'),
   navCollection: localized('Collection', '收藏'),
   navMore: localized('More', '更多'),
 
@@ -60,7 +60,7 @@ export const UI = {
   settingsNameTitle: localized('Name', '姓名'),
   settingsNameDesc: localized(
     'How Companions of the Way see you in the shared Great Harmony World.',
-    '这是「道上同行」在共享大同世界中看到你的名字。',
+    '这是「道上同修」在共享大同世界中看到你的名字。',
   ),
   settingsNameSave: localized('Save', '保存'),
 
@@ -126,7 +126,7 @@ export const UI = {
   nameGateTitle: localized('What should we call you?', '我们该如何称呼你？'),
   nameGateSubtitle: localized(
     'This is how Companions of the Way will know you in the shared world.',
-    '这将是「道上同行」在共享世界中认出你的名字。',
+    '这将是「道上同修」在共享世界中认出你的名字。',
   ),
   nameGatePlaceholder: localized('Your name', '你的名字'),
   nameGateContinue: localized('Continue', '继续'),
@@ -149,7 +149,7 @@ export const UI = {
   harmonyInfoTitle: localized('🌏 Your Harmony Contribution', '🌏 你的和谐贡献'),
   harmonyInfoBody: localized(
     'This is how many harmony points you have personally contributed to the shared Great Harmony World — earned through lessons, challenges, reflections, and encouragement sent to fellow travellers. It adds to the community\'s own growth to advance it through four stages: Village, Town, City, and World (see the World tab).',
-    '这是你个人为共享的大同世界，贡献了多少和谐点 — 通过课程、挑战、反思，以及向同行者送出的鼓励所获得。它与社群自身的成长相加，共同推动世界经历四个阶段：村庄、城镇、城市，最终迈向「世界」（详见「世界」页面）。',
+    '这是你个人为共享的大同世界，贡献了多少和谐点 — 通过课程、挑战、反思，以及向同修送出的鼓励所获得。它与社群自身的成长相加，共同推动世界经历四个阶段：村庄、城镇、城市，最终迈向「世界」（详见「世界」页面）。',
   ),
 
   // ── Today ─────────────────────────────────────────────────────────
@@ -200,7 +200,7 @@ export const UI = {
   keepExploringTitle: localized('Keep exploring', '继续探索'),
   keepExploringBody: localized(
     "Study humanity's story on the Wisdom Timeline, walk the Journey Map, cheer on fellow travellers in the Community, or browse your Collection.",
-    '在智慧时间线上研读人类的故事，走上旅程地图，在社群中为同行者加油，或浏览你的收藏。',
+    '在智慧时间线上研读人类的故事，走上旅程地图，在社群中为同修加油，或浏览你的收藏。',
   ),
 
   // ── Practice ──────────────────────────────────────────────────────
@@ -363,8 +363,18 @@ export const UI = {
   ),
   settingsInstallTitle: localized('Install on your phone', '安装到手机'),
   settingsInstallDesc: localized(
-    'Add this journey to your home screen for offline use. On iPhone: Safari → Share → Add to Home Screen. On Android: Chrome menu → Install app / Add to Home screen.',
-    '把这段旅程加到主屏幕，以便离线使用。iPhone：Safari → 分享 → 添加到主屏幕。Android：Chrome 菜单 → 安装应用 / 添加到主屏幕。',
+    'Add this journey to your home screen for offline use. Tap Install — your browser will handle the rest when it can.',
+    '把这段旅程加到主屏幕，以便离线使用。点击「安装」— 浏览器会在支持时为你完成安装。',
+  ),
+  settingsInstallBtn: localized('Install app', '安装应用'),
+  settingsInstallDone: localized('Installed on this device', '已安装到此设备'),
+  settingsInstallIosHint: localized(
+    'On iPhone / iPad: tap Share, then “Add to Home Screen”.',
+    '在 iPhone / iPad：点击「分享」，再选择「添加到主屏幕」。',
+  ),
+  settingsInstallFallbackHint: localized(
+    'Your browser did not show an install prompt. Try Chrome or Edge on Android, or use the browser menu → Install app.',
+    '浏览器未弹出安装提示。请在 Android 上使用 Chrome 或 Edge，或打开浏览器菜单 → 安装应用。',
   ),
   seasonalVirtueTitle: localized('Virtue of the season', '当季德行'),
   yearlyReviewTitle: localized('Yearly harmony review', '年度和谐回顾'),
@@ -383,13 +393,13 @@ export const UI = {
   journalPromptDefault1: localized('What kindness will you practise today?', '你今天将践行怎样的善意？'),
   journalPromptDefault2: localized('Where can you be a little more patient?', '你能在哪里多一点耐心？'),
   journalPromptDefault3: localized('What is one honest step toward harmony?', '迈向和谐的一步真诚行动是什么？'),
-  companionYearsLabel: localized('years on the Way together', '年同行于道'),
-  companionYearsNew: localized('Newly walking beside you', '初与你同行'),
+  companionYearsLabel: localized('years on the Way together', '年同修于道'),
+  companionYearsNew: localized('Newly walking beside you', '初与你同修'),
   offlineBanner: localized('You’re offline — your journey continues here.', '你处于离线状态 — 旅程仍可在此继续。'),
   civicTapSchool: localized('A mind that grows here teaches another. Revisit the Knowledge Path when you can.', '在此成长的心灵，也将教导他人。有空时再走一走知识之路。'),
   civicTapLibrary: localized('From the shelves of wisdom', '来自智慧的书架'),
   civicTapGarden: localized('Patience tends this garden. Visit your Virtue Forest.', '耐心照料着这座花园。去看看你的德行森林。'),
-  civicTapCare: localized('Compassion built this place. Send encouragement to a companion.', '慈悲建成此地。向一位同行者送出鼓励吧。'),
+  civicTapCare: localized('Compassion built this place. Send encouragement to a companion.', '慈悲建成此地。向一位同修送出鼓励吧。'),
   civicTapBridge: localized('This bridge is built by encouragement given.', '这座桥，由给予的鼓励建成。'),
   civicTapHall: localized('Eras you have crowned with reflection', '你以反思加冕过的时代'),
   civicTapLocked: localized('Not yet built — keep contributing harmony.', '尚未建成 — 请继续贡献和谐。'),
@@ -509,14 +519,14 @@ export const UI = {
   ),
   worldFooter: localized(
     "You'll always have fellow travellers here to grow alongside, cheering you on and building this world with you. With community accounts in a future version, you'll also be able to walk this road with real friends and family.",
-    '在这里，你永远都会有同行的旅人，与你一起成长，为你加油，一同建设这个世界。未来加入社群账号功能后，你也将能与真实的亲友一同走上这条路。',
+    '在这里，你永远都会有同修旅人，与你一起成长，为你加油，一同建设这个世界。未来加入社群账号功能后，你也将能与真实的亲友一同走上这条路。',
   ),
 
   // ── Community ─────────────────────────────────────────────────────
-  communityTitle: localized('Companions of the Way', '道上同行'),
+  communityTitle: localized('Companions of the Way', '道上同修'),
   communitySubtitle: localized(
     'Archetypal fellow travellers on the road to Great Harmony — companions of the Way, not a contest of worth.',
-    '通往大同之路上的典型同行者 — 道上的伙伴，而非价值的较量。',
+    '通往大同之路上的典型同修 — 道上的伙伴，而非价值的较量。',
   ),
   leaderboardsTitle: localized('Shared dedication', '共同的坚持'),
   leaderboardsFooter: localized(
@@ -526,7 +536,7 @@ export const UI = {
   sendEncouragementTitle: localized('Send encouragement 🌸', '送出鼓励 🌸'),
   sendEncouragementDesc: localized(
     'Celebrate a companion of the Way. Encouragement costs nothing and builds the world (+2 XP, +5 harmony).',
-    '为道上的同行者喝彩。鼓励不花费任何代价，还能建设世界 (+2 经验, +5 和谐)。',
+    '为道上的同修喝彩。鼓励不花费任何代价，还能建设世界 (+2 经验, +5 和谐)。',
   ),
   peerTierActive: localized('active', '活跃'),
   peerTierNormal: localized('regular', '常规'),
@@ -546,7 +556,7 @@ export const UI = {
   catGrowthDesc: localized('Overall personal cultivation', '整体的个人修养'),
   groupsBody: localized(
     '🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles are coming with community accounts in a future version. Until then, these Companions of the Way are archetypal fellow travellers — always ready to learn, practise, and grow alongside you.',
-    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈，将在未来加入社群账号功能后到来。在那之前，这些「道上同行」是典型的旅伴形象 — 永远愿意与你一起学习、践行、共同成长。',
+    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈，将在未来加入社群账号功能后到来。在那之前，这些「道上同修」是典型的旅伴形象 — 永远愿意与你一起学习、践行、共同成长。',
   ),
 
   // ── Collection ────────────────────────────────────────────────────

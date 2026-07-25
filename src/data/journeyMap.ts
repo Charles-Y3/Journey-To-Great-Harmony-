@@ -88,7 +88,7 @@ export const REGIONS: MapRegion[] = [
     ),
     challenge: localized(
       'Complete 15 daily virtue challenges and send encouragement to 5 fellow travellers.',
-      '完成15次每日德行挑战，并为5位同行者送出鼓励。',
+      '完成15次每日德行挑战，并为5位同修送出鼓励。',
     ),
     rewardXp: 60,
     epilogue: localized(
@@ -108,16 +108,76 @@ export const REGIONS: MapRegion[] = [
     ),
     challenge: localized(
       'Send encouragement to 10 fellow travellers and reach the rank of Cultivator.',
-      '为10位同行者送出鼓励，并达到「耕耘者」段位。',
+      '为10位同修送出鼓励，并达到「修行者」段位。',
     ),
     rewardXp: 75,
     epilogue: localized('The rail held, because enough hands were on it. It always does.', '栏杆稳住了，因为有足够多的手扶着它。它向来如此。'),
   },
   {
+    id: 'scrolls',
+    name: localized('Hall of Teachings', '教导之厅'),
+    emoji: '📜',
+    unlockXp: 1700,
+    tagline: localized('Where the Knowledge Path becomes a home.', '知识之路化为归处之地。'),
+    story: localized(
+      'Shelves of teachings line a quiet hall — compassion, character, understanding. Nothing here is stored for display; each scroll asks to be lived. A plaque reads: "To learn and to practise is one road."',
+      '静厅两侧排列着教导的卷轴 — 慈悲、品格、理解。这里的一切不是为陈列而存；每一卷都邀请被活出来。匾额写着：「学与行，本是一条路。」',
+    ),
+    challenge: localized(
+      'Complete every lesson on the Knowledge Path.',
+      '完成知识之路上的每一课。',
+    ),
+    rewardXp: 80,
+    epilogue: localized(
+      'The hall did not grow quieter when you finished — you did.',
+      '你走完时，厅堂并未更静 — 是你更静了。',
+    ),
+  },
+  {
+    id: 'horizon',
+    name: localized('Horizon of Ages', '世代之涯'),
+    emoji: '🌅',
+    unlockXp: 2400,
+    tagline: localized('Where the Wisdom Timeline opens wide.', '智慧时间线开阔之处。'),
+    story: localized(
+      'From a high ridge you see the long river of human wisdom — eras like bends of light. The wind carries names you have studied. To stand here is to know you are one chapter among many, and still responsible for your own.',
+      '从高脊望去，人类智慧的长河铺开 — 各个时代如光的弯折。风里有你研读过的名字。站在此处，是明白自己只是众多篇章中的一章，却仍要对这一章负责。',
+    ),
+    challenge: localized(
+      'Complete the foundation level of every Wisdom Timeline point.',
+      '完成智慧时间线每一个节点的基础关。',
+    ),
+    rewardXp: 90,
+    epilogue: localized(
+      'The horizon did not end — it only taught you how far a life can see.',
+      '天涯并未终结 — 它只是教你，一生可以望见多远。',
+    ),
+  },
+  {
+    id: 'sanctuary',
+    name: localized('Sanctuary of Practice', '践行圣境'),
+    emoji: '⛩️',
+    unlockXp: 3000,
+    tagline: localized('Where forest, world, and vow meet.', '森林、世界与心愿交会之处。'),
+    story: localized(
+      'A simple gate opens onto ground you have already been tending — your forest, your contributions, your evening honesty. The sanctuary asks for no new spectacle, only that practice has become a place you can return to.',
+      '一道朴素的门，通向你已在照料的土地 — 你的森林、你的贡献、你夜间的诚实。圣境不索求新的奇观，只问：践行是否已成你可以归来的地方。',
+    ),
+    challenge: localized(
+      'Reach a 21-day streak and write 20 evening reflections.',
+      '达成连续21天的修习，并写下20篇夜间反思。',
+    ),
+    rewardXp: 95,
+    epilogue: localized(
+      'You do not leave the sanctuary; you carry its stillness into ordinary days.',
+      '你并未离开圣境；你把它的静定，带进了平常日子。',
+    ),
+  },
+  {
     id: 'city',
     name: localized('City of Harmony', '大同之城'),
     emoji: '🏙️',
-    unlockXp: 1800,
+    unlockXp: 3800,
     tagline: localized('Where the journey becomes a home.', '旅程化为归宿的地方。'),
     story: localized(
       'At last: a city with open gates and no walls. In its squares, the old are cared for, the young are taught, and strangers are greeted as kin — the Great Harmony 大同, not as a dream but as a daily practice. You understand now that this city is not a destination. It is built, everywhere, by people who took the same road you did: learn, cultivate, practise, contribute.',
@@ -127,7 +187,7 @@ export const REGIONS: MapRegion[] = [
       "Reach the rank of Contributor and complete every other region's challenge.",
       '达到「贡献者」段位，并完成其他所有区域的挑战。',
     ),
-    rewardXp: 100,
+    rewardXp: 120,
     epilogue: localized(
       'This city was never really a place on the map — it was the shape every other ground was quietly building toward.',
       '这座城，从来就不真正是地图上的一处地方 — 它是其他每一片土地，一直在悄悄建造着的那个形状。',

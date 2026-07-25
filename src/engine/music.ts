@@ -1,10 +1,7 @@
 import type { MusicTrackId } from '../state/soundStore';
 
-// A small, free, generative ambient-music engine: everything here is
-// synthesized locally with the Web Audio API — oscillators, filters, and a
-// noise buffer — rather than streaming or bundling licensed audio files.
-// It only ever starts from a user gesture (the Settings play button),
-// which also satisfies browser autoplay restrictions.
+// Generative ambient music via the Web Audio API — soft, sparse, and
+// consonant. Starts only from a user gesture (Settings track select).
 
 interface ActiveTrack {
   stop: () => void;
@@ -20,15 +17,18 @@ function getContext(): AudioContext {
     const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     ctx = new Ctor();
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.35;
-    masterGain.connect(ctx.destination);
+    masterGain.gain.value = 0.28;
+    const soft = ctx.createGain();
+    soft.gain.value = 0.7;
+    masterGain.connect(soft);
+    soft.connect(ctx.destination);
   }
   if (ctx.state === 'suspended') void ctx.resume();
   return ctx;
 }
 
-const FADE_IN = 2.5;
-const FADE_OUT = 1.2;
+const FADE_IN = 4;
+const FADE_OUT = 2;
 
 function fadeInGain(audioCtx: AudioContext, target: number): GainNode {
   const g = audioCtx.createGain();
@@ -43,39 +43,49 @@ function fadeOutAndStop(audioCtx: AudioContext, gain: GainNode, cleanup: () => v
   gain.gain.cancelScheduledValues(now);
   gain.gain.setValueAtTime(gain.gain.value, now);
   gain.gain.linearRampToValueAtTime(0, now + FADE_OUT);
-  window.setTimeout(cleanup, (FADE_OUT + 0.1) * 1000);
+  window.setTimeout(cleanup, (FADE_OUT + 0.2) * 1000);
 }
 
-/** Soft, irregularly-spaced pentatonic bell tones, with silence between —
- * no continuous tone underneath. An earlier version kept a quiet drone
- * running under the plucks at all times, which read as an unwanted low
- * hum rather than part of the music; removed rather than just quieted. */
+/** Soft temple bell: sine + quiet octave, long decay, wide gaps. */
 function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const bellGain = fadeInGain(audioCtx, 0.3);
-  bellGain.connect(out);
+  const bellGain = fadeInGain(audioCtx, 0.16);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 1800;
+  filter.Q.value = 0.5;
+  bellGain.connect(filter);
+  filter.connect(out);
 
-  const pentatonic = [523.25, 587.33, 659.25, 783.99, 880.0]; // C D E G A (5th octave)
+  // Mid-low pentatonic — warmer, less piercing.
+  const pentatonic = [261.63, 293.66, 329.63, 392.0, 440.0]; // C D E G A
   let stopped = false;
   let timeoutId: number | null = null;
 
   function pluck() {
     if (stopped) return;
     const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    const env = audioCtx.createGain();
     const now = audioCtx.currentTime;
-    env.gain.setValueAtTime(0, now);
-    env.gain.linearRampToValueAtTime(0.5, now + 0.05);
-    env.gain.exponentialRampToValueAtTime(0.001, now + 3.2);
-    osc.frequency.value = freq;
-    osc.connect(env);
-    env.connect(bellGain);
-    osc.start(now);
-    osc.stop(now + 3.3);
-    timeoutId = window.setTimeout(pluck, 3500 + Math.random() * 4500);
+
+    const makePartial = (f: number, peak: number, dur: number) => {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = f;
+      const env = audioCtx.createGain();
+      env.gain.setValueAtTime(0, now);
+      env.gain.linearRampToValueAtTime(peak, now + 0.06);
+      env.gain.exponentialRampToValueAtTime(0.001, now + dur);
+      osc.connect(env);
+      env.connect(bellGain);
+      osc.start(now);
+      osc.stop(now + dur + 0.05);
+    };
+
+    makePartial(freq, 0.38, 5.5);
+    makePartial(freq * 2.003, 0.05, 3.2);
+
+    timeoutId = window.setTimeout(pluck, 5500 + Math.random() * 7000);
   }
-  timeoutId = window.setTimeout(pluck, 1200);
+  timeoutId = window.setTimeout(pluck, 2000);
 
   return {
     stop() {
@@ -86,53 +96,66 @@ function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
   };
 }
 
-/** A warm, layered pad: several softly detuned voices under a slow filter
- * sweep and a gentle vibrato-like wobble, for a "breathing" ambient bed.
- * Uses the same root/fifth/octave ratios as a clean, consonant chord (no
- * dissonant intervals close enough to beat against each other) — an
- * earlier version included a near-third interval that beat against the
- * other voices and read as a low humming/buzzing artifact rather than a
- * calm tone. */
+/** Warm sine pad — pure ratios, heavy lowpass, slow amplitude breath. */
 function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, level: number): ActiveTrack {
   const gain = fadeInGain(audioCtx, level);
   gain.connect(out);
 
+  const breathGain = audioCtx.createGain();
+  breathGain.gain.value = 1;
+  breathGain.connect(gain);
+
   const filter = audioCtx.createBiquadFilter();
   filter.type = 'lowpass';
-  filter.frequency.value = 700;
-  filter.Q.value = 0.5;
-  filter.connect(gain);
+  filter.frequency.value = 420;
+  filter.Q.value = 0.3;
+  filter.connect(breathGain);
 
-  // Root, fifth, octave, octave+fifth — all pure harmonic ratios, so no
-  // two voices sit close enough in pitch to beat against each other.
-  const ratios = [1, 1.5, 2, 3];
-  const oscs = ratios.map((ratio, i) => {
-    const osc = audioCtx.createOscillator();
-    osc.type = 'triangle';
-    osc.frequency.value = baseFreq * ratio;
-    osc.detune.value = (i - 1.5) * 2;
-    const oscGain = audioCtx.createGain();
-    oscGain.gain.value = 1 / ratios.length;
-    osc.connect(oscGain);
-    oscGain.connect(filter);
-    osc.start();
-    return osc;
+  // Soft stereo width via dual detuned voices into a shared filter.
+  const ratios = [1, 1.5, 2];
+  const oscs: OscillatorNode[] = [];
+  ratios.forEach((ratio, i) => {
+    for (const side of [-1, 1] as const) {
+      const osc = audioCtx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.value = baseFreq * ratio;
+      osc.detune.value = side * (2.5 + i * 0.4);
+      const oscGain = audioCtx.createGain();
+      oscGain.gain.value = ((i === 0 ? 1.0 : 0.55) / ratios.length) * 0.55;
+      const pan = audioCtx.createStereoPanner();
+      pan.pan.value = side * 0.35;
+      osc.connect(oscGain);
+      oscGain.connect(pan);
+      pan.connect(filter);
+      osc.start();
+      oscs.push(osc);
+    }
   });
 
   const filterLfo = audioCtx.createOscillator();
-  filterLfo.frequency.value = 0.05;
+  filterLfo.type = 'sine';
+  filterLfo.frequency.value = 0.035;
   const filterLfoGain = audioCtx.createGain();
-  filterLfoGain.gain.value = 220;
+  filterLfoGain.gain.value = 70;
   filterLfo.connect(filterLfoGain);
   filterLfoGain.connect(filter.frequency);
   filterLfo.start();
 
-  // A slow, subtle vibrato across all voices via detune, so the chord feels
-  // like it's gently breathing rather than perfectly static.
+  // Slow breath on level (additive on AudioParam around 1.0).
+  const breath = audioCtx.createOscillator();
+  breath.type = 'sine';
+  breath.frequency.value = 0.055;
+  const breathDepth = audioCtx.createGain();
+  breathDepth.gain.value = 0.18;
+  breath.connect(breathDepth);
+  breathDepth.connect(breathGain.gain);
+  breath.start();
+
   const vibrato = audioCtx.createOscillator();
-  vibrato.frequency.value = 0.12;
+  vibrato.type = 'sine';
+  vibrato.frequency.value = 0.07;
   const vibratoGain = audioCtx.createGain();
-  vibratoGain.gain.value = 2;
+  vibratoGain.gain.value = 0.9;
   vibrato.connect(vibratoGain);
   oscs.forEach((o) => vibratoGain.connect(o.detune));
   vibrato.start();
@@ -143,47 +166,62 @@ function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, leve
         oscs.forEach((o) => o.stop());
         filterLfo.stop();
         vibrato.stop();
+        breath.stop();
       });
     },
   };
 }
 
-/** Sparse, high, airy plucks with a soft stereo drift — wind chimes, not
- * looping noise, and no continuous tone bed underneath (an earlier version
- * layered a quiet pad chord under the chimes, which read as an unwanted
- * low hum rather than part of the music). */
+/** Airy wind chimes: soft attack, sparse rings, no bed tone. */
 function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const chimeGain = fadeInGain(audioCtx, 0.28);
-  chimeGain.connect(out);
+  const chimeGain = fadeInGain(audioCtx, 0.14);
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.value = 3200;
+  filter.Q.value = 0.4;
+  chimeGain.connect(filter);
+  filter.connect(out);
 
-  const pentatonic = [1046.5, 1174.66, 1318.51, 1567.98, 1760.0]; // C D E G A (6th octave)
+  const pentatonic = [523.25, 587.33, 659.25, 783.99, 880.0]; // C5–A5
   let stopped = false;
   let timeoutId: number | null = null;
 
   function ring() {
     if (stopped) return;
-    const notes = Math.random() < 0.3 ? 2 : 1; // occasionally two chimes ring close together
+    const notes = Math.random() < 0.2 ? 2 : 1;
     for (let n = 0; n < notes; n++) {
       const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
       const osc = audioCtx.createOscillator();
       osc.type = 'sine';
       const pan = audioCtx.createStereoPanner();
-      pan.pan.value = Math.random() * 1.6 - 0.8;
+      pan.pan.value = Math.random() * 1.2 - 0.6;
       const env = audioCtx.createGain();
-      const now = audioCtx.currentTime + n * 0.12;
+      const now = audioCtx.currentTime + n * 0.22;
       env.gain.setValueAtTime(0, now);
-      env.gain.linearRampToValueAtTime(0.22, now + 0.02);
-      env.gain.exponentialRampToValueAtTime(0.001, now + 2.6);
+      env.gain.linearRampToValueAtTime(0.12, now + 0.04);
+      env.gain.exponentialRampToValueAtTime(0.001, now + 4.0);
       osc.frequency.value = freq;
       osc.connect(env);
       env.connect(pan);
       pan.connect(chimeGain);
       osc.start(now);
-      osc.stop(now + 2.7);
+      osc.stop(now + 4.1);
+
+      const partial = audioCtx.createOscillator();
+      partial.type = 'sine';
+      partial.frequency.value = freq * 2.002;
+      const pEnv = audioCtx.createGain();
+      pEnv.gain.setValueAtTime(0, now);
+      pEnv.gain.linearRampToValueAtTime(0.025, now + 0.03);
+      pEnv.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
+      partial.connect(pEnv);
+      pEnv.connect(pan);
+      partial.start(now);
+      partial.stop(now + 2.1);
     }
-    timeoutId = window.setTimeout(ring, 2600 + Math.random() * 3800);
+    timeoutId = window.setTimeout(ring, 4500 + Math.random() * 6500);
   }
-  timeoutId = window.setTimeout(ring, 900);
+  timeoutId = window.setTimeout(ring, 1800);
 
   return {
     stop() {
@@ -195,7 +233,7 @@ function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
 }
 
 const BUILDERS: Record<MusicTrackId, (audioCtx: AudioContext, out: AudioNode) => ActiveTrack> = {
-  pad: (audioCtx, out) => buildPad(audioCtx, out, 98, 0.3), // G2-rooted warm pad
+  pad: (audioCtx, out) => buildPad(audioCtx, out, 65.41, 0.2), // C2-rooted warm pad
   bells: buildBells,
   chimes: buildChimes,
 };
@@ -216,7 +254,7 @@ export function stopMusic(): void {
 
 export function setMusicVolume(volume: number): void {
   if (!ctx || !masterGain) return;
-  masterGain.gain.setTargetAtTime(volume, ctx.currentTime, 0.1);
+  masterGain.gain.setTargetAtTime(volume * 0.28, ctx.currentTime, 0.12);
 }
 
 export function currentMusicTrack(): MusicTrackId | null {

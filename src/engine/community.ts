@@ -87,7 +87,7 @@ const FEED_ACTIONS: Localized<string>[] = [
   localized('wrote an evening reflection 🪞', '写下了一篇夜间反思 🪞'),
   localized('studied a point on the Wisdom Timeline ⏳', '在智慧时间线上研读了一个节点 ⏳'),
   localized('helped a neighbour today 🤲', '今天帮助了一位邻居 🤲'),
-  localized('sent encouragement to a fellow traveller 🌸', '为一位同行者送出了鼓励 🌸'),
+  localized('sent encouragement to a fellow traveller 🌸', '为一位同修送出了鼓励 🌸'),
   localized('planted a tree in their Virtue Forest 🌳', '在自己的德行森林中种下了一棵树 🌳'),
   localized('set a morning intention 🌅', '立下了晨间心愿 🌅'),
 ];
