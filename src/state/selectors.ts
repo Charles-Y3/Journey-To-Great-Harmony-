@@ -84,13 +84,6 @@ export function isTopicUnlocked(completedLessons: string[], topic: Topic): boole
   return prior.length > 0 && prior.every((t) => isTopicCompleted(completedLessons, t));
 }
 
-/** True once every point in an era has at least started (reached foundation level). */
-export function completedEraIds(completedTimelinePoints: string[]): string[] {
-  return TIMELINE.filter((era) => era.points.every((p) => completedTimelinePoints.includes(p.id))).map(
-    (era) => era.id,
-  );
-}
-
 /** True once every point in an era has reached full 3/3 mastery — not just foundation. */
 export function fullyMasteredEraIds(timelinePointLevels: Record<string, number>): string[] {
   return TIMELINE.filter((era) =>

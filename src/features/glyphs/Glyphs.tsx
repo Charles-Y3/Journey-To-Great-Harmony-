@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { GLYPHS, type VirtueGlyph } from '../../data/glyphs';
-import { scrambleBoard, trySlide, isSolved, type GlyphBoard } from '../../engine/glyphPuzzle';
+import { scrambleBoard, fullBoard, trySlide, isSolved, type GlyphBoard } from '../../engine/glyphPuzzle';
 import { useJourney } from '../../state/store';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -35,10 +35,13 @@ function PuzzleBoard({
   glyph,
   board,
   onSlide,
+  interactive = true,
 }: {
   glyph: VirtueGlyph;
   board: GlyphBoard;
   onSlide: (index: number) => void;
+  /** false for the assembled "here's the target" preview — a picture, not a puzzle. */
+  interactive?: boolean;
 }) {
   const size = glyph.size;
   return (
@@ -52,6 +55,14 @@ function PuzzleBoard({
         if (tileId === null) {
           return <div key={`e-${index}`} className="glyph-cell glyph-cell-empty" role="gridcell" />;
         }
+        const face = <TileFace character={glyph.character} tileId={tileId} size={size} />;
+        if (!interactive) {
+          return (
+            <div key={`t-${tileId}-${index}`} className="glyph-cell glyph-tile" role="gridcell">
+              {face}
+            </div>
+          );
+        }
         return (
           <button
             key={`t-${tileId}-${index}`}
@@ -60,7 +71,7 @@ function PuzzleBoard({
             role="gridcell"
             onClick={() => onSlide(index)}
           >
-            <TileFace character={glyph.character} tileId={tileId} size={size} />
+            {face}
           </button>
         );
       })}
@@ -71,22 +82,31 @@ function PuzzleBoard({
 function PuzzleModal({ glyph, onClose }: { glyph: VirtueGlyph; onClose: () => void }) {
   const { t, L } = useT();
   const completeGlyph = useJourney((s) => s.completeGlyph);
-  const [board, setBoard] = useState<GlyphBoard>(() => scrambleBoard(glyph.size));
+  const [started, setStarted] = useState(false);
+  const [board, setBoard] = useState<GlyphBoard>(() => fullBoard(glyph.size));
   const [solved, setSolved] = useState(false);
   const [wasFirstClear, setWasFirstClear] = useState(false);
 
   useEffect(() => {
-    setBoard(scrambleBoard(glyph.size));
+    setStarted(false);
+    setBoard(fullBoard(glyph.size));
     setSolved(false);
     setWasFirstClear(false);
   }, [glyph.id, glyph.size]);
+
+  function start() {
+    setBoard(scrambleBoard(glyph.size, glyph.solvedEmptyIndex));
+    setStarted(true);
+    setSolved(false);
+    setWasFirstClear(false);
+  }
 
   function slide(index: number) {
     if (solved) return;
     const next = trySlide(board, index, glyph.size);
     if (!next) return;
     setBoard(next);
-    if (isSolved(next)) {
+    if (isSolved(next, glyph.solvedEmptyIndex)) {
       setSolved(true);
       playSfx('chime');
       const first = completeGlyph(glyph.id);
@@ -99,21 +119,27 @@ function PuzzleModal({ glyph, onClose }: { glyph: VirtueGlyph; onClose: () => vo
       <h2>
         {glyph.character} · {L(glyph.title)}
       </h2>
-      <p className="small muted">{t('glyphsHint')}</p>
-      <PuzzleBoard glyph={glyph} board={board} onSlide={slide} />
-      <div className="glyph-actions">
-        <button
-          type="button"
-          className="btn"
-          onClick={() => {
-            setBoard(scrambleBoard(glyph.size));
-            setSolved(false);
-            setWasFirstClear(false);
-          }}
-        >
-          {t('glyphsShuffleBtn')}
-        </button>
-      </div>
+      {!started ? (
+        <>
+          <p className="small muted">{t('glyphsPreviewHint')}</p>
+          <PuzzleBoard glyph={glyph} board={board} onSlide={() => {}} interactive={false} />
+          <div className="glyph-actions">
+            <button type="button" className="btn btn-primary" onClick={start}>
+              {t('glyphsStartBtn')}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="small muted">{t('glyphsHint')}</p>
+          <PuzzleBoard glyph={glyph} board={board} onSlide={slide} />
+          <div className="glyph-actions">
+            <button type="button" className="btn" onClick={start}>
+              {t('glyphsShuffleBtn')}
+            </button>
+          </div>
+        </>
+      )}
 
       {solved && (
         <div className="glyph-solved">

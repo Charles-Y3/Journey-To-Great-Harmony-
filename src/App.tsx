@@ -44,7 +44,7 @@ const SIDEBAR_NAV = [
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
   { to: '/glyphs', emoji: '🧩', key: 'navGlyphs' as const },
-  { to: '/turning-points', emoji: '🪙', key: 'navTurningPoints' as const },
+  { to: '/turning-points', emoji: '💧', key: 'navTurningPoints' as const },
 ];
 
 // Mobile bottom nav: daily loop + living places; the rest lives behind "More".
@@ -62,7 +62,7 @@ const MORE_ITEMS = [
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
   { to: '/glyphs', emoji: '🧩', key: 'navGlyphs' as const },
-  { to: '/turning-points', emoji: '🪙', key: 'navTurningPoints' as const },
+  { to: '/turning-points', emoji: '💧', key: 'navTurningPoints' as const },
 ];
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */

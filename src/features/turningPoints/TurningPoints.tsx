@@ -5,6 +5,8 @@ import { dailyTurningPoint } from '../../data/turningPoints';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 
+const FLIP_MS = 220;
+
 export default function TurningPoints() {
   const { t, L } = useT();
   const today = useToday();
@@ -15,42 +17,60 @@ export default function TurningPoints() {
   const point = dailyTurningPoint(today);
   const flippedToday = flippedDays.includes(today);
   const [revealed, setRevealed] = useState(flippedToday);
+  const [flipping, setFlipping] = useState(false);
 
   function flip() {
-    setRevealed(true);
-    markFlipped(today);
+    setFlipping(true);
+    window.setTimeout(() => {
+      setRevealed(true);
+      markFlipped(today);
+      setFlipping(false);
+    }, FLIP_MS);
   }
 
   const pastDays = flippedDays.filter((d) => d !== today).sort((a, b) => (a < b ? 1 : -1));
 
   return (
     <div>
-      <PageHeader emoji="🪙" title={t('turningPointsTitle')} subtitle={t('turningPointsSubtitle')} />
+      <PageHeader emoji="💧" title={t('turningPointsTitle')} subtitle={t('turningPointsSubtitle')} />
 
-      <div className="card">
-        <p style={{ marginBottom: 10 }}>
-          <span className="pill">
-            {point.emoji} {L(point.tradition)}
-          </span>
-        </p>
-        <p>{L(point.setting)}</p>
-        {!revealed ? (
-          <>
-            <p className="small muted" style={{ marginTop: 10 }}>
-              {t('turningPointsPrompt')}
-            </p>
-            <button type="button" className="btn btn-primary" style={{ marginTop: 6 }} onClick={flip}>
-              {t('turningPointsFlipBtn')}
-            </button>
-          </>
-        ) : (
-          <div style={{ borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 10 }}>
-            <p className="small muted" style={{ marginBottom: 4 }}>
-              <strong>{t('turningPointsResolutionLabel')}</strong>
-            </p>
-            <p>{L(point.resolution)}</p>
+      <div className={flipping ? 'tp-card tp-card-flipping' : 'tp-card'}>
+        <div className="card-modal-hero card-modal-hero-common tp-card-hero">
+          <div className="card-modal-portrait">
+            <div className="card-modal-portrait-inner">
+              <span className="card-modal-portrait-emoji">{point.emoji}</span>
+            </div>
           </div>
-        )}
+        </div>
+        <div className="tp-card-body">
+          <p style={{ marginBottom: 10 }}>
+            <span className="pill">{L(point.tradition)}</span>
+          </p>
+          {!revealed ? (
+            <>
+              <p>{L(point.setting)}</p>
+              <p className="small muted" style={{ marginTop: 10 }}>
+                {t('turningPointsPrompt')}
+              </p>
+              <button type="button" className="btn btn-primary" style={{ marginTop: 6 }} onClick={flip}>
+                {t('turningPointsFlipBtn')}
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="small muted" style={{ marginBottom: 4 }}>
+                <strong>{t('turningPointsResolutionLabel')}</strong>
+              </p>
+              <p>{L(point.resolution)}</p>
+              <div style={{ borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 14 }}>
+                <p className="small muted" style={{ marginBottom: 4 }}>
+                  <strong>{t('turningPointsQuestionLabel')}</strong>
+                </p>
+                <p>{L(point.reflectionQuestion)}</p>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {pastDays.length > 0 && (
@@ -71,6 +91,9 @@ export default function TurningPoints() {
                       {p.emoji} {L(p.tradition)}
                     </p>
                     <p className="small">{L(p.resolution)}</p>
+                    <p className="small muted" style={{ marginTop: 4 }}>
+                      {L(p.reflectionQuestion)}
+                    </p>
                   </div>
                 );
               })}

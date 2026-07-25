@@ -23,7 +23,7 @@ export const UI = {
   navCommunity: localized('Companions', '同修'),
   navCollection: localized('Collection', '收藏'),
   navGlyphs: localized('Glyphs', '字谜'),
-  navTurningPoints: localized('Turning Points', '转折点'),
+  navTurningPoints: localized('Still Waters', '静水'),
   navMore: localized('More', '更多'),
 
   moreSheetTitle: localized('More', '更多'),
@@ -42,6 +42,11 @@ export const UI = {
   glyphsPlayBtn: localized('Play', '开始'),
   glyphsReplayBtn: localized('Play again', '再玩一次'),
   glyphsShuffleBtn: localized('Shuffle', '打乱'),
+  glyphsPreviewHint: localized(
+    "This is what you're rebuilding. Tap Start when you're ready to scramble it.",
+    '这是你要还原的样子。准备好后，点按「开始」将它打乱。',
+  ),
+  glyphsStartBtn: localized('Start', '开始'),
   glyphsHint: localized(
     'Tap a tile next to the empty space to slide it. Restore the character.',
     '点按空格旁的拼块即可滑动。还原这个汉字。',
@@ -59,16 +64,17 @@ export const UI = {
   glyphsSizeLabel: localized('Grid', '棋盘'),
   openGlyphsCta: localized('Open Glyphs', '打开字谜'),
 
-  // ── Turning Points (daily koan/dilemma card) ────────────────────────
-  turningPointsTitle: localized('Turning Points', '转折点'),
+  // ── Still Waters (daily koan/dilemma card) ──────────────────────────
+  turningPointsTitle: localized('Still Waters', '静水'),
   turningPointsSubtitle: localized(
-    'One real story a day, up to the moment of choice. Ponder it, then flip the card.',
+    'One real story a day, up to the moment of choice. Ponder it, then turn the card.',
     '每天一则真实的故事，停在抉择的那一刻。先静静想一想，再翻开卡牌。',
   ),
   turningPointsPrompt: localized('What would you have done?', '若是你，会怎么做？'),
-  turningPointsFlipBtn: localized('Flip the card', '翻开卡牌'),
+  turningPointsFlipBtn: localized('Turn the card', '翻开卡牌'),
   turningPointsResolutionLabel: localized('What happened', '后来发生的事'),
-  turningPointsArchiveTitle: localized('Past Turning Points', '过往的转折点'),
+  turningPointsQuestionLabel: localized('To sit with', '留待细想'),
+  turningPointsArchiveTitle: localized('Past Reflections', '过往的沉思'),
   turningPointsArchiveBrowse: localized('Browse', '浏览'),
   turningPointsArchiveClose: localized('Close', '关闭'),
 
@@ -644,8 +650,8 @@ export const UI = {
     '轻点上方已达成的阶段，近看它的景象。',
   ),
   worldFooter: localized(
-    "You'll always have fellow travellers here to grow alongside, cheering you on and building this world with you. With community accounts in a future version, you'll also be able to walk this road with real friends and family.",
-    '在这里，你永远都会有同修旅人，与你一起成长，为你加油，一同建设这个世界。未来加入社群账号功能后，你也将能与真实的亲友一同走上这条路。',
+    "You'll always have fellow travellers here to grow alongside, cheering you on and building this world with you.",
+    '在这里，你永远都会有同修旅人，与你一起成长，为你加油，一同建设这个世界。',
   ),
 
   // ── Community ─────────────────────────────────────────────────────
@@ -785,33 +791,30 @@ export function knowledgeProgressLabel(locale: Locale, done: number, total: numb
   return pick(locale, `${done}/${total} lessons completed`, `已完成 ${done}/${total} 课`, `已完成 ${done}/${total} 課`);
 }
 
-export function timelineProgressLabel(
-  locale: Locale,
-  done: number,
-  total: number,
-  erasDone: number,
-  erasTotal: number,
-): string {
+// A single bar tracks whichever wave is currently active (see Timeline.tsx)
+// instead of showing separate "surveyed" and "mastered" bars at once.
+export function timelineWaveProgressLabel(locale: Locale, level: 1 | 2 | 3, done: number, total: number): string {
+  if (level === 1) {
+    return pick(
+      locale,
+      `Level 1 · Foundations — ${done}/${total} points`,
+      `第一关 · 基础 — ${done}/${total} 个节点`,
+      `第一關 · 基礎 — ${done}/${total} 個節點`,
+    );
+  }
+  if (level === 2) {
+    return pick(
+      locale,
+      `Level 2 · Deeper Study — ${done}/${total} points`,
+      `第二关 · 深入研读 — ${done}/${total} 个节点`,
+      `第二關 · 深入研讀 — ${done}/${total} 個節點`,
+    );
+  }
   return pick(
     locale,
-    `${done}/${total} points surveyed · ${erasDone}/${erasTotal} eras surveyed`,
-    `已略览 ${done}/${total} 个节点 · 已略览 ${erasDone}/${erasTotal} 个时代`,
-    `已略覽 ${done}/${total} 個節點 · 已略覽 ${erasDone}/${erasTotal} 個時代`,
-  );
-}
-
-export function timelineMasteryProgressLabel(
-  locale: Locale,
-  done: number,
-  total: number,
-  erasDone: number,
-  erasTotal: number,
-): string {
-  return pick(
-    locale,
-    `${done}/${total} points mastered · ${erasDone}/${erasTotal} eras mastered`,
-    `已精通 ${done}/${total} 个节点 · 已精通 ${erasDone}/${erasTotal} 个时代`,
-    `已精通 ${done}/${total} 個節點 · 已精通 ${erasDone}/${erasTotal} 個時代`,
+    `Level 3 · Mastery — ${done}/${total} points`,
+    `第三关 · 精通 — ${done}/${total} 个节点`,
+    `第三關 · 精通 — ${done}/${total} 個節點`,
   );
 }
 

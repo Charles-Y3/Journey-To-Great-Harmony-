@@ -1,16 +1,25 @@
-/** Sliding-tile board: tile ids 0..n-2 in solved order, `null` = empty cell. */
+/** Sliding-tile board: tile id equals its solved grid position, `null` = empty cell. */
 export type GlyphBoard = (number | null)[];
 
-export function solvedBoard(size: number): GlyphBoard {
-  const n = size * size;
-  return Array.from({ length: n }, (_, i) => (i === n - 1 ? null : i));
+/** A fully assembled board with no empty cell — for the "here's the target" preview, not playable. */
+export function fullBoard(size: number): GlyphBoard {
+  return Array.from({ length: size * size }, (_, i) => i);
 }
 
-export function isSolved(board: GlyphBoard): boolean {
-  for (let i = 0; i < board.length - 1; i++) {
-    if (board[i] !== i) return false;
+export function solvedBoard(size: number, solvedEmptyIndex: number = size * size - 1): GlyphBoard {
+  const n = size * size;
+  return Array.from({ length: n }, (_, i) => (i === solvedEmptyIndex ? null : i));
+}
+
+export function isSolved(board: GlyphBoard, solvedEmptyIndex: number = board.length - 1): boolean {
+  for (let i = 0; i < board.length; i++) {
+    if (i === solvedEmptyIndex) {
+      if (board[i] !== null) return false;
+    } else if (board[i] !== i) {
+      return false;
+    }
   }
-  return board[board.length - 1] === null;
+  return true;
 }
 
 export function emptyIndex(board: GlyphBoard): number {
@@ -43,10 +52,10 @@ export function trySlide(board: GlyphBoard, fromIndex: number, size: number): Gl
  * Scramble by performing legal slides from the solved state so the puzzle
  * is always solvable. `moves` scales with board size.
  */
-export function scrambleBoard(size: number, moves?: number): GlyphBoard {
+export function scrambleBoard(size: number, solvedEmptyIndex: number = size * size - 1, moves?: number): GlyphBoard {
   const steps = moves ?? (size <= 3 ? 48 : 96);
-  let board = solvedBoard(size);
-  let empty = board.length - 1;
+  let board = solvedBoard(size, solvedEmptyIndex);
+  let empty = solvedEmptyIndex;
   let prev = -1;
   for (let i = 0; i < steps; i++) {
     const opts = neighborIndices(empty, size).filter((n) => n !== prev);
@@ -57,6 +66,6 @@ export function scrambleBoard(size: number, moves?: number): GlyphBoard {
     prev = empty;
     empty = pick;
   }
-  if (isSolved(board)) return scrambleBoard(size, steps + 8);
+  if (isSolved(board, solvedEmptyIndex)) return scrambleBoard(size, solvedEmptyIndex, steps + 8);
   return board;
 }

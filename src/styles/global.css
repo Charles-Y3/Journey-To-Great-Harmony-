@@ -978,6 +978,36 @@ select:focus {
   pointer-events: none;
 }
 
+/* ── Still Waters card (features/turningPoints) ─────────────────────── */
+.tp-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: transform 0.22s ease;
+  transform-origin: center;
+}
+
+/* A brief scaleX(0) mid-transition, swapped for the revealed content right
+   at that point (see the setTimeout in TurningPoints.tsx) — a cheap but
+   convincing "card turning over" illusion without the fragility of a true
+   3D flip (fixed heights, absolutely-positioned faces) on variable-length
+   story text. */
+.tp-card-flipping {
+  transform: scaleX(0);
+}
+
+.tp-card-hero {
+  margin: 0;
+  padding: 32px 24px 22px;
+}
+
+.tp-card-body {
+  padding: 18px;
+}
+
 @keyframes sparkle-twinkle {
   0%,
   100% {
@@ -2327,10 +2357,13 @@ button.stage-step:disabled {
   opacity: 0.55;
 }
 
-button.glyph-tile {
-  cursor: pointer;
+.glyph-tile {
   color: inherit;
   border: 1px solid var(--line);
+}
+
+button.glyph-tile {
+  cursor: pointer;
 }
 
 button.glyph-tile:hover {

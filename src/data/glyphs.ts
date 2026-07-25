@@ -6,6 +6,14 @@ export interface VirtueGlyph {
   character: string;
   /** Board size N for an N×N sliding puzzle (one cell empty). */
   size: 3 | 4;
+  /**
+   * Which grid cell (0-indexed, row-major) is the permanently-empty slot
+   * in the solved state. Defaults to the last cell (bottom-right) when
+   * omitted. Not every character spreads its strokes evenly, so a
+   * character whose bottom-right corner carries real detail should use a
+   * different cell here instead — see 'ren' below.
+   */
+  solvedEmptyIndex?: number;
   title: Localized<string>;
   meaning: Localized<string>;
   teaching: Localized<string>;
@@ -17,6 +25,11 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'ren',
     character: '仁',
     size: 3,
+    // 仁's right-hand 二 stroke reaches into the bottom-right cell, so
+    // leaving that corner permanently empty (the usual default) cuts into
+    // real detail. The top-left corner is just the start of 亻's plain
+    // vertical stroke — a safer, less disruptive cell to leave blank.
+    solvedEmptyIndex: 0,
     title: localized('Ren — Benevolence', '仁 — 仁爱'),
     meaning: localized(
       'Care for others as people like yourself — the heart of Confucian virtue.',
@@ -44,7 +57,7 @@ export const GLYPHS: VirtueGlyph[] = [
   {
     id: 'li',
     character: '禮',
-    size: 4,
+    size: 3,
     title: localized('Li — Ritual Propriety', '禮 — 礼'),
     meaning: localized(
       'Forms of respect that train the heart — manners with meaning.',
@@ -58,7 +71,7 @@ export const GLYPHS: VirtueGlyph[] = [
   {
     id: 'zhi',
     character: '智',
-    size: 4,
+    size: 3,
     title: localized('Zhi — Wisdom', '智 — 智'),
     meaning: localized(
       'Clear seeing that joins understanding with how you live.',
@@ -72,7 +85,7 @@ export const GLYPHS: VirtueGlyph[] = [
   {
     id: 'xin',
     character: '信',
-    size: 4,
+    size: 3,
     title: localized('Xin — Trustworthiness', '信 — 信'),
     meaning: localized(
       'Keeping your word so others can rest their trust on you.',

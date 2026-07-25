@@ -3,7 +3,6 @@ import { TIMELINE, ALL_POINTS } from '../../data/timeline';
 import type { TimelinePoint, TimelineEra, TimelineLevel } from '../../data/types';
 import { useJourney } from '../../state/store';
 import {
-  completedEraIds,
   fullyMasteredEraIds,
   timelineWaveReady,
   timelinePointsReadyForWave,
@@ -15,8 +14,7 @@ import { useToday } from '../../state/store';
 import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import {
-  timelineProgressLabel,
-  timelineMasteryProgressLabel,
+  timelineWaveProgressLabel,
   timelineWaveLockedNote,
   questionProgress,
   nextOrFinish,
@@ -233,24 +231,34 @@ export default function Timeline() {
   const [open, setOpen] = useState<TimelinePoint | null>(null);
   const [capstoneEra, setCapstoneEra] = useState<TimelineEra | null>(null);
   const { t, L, locale } = useT();
-  const doneEras = completedEraIds(completedPoints);
   const masteredEras = fullyMasteredEraIds(timelinePointLevels);
-  const masteredPointCount = ALL_POINTS.filter((p) => (timelinePointLevels[p.id] ?? 0) >= p.levels.length).length;
   const totalPoints = TIMELINE.reduce((n, e) => n + e.points.length, 0);
+
+  // A single bar tracking whichever wave is currently in progress: it
+  // shows Level 1 progress until every point has foundation, then
+  // switches to Level 2, then Level 3 — never two bars at once.
+  const level1Count = completedPoints.length;
+  const level2Count = timelinePointsReadyForWave(timelinePointLevels, 2);
+  const level3Count = timelinePointsReadyForWave(timelinePointLevels, 3);
+  let currentWaveLevel: 1 | 2 | 3 = 1;
+  let currentWaveCount = level1Count;
+  if (level1Count >= totalPoints) {
+    currentWaveLevel = 2;
+    currentWaveCount = level2Count;
+    if (level2Count >= totalPoints) {
+      currentWaveLevel = 3;
+      currentWaveCount = level3Count;
+    }
+  }
 
   return (
     <div>
       <PageHeader emoji="⏳" title={t('timelineTitle')} subtitle={t('timelineSubtitle')} />
       <div className="card">
         <ProgressBar
-          value={completedPoints.length}
+          value={currentWaveCount}
           max={totalPoints}
-          label={timelineProgressLabel(locale, completedPoints.length, totalPoints, doneEras.length, TIMELINE.length)}
-        />
-        <ProgressBar
-          value={masteredPointCount}
-          max={totalPoints}
-          label={timelineMasteryProgressLabel(locale, masteredPointCount, totalPoints, masteredEras.length, TIMELINE.length)}
+          label={timelineWaveProgressLabel(locale, currentWaveLevel, currentWaveCount, totalPoints)}
         />
       </div>
 
