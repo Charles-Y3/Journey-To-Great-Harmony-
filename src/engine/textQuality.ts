@@ -50,7 +50,9 @@ const FILLER_PHRASE =
 
 /**
  * Extra nonsense / keyboard-mash detector used by `isMeaningful`.
- * Conservative for short CJK (few characters can be a real sentence).
+ * Conservative for real prose (English reuses letters heavily; CJK reuses
+ * function characters) — never treat ordinary writing as "too repetitive"
+ * just because unique-character density is moderate.
  */
 export function looksLikeNonsense(raw: string): boolean {
   const text = raw.trim();
@@ -65,24 +67,28 @@ export function looksLikeNonsense(raw: string): boolean {
   if (compact.length >= 6 && uniqueAll <= 2) return true;
 
   const latin = (compact.match(/[A-Za-z]/g) ?? []).join('').toLowerCase();
-  if (latin.length >= 6) {
+  const cjkCount = (compact.match(/\p{Script=Han}/gu) ?? []).length;
+  const mostlyLatin = latin.length >= 8 && latin.length >= compact.length * 0.7;
+  const mostlyCjk = cjkCount >= 4 && cjkCount >= compact.length * 0.5;
+
+  if (mostlyLatin) {
     const vowels = (latin.match(/[aeiou]/g) ?? []).length;
     if (vowels / latin.length < 0.12) return true;
+    // Extreme letter poverty only — normal English often sits around 0.20–0.35.
+    if (latin.length >= 24 && uniqueAll / latin.length < 0.12) return true;
+    // Long runs of consonants with almost no vowels.
+    if (/[b-df-hj-np-tv-z]{6,}/i.test(latin)) return true;
   }
-
-  if (compact.length >= 10) {
-    if (uniqueAll / compact.length < 0.28) return true;
-  }
-
-  // Long runs of consonants with almost no vowels (Latin only).
-  if (/[b-df-hj-np-tv-z]{6,}/i.test(latin)) return true;
 
   // Word salad: many tiny repeated tokens ("a a a a a a a a")
   const words = text.toLowerCase().split(/\s+/).filter(Boolean);
-  if (words.length >= 4) {
+  if (mostlyLatin && words.length >= 4) {
     const uniqWords = new Set(words).size;
     if (uniqWords / words.length <= 0.35) return true;
   }
+
+  // CJK: only catch near-total glyph poverty / keyboard-ish filler already above.
+  if (mostlyCjk && compact.length >= 12 && uniqueAll / compact.length < 0.15) return true;
 
   return false;
 }
