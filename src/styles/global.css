@@ -1455,23 +1455,28 @@ select:focus {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.6);
+  border: 2px solid rgba(51, 41, 29, 0.35);
+  background: rgba(255, 253, 246, 0.92);
   color: var(--ink);
-  font-size: 0.95rem;
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  z-index: 4;
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .world-rotate:hover {
-  background: rgba(255, 255, 255, 0.9);
+  background: #fff;
+  border-color: var(--jade);
+  color: var(--jade-deep);
 }
 
 .world-rotate-left {

@@ -421,10 +421,10 @@ export default function World() {
           <WorldWalkers walkers={walkers} onGreet={greet} speakingId={peerBubble.activeId} L={L} />
         </div>
         <button type="button" className="world-rotate world-rotate-left" onClick={() => rotate(-1)} aria-label={t('worldRotateLeft')}>
-          ◀
+          ‹
         </button>
         <button type="button" className="world-rotate world-rotate-right" onClick={() => rotate(1)} aria-label={t('worldRotateRight')}>
-          ▶
+          ›
         </button>
         <button
           type="button"

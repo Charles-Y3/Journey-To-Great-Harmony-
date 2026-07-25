@@ -26,7 +26,7 @@ export const REGIONS: MapRegion[] = [
     id: 'forest',
     name: localized('Forest of Reflection', '反思之林'),
     emoji: '🌲',
-    unlockXp: 150,
+    unlockXp: 180,
     tagline: localized('Where the noise falls away.', '喧嚣归于平静的地方。'),
     story: localized(
       'The path climbs into a still forest where sunlight falls in quiet columns. Here, hermits and sages once kept their journals; the trees seem to hold their listening. A carved stone reads: "I daily examine myself on three points." In this forest, the only way forward is inward — those who rush through it emerge exactly as they entered.',
@@ -46,7 +46,7 @@ export const REGIONS: MapRegion[] = [
     id: 'mountain',
     name: localized('Mountain of Discipline', '自律之山'),
     emoji: '⛰️',
-    unlockXp: 400,
+    unlockXp: 450,
     tagline: localized('Where habits are forged.', '习惯锻造而成的地方。'),
     story: localized(
       'The mountain is honest: it cannot be argued with, only climbed. Each morning the pilgrims here rise before the sun, not because the mountain demands it, but because they have learned that character is built one step at a time, like a wall — brick by brick, act by act. On the summit, they say, you can see who you are becoming.',
@@ -63,7 +63,7 @@ export const REGIONS: MapRegion[] = [
     id: 'garden',
     name: localized('Garden of Patience', '耐心之园'),
     emoji: '🪴',
-    unlockXp: 700,
+    unlockXp: 800,
     tagline: localized('Where growth cannot be rushed.', '成长无法被催促的地方。'),
     story: localized(
       'Rows of seedlings stretch before you in careful lines, none of them ready before their time. An old gardener waters without hurry, humming an old proverb: patience is bitter, but its fruit is sweet. Nothing in this garden grows any faster for being watched — only for being tended, day after unremarkable day.',
@@ -80,7 +80,7 @@ export const REGIONS: MapRegion[] = [
     id: 'river',
     name: localized('River of Compassion', '慈悲之河'),
     emoji: '🌊',
-    unlockXp: 950,
+    unlockXp: 1100,
     tagline: localized('Where the heart learns to flow.', '心学会流动的地方。'),
     story: localized(
       'Down from the mountain runs a wide, generous river. "The highest good is like water," reads the boatman\'s sail: "it benefits all things without contending." The river does not choose which fields to nourish. Ferrymen here carry travellers across without payment, saying only: "Someone once carried me." To cross, you must have carried others.',
@@ -100,7 +100,7 @@ export const REGIONS: MapRegion[] = [
     id: 'bridge',
     name: localized('Bridge of Community', '同心之桥'),
     emoji: '🌉',
-    unlockXp: 1300,
+    unlockXp: 1600,
     tagline: localized('Where no one crosses alone.', '无人独自跨越的地方。'),
     story: localized(
       'A long wooden bridge spans a gorge too wide to leap. Every plank was laid by someone who had already crossed, for those still to come. There is no toll here — only travellers willing to steady the rail for whoever crosses next.',
@@ -117,7 +117,7 @@ export const REGIONS: MapRegion[] = [
     id: 'scrolls',
     name: localized('Hall of Teachings', '教导之厅'),
     emoji: '📜',
-    unlockXp: 1700,
+    unlockXp: 2200,
     tagline: localized('Where the Knowledge Path becomes a home.', '知识之路化为归处之地。'),
     story: localized(
       'Shelves of teachings line a quiet hall — compassion, character, understanding. Nothing here is stored for display; each scroll asks to be lived. A plaque reads: "To learn and to practise is one road."',
@@ -137,7 +137,7 @@ export const REGIONS: MapRegion[] = [
     id: 'horizon',
     name: localized('Horizon of Ages', '世代之涯'),
     emoji: '🌅',
-    unlockXp: 2400,
+    unlockXp: 3000,
     tagline: localized('Where the Wisdom Timeline opens wide.', '智慧时间线开阔之处。'),
     story: localized(
       'From a high ridge you see the long river of human wisdom — eras like bends of light. The wind carries names you have studied. To stand here is to know you are one chapter among many, and still responsible for your own.',
@@ -157,7 +157,7 @@ export const REGIONS: MapRegion[] = [
     id: 'sanctuary',
     name: localized('Sanctuary of Practice', '践行圣境'),
     emoji: '⛩️',
-    unlockXp: 3000,
+    unlockXp: 4000,
     tagline: localized('Where forest, world, and vow meet.', '森林、世界与心愿交会之处。'),
     story: localized(
       'A simple gate opens onto ground you have already been tending — your forest, your contributions, your evening honesty. The sanctuary asks for no new spectacle, only that practice has become a place you can return to.',
@@ -177,7 +177,7 @@ export const REGIONS: MapRegion[] = [
     id: 'city',
     name: localized('City of Harmony', '大同之城'),
     emoji: '🏙️',
-    unlockXp: 3800,
+    unlockXp: 5000,
     tagline: localized('Where the journey becomes a home.', '旅程化为归宿的地方。'),
     story: localized(
       'At last: a city with open gates and no walls. In its squares, the old are cared for, the young are taught, and strangers are greeted as kin — the Great Harmony 大同, not as a dream but as a daily practice. You understand now that this city is not a destination. It is built, everywhere, by people who took the same road you did: learn, cultivate, practise, contribute.',

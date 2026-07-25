@@ -94,23 +94,78 @@ export function playSfx(id: SfxId): void {
   }
 }
 
-function playChirp(audioCtx: AudioContext, vol: number) {
-  const now = audioCtx.currentTime;
-  const base = 1800 + Math.random() * 900;
-  tone(audioCtx, base, now, 0.09, 0.07 * vol, 'sine');
-  tone(audioCtx, base * 1.12, now + 0.07, 0.08, 0.05 * vol, 'sine');
-  if (Math.random() < 0.4) tone(audioCtx, base * 0.92, now + 0.16, 0.07, 0.04 * vol, 'triangle');
+function noiseBurst(audioCtx: AudioContext, start: number, dur: number, peak: number, hipass = 800) {
+  const len = Math.max(1, Math.floor(audioCtx.sampleRate * dur));
+  const buf = audioCtx.createBuffer(1, len, audioCtx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / len);
+  const src = audioCtx.createBufferSource();
+  src.buffer = buf;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.frequency.value = hipass;
+  filter.Q.value = 0.8;
+  const env = audioCtx.createGain();
+  env.gain.setValueAtTime(0, start);
+  env.gain.linearRampToValueAtTime(peak, start + 0.02);
+  env.gain.exponentialRampToValueAtTime(0.001, start + dur);
+  src.connect(filter);
+  filter.connect(env);
+  env.connect(audioCtx.destination);
+  src.start(start);
+  src.stop(start + dur + 0.02);
 }
 
+/** Short sparrow-like chirp. */
+function playChirp(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  const base = 2200 + Math.random() * 700;
+  tone(audioCtx, base, now, 0.07, 0.055 * vol, 'sine');
+  tone(audioCtx, base * 1.15, now + 0.06, 0.06, 0.04 * vol, 'sine');
+  if (Math.random() < 0.5) tone(audioCtx, base * 0.9, now + 0.13, 0.05, 0.03 * vol, 'sine');
+}
+
+/** Soft dove / wood-pigeon coo. */
 function playSoftCoo(audioCtx: AudioContext, vol: number) {
   const now = audioCtx.currentTime;
-  tone(audioCtx, 420 + Math.random() * 40, now, 0.35, 0.05 * vol, 'triangle');
-  tone(audioCtx, 380, now + 0.18, 0.4, 0.035 * vol, 'triangle');
+  tone(audioCtx, 390 + Math.random() * 30, now, 0.4, 0.04 * vol, 'triangle');
+  tone(audioCtx, 360, now + 0.2, 0.45, 0.03 * vol, 'triangle');
+}
+
+/** Quick wing flutter — occasional birds passing. */
+function playWingFlutter(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  noiseBurst(audioCtx, now, 0.14, 0.045 * vol, 1400);
+  noiseBurst(audioCtx, now + 0.1, 0.12, 0.035 * vol, 1200);
+  noiseBurst(audioCtx, now + 0.2, 0.1, 0.025 * vol, 1000);
+}
+
+/** Distant crow / rook call. */
+function playCrow(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  const f = 300 + Math.random() * 35;
+  tone(audioCtx, f, now, 0.3, 0.045 * vol, 'triangle');
+  tone(audioCtx, f * 0.9, now + 0.24, 0.34, 0.035 * vol, 'triangle');
+}
+
+/** Soft squirrel-like chatter. */
+function playChatter(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  for (let i = 0; i < 4; i++) {
+    tone(audioCtx, 980 + Math.random() * 160, now + i * 0.07, 0.045, 0.022 * vol, 'triangle');
+  }
+}
+
+/** Quiet frog / pond plip for oasis-ish moments. */
+function playPondPlip(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  tone(audioCtx, 520 + Math.random() * 80, now, 0.12, 0.035 * vol, 'sine');
+  tone(audioCtx, 240, now + 0.04, 0.18, 0.02 * vol, 'triangle');
 }
 
 let forestLoopTimer: number | null = null;
 
-/** Sparse animal/bird ambience while the Virtue Forest tab is open. */
+/** Occasional birds / animals while the Virtue Forest tab is open — sparse, not a loop bed. */
 export function startForestAmbience(): void {
   stopForestAmbience();
   const tick = () => {
@@ -119,17 +174,22 @@ export function startForestAmbience(): void {
     if (vol <= 0.001) return;
     try {
       const audioCtx = getContext();
-      if (Math.random() < 0.65) playChirp(audioCtx, vol * 0.85);
-      else playSoftCoo(audioCtx, vol * 0.9);
+      const roll = Math.random();
+      if (roll < 0.38) playChirp(audioCtx, vol * 0.9);
+      else if (roll < 0.55) playWingFlutter(audioCtx, vol * 0.85);
+      else if (roll < 0.7) playSoftCoo(audioCtx, vol * 0.85);
+      else if (roll < 0.82) playCrow(audioCtx, vol * 0.7);
+      else if (roll < 0.92) playChatter(audioCtx, vol * 0.75);
+      else playPondPlip(audioCtx, vol * 0.7);
     } catch {
       /* ignore */
     }
   };
-  // First sound after a short beat so landing on the tab isn't sudden.
+  // First sound after a pause; then long gaps so it feels like a living place.
   forestLoopTimer = window.setTimeout(function loop() {
     tick();
-    forestLoopTimer = window.setTimeout(loop, 2800 + Math.random() * 4200);
-  }, 900);
+    forestLoopTimer = window.setTimeout(loop, 5500 + Math.random() * 9000);
+  }, 1600);
 }
 
 export function stopForestAmbience(): void {

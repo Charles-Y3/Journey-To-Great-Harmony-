@@ -66,8 +66,7 @@ function Sprout({ x, size }: { x: number; size: number }) {
 // per stage so Tree and Forest read as distinct places, not the same scene
 // with more trees: a squirrel keeps to the Tree stage's few big trunks, a
 // rabbit and a deer share the Forest stage's denser canopy, a bee joins the
-// butterflies once the Oasis's flowers bloom, and a crane visits the
-// Sanctuary's shrine.
+// ducks visit the Oasis pond, and a crane visits the Sanctuary's shrine.
 function ForestCritters({ stageIndex }: { stageIndex: number }) {
   if (stageIndex < 1) return null;
   const butterflyCount = Math.min(5, 1 + stageIndex);
@@ -106,10 +105,10 @@ function ForestCritters({ stageIndex }: { stageIndex: number }) {
           </text>
         </>
       )}
-      {stageIndex >= 4 && (
-        <text fontSize={13}>
-          <animateMotion path="M120,250 q 30 -18 60 0 t 60 0 t -60 4 t -60 -4" dur="8s" repeatCount="indefinite" />
-          🐝
+      {stageIndex === 4 && (
+        <text fontSize={15}>
+          <animateMotion path="M90,268 q 40 -6 80 0 t 40 0" dur="9s" repeatCount="indefinite" />
+          🦆
         </text>
       )}
       {stageIndex >= 5 && (
@@ -161,12 +160,15 @@ function ForestScene({
   // Tree stage trees are individually bigger (a few notable trees); Forest
   // stage trees are smaller on average so more can read as one dense canopy.
   const treeSize = stageIndex === 2 ? { min: 0.95, span: 0.65 } : { min: 0.5, span: 0.55 };
+  // Flowers stay a Forest-floor accent; Oasis is palms + water, not a flowerbed.
   const flowerCount =
     stageIndex === 3
       ? Math.round(2 + stageProgress * 8) // 2–10: flowers first appear late in Forest
-      : stageIndex >= 4
-        ? Math.round(12 + stageProgress * 12) // 12–24: the Oasis bursts with colour
-        : 0;
+      : stageIndex === 4
+        ? Math.round(2 + stageProgress * 3) // sparse reeds/blooms by the water
+        : stageIndex >= 5
+          ? Math.round(4 + stageProgress * 4)
+          : 0;
 
   const sprouts = Array.from({ length: sproutCount }, (_, i) => ({
     x: 60 + seededRandom(`sprout-x-${i}`) * 480,
@@ -252,13 +254,28 @@ function ForestScene({
         </g>
       ))}
 
-      {stageIndex >= 4 && (
+      {stageIndex === 4 && (
         <g>
-          {/* pond */}
-          <ellipse cx="120" cy="272" rx="48" ry="12" fill="#8fc3dd" />
-          {/* birds */}
+          {/* oasis: clear water + palm silhouettes (not a flower garden) */}
+          <ellipse cx="150" cy="268" rx="70" ry="16" fill="#7eb8d4" />
+          <ellipse cx="150" cy="266" rx="52" ry="10" fill="#a8d4e8" opacity="0.7" />
+          {/* palms */}
+          <line x1="420" y1="250" x2="420" y2="198" stroke="#6d4c2a" strokeWidth="4" strokeLinecap="round" />
+          <path d="M420 205 q -28 -18 -36 -4 q 18 -6 36 4 q 22 -20 38 -6 q -16 -2 -38 6 q 8 -26 28 -22 q -14 10 -28 22" fill="#2e7d5b" opacity="0.92" />
+          <line x1="500" y1="252" x2="500" y2="210" stroke="#6d4c2a" strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M500 216 q -22 -14 -30 -2 q 14 -4 30 2 q 18 -16 32 -4 q -14 -2 -32 4 q 6 -20 22 -18 q -12 8 -22 18" fill="#3c8d5a" opacity="0.9" />
+          <line x1="80" y1="248" x2="80" y2="205" stroke="#6d4c2a" strokeWidth="3.5" strokeLinecap="round" />
+          <path d="M80 212 q -20 -12 -26 0 q 12 -4 26 0 q 16 -14 28 -2 q -12 -2 -28 2 q 4 -18 18 -16 q -10 8 -18 16" fill="#2e7d5b" opacity="0.88" />
+          {/* distant birds */}
+          <path d="M300 64 q 6 -7 12 0 q 6 -7 12 0" stroke="#556" strokeWidth="2" fill="none" />
+          <path d="M340 82 q 5 -6 10 0 q 5 -6 10 0" stroke="#556" strokeWidth="2" fill="none" />
+        </g>
+      )}
+
+      {stageIndex >= 5 && (
+        <g>
+          <ellipse cx="120" cy="272" rx="40" ry="11" fill="#8fc3dd" opacity="0.85" />
           <path d="M420 70 q 6 -7 12 0 q 6 -7 12 0" stroke="#556" strokeWidth="2" fill="none" />
-          <path d="M460 92 q 5 -6 10 0 q 5 -6 10 0" stroke="#556" strokeWidth="2" fill="none" />
         </g>
       )}
 

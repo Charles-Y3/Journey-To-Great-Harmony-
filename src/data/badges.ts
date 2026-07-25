@@ -17,8 +17,8 @@ const STATIC_BADGES: Badge[] = [
   { id: 'b-streak-7', title: localized('Steady Flame', '恒焰'), emoji: '🕯️', description: localized('Reach a 7-day streak.', '达成连续7天的记录。'), check: (s) => s.streakBest >= 7 },
   { id: 'b-streak-30', title: localized('Eternal Flame', '不灭之火'), emoji: '🏮', description: localized('Reach a 30-day streak.', '达成连续30天的记录。'), check: (s) => s.streakBest >= 30 },
   { id: 'b-encourager', title: localized('Encourager', '鼓励者'), emoji: '📣', description: localized('Send encouragement to 10 fellow travellers.', '为10位同修送出鼓励。'), check: (s) => s.encouragementsSent >= 10 },
-  { id: 'b-harmony-contributor', title: localized('Harmony Contributor', '和谐贡献者'), emoji: '🌏', description: localized('Contribute 300 harmony points to the shared world.', '为共享世界贡献300点和谐值。'), check: (s) => s.harmonyPoints >= 300 },
-  { id: 'b-world-builder', title: localized('World Builder', '世界建设者'), emoji: '🏙️', description: localized('Contribute 1000 harmony points to the shared world.', '为共享世界贡献1000点和谐值。'), check: (s) => s.harmonyPoints >= 1000 },
+  { id: 'b-harmony-contributor', title: localized('Harmony Contributor', '和谐贡献者'), emoji: '🌏', description: localized('Contribute 800 harmony points to the shared world.', '为共享世界贡献800点和谐值。'), check: (s) => s.harmonyPoints >= 800 },
+  { id: 'b-world-builder', title: localized('World Builder', '世界建设者'), emoji: '🏙️', description: localized('Contribute 2500 harmony points to the shared world.', '为共享世界贡献2500点和谐值。'), check: (s) => s.harmonyPoints >= 2500 },
   { id: 'b-pathfinder', title: localized('Pathfinder', '探路者'), emoji: '🗺️', description: localized('Complete 3 regions of the Journey Map.', '完成旅程地图上的3个区域。'), check: (s) => s.regionsCompleted >= 3 },
   { id: 'b-quiz-whiz', title: localized('Clear-Eyed', '明眼者'), emoji: '🔍', description: localized('Answer 15 quiz questions correctly.', '答对15道测验题。'), check: (s) => s.quizCorrect >= 15 },
 ];

@@ -600,7 +600,7 @@ export const CARDS: WisdomCard[] = [
       'No one is useless in this world who lightens the burden of another.',
       '在这个世界上，只要能减轻他人的负担，便无人是无用的。',
     ),
-    unlockHint: localized('Contribute 500 harmony points to the world.', '为世界贡献500点和谐值。'),
+    unlockHint: localized('Contribute 1500 harmony points to the world.', '为世界贡献1500点和谐值。'),
     didYouKnow: localized(
       'Contributing harmony points here does not remove them from you — it is one of the few "economies" where giving costs the giver nothing and only ever adds to what the receiver has. Real bridges rarely work that way; this one does.',
       '在此贡献和谐点数，并不会让你自己有所减损 — 这是少数几种"经济体系"之一：给予者毫无损失，接受者却因此有所增益。真实世界中的桥梁，很少能这样运作；而这一座，可以。',
@@ -624,7 +624,7 @@ export const SPECIAL_CARD_RULES: { cardId: string; check: (s: Stats) => boolean 
   { cardId: 'card-week', check: (s) => s.streakBest >= 7 },
   { cardId: 'card-moon', check: (s) => s.streakBest >= 30 },
   { cardId: 'card-datong', check: (s) => s.erasCompleted >= 10 },
-  { cardId: 'card-bridge', check: (s) => s.harmonyPoints >= 500 },
+  { cardId: 'card-bridge', check: (s) => s.harmonyPoints >= 1500 },
 ];
 
 export function cardById(id: string): WisdomCard | undefined {
