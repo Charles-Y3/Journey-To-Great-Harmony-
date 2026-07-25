@@ -8,6 +8,9 @@ interface UiState {
   /** One-time pacing intro after the name gate. */
   seenPacingIntro: boolean;
   setSeenPacingIntro: (seen: boolean) => void;
+  /** One-time guided tour shown right after the pacing intro. */
+  seenAppTour: boolean;
+  setSeenAppTour: (seen: boolean) => void;
   /** ISO week key (YYYY-Www) of the last weekly harmony review shown. */
   lastWeeklyReviewWeek: string | null;
   setLastWeeklyReviewWeek: (week: string) => void;
@@ -25,6 +28,19 @@ interface UiState {
   /** Soft tips card on Today (reminders / music / install) has been dismissed. */
   seenSetupTips: boolean;
   setSeenSetupTips: (seen: boolean) => void;
+  /** Day key the evening streak-at-risk nudge was dismissed, so it stays hidden only for that day. */
+  dismissedStreakNudgeDay: string | null;
+  setDismissedStreakNudgeDay: (day: string) => void;
+  /**
+   * Highest changelog version (see data/changelog.ts) this browser has seen.
+   * Null means "never set" — seeded to the latest version (no modal) the
+   * moment a brand-new user finishes the pacing intro, so only genuinely
+   * returning users (who already had seenPacingIntro=true before this flag
+   * existed) see the "What's New" modal. Deliberately NOT reset by
+   * resetOnboardingUi() — resetting progress doesn't un-show an update.
+   */
+  lastSeenChangelogVersion: number | null;
+  setLastSeenChangelogVersion: (version: number) => void;
 }
 
 export const useUi = create<UiState>()(
@@ -34,6 +50,8 @@ export const useUi = create<UiState>()(
       setLastWelcomeSeenDay: (day) => set({ lastWelcomeSeenDay: day }),
       seenPacingIntro: false,
       setSeenPacingIntro: (seen) => set({ seenPacingIntro: seen }),
+      seenAppTour: false,
+      setSeenAppTour: (seen) => set({ seenAppTour: seen }),
       lastWeeklyReviewWeek: null,
       setLastWeeklyReviewWeek: (week) => set({ lastWeeklyReviewWeek: week }),
       lastYearlyReviewYear: null,
@@ -44,15 +62,21 @@ export const useUi = create<UiState>()(
       setLastFullHarmonySfxDay: (day) => set({ lastFullHarmonySfxDay: day }),
       seenSetupTips: false,
       setSeenSetupTips: (seen) => set({ seenSetupTips: seen }),
+      dismissedStreakNudgeDay: null,
+      setDismissedStreakNudgeDay: (day) => set({ dismissedStreakNudgeDay: day }),
+      lastSeenChangelogVersion: null,
+      setLastSeenChangelogVersion: (version) => set({ lastSeenChangelogVersion: version }),
       resetOnboardingUi: () =>
         set({
           lastWelcomeSeenDay: null,
           seenPacingIntro: false,
+          seenAppTour: false,
           lastWeeklyReviewWeek: null,
           lastYearlyReviewYear: null,
           lastEveningSfxDay: null,
           lastFullHarmonySfxDay: null,
           seenSetupTips: false,
+          dismissedStreakNudgeDay: null,
         }),
     }),
     { name: 'journey-ui', version: 4 },

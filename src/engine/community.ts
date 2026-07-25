@@ -120,11 +120,19 @@ export function communityFeed(startDay: string, today: string): FeedItem[] {
  * user's rank has unlocked (see maxChallengeTierForRankIndex in
  * engine/progression.ts) — higher ranks see deeper, harder challenges
  * mixed in, not just a bigger number of the same gentle ones.
+ *
+ * `rerollCount` (0 by default) lets a tier-3 pick be swapped for a
+ * different one from the same pool — see rerollChallenge() in state/store.ts.
+ * A non-zero reroll excludes the original (seed-0) pick so it can't land
+ * back on the same challenge.
  */
-export function dailyChallenge(today: string, maxTier: 1 | 2 | 3) {
+export function dailyChallenge(today: string, maxTier: 1 | 2 | 3, rerollCount = 0) {
   const pool = CHALLENGES.filter((c) => c.tier <= maxTier);
-  const idx = Math.floor(seededRandom(`challenge:${maxTier}:${today}`) * pool.length);
-  return pool[idx];
+  const originalIdx = Math.floor(seededRandom(`challenge:${maxTier}:${today}`) * pool.length);
+  if (rerollCount <= 0) return pool[originalIdx];
+  const rerollPool = pool.filter((_, i) => i !== originalIdx);
+  const idx = Math.floor(seededRandom(`challenge:${maxTier}:${today}:reroll${rerollCount}`) * rerollPool.length);
+  return rerollPool[idx];
 }
 
 export function dailyQuoteIndex(today: string, quoteCount: number): number {

@@ -9,10 +9,13 @@ import {
   FOREST_STAGES,
   growthScore,
   todayKey,
+  maxChallengeTierForRankIndex,
 } from '../engine/progression';
+import { dailyChallenge } from '../engine/community';
 import {
   statsFromData,
-  completedEraIds,
+  fullyMasteredEraIds,
+  timelineWaveReady,
   completedTopicIds,
   isBranchMastered,
   branchCapstoneKey,
@@ -64,6 +67,8 @@ interface JourneyActions {
   completeTimelineLevel: (pointId: string, levelIndex: number, correctCount: number) => void;
   setIntention: (text: string) => void;
   completeChallenge: (challengeId: string, note?: string) => void;
+  /** Swap today's tier-3 challenge for a different one from the same pool. Once per day, only before it's completed. */
+  rerollChallenge: () => void;
   submitReflection: (learned: string, virtue: string, improve: string) => void;
   sendEncouragement: (peerId: string) => boolean;
   completeRegion: (regionId: string) => void;
@@ -184,9 +189,9 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     }
   }
 
-  // Era badges (granted once every point of an era is complete AND its
-  // capstone reflection has been written)
-  for (const eraId of completedEraIds(after.completedTimelinePoints)) {
+  // Era badges (granted once every point of an era has reached full 3/3
+  // mastery AND its capstone reflection has been written)
+  for (const eraId of fullyMasteredEraIds(after.timelinePointLevels)) {
     const id = eraBadgeId(eraId);
     if (!after.unlockedBadges.includes(id) && after.capstones[eraId]) {
       after.unlockedBadges.push(id);
@@ -379,6 +384,10 @@ export const useJourney = create<JourneyState>()(
           apply((draft, today) => {
             const levelsDone = draft.timelinePointLevels[pointId] ?? 0;
             if (levelIndex !== levelsDone) return; // levels must be completed in order, once each
+            // Level 2+ only opens once every point on the timeline has
+            // finished the prior level — defense in depth; the UI also
+            // hides/disables the button (see PointModal in Timeline.tsx).
+            if (levelIndex > 0 && !timelineWaveReady(draft.timelinePointLevels, levelIndex)) return;
             if (timelineStudiesToday(draft, today) >= DAILY_TIMELINE_CAP) return;
             draft.timelinePointLevels[pointId] = levelsDone + 1;
             if (levelIndex === 0 && !draft.completedTimelinePoints.includes(pointId)) {
@@ -417,6 +426,18 @@ export const useJourney = create<JourneyState>()(
             draft.xp += XP_FOR.challenge;
             draft.harmonyPoints += HARMONY_FOR.challenge;
             markActive(draft, today);
+          }),
+
+        rerollChallenge: () =>
+          apply((draft, today) => {
+            const rec = dayRec(draft, today);
+            if (rec.challengeDone) return;
+            const rerollsUsed = rec.challengeRerollCount ?? 0;
+            if (rerollsUsed >= 1) return;
+            const maxTier = maxChallengeTierForRankIndex(rankIndexForXp(draft.xp));
+            const current = dailyChallenge(today, maxTier, rerollsUsed);
+            if (current.tier !== 3) return;
+            rec.challengeRerollCount = rerollsUsed + 1;
           }),
 
         submitReflection: (learned, virtue, improve) =>

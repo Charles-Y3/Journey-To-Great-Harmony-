@@ -139,11 +139,6 @@ export default function Community() {
           );
         })}
       </div>
-
-      <div className="card">
-        <h3>{t('groupsTitle')}</h3>
-        <p className="small muted">{t('groupsBody')}</p>
-      </div>
     </div>
   );
 }

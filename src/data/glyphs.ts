@@ -17,7 +17,7 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'ren',
     character: '仁',
     size: 3,
-    title: localized('Ren — Humaneness', '仁 — 仁爱'),
+    title: localized('Ren — Benevolence', '仁 — 仁爱'),
     meaning: localized(
       'Care for others as people like yourself — the heart of Confucian virtue.',
       '爱人如己，以他人为人 — 儒家德性的核心。',
@@ -31,7 +31,7 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'yi',
     character: '義',
     size: 3,
-    title: localized('Yi — Rightness', '義 — 义'),
+    title: localized('Yi — Righteousness', '義 — 义'),
     meaning: localized(
       'Doing what ought to be done, even when it costs you.',
       '做应当做的事，即便要付出代价。',

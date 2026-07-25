@@ -1,5 +1,6 @@
 import type { WisdomCard, Stats, CardRarity } from './types';
 import { localized } from '../i18n/types';
+import { ALL_POINTS } from './timeline';
 
 export const CARDS: WisdomCard[] = [
   // ── Figures & teachings (from the Wisdom Timeline) ──────────────────
@@ -606,6 +607,43 @@ export const CARDS: WisdomCard[] = [
       '在此贡献和谐点数，并不会让你自己有所减损 — 这是少数几种"经济体系"之一：给予者毫无损失，接受者却因此有所增益。真实世界中的桥梁，很少能这样运作；而这一座，可以。',
     ),
   },
+  {
+    id: 'card-horizon',
+    title: localized('The Long Horizon', '长远的地平线'),
+    emoji: '🌅',
+    rarity: 'common',
+    category: 'story',
+    summary: localized(
+      'Having surveyed the foundation of every era, the whole shape of the journey comes into view before any one part is walked deeply.',
+      '在为每一个时代都打下基础之后，整段旅程的全貌，在深入任何一处之前，便已浮现眼前。',
+    ),
+    quote: localized('See the whole field before you till one corner of it.', '先纵览全田，再耕耘一隅。'),
+    unlockHint: localized('Complete the foundation level of every Wisdom Timeline point.', '完成智慧时间线每一个节点的基础关。'),
+    didYouKnow: localized(
+      'Historians of the Axial Age — the centuries when Confucius, the Buddha, and the early Greek philosophers all lived within a few generations of one another — often note that no single tradition saw the whole picture alone. Surveying many at once, even briefly, is itself an old way of learning to see clearly.',
+      '研究"轴心时代"的历史学者常常指出：孔子、佛陀与早期希腊哲人几乎生活在相近的世代，却无一个传统独自窥见全貌。同时略览多方，本身便是一种古老的、通向清明之见的学习方式。',
+    ),
+  },
+  {
+    id: 'card-second-walk',
+    title: localized('The Second Walk', '二度之行'),
+    emoji: '🔁',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'Every era, walked again — not to relearn what was known, but to notice what the first walk was too quick to see.',
+      '每一个时代，再走一遍 — 不是为了重新学会已知的，而是去留意初次走过时，太匆忙而错过的。',
+    ),
+    quote: localized(
+      'The path does not change; the walker does — and so the second walk is never the same road.',
+      '路未曾改变；变的是走路的人 — 因此，第二次行走，从来不是同一条路。',
+    ),
+    unlockHint: localized('Complete the second level of every Wisdom Timeline point.', '完成智慧时间线每一个节点的第二关。'),
+    didYouKnow: localized(
+      'This card shares its name with an idea already at work elsewhere on your journey: the Knowledge Path\'s deeper topics only open once every topic in a branch has been walked once — a "second walk" through familiar ground, on purpose, rather than by accident.',
+      '这张卡牌的名字，与你旅程中另一处已在运作的理念相呼应：知识之路上更深的主题，唯有在同一分支的每个主题都走过一遍之后，才会开启 — 一次刻意的，而非偶然的，「二度而行」。',
+    ),
+  },
 ];
 
 // Timeline-linked wisdom cards (see TimelinePoint.cardId) get harder to
@@ -625,6 +663,10 @@ export const SPECIAL_CARD_RULES: { cardId: string; check: (s: Stats) => boolean 
   { cardId: 'card-moon', check: (s) => s.streakBest >= 30 },
   { cardId: 'card-datong', check: (s) => s.erasCompleted >= 10 },
   { cardId: 'card-bridge', check: (s) => s.harmonyPoints >= 1500 },
+  // Wave milestones across the whole Wisdom Timeline (see timelineWaveReady
+  // in state/selectors.ts) — card-datong above is the wave-3 reward.
+  { cardId: 'card-horizon', check: (s) => s.timelinePoints >= ALL_POINTS.length },
+  { cardId: 'card-second-walk', check: (s) => s.timelinePointsLevel2 >= ALL_POINTS.length },
 ];
 
 export function cardById(id: string): WisdomCard | undefined {

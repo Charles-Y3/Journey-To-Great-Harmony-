@@ -1,13 +1,23 @@
 import { useState } from 'react';
-import { TIMELINE } from '../../data/timeline';
+import { TIMELINE, ALL_POINTS } from '../../data/timeline';
 import type { TimelinePoint, TimelineEra, TimelineLevel } from '../../data/types';
 import { useJourney } from '../../state/store';
-import { completedEraIds, timelineStudiesToday, DAILY_TIMELINE_CAP, type JourneyData } from '../../state/selectors';
+import {
+  completedEraIds,
+  fullyMasteredEraIds,
+  timelineWaveReady,
+  timelinePointsReadyForWave,
+  timelineStudiesToday,
+  DAILY_TIMELINE_CAP,
+  type JourneyData,
+} from '../../state/selectors';
 import { useToday } from '../../state/store';
 import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import {
   timelineProgressLabel,
+  timelineMasteryProgressLabel,
+  timelineWaveLockedNote,
   questionProgress,
   nextOrFinish,
   takeQuizBtn,
@@ -165,7 +175,7 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
   const levelsDone = timelinePointLevels[point.id] ?? 0;
   const capReached = timelineStudiesToday(data, today) >= DAILY_TIMELINE_CAP;
   const [openLevel, setOpenLevel] = useState<number | null>(levelsDone < 3 ? levelsDone : null);
-  const { t, L } = useT();
+  const { t, L, locale } = useT();
 
   return (
     <Modal onClose={onClose} wide>
@@ -177,6 +187,7 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
       {point.levels.map((lvl, i) => {
         const done = i < levelsDone;
         const locked = i > levelsDone;
+        const waveLocked = i === levelsDone && !timelineWaveReady(timelinePointLevels, i);
         const open = openLevel === i;
         let cls = 'btn';
         if (done) cls += ' quiz-option correct';
@@ -185,13 +196,18 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
             <button
               className={cls}
               style={{ width: '100%', textAlign: 'left' }}
-              disabled={locked}
+              disabled={locked || waveLocked}
               onClick={() => setOpenLevel(open ? null : i)}
             >
-              {done ? '✅' : locked ? '🔒' : '📖'} {L(lvl.label)}
+              {done ? '✅' : locked || waveLocked ? '🔒' : '📖'} {L(lvl.label)}
             </button>
             {locked && <p className="small muted" style={{ marginTop: 6 }}>{t('timelineLevelLockedNote')}</p>}
-            {open && !locked && !done && (
+            {waveLocked && (
+              <p className="small muted" style={{ marginTop: 6 }}>
+                {timelineWaveLockedNote(locale, timelinePointsReadyForWave(timelinePointLevels, i), ALL_POINTS.length)}
+              </p>
+            )}
+            {open && !locked && !waveLocked && !done && (
               <LevelBody level={lvl} capReached={capReached} onComplete={(correct) => completeTimelineLevel(point.id, i, correct)} />
             )}
             {open && done && (
@@ -211,12 +227,15 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
 
 export default function Timeline() {
   const completedPoints = useJourney((s) => s.completedTimelinePoints);
+  const timelinePointLevels = useJourney((s) => s.timelinePointLevels);
   const capstones = useJourney((s) => s.capstones);
   const submitCapstone = useJourney((s) => s.submitCapstone);
   const [open, setOpen] = useState<TimelinePoint | null>(null);
   const [capstoneEra, setCapstoneEra] = useState<TimelineEra | null>(null);
   const { t, L, locale } = useT();
   const doneEras = completedEraIds(completedPoints);
+  const masteredEras = fullyMasteredEraIds(timelinePointLevels);
+  const masteredPointCount = ALL_POINTS.filter((p) => (timelinePointLevels[p.id] ?? 0) >= p.levels.length).length;
   const totalPoints = TIMELINE.reduce((n, e) => n + e.points.length, 0);
 
   return (
@@ -228,32 +247,39 @@ export default function Timeline() {
           max={totalPoints}
           label={timelineProgressLabel(locale, completedPoints.length, totalPoints, doneEras.length, TIMELINE.length)}
         />
+        <ProgressBar
+          value={masteredPointCount}
+          max={totalPoints}
+          label={timelineMasteryProgressLabel(locale, masteredPointCount, totalPoints, masteredEras.length, TIMELINE.length)}
+        />
       </div>
 
       <div className="timeline-scroll">
         {TIMELINE.map((era) => {
-          const eraDone = doneEras.includes(era.id);
+          const eraMastered = masteredEras.includes(era.id);
           return (
             <div className="era-card" key={era.id}>
               <div className="timeline-rail" />
               <div className="era-emoji">{era.emoji}</div>
               <h3 style={{ marginBottom: 2 }}>{L(era.name)}</h3>
               <div className="era-period">{L(era.period)}</div>
-              {eraDone && capstones[era.id] && (
+              {eraMastered && capstones[era.id] && (
                 <p style={{ margin: '8px 0 0' }}>
                   <span className="pill">🏅 {L(era.badgeTitle)}</span>
                 </p>
               )}
-              {eraDone && !capstones[era.id] && (
+              {eraMastered && !capstones[era.id] && (
                 <button className="btn" style={{ marginTop: 8 }} onClick={() => setCapstoneEra(era)}>
                   🖋️ {capstoneEntryBtn(locale, L(era.name))}
                 </button>
               )}
               {era.points.map((p) => {
-                const done = completedPoints.includes(p.id);
+                const levelsDone = timelinePointLevels[p.id] ?? 0;
+                const mastered = levelsDone >= p.levels.length;
                 return (
                   <button key={p.id} className="btn point-btn" onClick={() => setOpen(p)}>
-                    {done ? '✅' : p.emoji} {L(p.title)}
+                    {mastered ? '✅' : p.emoji} {L(p.title)}
+                    {levelsDone > 0 && !mastered && <span className="small muted"> ({levelsDone}/{p.levels.length})</span>}
                   </button>
                 );
               })}

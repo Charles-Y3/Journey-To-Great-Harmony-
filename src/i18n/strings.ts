@@ -9,7 +9,7 @@ import { L } from './L';
 
 export const UI = {
   // ── App shell ──────────────────────────────────────────────────────
-  appName: localized('Journey to Great Harmony', '大同之旅'),
+  appName: localized('Journey to Great Harmony', '大同之路'),
   appTagline: localized('Learn · Cultivate · Practise · Contribute', '学习 · 修身 · 力行 · 贡献'),
   settings: localized('Settings', '设置'),
 
@@ -23,6 +23,7 @@ export const UI = {
   navCommunity: localized('Companions', '同修'),
   navCollection: localized('Collection', '收藏'),
   navGlyphs: localized('Glyphs', '字谜'),
+  navTurningPoints: localized('Turning Points', '转折点'),
   navMore: localized('More', '更多'),
 
   moreSheetTitle: localized('More', '更多'),
@@ -58,6 +59,19 @@ export const UI = {
   glyphsSizeLabel: localized('Grid', '棋盘'),
   openGlyphsCta: localized('Open Glyphs', '打开字谜'),
 
+  // ── Turning Points (daily koan/dilemma card) ────────────────────────
+  turningPointsTitle: localized('Turning Points', '转折点'),
+  turningPointsSubtitle: localized(
+    'One real story a day, up to the moment of choice. Ponder it, then flip the card.',
+    '每天一则真实的故事，停在抉择的那一刻。先静静想一想，再翻开卡牌。',
+  ),
+  turningPointsPrompt: localized('What would you have done?', '若是你，会怎么做？'),
+  turningPointsFlipBtn: localized('Flip the card', '翻开卡牌'),
+  turningPointsResolutionLabel: localized('What happened', '后来发生的事'),
+  turningPointsArchiveTitle: localized('Past Turning Points', '过往的转折点'),
+  turningPointsArchiveBrowse: localized('Browse', '浏览'),
+  turningPointsArchiveClose: localized('Close', '关闭'),
+
   // ── Settings modal ────────────────────────────────────────────────
   settingsTitle: localized('⚙️ Settings', '⚙️ 设置'),
   settingsLanguageTitle: localized('Language', '语言'),
@@ -75,7 +89,12 @@ export const UI = {
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
     'Journey to Great Harmony v1.0 — your progress is stored privately in this browser.',
-    '大同之旅 v1.0 — 你的进度私密地保存在此浏览器中。',
+    '大同之路 v1.0 — 你的进度私密地保存在此浏览器中。',
+  ),
+  settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
+  settingsDisclaimerBody: localized(
+    'This app is a personal-growth and reflection tool, offered for educational and entertainment purposes. It is not professional medical, psychological, legal, or financial advice, and its content — interpretations of classical teachings — is not a substitute for guidance from a qualified professional or a community you trust. All progress is stored only in this browser; there is no account or backup beyond what you export yourself in Settings, and no guarantee against data loss. Use the app and its content at your own discretion.',
+    '本应用是一款个人成长与自省工具，仅供学习与娱乐之用。它并非专业的医疗、心理、法律或财务建议，其内容 — 对经典教导的诠释 — 也不能替代合格专业人士或你所信任的群体所给予的指导。所有进度仅保存在此浏览器中；除非你在设置中自行导出备份，否则没有账号或云端备份，也不保证数据不会遗失。使用本应用及其内容，请自行判断、自负其责。',
   ),
 
   // ── Settings: name ───────────────────────────────────────────────────
@@ -112,6 +131,12 @@ export const UI = {
     '想每天被提醒反思吗？可在设置中加入夜间提醒。',
   ),
   reminderNudgeOpenSettings: localized('Set reminder', '设置提醒'),
+  streakNudgeBody: localized(
+    'Your streak is waiting — a couple of minutes on Practice keeps it alive tonight.',
+    '你的连续记录还在等你 — 花几分钟去修习，今晚就能延续它。',
+  ),
+  streakNudgeCta: localized('Go to Practice', '前往修行'),
+  streakNudgeDismiss: localized('Not now', '暂不'),
 
   // ── Settings: ambient music ──────────────────────────────────────────
   settingsMusicTitle: localized('Background Music', '背景音乐'),
@@ -137,7 +162,7 @@ export const UI = {
   shareCopiedConfirmation: localized('✓ Link copied!', '✓ 链接已复制！'),
   shareMessage: localized(
     "I'm on a journey through humanity's wisdom traditions with Journey to Great Harmony — thought you might like it too:",
-    '我正透过《大同之旅》探索人类的智慧传统 — 想你可能也会喜欢：',
+    '我正透过《大同之路》探索人类的智慧传统 — 想你可能也会喜欢：',
   ),
 
   // ── Language onboarding gate ──────────────────────────────────────
@@ -232,6 +257,19 @@ export const UI = {
     "Study humanity's story on the Wisdom Timeline, walk the Journey Map, cheer on fellow travellers in the Community, or browse your Collection.",
     '在智慧时间线上研读人类的故事，走上旅程地图，在社群中为同修加油，或浏览你的收藏。',
   ),
+  weeklyEchoTitle: localized('Card of the week', '本周之卡'),
+  weeklyEchoSubtitle: localized('A wisdom card from your collection, revisited.', '从你的收藏中，重访一张智慧卡牌。'),
+  journeyRecapTitle: localized('My Journey so far', '我的旅程至今'),
+  journeyRecapRankLabel: localized('rank', '段位'),
+  journeyRecapCardsLabel: localized('wisdom cards', '智慧卡牌'),
+  journeyRecapBadgesLabel: localized('badges', '徽章'),
+  journeyRecapCapstonesLabel: localized('capstone reflections', '圆满反思'),
+  journeyRecapSettingsTitle: localized('📊 My Journey so far', '📊 我的旅程至今'),
+  journeyRecapSettingsDesc: localized(
+    'A single view of everything you have gathered along the way.',
+    '一处纵览你一路以来所积累的一切。',
+  ),
+  journeyRecapOpenBtn: localized('View recap', '查看总览'),
   setupTipsTitle: localized('Settle in for the journey', '安顿好这段旅程'),
   setupTipsBody: localized(
     'A few optional steps help the path stay with you day to day — open Settings anytime to change them.',
@@ -284,6 +322,25 @@ export const UI = {
   forestUnmuteLabel: localized('Unmute forest sounds', '开启森林声响'),
   challengeBreathBtn: localized('Pause, then practise', '先静心，再践行'),
   challengeBtn: localized('I practised this today (+15 XP)', '我今天践行了 (+15 经验)'),
+  challengeRerollBtn: localized("🔄 If this doesn't resonate today", '🔄 若今天不适合这个'),
+  challengeRerollHint: localized(
+    'You can swap a deep challenge for a different one, once per day.',
+    '你可以将一个深度挑战换成另一个，每天限一次。',
+  ),
+
+  // ── Guided stillness timer ─────────────────────────────────────────
+  stillnessTimerStart: localized('Begin', '开始'),
+  stillnessTimerPause: localized('Pause', '暂停'),
+  stillnessTimerDone: localized('The bell has rung. Well held.', '钟声已响。你安坐住了。'),
+  quietMomentTitle: localized('🧘 Take a quiet moment', '🧘 静坐片刻'),
+  quietMomentDesc: localized(
+    'A guided stillness timer, any time you want one — not just for a challenge.',
+    '随时可用的静坐计时器 — 不只是为了挑战。',
+  ),
+  challengeTimerIntro: localized(
+    'This challenge asks for real silence. A guided timer can hold it with you.',
+    '这项挑战需要真正的静默。引导式计时器可以陪你一起完成。',
+  ),
   breathGateTitle: localized('One full breath', '一次完整的呼吸'),
   breathGateInhale: localized('Breathe in…', '吸气…'),
   breathGateExhale: localized('Breathe out…', '呼气…'),
@@ -298,6 +355,7 @@ export const UI = {
     '三个问题，诚实而温柔地回答。每题一句话就够了。',
   ),
   eveningIntentionEcho: localized('This morning you set out to:', '今早你立下的心愿是：'),
+  reflectionBreathBtn: localized('Pause, then reflect', '先静心，再反思'),
   reflectionQ1: localized('What did I learn today?', '我今天学到了什么？'),
   reflectionQ2: localized('What virtue did I practise?', '我践行了哪种德行？'),
   reflectionQ3: localized('How can I improve tomorrow?', '明天我可以如何做得更好？'),
@@ -347,6 +405,22 @@ export const UI = {
     '慢慢走。终点从来不是重点 — 成为能行走的人，才是。',
   ),
   pacingIntroContinue: localized('I understand', '我明白了'),
+  appTourTitle: localized('A quick look around', '快速导览'),
+  appTourIntro: localized(
+    'Everything below is already part of your journey — a short map before you begin.',
+    '以下这些都已是你旅程的一部分 — 在你启程前，先看一张简短的地图。',
+  ),
+  appTourClusterDailyTitle: localized('Daily practice', '每日修习'),
+  appTourClusterDailyDesc: localized('Where you set an intention, meet a challenge, and reflect each day.', '每天在此立下心愿、迎接挑战、写下反思。'),
+  appTourClusterLearningTitle: localized('Learning', '学习'),
+  appTourClusterLearningDesc: localized('Study the Knowledge Path and the Wisdom Timeline at your own pace.', '按自己的步调研读知识之路与智慧时间线。'),
+  appTourClusterLivingTitle: localized('A living world', '一个鲜活的世界'),
+  appTourClusterLivingDesc: localized('Watch your forest grow, the shared world brighten, and your map unfold.', '看着你的森林成长、共享的世界变得明亮、地图逐渐展开。'),
+  appTourClusterTogetherTitle: localized('Together, and collecting', '同修与收藏'),
+  appTourClusterTogetherDesc: localized('Companions to encourage, wisdom cards and badges to gather, and a puzzle to play.', '可鼓励的同修、可收集的智慧卡牌与徽章，还有一个可玩的谜题。'),
+  appTourContinue: localized("Let's begin", '开始吧'),
+  whatsNewTitle: localized("What's new", '有什么新变化'),
+  whatsNewContinue: localized('Continue', '继续'),
   celebrateVisitForest: localized('Visit your forest', '前往你的森林'),
   celebrateVisitWorld: localized('Visit the world', '前往大同世界'),
   celebrateVisitCollection: localized('Open Collection', '打开收藏'),
@@ -596,7 +670,6 @@ export const UI = {
   encourageSentJust: localized('🌸 Sent!', '🌸 已送出！'),
   encourageSentToday: localized('🌸 Sent today', '🌸 今日已送出'),
   encourageBtn: localized('🌸 Encourage', '🌸 鼓励'),
-  groupsTitle: localized('Groups', '小组'),
   leaderboardYou: localized('You', '你'),
   catWisdomName: localized('Wisdom', '智慧'),
   catWisdomDesc: localized('Learning completed (XP)', '已完成的学习（经验值）'),
@@ -606,11 +679,6 @@ export const UI = {
   catCompassionDesc: localized('Challenges & encouragement given', '完成的挑战与给予的鼓励'),
   catGrowthName: localized('Growth', '成长'),
   catGrowthDesc: localized('Overall personal cultivation', '整体的个人修养'),
-  groupsBody: localized(
-    '🏡 Family journeys · 🏫 School groups · 🧑‍🤝‍🧑 Study circles are coming with community accounts in a future version. Until then, these Companions of the Way are archetypal fellow travellers — always ready to learn, practise, and grow alongside you.',
-    '🏡 家庭旅程 · 🏫 学校小组 · 🧑‍🤝‍🧑 学习圈，将在未来加入社群账号功能后到来。在那之前，这些「道上同修」是典型的旅伴形象 — 永远愿意与你一起学习、践行、共同成长。',
-  ),
-
   // ── Collection ────────────────────────────────────────────────────
   collectionTitle: localized('Collection', '收藏'),
   collectionSubtitle: localized(
@@ -620,9 +688,9 @@ export const UI = {
   wisdomCardsTab: localized('🎴 Wisdom Cards', '🎴 智慧卡牌'),
   badgesTab: localized('🏅 Badges', '🏅 徽章'),
   lockedCardTitle: localized('???', '？？？'),
-  rarityCommon: localized('common', '普通'),
-  rarityRare: localized('rare', '稀有'),
-  rarityLegendary: localized('legendary', '传说'),
+  rarityCommon: localized('Common', '普通'),
+  rarityRare: localized('Rare', '稀有'),
+  rarityLegendary: localized('Legendary', '传说'),
   categoryFigure: localized('figure', '人物'),
   categoryTeaching: localized('teaching', '教导'),
   categoryVirtue: localized('virtue', '德行'),
@@ -692,6 +760,14 @@ export function lessonsCompletedToday(locale: Locale, n: number): string {
   );
 }
 
+export function minutesLabel(locale: Locale, n: number): string {
+  return pick(locale, `${n} min`, `${n} 分钟`, `${n} 分鐘`);
+}
+
+export function challengeTimerBtn(locale: Locale, n: number): string {
+  return pick(locale, `Start guided timer (${n} min)`, `开始引导计时（${n}分钟）`, `開始引導計時（${n}分鐘）`);
+}
+
 export function journalCount(locale: Locale, n: number): string {
   return pick(
     locale,
@@ -718,9 +794,33 @@ export function timelineProgressLabel(
 ): string {
   return pick(
     locale,
-    `${done}/${total} points studied · ${erasDone}/${erasTotal} eras complete`,
-    `已研读 ${done}/${total} 个节点 · 已完成 ${erasDone}/${erasTotal} 个时代`,
-    `已研讀 ${done}/${total} 個節點 · 已完成 ${erasDone}/${erasTotal} 個時代`,
+    `${done}/${total} points surveyed · ${erasDone}/${erasTotal} eras surveyed`,
+    `已略览 ${done}/${total} 个节点 · 已略览 ${erasDone}/${erasTotal} 个时代`,
+    `已略覽 ${done}/${total} 個節點 · 已略覽 ${erasDone}/${erasTotal} 個時代`,
+  );
+}
+
+export function timelineMasteryProgressLabel(
+  locale: Locale,
+  done: number,
+  total: number,
+  erasDone: number,
+  erasTotal: number,
+): string {
+  return pick(
+    locale,
+    `${done}/${total} points mastered · ${erasDone}/${erasTotal} eras mastered`,
+    `已精通 ${done}/${total} 个节点 · 已精通 ${erasDone}/${erasTotal} 个时代`,
+    `已精通 ${done}/${total} 個節點 · 已精通 ${erasDone}/${erasTotal} 個時代`,
+  );
+}
+
+export function timelineWaveLockedNote(locale: Locale, ready: number, total: number): string {
+  return pick(
+    locale,
+    `Every point on the Wisdom Timeline must reach this level before you can go deeper here — ${ready}/${total} ready so far.`,
+    `智慧时间线上的每一个节点，都必须先到达这一关，才能在此继续深入 — 目前已有 ${ready}/${total} 个节点准备就绪。`,
+    `智慧時間線上的每一個節點，都必須先到達這一關，才能在此繼續深入 — 目前已有 ${ready}/${total} 個節點準備就緒。`,
   );
 }
 
@@ -841,9 +941,9 @@ export function welcomeBackTitle(locale: Locale, name: string): string {
 export function capstoneEraPrompt(locale: Locale, eraName: string): string {
   return pick(
     locale,
-    `You've studied every point of the "${eraName}" era. Write a longer reflection on what it taught you to earn its era badge.`,
-    `你已经研读完「${eraName}」时代的每一个节点。写下一篇更完整的反思，谈谈它教会了你什么，即可获得该时代徽章。`,
-    `你已經研讀完「${eraName}」時代的每一個節點。寫下一篇更完整的反思，談談它教會了你什麼，即可獲得該時代徽章。`,
+    `You've mastered every point of the "${eraName}" era — all three levels, each one. Write a longer reflection on what it taught you to earn its era badge.`,
+    `你已经精通「${eraName}」时代的每一个节点 — 三关皆已完成。写下一篇更完整的反思，谈谈它教会了你什么，即可获得该时代徽章。`,
+    `你已經精通「${eraName}」時代的每一個節點 — 三關皆已完成。寫下一篇更完整的反思，談談它教會了你什麼，即可獲得該時代徽章。`,
   );
 }
 

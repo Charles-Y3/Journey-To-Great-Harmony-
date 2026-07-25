@@ -114,6 +114,9 @@ export interface Stats {
   lessons: number;
   topicsCompleted: number;
   timelinePoints: number;
+  /** Count of Wisdom Timeline points that have reached level 2 (deepened past foundation). */
+  timelinePointsLevel2: number;
+  /** Count of eras where every point has reached full 3/3 mastery — not just foundation. */
   erasCompleted: number;
   challengesDone: number;
   reflections: number;

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
 import { useSound } from '../../state/soundStore';
-import { worldInfo, completedEraIds, type JourneyData } from '../../state/selectors';
+import { worldInfo, fullyMasteredEraIds, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
 import { CARDS } from '../../data/cards';
 import { TIMELINE } from '../../data/timeline';
@@ -364,8 +364,8 @@ export default function World() {
   }, [d.unlockedCards, today]);
 
   const cappedEras = useMemo(() => {
-    return completedEraIds(d.completedTimelinePoints).filter((id) => d.capstones[id]);
-  }, [d.completedTimelinePoints, d.capstones]);
+    return fullyMasteredEraIds(d.timelinePointLevels).filter((id) => d.capstones[id]);
+  }, [d.timelinePointLevels, d.capstones]);
 
   const recentEncouragements = d.encouragementsSent;
 

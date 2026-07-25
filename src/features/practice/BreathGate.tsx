@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useT } from '../../i18n/useT';
+import { useSound } from '../../state/soundStore';
+import { playMusicTrack, stopMusic, setMusicVolume } from '../../engine/music';
 
 const BREATH_MS = 10_000;
 const SKIP_AFTER_MS = 3_000;
@@ -22,6 +24,18 @@ export default function BreathGate({ onReady }: { onReady: () => void }) {
       window.clearInterval(phaseTimer);
     };
   }, [onReady]);
+
+  // A brief ambient accompaniment for the pause, but only if the user
+  // hasn't already chosen their own ambient track in Settings — never
+  // interrupt a track they deliberately started.
+  useEffect(() => {
+    if (useSound.getState().musicTrack !== null) return;
+    playMusicTrack('chimes');
+    setMusicVolume(0.3);
+    return () => {
+      if (useSound.getState().musicTrack === null) stopMusic();
+    };
+  }, []);
 
   return (
     <div className="breath-gate" role="dialog" aria-label={t('breathGateTitle')}>

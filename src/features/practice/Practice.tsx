@@ -6,23 +6,19 @@ import { forestInfo, worldInfo } from '../../state/selectors';
 import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
-import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
+import { maxChallengeTierForRankIndex, rankIndexForXp, EVENING_OPEN_HOUR } from '../../engine/progression';
 import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { yourNoteLabel, journalCount, minLengthHint, type UiKey } from '../../i18n/strings';
+import { yourNoteLabel, journalCount, minLengthHint, challengeTimerBtn, minutesLabel, type UiKey } from '../../i18n/strings';
 import { playSfx } from '../../engine/sfx';
 import { useUi } from '../../state/uiStore';
 import { useTodayTasks } from '../home/useTodayTasks';
 import BreathGate from './BreathGate';
+import StillnessTimer from './StillnessTimer';
 import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
 import { collectPastIntentions, journalPromptFromIntentions } from '../../engine/journalPrompts';
 import { useReminders } from '../../state/reminderStore';
-
-// Evening reflection only opens from 5pm local time, up to midnight — it's
-// meant to be a look back on the day that's actually happened, not
-// something to front-load in the morning.
-const EVENING_OPEN_HOUR = 17;
 
 function openReminderSettings() {
   window.dispatchEvent(new CustomEvent('journey:open-settings', { detail: { section: 'reminders' } }));
@@ -114,15 +110,27 @@ function MorningCard({ today }: { today: string }) {
   );
 }
 
+// Challenges that explicitly ask for unaided silence — the guided timer
+// gives them real in-app support instead of only the instruction text.
+const SILENCE_MINUTES: Record<string, number> = {
+  'ch-silence-1': 10,
+  'ch-deep-silence-1': 20,
+};
+
 function ChallengeCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const completeChallenge = useJourney((s) => s.completeChallenge);
+  const rerollChallenge = useJourney((s) => s.rerollChallenge);
   const xp = useJourney((s) => s.xp);
   const [note, setNote] = useState('');
   const [breathing, setBreathing] = useState(false);
   const [breathDone, setBreathDone] = useState(false);
+  const [showTimer, setShowTimer] = useState(false);
   const { t, L, locale } = useT();
-  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(xp)));
+  const rerollCount = rec.challengeRerollCount ?? 0;
+  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(xp)), rerollCount);
+  const canReroll = !rec.challengeDone && challenge.tier === 3 && rerollCount < 1;
+  const silenceMinutes = SILENCE_MINUTES[challenge.id];
 
   const onBreathReady = useCallback(() => {
     setBreathing(false);
@@ -145,11 +153,35 @@ function ChallengeCard({ today }: { today: string }) {
       ) : breathing ? (
         <BreathGate onReady={onBreathReady} />
       ) : !breathDone ? (
-        <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => setBreathing(true)}>
-          {t('challengeBreathBtn')}
-        </button>
+        <>
+          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => setBreathing(true)}>
+            {t('challengeBreathBtn')}
+          </button>
+          {canReroll && (
+            <>
+              <button className="btn" style={{ marginTop: 10, marginLeft: 8 }} onClick={() => rerollChallenge()}>
+                {t('challengeRerollBtn')}
+              </button>
+              <p className="small muted" style={{ marginTop: 6 }}>{t('challengeRerollHint')}</p>
+            </>
+          )}
+        </>
       ) : (
         <>
+          {silenceMinutes && !rec.challengeDone && (
+            <div style={{ marginBottom: 12 }}>
+              {showTimer ? (
+                <StillnessTimer minutes={silenceMinutes} />
+              ) : (
+                <>
+                  <p className="small muted">{t('challengeTimerIntro')}</p>
+                  <button className="btn" onClick={() => setShowTimer(true)}>
+                    {challengeTimerBtn(locale, silenceMinutes)}
+                  </button>
+                </>
+              )}
+            </div>
+          )}
           <p className="small muted">{t('challengeNoteHint')}</p>
           <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('challengeNotePlaceholder')} />
           <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, progressLength(note), TEXT_MIN.challengeNote)}</p>
@@ -183,8 +215,14 @@ function EveningCard({ today }: { today: string }) {
   const [learned, setLearned] = useState('');
   const [virtue, setVirtue] = useState('');
   const [improve, setImprove] = useState('');
+  const [breathing, setBreathing] = useState(false);
+  const [breathDone, setBreathDone] = useState(false);
   const { t, locale } = useT();
   const eveningOpen = new Date().getHours() >= EVENING_OPEN_HOUR;
+  const onBreathReady = useCallback(() => {
+    setBreathing(false);
+    setBreathDone(true);
+  }, []);
   const lastEveningSfxDay = useUi((s) => s.lastEveningSfxDay);
   const setLastEveningSfxDay = useUi((s) => s.setLastEveningSfxDay);
 
@@ -222,35 +260,45 @@ function EveningCard({ today }: { today: string }) {
               {t('eveningIntentionEcho')} <em>“{rec.intention}”</em>
             </p>
           )}
-          <p className="small muted">{t('reflectionIntro')}</p>
-          <label className="small">{t('reflectionQ1')}</label>
-          <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(learned), TEXT_MIN.reflection)}</p>
-          {progressLength(learned) >= TEXT_MIN.reflection && looksLikeNonsense(learned) && (
-            <p className="small muted">{t('textNonsenseHint')}</p>
+          {breathing ? (
+            <BreathGate onReady={onBreathReady} />
+          ) : !breathDone ? (
+            <button className="btn btn-primary" onClick={() => setBreathing(true)}>
+              {t('reflectionBreathBtn')}
+            </button>
+          ) : (
+            <>
+              <p className="small muted">{t('reflectionIntro')}</p>
+              <label className="small">{t('reflectionQ1')}</label>
+              <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
+              <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(learned), TEXT_MIN.reflection)}</p>
+              {progressLength(learned) >= TEXT_MIN.reflection && looksLikeNonsense(learned) && (
+                <p className="small muted">{t('textNonsenseHint')}</p>
+              )}
+              <label className="small">{t('reflectionQ2')}</label>
+              <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
+              <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(virtue), TEXT_MIN.reflection)}</p>
+              {progressLength(virtue) >= TEXT_MIN.reflection && looksLikeNonsense(virtue) && (
+                <p className="small muted">{t('textNonsenseHint')}</p>
+              )}
+              <label className="small">{rec.intention ? t('reflectionQ3WithIntention') : t('reflectionQ3')}</label>
+              <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
+              <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(improve), TEXT_MIN.reflection)}</p>
+              {progressLength(improve) >= TEXT_MIN.reflection && looksLikeNonsense(improve) && (
+                <p className="small muted">{t('textNonsenseHint')}</p>
+              )}
+              <button
+                className="btn btn-primary"
+                disabled={meaningfulLength(learned) < TEXT_MIN.reflection || meaningfulLength(virtue) < TEXT_MIN.reflection || meaningfulLength(improve) < TEXT_MIN.reflection}
+                onClick={() => {
+                  submitReflection(learned.trim(), virtue.trim(), improve.trim());
+                  playSfx('hush');
+                }}
+              >
+                {t('reflectionBtn')}
+              </button>
+            </>
           )}
-          <label className="small">{t('reflectionQ2')}</label>
-          <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(virtue), TEXT_MIN.reflection)}</p>
-          {progressLength(virtue) >= TEXT_MIN.reflection && looksLikeNonsense(virtue) && (
-            <p className="small muted">{t('textNonsenseHint')}</p>
-          )}
-          <label className="small">{rec.intention ? t('reflectionQ3WithIntention') : t('reflectionQ3')}</label>
-          <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(improve), TEXT_MIN.reflection)}</p>
-          {progressLength(improve) >= TEXT_MIN.reflection && looksLikeNonsense(improve) && (
-            <p className="small muted">{t('textNonsenseHint')}</p>
-          )}
-          <button
-            className="btn btn-primary"
-            disabled={meaningfulLength(learned) < TEXT_MIN.reflection || meaningfulLength(virtue) < TEXT_MIN.reflection || meaningfulLength(improve) < TEXT_MIN.reflection}
-            onClick={() => {
-              submitReflection(learned.trim(), virtue.trim(), improve.trim());
-              playSfx('hush');
-            }}
-          >
-            {t('reflectionBtn')}
-          </button>
         </>
       )}
       <ReminderNudge kind="evening" />
@@ -364,6 +412,36 @@ function Journal() {
   );
 }
 
+const QUIET_MOMENT_PRESETS = [5, 10, 20];
+
+function QuietMomentCard() {
+  const { t, locale } = useT();
+  const [minutes, setMinutes] = useState<number | null>(null);
+
+  return (
+    <div className="card practice-card">
+      <h3>{t('quietMomentTitle')}</h3>
+      <p className="small muted">{t('quietMomentDesc')}</p>
+      {minutes === null ? (
+        <div className="tab-row">
+          {QUIET_MOMENT_PRESETS.map((m) => (
+            <button key={m} type="button" className="btn tab-btn" onClick={() => setMinutes(m)}>
+              {minutesLabel(locale, m)}
+            </button>
+          ))}
+        </div>
+      ) : (
+        <>
+          <StillnessTimer key={minutes} minutes={minutes} />
+          <button type="button" className="btn" style={{ marginTop: 10 }} onClick={() => setMinutes(null)}>
+            {t('close')}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 function GrowthVisitBanners({ today }: { today: string }) {
   const { t } = useT();
   const { doneCount, tasks } = useTodayTasks();
@@ -409,6 +487,7 @@ export default function Practice() {
       <ChallengeCard today={today} />
       <EveningCard today={today} />
       <Journal />
+      <QuietMomentCard />
     </div>
   );
 }

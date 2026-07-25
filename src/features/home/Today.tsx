@@ -5,7 +5,9 @@ import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex } from '../../engine/community';
 import { addDaysToKey, hashString } from '../../engine/progression';
-import { statsFromData, forestInfo, worldInfo, type JourneyData } from '../../state/selectors';
+import { statsFromData, forestInfo, worldInfo, weeklyEchoCard, type JourneyData } from '../../state/selectors';
+import { EVENING_OPEN_HOUR } from '../../engine/progression';
+import { CardModal } from '../collection/Collection';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { todaySubtitle } from '../../i18n/strings';
@@ -32,14 +34,21 @@ export default function Today() {
   const year = Number(today.slice(0, 4));
 
   const weekKey = isoWeekKey(today);
+  const echoCard = useMemo(() => weeklyEchoCard(d.unlockedCards, weekKey), [d.unlockedCards, weekKey]);
+  const [showEchoCard, setShowEchoCard] = useState(false);
   const lastWeeklyReviewWeek = useUi((s) => s.lastWeeklyReviewWeek);
   const setLastWeeklyReviewWeek = useUi((s) => s.setLastWeeklyReviewWeek);
   const lastYearlyReviewYear = useUi((s) => s.lastYearlyReviewYear);
   const setLastYearlyReviewYear = useUi((s) => s.setLastYearlyReviewYear);
   const seenSetupTips = useUi((s) => s.seenSetupTips);
   const setSeenSetupTips = useUi((s) => s.setSeenSetupTips);
+  const dismissedStreakNudgeDay = useUi((s) => s.dismissedStreakNudgeDay);
+  const setDismissedStreakNudgeDay = useUi((s) => s.setDismissedStreakNudgeDay);
   const [showWeekly, setShowWeekly] = useState(false);
   const [showYearly, setShowYearly] = useState(false);
+
+  const streakAtRisk = new Date().getHours() >= EVENING_OPEN_HOUR && !rec.intention && !rec.challengeDone && !rec.reflection;
+  const showStreakNudge = streakAtRisk && dismissedStreakNudgeDay !== today;
 
   function openSettings() {
     window.dispatchEvent(new CustomEvent('journey:open-settings'));
@@ -133,6 +142,20 @@ export default function Today() {
         </p>
       )}
 
+      {showStreakNudge && (
+        <div className="today-intention-strip">
+          <p style={{ margin: '0 0 8px' }}>🔥 {t('streakNudgeBody')}</p>
+          <div className="setup-tips-actions">
+            <Link className="btn btn-primary" to="/practice">
+              {t('streakNudgeCta')}
+            </Link>
+            <button type="button" className="btn" onClick={() => setDismissedStreakNudgeDay(today)}>
+              {t('streakNudgeDismiss')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {!seenSetupTips && (
         <div className="card setup-tips-card">
           <h3>{t('setupTipsTitle')}</h3>
@@ -207,10 +230,24 @@ export default function Today() {
         </div>
       </div>
 
+      {echoCard && (
+        <div className="card" style={{ cursor: 'pointer' }} onClick={() => setShowEchoCard(true)}>
+          <h3>
+            {echoCard.emoji} {t('weeklyEchoTitle')}
+          </h3>
+          <p className="small muted" style={{ marginBottom: 4 }}>{t('weeklyEchoSubtitle')}</p>
+          <p style={{ margin: 0 }}>
+            <strong>{L(echoCard.title)}</strong>
+          </p>
+        </div>
+      )}
+
       <div className="card">
         <h3>{t('keepExploringTitle')}</h3>
         <p className="small muted">{t('keepExploringBody')}</p>
       </div>
+
+      {showEchoCard && echoCard && <CardModal card={echoCard} onClose={() => setShowEchoCard(false)} />}
 
       {showWeekly && (
         <Modal onClose={closeWeekly}>

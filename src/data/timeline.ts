@@ -519,7 +519,7 @@ export const TIMELINE: TimelineEra[] = [
               q(
                 ['What is ren 仁, the central virtue of Confucius?', '「仁」，孔子思想的核心德行，是什么？'],
                 [
-                  ['Military skill', 'Humaneness — deep care for others', 'Cleverness in argument', 'Strict obedience'],
+                  ['Military skill', 'Benevolence — deep care for others', 'Cleverness in argument', 'Strict obedience'],
                   ['军事技能', '人道关怀 — 对他人深切的关怀', '辩论上的机敏', '严格的服从'],
                 ],
                 1,

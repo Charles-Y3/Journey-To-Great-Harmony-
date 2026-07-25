@@ -23,7 +23,7 @@ export function useTodayTasks(): { tasks: TodayTask[]; doneCount: number } {
   const today = useToday();
   const { t, L, locale } = useT();
   const rec = state.days[today] ?? {};
-  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(state.xp)));
+  const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(state.xp)), rec.challengeRerollCount ?? 0);
 
   const knowledgeDone = ALL_LESSONS.every((l) => state.completedLessons.includes(l.id));
   // Every timeline point has 3 levels; "fully studied" means all levels done.

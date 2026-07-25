@@ -1,4 +1,4 @@
-import type { Stats, Topic } from '../data/types';
+import type { Stats, Topic, WisdomCard } from '../data/types';
 import { ALL_LESSONS, TOPICS } from '../data/knowledgeTree';
 import { ALL_POINTS, TIMELINE } from '../data/timeline';
 import {
@@ -7,10 +7,12 @@ import {
   growthScore,
   forestStageIndex,
   FOREST_STAGES,
+  seededRandom,
 } from '../engine/progression';
 import { communityHarmony } from '../engine/community';
 import { WORLD_STAGES, BUILDINGS } from '../data/world';
 import { REGIONS } from '../data/journeyMap';
+import { CARDS } from '../data/cards';
 
 // The persisted data shape the selectors read (defined by the store).
 export interface JourneyData {
@@ -23,6 +25,8 @@ export interface JourneyData {
       challengeDone?: boolean;
       challengeNote?: string;
       challengeId?: string;
+      /** How many times today's tier-3 challenge has been rerolled (capped at 1). */
+      challengeRerollCount?: number;
       reflection?: { learned: string; virtue: string; improve: string };
       lessons?: number;
       timelineStudies?: number;
@@ -80,10 +84,36 @@ export function isTopicUnlocked(completedLessons: string[], topic: Topic): boole
   return prior.length > 0 && prior.every((t) => isTopicCompleted(completedLessons, t));
 }
 
+/** True once every point in an era has at least started (reached foundation level). */
 export function completedEraIds(completedTimelinePoints: string[]): string[] {
   return TIMELINE.filter((era) => era.points.every((p) => completedTimelinePoints.includes(p.id))).map(
     (era) => era.id,
   );
+}
+
+/** True once every point in an era has reached full 3/3 mastery — not just foundation. */
+export function fullyMasteredEraIds(timelinePointLevels: Record<string, number>): string[] {
+  return TIMELINE.filter((era) =>
+    era.points.every((p) => (timelinePointLevels[p.id] ?? 0) >= p.levels.length),
+  ).map((era) => era.id);
+}
+
+/**
+ * Whether `levelIndex` (0-indexed: 0=foundation, 1=level 2, 2=level 3) can
+ * begin for any point yet. Foundation has no prerequisite; level 2 needs
+ * every point on the timeline to have finished foundation first, and level
+ * 3 needs every point to have finished level 2 first — the same
+ * "finish the prior wave everywhere before going deeper" shape already
+ * used by Knowledge Path branches (see isTopicUnlocked above).
+ */
+export function timelineWaveReady(timelinePointLevels: Record<string, number>, levelIndex: number): boolean {
+  if (levelIndex <= 0) return true;
+  return ALL_POINTS.every((p) => (timelinePointLevels[p.id] ?? 0) >= levelIndex);
+}
+
+/** How many points have reached at least `levelIndex` levels, for wave-progress messaging. */
+export function timelinePointsReadyForWave(timelinePointLevels: Record<string, number>, levelIndex: number): number {
+  return ALL_POINTS.filter((p) => (timelinePointLevels[p.id] ?? 0) >= levelIndex).length;
 }
 
 /** True once every topic (root + leaves) belonging to a knowledge branch is completed. */
@@ -128,7 +158,8 @@ export function statsFromData(d: JourneyData): Stats {
     lessons: d.completedLessons.length,
     topicsCompleted: completedTopicIds(d.completedLessons).length,
     timelinePoints: d.completedTimelinePoints.length,
-    erasCompleted: completedEraIds(d.completedTimelinePoints).length,
+    timelinePointsLevel2: timelinePointsReadyForWave(d.timelinePointLevels, 2),
+    erasCompleted: fullyMasteredEraIds(d.timelinePointLevels).length,
     challengesDone,
     reflections,
     intentions,
@@ -163,6 +194,19 @@ export function worldInfo(d: JourneyData, today: string) {
   const next = idx + 1 < WORLD_STAGES.length ? WORLD_STAGES[idx + 1] : null;
   const buildings = BUILDINGS.map((b) => ({ ...b, built: total >= b.threshold }));
   return { community, user: d.harmonyPoints, total, stageIndex: idx, stage, next, buildings };
+}
+
+// ── Weekly Card Echo ──────────────────────────────────────────────────
+// A small evergreen touch for long-term users: once the finite Knowledge
+// Path / Timeline / Map content is exhausted, this resurfaces one
+// already-unlocked wisdom card per ISO week, deterministically by weekKey
+// (see isoWeekKey in state/uiStore.ts) so everyone sees the same spotlight
+// on the same week and it changes every week, forever.
+export function weeklyEchoCard(unlockedCardIds: string[], weekKey: string): WisdomCard | null {
+  if (unlockedCardIds.length === 0) return null;
+  const idx = Math.floor(seededRandom(`weekly-echo:${weekKey}`) * unlockedCardIds.length);
+  const id = unlockedCardIds[idx];
+  return CARDS.find((c) => c.id === id) ?? null;
 }
 
 // ── Journey Map ────────────────────────────────────────────────────────

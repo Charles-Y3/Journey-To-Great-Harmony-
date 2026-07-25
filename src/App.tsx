@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJourney, useToday, JOURNEY_EXPORT_VERSION, exportJourneyData } from './state/store';
-import type { JourneyData } from './state/selectors';
+import { statsFromData, forestInfo, worldInfo, type JourneyData } from './state/selectors';
+import { CARDS } from './data/cards';
+import { BADGES } from './data/badges';
+import { CHANGELOG, LATEST_CHANGELOG_VERSION } from './data/changelog';
 import { useLocale } from './state/localeStore';
 import { useReminders } from './state/reminderStore';
 import { useUi } from './state/uiStore';
@@ -11,7 +14,7 @@ import { useSound, type MusicTrackId } from './state/soundStore';
 import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
 import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
-import { xpBarLabel, newItemsAriaLabel, rankXpLabel, welcomeBackTitle } from './i18n/strings';
+import { xpBarLabel, newItemsAriaLabel, rankXpLabel, welcomeBackTitle, type UiKey } from './i18n/strings';
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp, todayKey } from './engine/progression';
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
@@ -28,6 +31,7 @@ import World from './features/world/World';
 import Community from './features/community/Community';
 import Collection from './features/collection/Collection';
 import Glyphs from './features/glyphs/Glyphs';
+import TurningPoints from './features/turningPoints/TurningPoints';
 
 const SIDEBAR_NAV = [
   { to: '/', emoji: '🌅', key: 'navToday' as const },
@@ -40,6 +44,7 @@ const SIDEBAR_NAV = [
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
   { to: '/glyphs', emoji: '🧩', key: 'navGlyphs' as const },
+  { to: '/turning-points', emoji: '🪙', key: 'navTurningPoints' as const },
 ];
 
 // Mobile bottom nav: daily loop + living places; the rest lives behind "More".
@@ -57,6 +62,7 @@ const MORE_ITEMS = [
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
   { to: '/glyphs', emoji: '🧩', key: 'navGlyphs' as const },
+  { to: '/turning-points', emoji: '🪙', key: 'navTurningPoints' as const },
 ];
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
@@ -282,6 +288,16 @@ function BackupSection() {
   );
 }
 
+function DisclaimerSection() {
+  const { t } = useT();
+  return (
+    <div className="card">
+      <h3>{t('settingsDisclaimerTitle')}</h3>
+      <p className="small muted">{t('settingsDisclaimerBody')}</p>
+    </div>
+  );
+}
+
 function PacingIntroModal({ onClose }: { onClose: () => void }) {
   const { t } = useT();
   const navigate = useNavigate();
@@ -300,6 +316,77 @@ function PacingIntroModal({ onClose }: { onClose: () => void }) {
       <p>{t('pacingIntroBody4')}</p>
       <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
         {t('pacingIntroContinue')}
+      </button>
+    </Modal>
+  );
+}
+
+const APP_TOUR_CLUSTERS: { emoji: string; titleKey: UiKey; descKey: UiKey }[] = [
+  { emoji: '🎯', titleKey: 'appTourClusterDailyTitle', descKey: 'appTourClusterDailyDesc' },
+  { emoji: '📖', titleKey: 'appTourClusterLearningTitle', descKey: 'appTourClusterLearningDesc' },
+  { emoji: '🌏', titleKey: 'appTourClusterLivingTitle', descKey: 'appTourClusterLivingDesc' },
+  { emoji: '🎴', titleKey: 'appTourClusterTogetherTitle', descKey: 'appTourClusterTogetherDesc' },
+];
+
+function AppTourModal({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+  const navigate = useNavigate();
+
+  function finish() {
+    navigate('/', { replace: true });
+    onClose();
+  }
+
+  return (
+    <Modal onClose={finish}>
+      <h2>{t('appTourTitle')}</h2>
+      <p className="small muted">{t('appTourIntro')}</p>
+      {APP_TOUR_CLUSTERS.map((c) => (
+        <div className="card" key={c.titleKey} style={{ marginTop: 10 }}>
+          <h3>
+            {c.emoji} {t(c.titleKey)}
+          </h3>
+          <p className="small muted" style={{ margin: 0 }}>
+            {t(c.descKey)}
+          </p>
+        </div>
+      ))}
+      <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
+        {t('appTourContinue')}
+      </button>
+    </Modal>
+  );
+}
+
+function WhatsNewModal({ sinceVersion, onClose }: { sinceVersion: number; onClose: () => void }) {
+  const { t, L } = useT();
+  const navigate = useNavigate();
+  const entries = CHANGELOG.filter((e) => e.version > sinceVersion);
+
+  function finish() {
+    navigate('/', { replace: true });
+    onClose();
+  }
+
+  return (
+    <Modal onClose={finish}>
+      <h2>{t('whatsNewTitle')}</h2>
+      {entries.map((entry) => (
+        <div key={entry.version} style={{ marginBottom: 14 }}>
+          <p className="small muted" style={{ marginBottom: 6 }}>
+            {entry.date}
+          </p>
+          <ul style={{ margin: 0, paddingLeft: '1.2em' }}>
+            {entry.highlights.map((h, i) => (
+              <li key={i} style={{ marginBottom: 6 }}>
+                {L(h)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))}
+      <button type="button" className="btn btn-primary" style={{ marginTop: 8 }} onClick={finish}>
+        {t('whatsNewContinue')}
       </button>
     </Modal>
   );
@@ -542,12 +629,70 @@ function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   );
 }
 
+function JourneyRecapModal({ onClose }: { onClose: () => void }) {
+  const { t, L } = useT();
+  const state = useJourney();
+  const today = useToday();
+  const d = state as unknown as JourneyData;
+  const stats = statsFromData(d);
+  const forest = forestInfo(d);
+  const world = worldInfo(d, today);
+  const rank = rankForXp(stats.xp);
+  const capstoneCount = Object.keys(d.capstones).length;
+
+  const tiles: { emoji: string; value: string | number; label: string }[] = [
+    { emoji: rank.emoji, value: L(rank.name), label: t('journeyRecapRankLabel') },
+    { emoji: '✨', value: stats.xp, label: t('statWisdomXp') },
+    { emoji: '🔥', value: stats.streakBest, label: t('forestFactorStreak') },
+    { emoji: '📖', value: stats.lessons, label: t('forestFactorLessons') },
+    { emoji: '⏳', value: stats.timelinePoints, label: t('forestFactorTimeline') },
+    { emoji: '🎯', value: stats.challengesDone, label: t('forestFactorChallenges') },
+    { emoji: '🪞', value: stats.reflections, label: t('forestFactorReflections') },
+    { emoji: forest.stage.emoji, value: L(forest.stage.name), label: t('statForest') },
+    { emoji: world.stage.emoji, value: L(world.stage.name), label: t('statWorld') },
+    { emoji: '🎴', value: `${d.unlockedCards.length}/${CARDS.length}`, label: t('journeyRecapCardsLabel') },
+    { emoji: '🏅', value: `${d.unlockedBadges.length}/${BADGES.length}`, label: t('journeyRecapBadgesLabel') },
+    { emoji: '📜', value: capstoneCount, label: t('journeyRecapCapstonesLabel') },
+  ];
+
+  return (
+    <Modal onClose={onClose} wide>
+      <h2>{t('journeyRecapTitle')}</h2>
+      <div className="stat-grid">
+        {tiles.map((tile) => (
+          <div className="stat-tile" key={tile.label}>
+            <div className="stat-value">
+              {tile.emoji} {tile.value}
+            </div>
+            <div className="stat-name">{tile.label}</div>
+          </div>
+        ))}
+      </div>
+    </Modal>
+  );
+}
+
+function JourneyRecapSection({ onOpen }: { onOpen: () => void }) {
+  const { t } = useT();
+  return (
+    <div className="card">
+      <h3>{t('journeyRecapSettingsTitle')}</h3>
+      <p className="small muted">{t('journeyRecapSettingsDesc')}</p>
+      <button className="btn" onClick={onOpen}>
+        {t('journeyRecapOpenBtn')}
+      </button>
+    </div>
+  );
+}
+
 function SettingsModal({
   onClose,
   focusSection,
+  onOpenRecap,
 }: {
   onClose: () => void;
   focusSection?: string | null;
+  onOpenRecap: () => void;
 }) {
   const { t } = useT();
   const navigate = useNavigate();
@@ -568,11 +713,13 @@ function SettingsModal({
       <h2>{t('settingsTitle')}</h2>
       <LanguageSection />
       <NameSection />
+      <JourneyRecapSection onOpen={onOpenRecap} />
       <ReminderSection />
       <MusicSection />
       <ShareSection />
       <BackupSection />
       <InstallSection />
+      <DisclaimerSection />
       <div className="card">
         <h3>{t('settingsResetTitle')}</h3>
         <p className="small muted">{t('settingsResetDesc')}</p>
@@ -712,14 +859,21 @@ export default function App() {
   const setLastWelcomeSeenDay = useUi((s) => s.setLastWelcomeSeenDay);
   const seenPacingIntro = useUi((s) => s.seenPacingIntro);
   const setSeenPacingIntro = useUi((s) => s.setSeenPacingIntro);
+  const seenAppTour = useUi((s) => s.seenAppTour);
+  const setSeenAppTour = useUi((s) => s.setSeenAppTour);
+  const lastSeenChangelogVersion = useUi((s) => s.lastSeenChangelogVersion);
+  const setLastSeenChangelogVersion = useUi((s) => s.setLastSeenChangelogVersion);
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [settingsFocus, setSettingsFocus] = useState<string | null>(null);
   const [showRankModal, setShowRankModal] = useState(false);
+  const [showRecap, setShowRecap] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [showHarmonyInfo, setShowHarmonyInfo] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showPacing, setShowPacing] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [showWhatsNew, setShowWhatsNew] = useState(false);
 
   // Once per calendar day (and only past the language/name gates), greet
   // the user with a quick progress + to-do summary instead of dropping
@@ -736,6 +890,27 @@ export default function App() {
       setShowPacing(true);
     }
   }, [hasChosenLocale, hasSetName, seenPacingIntro]);
+
+  // Shows once right after the pacing intro (for new users) or on next open
+  // for anyone who already saw the pacing intro before this tour existed.
+  useEffect(() => {
+    if (hasChosenLocale && hasSetName && seenPacingIntro && !seenAppTour) {
+      setShowTour(true);
+    }
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenAppTour]);
+
+  // Only for genuinely returning users: seenPacingIntro is already true
+  // (from before this flag existed) but lastSeenChangelogVersion was never
+  // set. A brand-new user instead gets lastSeenChangelogVersion seeded to
+  // the latest version the moment they finish the pacing intro (see its
+  // onClose below), so they never see this — nothing to announce yet.
+  useEffect(() => {
+    if (hasChosenLocale && hasSetName && seenPacingIntro) {
+      if (lastSeenChangelogVersion === null || lastSeenChangelogVersion < LATEST_CHANGELOG_VERSION) {
+        setShowWhatsNew(true);
+      }
+    }
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, lastSeenChangelogVersion]);
 
   useEffect(() => {
     const open = (e: Event) => {
@@ -818,6 +993,7 @@ export default function App() {
               <Route path="/community" element={<Community />} />
               <Route path="/collection" element={<Collection />} />
               <Route path="/glyphs" element={<Glyphs />} />
+              <Route path="/turning-points" element={<TurningPoints />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
@@ -828,7 +1004,7 @@ export default function App() {
 
       {/* Hide celebrations under onboarding modals so a primary CTA click
           cannot fall through onto a "Visit Collection" link underneath. */}
-      {!showPacing && !showWelcome && <CelebrationOverlay />}
+      {!showPacing && !showTour && !showWhatsNew && !showWelcome && <CelebrationOverlay />}
       {showSettings && (
         <SettingsModal
           focusSection={settingsFocus}
@@ -836,8 +1012,14 @@ export default function App() {
             setShowSettings(false);
             setSettingsFocus(null);
           }}
+          onOpenRecap={() => {
+            setShowSettings(false);
+            setSettingsFocus(null);
+            setShowRecap(true);
+          }}
         />
       )}
+      {showRecap && <JourneyRecapModal onClose={() => setShowRecap(false)} />}
       {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
       {showStreakInfo && <StreakInfoModal onClose={() => setShowStreakInfo(false)} />}
       {showHarmonyInfo && <HarmonyInfoModal onClose={() => setShowHarmonyInfo(false)} />}
@@ -845,11 +1027,29 @@ export default function App() {
         <PacingIntroModal
           onClose={() => {
             setSeenPacingIntro(true);
+            setLastSeenChangelogVersion(LATEST_CHANGELOG_VERSION);
             setShowPacing(false);
           }}
         />
       )}
-      {showWelcome && !showPacing && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+      {showTour && !showPacing && (
+        <AppTourModal
+          onClose={() => {
+            setSeenAppTour(true);
+            setShowTour(false);
+          }}
+        />
+      )}
+      {showWhatsNew && !showPacing && !showTour && (
+        <WhatsNewModal
+          sinceVersion={lastSeenChangelogVersion ?? 0}
+          onClose={() => {
+            setLastSeenChangelogVersion(LATEST_CHANGELOG_VERSION);
+            setShowWhatsNew(false);
+          }}
+        />
+      )}
+      {showWelcome && !showPacing && !showTour && !showWhatsNew && <WelcomeModal onClose={() => setShowWelcome(false)} />}
     </div>
   );
 }

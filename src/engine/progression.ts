@@ -198,6 +198,11 @@ export function forestStageIndex(score: number): number {
   return idx;
 }
 
+// Evening reflection (and the streak-at-risk nudge) only opens from 5pm
+// local time — a look back on the day that's actually happened, not
+// something to front-load in the morning.
+export const EVENING_OPEN_HOUR = 17;
+
 // ── Day helpers ────────────────────────────────────────────────────────
 // Day keys are local-date strings "YYYY-MM-DD".
 export function dayKeyFromDate(d: Date): string {

@@ -32,7 +32,7 @@ const SPARKLE_SPOTS = [
   { top: '82%', left: '68%', delay: '0.7s' },
 ];
 
-function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void }) {
+export function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => void }) {
   const { t, L } = useT();
   const Art = CARD_ART[card.id];
   const timelinePoint = ALL_POINTS.find((p) => p.cardId === card.id);
