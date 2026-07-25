@@ -19,6 +19,10 @@ import { BADGES } from '../src/data/badges';
 import { REGIONS } from '../src/data/journeyMap';
 import { WORLD_STAGES, BUILDINGS } from '../src/data/world';
 import { PEERS } from '../src/data/peers';
+import { GLYPHS } from '../src/data/glyphs';
+import { TURNING_POINTS } from '../src/data/turningPoints';
+import { CHANGELOG } from '../src/data/changelog';
+import { SEASONAL_VIRTUES } from '../src/data/seasons';
 import { RANKS, FOREST_STAGES } from '../src/engine/progression';
 import { UI } from '../src/i18n/strings';
 
@@ -43,7 +47,25 @@ function collect(value: unknown, out: Set<string>): void {
 }
 
 const found = new Set<string>();
-for (const root_ of [TIMELINE, TOPICS, CHALLENGES, QUOTES, CARDS, BADGES, REGIONS, WORLD_STAGES, BUILDINGS, PEERS, RANKS, FOREST_STAGES, UI]) {
+for (const root_ of [
+  TIMELINE,
+  TOPICS,
+  CHALLENGES,
+  QUOTES,
+  CARDS,
+  BADGES,
+  REGIONS,
+  WORLD_STAGES,
+  BUILDINGS,
+  PEERS,
+  GLYPHS,
+  TURNING_POINTS,
+  CHANGELOG,
+  SEASONAL_VIRTUES,
+  RANKS,
+  FOREST_STAGES,
+  UI,
+]) {
   collect(root_, found);
 }
 
