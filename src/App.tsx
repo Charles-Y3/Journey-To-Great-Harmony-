@@ -588,8 +588,14 @@ function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   const selected = selectedId ? RANKS.find((r) => r.id === selectedId) ?? null : null;
   const selectedIdx = selected ? RANKS.findIndex((r) => r.id === selected.id) : -1;
 
+  // Closing a rank-detail view returns to the list; only the list dismisses the modal.
+  const handleClose = () => {
+    if (selectedId) setSelectedId(null);
+    else onClose();
+  };
+
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={handleClose}>
       {selected ? (
         <>
           <button type="button" className="btn" style={{ marginBottom: 12 }} onClick={() => setSelectedId(null)}>
