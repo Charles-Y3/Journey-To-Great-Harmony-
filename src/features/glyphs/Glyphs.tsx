@@ -134,7 +134,7 @@ export default function Glyphs() {
 
   return (
     <div>
-      <PageHeader emoji="🀄" title={t('glyphsTitle')} subtitle={t('glyphsSubtitle')} />
+      <PageHeader emoji="🧩" title={t('glyphsTitle')} subtitle={t('glyphsSubtitle')} />
       <div className="glyph-list">
         {GLYPHS.map((g) => {
           const done = completedGlyphs.includes(g.id);
