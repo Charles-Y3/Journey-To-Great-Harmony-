@@ -78,7 +78,8 @@ function baode(
     id,
     character,
     tier: 'intermediate',
-    oracleSvg: `/glyphs/oracle/${svgFile}`,
+    // BASE_URL respects vite.config `base: './'` so public assets resolve in prod.
+    oracleSvg: `${import.meta.env.BASE_URL}glyphs/oracle/${svgFile}`,
     board: { cols: BAODE_BOARD.cols, rows: BAODE_BOARD.rows },
     pieces: BAODE_PIECES,
     title,
