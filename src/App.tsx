@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Route, Routes } from 'react-router-dom';
+import { Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useJourney, useToday, JOURNEY_EXPORT_VERSION, exportJourneyData } from './state/store';
 import type { JourneyData } from './state/selectors';
 import { useLocale } from './state/localeStore';
@@ -281,14 +281,21 @@ function BackupSection() {
 
 function PacingIntroModal({ onClose }: { onClose: () => void }) {
   const { t } = useT();
+  const navigate = useNavigate();
+
+  function finish() {
+    navigate('/', { replace: true });
+    onClose();
+  }
+
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={finish}>
       <h2>{t('pacingIntroTitle')}</h2>
       <p>{t('pacingIntroBody1')}</p>
       <p>{t('pacingIntroBody2')}</p>
       <p>{t('pacingIntroBody3')}</p>
       <p>{t('pacingIntroBody4')}</p>
-      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={onClose}>
+      <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
         {t('pacingIntroContinue')}
       </button>
     </Modal>
@@ -445,14 +452,20 @@ function MusicSection() {
 
 function WelcomeModal({ onClose }: { onClose: () => void }) {
   const { t, L, locale } = useT();
+  const navigate = useNavigate();
   const name = useProfile((s) => s.name);
   const streak = useJourney((s) => s.streakCurrent);
   const xp = useJourney((s) => s.xp);
   const rank = rankForXp(xp);
   const { tasks, doneCount } = useTodayTasks();
 
+  function finish() {
+    navigate('/', { replace: true });
+    onClose();
+  }
+
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={finish}>
       <h2>{name ? welcomeBackTitle(locale, name) : t('welcomeBackTitleAnon')}</h2>
       <p className="small muted">
         {rank.emoji} {L(rank.name)} · 🔥 {streak} {t('statStreak')}
@@ -467,7 +480,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
         </div>
       ))}
       {doneCount === tasks.length && <p className="pill" style={{ marginTop: 10 }}>{t('todayFullHarmony')}</p>}
-      <button className="btn btn-primary" style={{ marginTop: 16 }} onClick={onClose}>
+      <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
         {t('welcomeBackContinue')}
       </button>
     </Modal>
@@ -524,7 +537,9 @@ function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
 
 function SettingsModal({ onClose }: { onClose: () => void }) {
   const { t } = useT();
+  const navigate = useNavigate();
   const reset = useJourney((s) => s.resetJourney);
+  const resetOnboardingUi = useUi((s) => s.resetOnboardingUi);
   const [confirming, setConfirming] = useState(false);
   return (
     <Modal onClose={onClose}>
@@ -546,6 +561,8 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
               style={{ borderColor: 'var(--seal)', color: 'var(--seal)', marginRight: 8 }}
               onClick={() => {
                 reset();
+                resetOnboardingUi();
+                navigate('/', { replace: true });
                 setConfirming(false);
                 onClose();
               }}
@@ -764,13 +781,16 @@ export default function App() {
             <Route path="/world" element={<World />} />
             <Route path="/community" element={<Community />} />
             <Route path="/collection" element={<Collection />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
       </div>
 
       <BottomNav />
 
-      <CelebrationOverlay />
+      {/* Hide celebrations under onboarding modals so a primary CTA click
+          cannot fall through onto a "Visit Collection" link underneath. */}
+      {!showPacing && !showWelcome && <CelebrationOverlay />}
       {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
       {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
       {showStreakInfo && <StreakInfoModal onClose={() => setShowStreakInfo(false)} />}

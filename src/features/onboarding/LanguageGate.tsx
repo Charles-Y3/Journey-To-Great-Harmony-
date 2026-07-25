@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../../state/localeStore';
 import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from '../../i18n/types';
 import { t } from '../../i18n/strings';
@@ -15,6 +16,12 @@ const GATE_PREVIEW_LOCALES = VISIBLE_LOCALES;
  */
 export default function LanguageGate() {
   const setLocale = useLocale((s) => s.setLocale);
+  const navigate = useNavigate();
+
+  function choose(locale: Locale) {
+    navigate('/', { replace: true });
+    setLocale(locale);
+  }
 
   return (
     <div className="gate">
@@ -24,7 +31,7 @@ export default function LanguageGate() {
         <p className="gate-subtitle">{GATE_PREVIEW_LOCALES.map((l) => t('gateSubtitle', l)).join(' ')}</p>
         <div className="gate-options">
           {VISIBLE_LOCALES.map((locale: Locale) => (
-            <button key={locale} className="gate-option" onClick={() => setLocale(locale)}>
+            <button key={locale} className="gate-option" onClick={() => choose(locale)}>
               <span className="gate-flag">{LOCALE_LABELS[locale].flagEmoji}</span>
               <span className="gate-native">{LOCALE_LABELS[locale].native}</span>
             </button>

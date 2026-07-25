@@ -20,6 +20,8 @@ interface UiState {
   /** Day key when the full-harmony SFX last played. */
   lastFullHarmonySfxDay: string | null;
   setLastFullHarmonySfxDay: (day: string) => void;
+  /** After "Reset journey", re-show welcome/pacing as on a new start. */
+  resetOnboardingUi: () => void;
 }
 
 export const useUi = create<UiState>()(
@@ -37,6 +39,15 @@ export const useUi = create<UiState>()(
       setLastEveningSfxDay: (day) => set({ lastEveningSfxDay: day }),
       lastFullHarmonySfxDay: null,
       setLastFullHarmonySfxDay: (day) => set({ lastFullHarmonySfxDay: day }),
+      resetOnboardingUi: () =>
+        set({
+          lastWelcomeSeenDay: null,
+          seenPacingIntro: false,
+          lastWeeklyReviewWeek: null,
+          lastYearlyReviewYear: null,
+          lastEveningSfxDay: null,
+          lastFullHarmonySfxDay: null,
+        }),
     }),
     { name: 'journey-ui', version: 3 },
   ),
