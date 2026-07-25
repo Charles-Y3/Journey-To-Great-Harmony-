@@ -49,7 +49,13 @@ function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done
       <h3>{L(lesson.title)}</h3>
       <p style={{ whiteSpace: 'pre-line' }}>{L(lesson.reading)}</p>
 
-      {showQuiz ? (
+      {/* Reading stays open when the daily cap is hit; quiz/complete wait until tomorrow. */}
+      {!done && capReached ? (
+        <>
+          <p className="small muted" style={{ marginTop: 10 }}>{t('knowledgeDailyCapNote')}</p>
+          <p className="small muted">{t('knowledgeDailyCapWhy')}</p>
+        </>
+      ) : showQuiz ? (
         <>
           <h4>{t('checkUnderstanding')}</h4>
           <p className="small">{L(lesson.question.q)}</p>
@@ -85,21 +91,14 @@ function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done
         </button>
       )}
 
-      {correct && !done && (
+      {correct && !done && !capReached && (
         <>
           <h4>{t('reflectHeading')}</h4>
           <p className="small muted">{L(lesson.reflection)}</p>
           <textarea rows={2} value={reflectionText} onChange={(e) => setReflectionText(e.target.value)} placeholder={t('reflectionOptionalPlaceholder')} />
-          {capReached ? (
-            <>
-              <p className="small muted" style={{ marginTop: 10 }}>{t('knowledgeDailyCapNote')}</p>
-              <p className="small muted">{t('knowledgeDailyCapWhy')}</p>
-            </>
-          ) : (
-            <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone()}>
-              {t('completeLessonBtn')}
-            </button>
-          )}
+          <button className="btn btn-primary" style={{ marginTop: 10 }} onClick={() => onDone()}>
+            {t('completeLessonBtn')}
+          </button>
         </>
       )}
       {done && (

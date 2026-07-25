@@ -165,6 +165,15 @@ export const UI = {
     'Complete a short lesson on the Knowledge Path or Timeline.',
     '在知识之路或时间线上完成一课。',
   ),
+  taskLearnDescTimeline: localized(
+    'Your Knowledge Path is complete — continue on the Wisdom Timeline.',
+    '知识之路已走完 — 请到智慧时间线继续研读。',
+  ),
+  taskLearnDescAllDone: localized(
+    'You have finished the Knowledge Path and Timeline studies for now.',
+    '知识之路与时间线的研读，你都已完成。',
+  ),
+  ctaTimeline: localized('Timeline', '时间线'),
   taskChallengePrefix: localized('Virtue challenge', '德行挑战'),
   taskEveningTitle: localized('Evening reflection', '夜间反思'),
   taskEveningDesc: localized(
@@ -574,7 +583,12 @@ export function todaySubtitle(locale: Locale, dateStr: string, done: number, tot
 }
 
 export function lessonsCompletedToday(locale: Locale, n: number): string {
-  return pick(locale, `${n} lesson${n === 1 ? '' : 's'} completed today`, `今天已完成 ${n} 课`, `今天已完成 ${n} 課`);
+  return pick(
+    locale,
+    `${n} learning step${n === 1 ? '' : 's'} completed today`,
+    `今天已完成 ${n} 次学习`,
+    `今天已完成 ${n} 次學習`,
+  );
 }
 
 export function journalCount(locale: Locale, n: number): string {

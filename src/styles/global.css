@@ -398,6 +398,9 @@ a {
     flex-direction: column;
     gap: 2px;
     font-size: 0.58rem;
+    line-height: 1.2;
+    font-weight: 400;
+    font-family: inherit;
     padding: 6px 2px;
     text-align: center;
     justify-content: center;
@@ -409,11 +412,15 @@ a {
   .bottom-nav button.nav-link-more {
     background: transparent;
     border: none;
-    font: inherit;
     color: inherit;
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
+    /* Keep the same type scale as NavLink tabs — do not use font:inherit (resets size). */
+    font-size: 0.58rem;
+    line-height: 1.2;
+    font-weight: 400;
+    font-family: inherit;
   }
   .bottom-nav button.nav-link-more:hover {
     background: var(--surface-2);

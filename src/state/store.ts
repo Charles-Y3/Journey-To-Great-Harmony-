@@ -17,6 +17,10 @@ import {
   isBranchMastered,
   branchCapstoneKey,
   worldInfo,
+  DAILY_LESSON_CAP,
+  DAILY_TIMELINE_CAP,
+  lessonsCompletedToday,
+  timelineStudiesToday,
   type JourneyData,
 } from './selectors';
 import { BADGES, eraBadgeId, branchBadgeId, badgeById, MASTERABLE_BRANCHES } from '../data/badges';
@@ -353,6 +357,8 @@ export const useJourney = create<JourneyState>()(
         completeLesson: (lessonId, answeredCorrectly) =>
           apply((draft, today) => {
             if (draft.completedLessons.includes(lessonId)) return;
+            // Hard daily cap — UI also hides the button; this is defense in depth.
+            if (lessonsCompletedToday(draft, today) >= DAILY_LESSON_CAP) return;
             draft.completedLessons.push(lessonId);
             const rec = dayRec(draft, today);
             rec.lessons = (rec.lessons ?? 0) + 1;
@@ -366,6 +372,7 @@ export const useJourney = create<JourneyState>()(
           apply((draft, today) => {
             const levelsDone = draft.timelinePointLevels[pointId] ?? 0;
             if (levelIndex !== levelsDone) return; // levels must be completed in order, once each
+            if (timelineStudiesToday(draft, today) >= DAILY_TIMELINE_CAP) return;
             draft.timelinePointLevels[pointId] = levelsDone + 1;
             if (levelIndex === 0 && !draft.completedTimelinePoints.includes(pointId)) {
               draft.completedTimelinePoints.push(pointId);

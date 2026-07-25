@@ -3,6 +3,8 @@ import { dailyChallenge } from '../../engine/community';
 import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
 import { useT } from '../../i18n/useT';
 import { lessonsCompletedToday } from '../../i18n/strings';
+import { ALL_LESSONS } from '../../data/knowledgeTree';
+import { ALL_POINTS } from '../../data/timeline';
 
 export interface TodayTask {
   done: boolean;
@@ -23,6 +25,24 @@ export function useTodayTasks(): { tasks: TodayTask[]; doneCount: number } {
   const rec = state.days[today] ?? {};
   const challenge = dailyChallenge(today, maxChallengeTierForRankIndex(rankIndexForXp(state.xp)));
 
+  const knowledgeDone = ALL_LESSONS.every((l) => state.completedLessons.includes(l.id));
+  // Every timeline point has 3 levels; "fully studied" means all levels done.
+  const timelineDone = ALL_POINTS.every((p) => (state.timelinePointLevels[p.id] ?? 0) >= 3);
+  const learnedToday = (rec.lessons ?? 0) + (rec.timelineStudies ?? 0) > 0;
+
+  let learnTo = '/knowledge';
+  let learnDesc = t('taskLearnDesc');
+  let learnCta = t('ctaLearn');
+  if (knowledgeDone && !timelineDone) {
+    learnTo = '/timeline';
+    learnDesc = t('taskLearnDescTimeline');
+    learnCta = t('ctaTimeline');
+  } else if (knowledgeDone && timelineDone) {
+    learnTo = '/timeline';
+    learnDesc = t('taskLearnDescAllDone');
+    learnCta = t('ctaTimeline');
+  }
+
   const tasks: TodayTask[] = [
     {
       done: !!rec.intention,
@@ -33,12 +53,14 @@ export function useTodayTasks(): { tasks: TodayTask[]; doneCount: number } {
       cta: t('ctaBegin'),
     },
     {
-      done: (rec.lessons ?? 0) > 0,
+      done: knowledgeDone && timelineDone ? true : learnedToday,
       emoji: '📖',
       title: t('taskLearnTitle'),
-      desc: (rec.lessons ?? 0) > 0 ? lessonsCompletedToday(locale, rec.lessons ?? 0) : t('taskLearnDesc'),
-      to: '/knowledge',
-      cta: t('ctaLearn'),
+      desc: learnedToday && !(knowledgeDone && timelineDone)
+        ? lessonsCompletedToday(locale, (rec.lessons ?? 0) + (rec.timelineStudies ?? 0))
+        : learnDesc,
+      to: learnTo,
+      cta: learnCta,
     },
     {
       done: !!rec.challengeDone,
