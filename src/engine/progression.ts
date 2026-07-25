@@ -7,20 +7,94 @@ export interface Rank {
   name: Localized<string>;
   emoji: string;
   minXp: number;
+  /** Short portrait shown when the user taps the rank in the rank list. */
+  blurb: Localized<string>;
 }
 
 // Thresholds climb more steeply from Cultivator onward — the top ranks are
 // meant to be a long-term aspiration (weeks to months of real daily
 // practice), not something a single binge session can reach.
 export const RANKS: Rank[] = [
-  { id: 'seeker', name: localized('Seeker', '求道者'), emoji: '🔦', minXp: 0 },
-  { id: 'explorer', name: localized('Explorer', '探索者'), emoji: '🧭', minXp: 100 },
-  { id: 'learner', name: localized('Learner', '学者'), emoji: '📖', minXp: 280 },
-  { id: 'practitioner', name: localized('Practitioner', '实行者'), emoji: '🥋', minXp: 600 },
-  { id: 'cultivator', name: localized('Cultivator', '修行者'), emoji: '🌱', minXp: 1100 },
-  { id: 'contributor', name: localized('Contributor', '贡献者'), emoji: '🤝', minXp: 1800 },
-  { id: 'harmony-builder', name: localized('Harmony Builder', '大同建设者'), emoji: '🌉', minXp: 2800 },
-  { id: 'wisdom-keeper', name: localized('Wisdom Keeper', '守智者'), emoji: '🏮', minXp: 4200 },
+  {
+    id: 'seeker',
+    name: localized('Seeker', '求道者'),
+    emoji: '🔦',
+    minXp: 0,
+    blurb: localized(
+      'You have lit the lamp. The path is still mostly questions — and that is exactly where wisdom begins.',
+      '你已点燃灯火。路上多为疑问 — 而这正是智慧开始的地方。',
+    ),
+  },
+  {
+    id: 'explorer',
+    name: localized('Explorer', '探索者'),
+    emoji: '🧭',
+    minXp: 100,
+    blurb: localized(
+      'Curiosity has become a habit. You are mapping the first landmarks of compassion, character, and understanding.',
+      '好奇已成为习惯。你正在标出慈悲、品格与理解的第一批地标。',
+    ),
+  },
+  {
+    id: 'learner',
+    name: localized('Learner', '学者'),
+    emoji: '📖',
+    minXp: 280,
+    blurb: localized(
+      'Study is taking root. You return to teachings not only to know them, but to let them change how you live.',
+      '学问正在生根。你重读教导，不只为知晓，更为让它们改变你如何生活。',
+    ),
+  },
+  {
+    id: 'practitioner',
+    name: localized('Practitioner', '实行者'),
+    emoji: '🥋',
+    minXp: 600,
+    blurb: localized(
+      'Knowing and doing begin to meet. Daily practice — intention, challenge, reflection — is becoming your shape.',
+      '知与行开始相遇。每日的践行 — 立愿、挑战、反思 — 正在成为你的形状。',
+    ),
+  },
+  {
+    id: 'cultivator',
+    name: localized('Cultivator', '修行者'),
+    emoji: '🌱',
+    minXp: 1100,
+    blurb: localized(
+      'You tend the inner field with patience. Growth is slower, deeper — measured in seasons of effort, not bursts.',
+      '你以耐心照料内心的田地。成长更慢、更深 — 以努力的季节衡量，而非爆发。',
+    ),
+  },
+  {
+    id: 'contributor',
+    name: localized('Contributor', '贡献者'),
+    emoji: '🤝',
+    minXp: 1800,
+    blurb: localized(
+      'Your practice overflows toward others. Encouragement, service, and shared harmony become part of the path.',
+      '你的修习向他人溢出。鼓励、服务与共享的和谐，成为道路的一部分。',
+    ),
+  },
+  {
+    id: 'harmony-builder',
+    name: localized('Harmony Builder', '大同建设者'),
+    emoji: '🌉',
+    minXp: 2800,
+    blurb: localized(
+      'You help lay planks others will cross. Great Harmony is no longer only a vision — it is work you take part in.',
+      '你帮助铺设他人将跨越的木板。大同不再只是愿景 — 它是你参与其中的工作。',
+    ),
+  },
+  {
+    id: 'wisdom-keeper',
+    name: localized('Wisdom Keeper', '守智者'),
+    emoji: '🏮',
+    minXp: 4200,
+    blurb: localized(
+      'You hold the lantern steady for those still climbing. Mastery here means guarding what you have learned by living it.',
+      '你为仍在攀登的人稳稳举起灯笼。此处的圆满，意味着以活出来的方式守护所学。',
+    ),
+  },
 ];
 
 export function rankIndexForXp(xp: number): number {

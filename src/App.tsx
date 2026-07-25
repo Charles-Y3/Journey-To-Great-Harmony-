@@ -478,25 +478,47 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
 function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   const { t, L, locale } = useT();
   const currentIdx = rankIndexForXp(xp);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = selectedId ? RANKS.find((r) => r.id === selectedId) ?? null : null;
+  const selectedIdx = selected ? RANKS.findIndex((r) => r.id === selected.id) : -1;
+
   return (
     <Modal onClose={onClose}>
-      <h2>{t('rankModalTitle')}</h2>
-      <p className="small muted">{t('rankModalSubtitle')}</p>
-      {RANKS.map((r, i) => {
-        let cls = 'rank-row';
-        if (i < currentIdx) cls += ' reached';
-        if (i === currentIdx) cls += ' current';
-        return (
-          <div key={r.id} className={cls}>
-            <span className="rank-row-emoji">{r.emoji}</span>
-            <span className="rank-row-body">
-              <strong>{L(r.name)}</strong>
-              <span className="small muted rank-row-xp">{rankXpLabel(locale, r.minXp)}</span>
-            </span>
-            {i === currentIdx && <span className="pill">{t('rankModalCurrent')}</span>}
-          </div>
-        );
-      })}
+      {selected ? (
+        <>
+          <button type="button" className="btn" style={{ marginBottom: 12 }} onClick={() => setSelectedId(null)}>
+            {t('rankModalBack')}
+          </button>
+          <h2>
+            {selected.emoji} {L(selected.name)}
+          </h2>
+          <p className="small muted">
+            {t('rankModalUnlockedAt')} {rankXpLabel(locale, selected.minXp)}
+            {selectedIdx === currentIdx ? ` · ${t('rankModalCurrent')}` : ''}
+          </p>
+          <p style={{ marginTop: 12 }}>{L(selected.blurb)}</p>
+        </>
+      ) : (
+        <>
+          <h2>{t('rankModalTitle')}</h2>
+          <p className="small muted">{t('rankModalSubtitle')}</p>
+          {RANKS.map((r, i) => {
+            let cls = 'rank-row rank-row-btn';
+            if (i < currentIdx) cls += ' reached';
+            if (i === currentIdx) cls += ' current';
+            return (
+              <button key={r.id} type="button" className={cls} onClick={() => setSelectedId(r.id)}>
+                <span className="rank-row-emoji">{r.emoji}</span>
+                <span className="rank-row-body">
+                  <strong>{L(r.name)}</strong>
+                  <span className="small muted rank-row-xp">{rankXpLabel(locale, r.minXp)}</span>
+                </span>
+                {i === currentIdx && <span className="pill">{t('rankModalCurrent')}</span>}
+              </button>
+            );
+          })}
+        </>
+      )}
     </Modal>
   );
 }

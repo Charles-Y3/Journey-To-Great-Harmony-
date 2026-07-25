@@ -17,9 +17,10 @@ function getContext(): AudioContext {
     const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     ctx = new Ctor();
     masterGain = ctx.createGain();
-    masterGain.gain.value = 0.28;
+    // Slider 0–1 maps nearly 1:1; soft bus only trims peaks slightly.
+    masterGain.gain.value = 0.85;
     const soft = ctx.createGain();
-    soft.gain.value = 0.7;
+    soft.gain.value = 0.95;
     masterGain.connect(soft);
     soft.connect(ctx.destination);
   }
@@ -48,7 +49,7 @@ function fadeOutAndStop(audioCtx: AudioContext, gain: GainNode, cleanup: () => v
 
 /** Soft temple bell: sine + quiet octave, long decay, wide gaps. */
 function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const bellGain = fadeInGain(audioCtx, 0.16);
+  const bellGain = fadeInGain(audioCtx, 0.45);
   const filter = audioCtx.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.value = 1800;
@@ -80,8 +81,8 @@ function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
       osc.stop(now + dur + 0.05);
     };
 
-    makePartial(freq, 0.38, 5.5);
-    makePartial(freq * 2.003, 0.05, 3.2);
+    makePartial(freq, 0.55, 5.5);
+    makePartial(freq * 2.003, 0.1, 3.2);
 
     timeoutId = window.setTimeout(pluck, 5500 + Math.random() * 7000);
   }
@@ -174,7 +175,7 @@ function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, leve
 
 /** Airy wind chimes: soft attack, sparse rings, no bed tone. */
 function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
-  const chimeGain = fadeInGain(audioCtx, 0.14);
+  const chimeGain = fadeInGain(audioCtx, 0.4);
   const filter = audioCtx.createBiquadFilter();
   filter.type = 'lowpass';
   filter.frequency.value = 3200;
@@ -198,7 +199,7 @@ function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
       const env = audioCtx.createGain();
       const now = audioCtx.currentTime + n * 0.22;
       env.gain.setValueAtTime(0, now);
-      env.gain.linearRampToValueAtTime(0.12, now + 0.04);
+      env.gain.linearRampToValueAtTime(0.28, now + 0.04);
       env.gain.exponentialRampToValueAtTime(0.001, now + 4.0);
       osc.frequency.value = freq;
       osc.connect(env);
@@ -212,7 +213,7 @@ function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
       partial.frequency.value = freq * 2.002;
       const pEnv = audioCtx.createGain();
       pEnv.gain.setValueAtTime(0, now);
-      pEnv.gain.linearRampToValueAtTime(0.025, now + 0.03);
+      pEnv.gain.linearRampToValueAtTime(0.06, now + 0.03);
       pEnv.gain.exponentialRampToValueAtTime(0.001, now + 2.0);
       partial.connect(pEnv);
       pEnv.connect(pan);
@@ -233,7 +234,7 @@ function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
 }
 
 const BUILDERS: Record<MusicTrackId, (audioCtx: AudioContext, out: AudioNode) => ActiveTrack> = {
-  pad: (audioCtx, out) => buildPad(audioCtx, out, 65.41, 0.2), // C2-rooted warm pad
+  pad: (audioCtx, out) => buildPad(audioCtx, out, 65.41, 0.5), // C2-rooted warm pad
   bells: buildBells,
   chimes: buildChimes,
 };
@@ -254,7 +255,8 @@ export function stopMusic(): void {
 
 export function setMusicVolume(volume: number): void {
   if (!ctx || !masterGain) return;
-  masterGain.gain.setTargetAtTime(volume * 0.28, ctx.currentTime, 0.12);
+  // Near-linear mapping so the Settings slider reaches an audible level.
+  masterGain.gain.setTargetAtTime(Math.max(0, Math.min(1, volume)) * 0.95, ctx.currentTime, 0.12);
 }
 
 export function currentMusicTrack(): MusicTrackId | null {

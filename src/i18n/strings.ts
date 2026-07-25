@@ -595,10 +595,12 @@ export const UI = {
   highestRankLabel: localized('highest rank', '最高段位'),
   rankModalTitle: localized('Your Rank', '你的段位'),
   rankModalSubtitle: localized(
-    'Every rank on the journey from Seeker to Wisdom Keeper. Progress is measured by consistency, not competition.',
-    '从求道者到守智者，旅程中的每一个段位。进步以坚持衡量，而非竞争。',
+    'Tap a rank to learn what it means. Progress is measured by consistency, not competition.',
+    '点按某个段位，了解它的含义。进步以坚持衡量，而非竞争。',
   ),
   rankModalCurrent: localized('You are here', '你在这里'),
+  rankModalBack: localized('Back to all ranks', '返回全部段位'),
+  rankModalUnlockedAt: localized('Unlocks at', '解锁于'),
 
   // ── Capstone reflections ──────────────────────────────────────────────
   capstoneModalTitle: localized('Capstone Reflection', '圆满反思'),

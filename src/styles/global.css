@@ -292,7 +292,31 @@ a {
   border-bottom: 1px solid var(--line);
 }
 
-.rank-row:last-child {
+.rank-row-btn {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.rank-row-btn:hover,
+.rank-row-btn:focus-visible {
+  background: var(--surface-2);
+  outline: none;
+}
+
+.rank-row-btn.current:hover,
+.rank-row-btn.current:focus-visible {
+  background: var(--jade-soft);
+}
+
+.rank-row:last-child,
+.rank-row-btn:last-child {
   border-bottom: none;
 }
 

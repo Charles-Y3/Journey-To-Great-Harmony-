@@ -25,7 +25,7 @@ export const useSound = create<SoundState>()(
       speechMuted: false,
       forestMuted: false,
       musicTrack: null,
-      musicVolume: 0.35,
+      musicVolume: 0.7,
       setSpeechMuted: (speechMuted) => set({ speechMuted }),
       setForestMuted: (forestMuted) => set({ forestMuted }),
       setMusicTrack: (musicTrack) => set({ musicTrack }),
