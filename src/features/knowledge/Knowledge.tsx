@@ -222,20 +222,27 @@ export default function Knowledge() {
                 <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
               ))}
             </div>
-            <p className="small muted" style={{ margin: '12px 0 4px' }}>{t('knowledgeDepth2')}</p>
-            {!depth1Done && <p className="small muted">{t('knowledgeDepth2Locked')}</p>}
-            <div className="topic-leaf-list">
-              {depthLeaves(2).map((leaf) => (
-                <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
-              ))}
-            </div>
-            <p className="small muted" style={{ margin: '12px 0 4px' }}>{t('knowledgeDepth3')}</p>
-            {!depth2Done && <p className="small muted">{t('knowledgeDepth3Locked')}</p>}
-            <div className="topic-leaf-list">
-              {depthLeaves(3).map((leaf) => (
-                <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
-              ))}
-            </div>
+            {/* Depth II / III stay hidden until the prior depth is finished. */}
+            {depth1Done && (
+              <>
+                <p className="small muted" style={{ margin: '12px 0 4px' }}>{t('knowledgeDepth2')}</p>
+                <div className="topic-leaf-list">
+                  {depthLeaves(2).map((leaf) => (
+                    <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
+                  ))}
+                </div>
+              </>
+            )}
+            {depth2Done && (
+              <>
+                <p className="small muted" style={{ margin: '12px 0 4px' }}>{t('knowledgeDepth3')}</p>
+                <div className="topic-leaf-list">
+                  {depthLeaves(3).map((leaf) => (
+                    <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
+                  ))}
+                </div>
+              </>
+            )}
             {mastered && !hasCapstone && (
               <button className="btn" style={{ marginTop: 8 }} onClick={() => setCapstoneBranch(branchTopic)}>
                 🖋️ {capstoneEntryBtn(locale, L(branchTopic.name))}

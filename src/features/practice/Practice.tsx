@@ -139,9 +139,13 @@ function ChallengeCard({ today }: { today: string }) {
           <button
             className="btn btn-primary"
             style={{ marginTop: 10 }}
-            disabled={meaningfulLength(note) < TEXT_MIN.challengeNote}
+            disabled={
+              meaningfulLength(note) < TEXT_MIN.challengeNote || looksLikeNonsense(note)
+            }
             onClick={() => {
-              completeChallenge(challenge.id, note.trim());
+              const trimmed = note.trim();
+              if (meaningfulLength(trimmed) < TEXT_MIN.challengeNote || looksLikeNonsense(trimmed)) return;
+              completeChallenge(challenge.id, trimmed);
               playSfx('bell');
             }}
           >

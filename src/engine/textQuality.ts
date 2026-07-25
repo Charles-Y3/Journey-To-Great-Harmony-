@@ -9,7 +9,8 @@
 export const TEXT_MIN = {
   intention: 8,
   reflection: 15,
-  challengeNote: 8,
+  /** Same floor as a short intention — notes must be real words, not mash. */
+  challengeNote: 12,
   capstone: 40,
 } as const;
 
@@ -43,6 +44,10 @@ export function progressLength(raw: string): number {
 const KEYBOARD_SPAM =
   /asdf+|qwer+|zxcv+|hjkl+|fghj+|yuio+|bnm+|1234+|abcd+|aoeu+|jkl;+|qazwsx|password/i;
 
+/** Low-effort filler that clears a length check without saying anything real. */
+const FILLER_PHRASE =
+  /^(test|testing|asdf|qwer|ok+|okay|done|lol+|haha+|yes+|no+|idk|nvm|foo|bar|baz|aaa+|xxx+|ttt+|随便|测试|试试|哈哈+|呵呵+|嗯嗯+|啊啊+|好好好+|123+|111+)[\s!.。]*$/i;
+
 /**
  * Extra nonsense / keyboard-mash detector used by `isMeaningful`.
  * Conservative for short CJK (few characters can be a real sentence).
@@ -53,6 +58,11 @@ export function looksLikeNonsense(raw: string): boolean {
 
   const compact = text.replace(/\s+/gu, '');
   if (KEYBOARD_SPAM.test(compact)) return true;
+  if (FILLER_PHRASE.test(text) || FILLER_PHRASE.test(compact)) return true;
+
+  // Mostly the same character / glyph (e.g. "。。。。。。。。。。")
+  const uniqueAll = new Set([...compact.toLowerCase()]).size;
+  if (compact.length >= 6 && uniqueAll <= 2) return true;
 
   const latin = (compact.match(/[A-Za-z]/g) ?? []).join('').toLowerCase();
   if (latin.length >= 6) {
@@ -60,13 +70,19 @@ export function looksLikeNonsense(raw: string): boolean {
     if (vowels / latin.length < 0.12) return true;
   }
 
-  if (compact.length >= 12) {
-    const unique = new Set([...compact.toLowerCase()]).size;
-    if (unique / compact.length < 0.22) return true;
+  if (compact.length >= 10) {
+    if (uniqueAll / compact.length < 0.28) return true;
   }
 
   // Long runs of consonants with almost no vowels (Latin only).
   if (/[b-df-hj-np-tv-z]{6,}/i.test(latin)) return true;
+
+  // Word salad: many tiny repeated tokens ("a a a a a a a a")
+  const words = text.toLowerCase().split(/\s+/).filter(Boolean);
+  if (words.length >= 4) {
+    const uniqWords = new Set(words).size;
+    if (uniqWords / words.length <= 0.35) return true;
+  }
 
   return false;
 }

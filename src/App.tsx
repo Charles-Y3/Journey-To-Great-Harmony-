@@ -11,7 +11,7 @@ import { useSound, type MusicTrackId } from './state/soundStore';
 import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
 import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
-import { xpBarLabel, advancedDaysNote, newItemsAriaLabel, rankXpLabel, welcomeBackTitle } from './i18n/strings';
+import { xpBarLabel, newItemsAriaLabel, rankXpLabel, welcomeBackTitle } from './i18n/strings';
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp, todayKey } from './engine/progression';
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
@@ -377,8 +377,7 @@ function HarmonyInfoModal({ onClose }: { onClose: () => void }) {
   );
 }
 
-const MUSIC_TRACKS: { id: MusicTrackId; key: 'musicTrackPad' | 'musicTrackBells' | 'musicTrackChimes' }[] = [
-  { id: 'pad', key: 'musicTrackPad' },
+const MUSIC_TRACKS: { id: MusicTrackId; key: 'musicTrackBells' | 'musicTrackChimes' }[] = [
   { id: 'bells', key: 'musicTrackBells' },
   { id: 'chimes', key: 'musicTrackChimes' },
 ];
@@ -524,11 +523,8 @@ function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
 }
 
 function SettingsModal({ onClose }: { onClose: () => void }) {
-  const { t, locale } = useT();
+  const { t } = useT();
   const reset = useJourney((s) => s.resetJourney);
-  const advanceDay = useJourney((s) => s.advanceDay);
-  const dayOffset = useJourney((s) => s.dayOffset);
-  const today = useToday();
   const [confirming, setConfirming] = useState(false);
   return (
     <Modal onClose={onClose}>
@@ -540,14 +536,6 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <ShareSection />
       <BackupSection />
       <InstallSection />
-      <div className="card">
-        <h3>{t('settingsTestingTitle')}</h3>
-        <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
-        <p className="small muted">{t('settingsTestingDesc')}</p>
-        <button className="btn" onClick={advanceDay}>
-          {t('settingsAdvanceDay')}
-        </button>
-      </div>
       <div className="card">
         <h3>{t('settingsResetTitle')}</h3>
         <p className="small muted">{t('settingsResetDesc')}</p>

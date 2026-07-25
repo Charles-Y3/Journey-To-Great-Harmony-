@@ -37,12 +37,6 @@ export const UI = {
     'Choose your language. You can change this anytime.',
     '选择你的语言，随时可以更改。',
   ),
-  settingsTestingTitle: localized('Testing tools', '测试工具'),
-  settingsTestingDesc: localized(
-    'Advancing the day lets you preview streaks and community growth without waiting.',
-    '推进日期可以让你无需等待即可预览连续记录与社群成长。',
-  ),
-  settingsAdvanceDay: localized('⏭️ Advance one day', '⏭️ 推进一天'),
   settingsResetTitle: localized('Reset', '重置'),
   settingsResetDesc: localized(
     'Erase all progress and begin the journey again as a Seeker.',
@@ -52,8 +46,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1 — your progress is stored privately in this browser.',
-    '大同之旅 v1 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.0 — your progress is stored privately in this browser.',
+    '大同之旅 v1.0 — 你的进度私密地保存在此浏览器中。',
   ),
 
   // ── Settings: name ───────────────────────────────────────────────────
@@ -89,7 +83,6 @@ export const UI = {
     '在你修习时可循环播放的免费舒缓背景音乐。由你的浏览器即时生成 — 无需下载，无需账号。',
   ),
   musicTrackOff: localized('Off', '关闭'),
-  musicTrackPad: localized('🎐 Calm Pad', '🎐 静谧长音'),
   musicTrackBells: localized('🔔 Temple Bells', '🔔 寺钟'),
   musicTrackChimes: localized('🎋 Wind Chimes', '🎋 风铃'),
   musicVolumeLabel: localized('Volume', '音量'),
@@ -412,20 +405,12 @@ export const UI = {
   // ── Knowledge ─────────────────────────────────────────────────────
   knowledgeTitle: localized('The Knowledge Path', '知识之路'),
   knowledgeSubtitle: localized(
-    'Three depths: foundation virtues, a second walk of new virtues, then branch mastery. Your progress is kept.',
-    '三层深度：基础德行、第二程新德行，再到分支圆满。你的进度会保留。',
+    'Begin with Depth I. Deeper walks open when you finish the one before — your progress is kept.',
+    '从第一层开始。完成上一层后，更深的路程才会打开 — 你的进度会保留。',
   ),
   knowledgeDepth1: localized('Depth I · Foundation', '第一层 · 基础'),
   knowledgeDepth2: localized('Depth II · New virtues', '第二层 · 新德行'),
   knowledgeDepth3: localized('Depth III · Mastery', '第三层 · 圆满'),
-  knowledgeDepth2Locked: localized(
-    'Complete every Depth I topic in this branch to begin the second walk.',
-    '完成本分支第一层的全部主题后，即可开始第二程。',
-  ),
-  knowledgeDepth3Locked: localized(
-    'Complete every Depth II virtue in this branch to open mastery.',
-    '完成本分支第二层的全部德行后，即可开启圆满。',
-  ),
   lockedPrevLesson: localized('complete the previous lesson first', '请先完成前一课'),
   checkUnderstanding: localized('Check your understanding', '检验你的理解'),
   quizCorrectMsg: localized('✅ Exactly right. (+5 XP)', '✅ 完全正确。(+5 经验)'),
@@ -754,18 +739,6 @@ export function cardsTabLabel(locale: Locale, owned: number, total: number): str
 
 export function badgesTabLabel(locale: Locale, owned: number, total: number): string {
   return `${t('badgesTab', locale)} (${owned}/${total})`;
-}
-
-export function advancedDaysNote(locale: Locale, today: string, dayOffset: number): string {
-  if (dayOffset <= 0) {
-    return pick(locale, `Simulated date: ${today}.`, `模拟日期：${today}。`, `模擬日期：${today}。`);
-  }
-  return pick(
-    locale,
-    `Simulated date: ${today} (advanced ${dayOffset} day${dayOffset === 1 ? '' : 's'}).`,
-    `模拟日期：${today}（已推进 ${dayOffset} 天）。`,
-    `模擬日期：${today}（已推進 ${dayOffset} 天）。`,
-  );
 }
 
 export function continueBtn(locale: Locale, remaining: number): string {

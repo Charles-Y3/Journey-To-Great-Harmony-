@@ -97,82 +97,6 @@ function buildBells(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
   };
 }
 
-/** Warm sine pad — pure ratios, heavy lowpass, slow amplitude breath. */
-function buildPad(audioCtx: AudioContext, out: AudioNode, baseFreq: number, level: number): ActiveTrack {
-  const gain = fadeInGain(audioCtx, level);
-  gain.connect(out);
-
-  const breathGain = audioCtx.createGain();
-  breathGain.gain.value = 1;
-  breathGain.connect(gain);
-
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 420;
-  filter.Q.value = 0.3;
-  filter.connect(breathGain);
-
-  // Soft stereo width via dual detuned voices into a shared filter.
-  const ratios = [1, 1.5, 2];
-  const oscs: OscillatorNode[] = [];
-  ratios.forEach((ratio, i) => {
-    for (const side of [-1, 1] as const) {
-      const osc = audioCtx.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.value = baseFreq * ratio;
-      osc.detune.value = side * (2.5 + i * 0.4);
-      const oscGain = audioCtx.createGain();
-      oscGain.gain.value = ((i === 0 ? 1.0 : 0.55) / ratios.length) * 0.55;
-      const pan = audioCtx.createStereoPanner();
-      pan.pan.value = side * 0.35;
-      osc.connect(oscGain);
-      oscGain.connect(pan);
-      pan.connect(filter);
-      osc.start();
-      oscs.push(osc);
-    }
-  });
-
-  const filterLfo = audioCtx.createOscillator();
-  filterLfo.type = 'sine';
-  filterLfo.frequency.value = 0.035;
-  const filterLfoGain = audioCtx.createGain();
-  filterLfoGain.gain.value = 70;
-  filterLfo.connect(filterLfoGain);
-  filterLfoGain.connect(filter.frequency);
-  filterLfo.start();
-
-  // Slow breath on level (additive on AudioParam around 1.0).
-  const breath = audioCtx.createOscillator();
-  breath.type = 'sine';
-  breath.frequency.value = 0.055;
-  const breathDepth = audioCtx.createGain();
-  breathDepth.gain.value = 0.18;
-  breath.connect(breathDepth);
-  breathDepth.connect(breathGain.gain);
-  breath.start();
-
-  const vibrato = audioCtx.createOscillator();
-  vibrato.type = 'sine';
-  vibrato.frequency.value = 0.07;
-  const vibratoGain = audioCtx.createGain();
-  vibratoGain.gain.value = 0.9;
-  vibrato.connect(vibratoGain);
-  oscs.forEach((o) => vibratoGain.connect(o.detune));
-  vibrato.start();
-
-  return {
-    stop() {
-      fadeOutAndStop(audioCtx, gain, () => {
-        oscs.forEach((o) => o.stop());
-        filterLfo.stop();
-        vibrato.stop();
-        breath.stop();
-      });
-    },
-  };
-}
-
 /** Airy wind chimes: soft attack, sparse rings, no bed tone. */
 function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
   const chimeGain = fadeInGain(audioCtx, 0.4);
@@ -234,7 +158,6 @@ function buildChimes(audioCtx: AudioContext, out: AudioNode): ActiveTrack {
 }
 
 const BUILDERS: Record<MusicTrackId, (audioCtx: AudioContext, out: AudioNode) => ActiveTrack> = {
-  pad: (audioCtx, out) => buildPad(audioCtx, out, 65.41, 0.5), // C2-rooted warm pad
   bells: buildBells,
   chimes: buildChimes,
 };
