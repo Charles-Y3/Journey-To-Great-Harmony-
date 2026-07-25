@@ -1532,9 +1532,10 @@ select:focus {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid rgba(51, 41, 29, 0.35);
+  border: 2px solid rgba(51, 41, 29, 0.55);
   background: rgba(255, 253, 246, 0.92);
-  color: var(--ink);
+  /* Fixed dark ink — cream button face; do not use var(--ink) (light in dark mode). */
+  color: #1a140c;
   font-size: 1.85rem;
   font-weight: 700;
   line-height: 1;
@@ -1544,13 +1545,13 @@ select:focus {
   align-items: center;
   justify-content: center;
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.28);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  text-shadow: none;
 }
 
 .world-rotate:hover {
   background: #fff;
   border-color: var(--jade);
-  color: var(--jade-deep);
+  color: #0f0c08;
 }
 
 .world-rotate-left {
