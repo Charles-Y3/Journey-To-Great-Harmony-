@@ -35,8 +35,18 @@ export const UI = {
   // ── Virtue Glyph sliding puzzles ──────────────────────────────────
   glyphsTitle: localized('Virtue Glyphs', '德行之字'),
   glyphsSubtitle: localized(
-    'A bonus logic puzzle: slide the tiles to restore each Chinese virtue character.',
-    '额外的逻辑谜题：滑动拼块，还原每一个德行汉字。',
+    'Bonus logic puzzles: restore virtue characters — modern slides, then oracle-bone Klotski.',
+    '额外的逻辑谜题：还原德行汉字 — 先是现代方块滑动，再是甲骨文华容道。',
+  ),
+  glyphsTierBeginner: localized('Beginner — Five Constants', '入门 — 五常'),
+  glyphsTierBeginnerBlurb: localized(
+    'Slide square tiles to restore each modern character.',
+    '滑动方块拼块，还原每一个现代汉字。',
+  ),
+  glyphsTierIntermediate: localized('Intermediate — Eight Virtues', '进阶 — 八德'),
+  glyphsTierIntermediateBlurb: localized(
+    'Slide mixed squares and rectangles to restore each oracle-bone form.',
+    '滑动方块与长方形拼块，还原每一个甲骨字形。',
   ),
   glyphsClearedLabel: localized('Cleared', '已解开'),
   glyphsPlayBtn: localized('Play', '开始'),
@@ -51,6 +61,10 @@ export const UI = {
     'Tap a tile next to the empty space to slide it. Restore the character.',
     '点按空格旁的拼块即可滑动。还原这个汉字。',
   ),
+  glyphsKlotskiHint: localized(
+    'Tap a piece that borders empty space to slide it one step. Restore the oracle form.',
+    '点按紧邻空位的拼块，让它滑一步。还原这个甲骨字形。',
+  ),
   glyphsSolvedTitle: localized('Character restored', '汉字已还原'),
   glyphsFirstClearNote: localized(
     'First clear — a small bonus for your journey.',
@@ -62,6 +76,7 @@ export const UI = {
   ),
   glyphsCloseBtn: localized('Continue', '继续'),
   glyphsSizeLabel: localized('Grid', '棋盘'),
+  glyphsKlotskiLabel: localized('Klotski', '华容道'),
   openGlyphsCta: localized('Open Glyphs', '打开字谜'),
 
   // ── Still Waters (daily koan/dilemma card) ──────────────────────────

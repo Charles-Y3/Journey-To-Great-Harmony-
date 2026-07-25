@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="#000" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- e  ear + heart (simplified bone-inspired) -->
+  <path d="M28 18c-8 4-10 14-6 24 4 8 12 12 20 10"/>
+  <path d="M30 22c6 2 10 8 10 16"/>
+  <path d="M22 48h28"/>
+  <path d="M36 48v14"/>
+  <path d="M58 40c-4 2-10 10-8 22 6 12 14 16 22 16s16-4 22-16c2-12-4-20-8-22"/>
+  <path d="M72 48v20"/>
+  <path d="M64 58h16"/>
+  <path d="M48 78c4 6 12 10 20 8"/>
+</svg>

@@ -1,6 +1,23 @@
 import { useEffect, useState } from 'react';
-import { GLYPHS, type VirtueGlyph } from '../../data/glyphs';
+import {
+  BEGINNER_GLYPHS,
+  INTERMEDIATE_GLYPHS,
+  isBeginnerGlyph,
+  isIntermediateGlyph,
+  type BeginnerGlyph,
+  type IntermediateGlyph,
+  type VirtueGlyph,
+} from '../../data/glyphs';
 import { scrambleBoard, fullBoard, trySlide, isSolved, type GlyphBoard } from '../../engine/glyphPuzzle';
+import {
+  previewState,
+  scrambleKlotski,
+  tryTapPiece,
+  isSolved as isKlotskiSolved,
+  movableDirs,
+  occupancy,
+  type KlotskiState,
+} from '../../engine/glyphKlotski';
 import { useJourney } from '../../state/store';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -31,13 +48,47 @@ function TileFace({ character, tileId, size }: { character: string; tileId: numb
   );
 }
 
+function OracleFace({
+  glyph,
+  solvedR,
+  solvedC,
+  w,
+  h,
+}: {
+  glyph: IntermediateGlyph;
+  solvedR: number;
+  solvedC: number;
+  w: number;
+  h: number;
+}) {
+  const { cols, rows } = glyph.board;
+  const layerStyle = {
+    width: `${(cols / w) * 100}%`,
+    height: `${(rows / h) * 100}%`,
+    transform: `translate(${-(solvedC / cols) * 100}%, ${-(solvedR / rows) * 100}%)`,
+  };
+  return (
+    <div className="glyph-tile-clip" aria-hidden="true">
+      <div className="glyph-tile-bg" style={layerStyle} />
+      <div
+        className="glyph-tile-oracle"
+        style={{
+          ...layerStyle,
+          WebkitMaskImage: `url(${glyph.oracleSvg})`,
+          maskImage: `url(${glyph.oracleSvg})`,
+        }}
+      />
+    </div>
+  );
+}
+
 function PuzzleBoard({
   glyph,
   board,
   onSlide,
   interactive = true,
 }: {
-  glyph: VirtueGlyph;
+  glyph: BeginnerGlyph;
   board: GlyphBoard;
   onSlide: (index: number) => void;
   /** false for the assembled "here's the target" preview — a picture, not a puzzle. */
@@ -79,7 +130,86 @@ function PuzzleBoard({
   );
 }
 
-function PuzzleModal({ glyph, onClose }: { glyph: VirtueGlyph; onClose: () => void }) {
+function KlotskiBoard({
+  glyph,
+  state,
+  onTap,
+  interactive = true,
+}: {
+  glyph: IntermediateGlyph;
+  state: KlotskiState;
+  onTap: (pieceId: string) => void;
+  interactive?: boolean;
+}) {
+  const { cols, rows } = glyph.board;
+  const grid = occupancy(state, glyph);
+  const empties: { r: number; c: number }[] = [];
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      if (grid[r]![c] === null) empties.push({ r, c });
+    }
+  }
+
+  return (
+    <div
+      className="glyph-klotski-board"
+      style={{
+        gridTemplateColumns: `repeat(${cols}, 1fr)`,
+        gridTemplateRows: `repeat(${rows}, 1fr)`,
+      }}
+      role="grid"
+      aria-label={glyph.character}
+    >
+      {empties.map(({ r, c }) => (
+        <div
+          key={`e-${r}-${c}`}
+          className="glyph-klotski-empty"
+          style={{ gridColumn: c + 1, gridRow: r + 1 }}
+          role="gridcell"
+        />
+      ))}
+      {glyph.pieces.map((p) => {
+        const pos = state[p.id];
+        if (!pos) return null;
+        const canMove = interactive && movableDirs(state, glyph, p.id).length > 0;
+        const face = (
+          <OracleFace glyph={glyph} solvedR={p.solvedR} solvedC={p.solvedC} w={p.w} h={p.h} />
+        );
+        const style = {
+          gridColumn: `${pos.c + 1} / span ${p.w}`,
+          gridRow: `${pos.r + 1} / span ${p.h}`,
+        };
+        if (!interactive) {
+          return (
+            <div
+              key={p.id}
+              className="glyph-klotski-piece"
+              style={style}
+              role="gridcell"
+            >
+              {face}
+            </div>
+          );
+        }
+        return (
+          <button
+            key={p.id}
+            type="button"
+            className={canMove ? 'glyph-klotski-piece movable' : 'glyph-klotski-piece'}
+            style={style}
+            role="gridcell"
+            onClick={() => onTap(p.id)}
+            disabled={!canMove}
+          >
+            {face}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function BeginnerModal({ glyph, onClose }: { glyph: BeginnerGlyph; onClose: () => void }) {
   const { t, L } = useT();
   const completeGlyph = useJourney((s) => s.completeGlyph);
   const [started, setStarted] = useState(false);
@@ -159,38 +289,183 @@ function PuzzleModal({ glyph, onClose }: { glyph: VirtueGlyph; onClose: () => vo
   );
 }
 
-export default function Glyphs() {
+function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClose: () => void }) {
   const { t, L } = useT();
+  const completeGlyph = useJourney((s) => s.completeGlyph);
+  const [started, setStarted] = useState(false);
+  const [state, setState] = useState<KlotskiState>(() => previewState(glyph));
+  const [solved, setSolved] = useState(false);
+  const [wasFirstClear, setWasFirstClear] = useState(false);
+
+  useEffect(() => {
+    setStarted(false);
+    setState(previewState(glyph));
+    setSolved(false);
+    setWasFirstClear(false);
+  }, [glyph]);
+
+  function start() {
+    setState(scrambleKlotski(glyph));
+    setStarted(true);
+    setSolved(false);
+    setWasFirstClear(false);
+  }
+
+  function tap(pieceId: string) {
+    if (solved) return;
+    const next = tryTapPiece(state, glyph, pieceId);
+    if (!next) return;
+    setState(next);
+    if (isKlotskiSolved(next, glyph)) {
+      setSolved(true);
+      playSfx('chime');
+      const first = completeGlyph(glyph.id);
+      setWasFirstClear(first);
+    }
+  }
+
+  return (
+    <Modal onClose={onClose}>
+      <h2>
+        {glyph.character} · {L(glyph.title)}
+      </h2>
+      {!started ? (
+        <>
+          <p className="small muted">{t('glyphsPreviewHint')}</p>
+          <KlotskiBoard glyph={glyph} state={state} onTap={() => {}} interactive={false} />
+          <div className="glyph-actions">
+            <button type="button" className="btn btn-primary" onClick={start}>
+              {t('glyphsStartBtn')}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <p className="small muted">{t('glyphsKlotskiHint')}</p>
+          <KlotskiBoard glyph={glyph} state={state} onTap={tap} />
+          <div className="glyph-actions">
+            <button type="button" className="btn" onClick={start}>
+              {t('glyphsShuffleBtn')}
+            </button>
+          </div>
+        </>
+      )}
+
+      {solved && (
+        <div className="glyph-solved">
+          <div
+            className="glyph-solved-oracle"
+            aria-hidden="true"
+            style={{
+              WebkitMaskImage: `url(${glyph.oracleSvg})`,
+              maskImage: `url(${glyph.oracleSvg})`,
+            }}
+          />
+          <h3>{t('glyphsSolvedTitle')}</h3>
+          <p className="glyph-meaning">{L(glyph.meaning)}</p>
+          <p className="small">{L(glyph.teaching)}</p>
+          <p className="small muted">{wasFirstClear ? t('glyphsFirstClearNote') : t('glyphsReplayNote')}</p>
+          <button type="button" className="btn btn-primary" onClick={onClose}>
+            {t('glyphsCloseBtn')}
+          </button>
+        </div>
+      )}
+    </Modal>
+  );
+}
+
+function GlyphModal({ glyph, onClose }: { glyph: VirtueGlyph; onClose: () => void }) {
+  if (isBeginnerGlyph(glyph)) return <BeginnerModal glyph={glyph} onClose={onClose} />;
+  if (isIntermediateGlyph(glyph)) return <IntermediateModal glyph={glyph} onClose={onClose} />;
+  return null;
+}
+
+function GlyphCard({
+  glyph,
+  done,
+  onPlay,
+}: {
+  glyph: VirtueGlyph;
+  done: boolean;
+  onPlay: () => void;
+}) {
+  const { t, L } = useT();
+  const meta = isBeginnerGlyph(glyph)
+    ? `${t('glyphsSizeLabel')} ${glyph.size}×${glyph.size}`
+    : `${t('glyphsKlotskiLabel')} ${glyph.board.cols}×${glyph.board.rows}`;
+
+  return (
+    <div className={done ? 'card glyph-card cleared' : 'card glyph-card'}>
+      <div className="glyph-card-char" aria-hidden="true">
+        {isIntermediateGlyph(glyph) ? (
+          <span
+            className="glyph-card-oracle"
+            style={{
+              WebkitMaskImage: `url(${glyph.oracleSvg})`,
+              maskImage: `url(${glyph.oracleSvg})`,
+            }}
+          />
+        ) : (
+          glyph.character
+        )}
+      </div>
+      <div className="glyph-card-body">
+        <strong>
+          {glyph.character} · {L(glyph.title)}
+        </strong>
+        <p className="small muted">{L(glyph.meaning)}</p>
+        <p className="small muted">
+          {meta}
+          {done ? ` · ${t('glyphsClearedLabel')}` : ''}
+        </p>
+        <button type="button" className="btn btn-primary" onClick={onPlay}>
+          {done ? t('glyphsReplayBtn') : t('glyphsPlayBtn')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default function Glyphs() {
+  const { t } = useT();
   const completedGlyphs = useJourney((s) => s.completedGlyphs ?? []);
   const [open, setOpen] = useState<VirtueGlyph | null>(null);
 
   return (
     <div>
       <PageHeader emoji="🧩" title={t('glyphsTitle')} subtitle={t('glyphsSubtitle')} />
-      <div className="glyph-list">
-        {GLYPHS.map((g) => {
-          const done = completedGlyphs.includes(g.id);
-          return (
-            <div key={g.id} className={done ? 'card glyph-card cleared' : 'card glyph-card'}>
-              <div className="glyph-card-char" aria-hidden="true">
-                {g.character}
-              </div>
-              <div className="glyph-card-body">
-                <strong>{L(g.title)}</strong>
-                <p className="small muted">{L(g.meaning)}</p>
-                <p className="small muted">
-                  {t('glyphsSizeLabel')} {g.size}×{g.size}
-                  {done ? ` · ${t('glyphsClearedLabel')}` : ''}
-                </p>
-                <button type="button" className="btn btn-primary" onClick={() => setOpen(g)}>
-                  {done ? t('glyphsReplayBtn') : t('glyphsPlayBtn')}
-                </button>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-      {open && <PuzzleModal glyph={open} onClose={() => setOpen(null)} />}
+
+      <section className="glyph-tier">
+        <h2 className="glyph-tier-title">{t('glyphsTierBeginner')}</h2>
+        <p className="small muted glyph-tier-blurb">{t('glyphsTierBeginnerBlurb')}</p>
+        <div className="glyph-list">
+          {BEGINNER_GLYPHS.map((g) => (
+            <GlyphCard
+              key={g.id}
+              glyph={g}
+              done={completedGlyphs.includes(g.id)}
+              onPlay={() => setOpen(g)}
+            />
+          ))}
+        </div>
+      </section>
+
+      <section className="glyph-tier">
+        <h2 className="glyph-tier-title">{t('glyphsTierIntermediate')}</h2>
+        <p className="small muted glyph-tier-blurb">{t('glyphsTierIntermediateBlurb')}</p>
+        <div className="glyph-list">
+          {INTERMEDIATE_GLYPHS.map((g) => (
+            <GlyphCard
+              key={g.id}
+              glyph={g}
+              done={completedGlyphs.includes(g.id)}
+              onPlay={() => setOpen(g)}
+            />
+          ))}
+        </div>
+      </section>
+
+      {open && <GlyphModal glyph={open} onClose={() => setOpen(null)} />}
     </div>
   );
 }
