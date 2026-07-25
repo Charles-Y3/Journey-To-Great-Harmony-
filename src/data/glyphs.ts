@@ -30,7 +30,10 @@ export const GLYPHS: VirtueGlyph[] = [
     // real detail. The top-left corner is just the start of 亻's plain
     // vertical stroke — a safer, less disruptive cell to leave blank.
     solvedEmptyIndex: 0,
-    title: localized('Ren — Benevolence', '仁 — 仁爱'),
+    // Chinese titles are the gloss only — the character is already shown
+    // beside the title in the UI, so "仁 — 仁爱" / "智 — 智" read as repeats
+    // (and Traditional conversion turns "義 — 义" into "義 — 義").
+    title: localized('Ren — Benevolence', '仁爱'),
     meaning: localized(
       'Care for others as people like yourself — the heart of Confucian virtue.',
       '爱人如己，以他人为人 — 儒家德性的核心。',
@@ -44,7 +47,7 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'yi',
     character: '義',
     size: 3,
-    title: localized('Yi — Righteousness', '義 — 义'),
+    title: localized('Yi — Righteousness', '道义'),
     meaning: localized(
       'Doing what ought to be done, even when it costs you.',
       '做应当做的事，即便要付出代价。',
@@ -58,7 +61,7 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'li',
     character: '禮',
     size: 3,
-    title: localized('Li — Ritual Propriety', '禮 — 礼'),
+    title: localized('Li — Ritual Propriety', '礼仪'),
     meaning: localized(
       'Forms of respect that train the heart — manners with meaning.',
       '带着敬意的形式，用以陶冶内心 — 有意义的礼节。',
@@ -72,7 +75,7 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'zhi',
     character: '智',
     size: 3,
-    title: localized('Zhi — Wisdom', '智 — 智'),
+    title: localized('Zhi — Wisdom', '智慧'),
     meaning: localized(
       'Clear seeing that joins understanding with how you live.',
       '清明的看见，把理解与如何生活连在一起。',
@@ -86,7 +89,7 @@ export const GLYPHS: VirtueGlyph[] = [
     id: 'xin',
     character: '信',
     size: 3,
-    title: localized('Xin — Trustworthiness', '信 — 信'),
+    title: localized('Xin — Trustworthiness', '诚信'),
     meaning: localized(
       'Keeping your word so others can rest their trust on you.',
       '信守承诺，使他人可以把信赖安放在你身上。',
