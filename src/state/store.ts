@@ -396,9 +396,10 @@ export const useJourney = create<JourneyState>()(
           apply((draft, today) => {
             const rec = dayRec(draft, today);
             if (rec.challengeDone) return;
+            if (!note || !isMeaningful(note, TEXT_MIN.challengeNote)) return;
             rec.challengeDone = true;
             rec.challengeId = challengeId;
-            if (note) rec.challengeNote = note;
+            rec.challengeNote = note;
             draft.xp += XP_FOR.challenge;
             draft.harmonyPoints += HARMONY_FOR.challenge;
             markActive(draft, today);

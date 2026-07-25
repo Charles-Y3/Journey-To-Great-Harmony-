@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { forestInfo, statsFromData, type JourneyData } from '../../state/selectors';
 import { FOREST_STAGES } from '../../engine/progression';
@@ -6,6 +6,8 @@ import { seededRandom } from '../../engine/progression';
 import { CHALLENGES } from '../../data/challenges';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
+import { useSound } from '../../state/soundStore';
+import { startForestAmbience, stopForestAmbience } from '../../engine/sfx';
 
 // Distinct palette per stage so the scene visibly shifts from bare and dusty
 // (Seed) to lush and serene (Sanctuary), not just "the same green".
@@ -284,9 +286,17 @@ export default function Forest() {
   const stats = statsFromData(d);
   const { t, L } = useT();
   const [previewStage, setPreviewStage] = useState<number | null>(null);
+  const forestMuted = useSound((s) => s.forestMuted);
+  const setForestMuted = useSound((s) => s.setForestMuted);
   const todayRec = d.days[today] ?? {};
   const showVirtueLeaf = !!(todayRec.challengeDone && todayRec.challengeNote);
   const todayChallenge = todayRec.challengeId ? CHALLENGES.find((c) => c.id === todayRec.challengeId) : undefined;
+
+  useEffect(() => {
+    if (!forestMuted && info.stageIndex >= 1) startForestAmbience();
+    else stopForestAmbience();
+    return () => stopForestAmbience();
+  }, [forestMuted, info.stageIndex]);
 
   const stageProgress = info.next
     ? Math.max(0, Math.min(1, (info.score - info.stage.threshold) / (info.next.threshold - info.stage.threshold)))
@@ -304,12 +314,23 @@ export default function Forest() {
     <div>
       <PageHeader emoji="🌲" title={t('forestTitle')} subtitle={t('forestSubtitle')} />
 
-      <ForestScene
-        stageIndex={info.stageIndex}
-        stageProgress={stageProgress}
-        seedCaption={t('forestSeedCaption')}
-        showVirtueLeaf={showVirtueLeaf}
-      />
+      <div className="forest-scene-wrap">
+        <button
+          type="button"
+          className="forest-mute-btn"
+          onClick={() => setForestMuted(!forestMuted)}
+          aria-label={forestMuted ? t('forestUnmuteLabel') : t('forestMuteLabel')}
+          title={forestMuted ? t('forestUnmuteLabel') : t('forestMuteLabel')}
+        >
+          {forestMuted ? '🔇' : '🔊'}
+        </button>
+        <ForestScene
+          stageIndex={info.stageIndex}
+          stageProgress={stageProgress}
+          seedCaption={t('forestSeedCaption')}
+          showVirtueLeaf={showVirtueLeaf}
+        />
+      </div>
       {showVirtueLeaf && (
         <p className="small muted" style={{ marginTop: 6 }}>
           {t('forestVirtueLeaf')}

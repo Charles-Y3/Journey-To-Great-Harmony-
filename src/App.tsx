@@ -40,19 +40,18 @@ const SIDEBAR_NAV = [
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
 ];
 
-// Mobile bottom nav shows only the daily-loop essentials; everything else
-// (Timeline, Forest, World, Community, Collection) lives behind "More".
+// Mobile bottom nav: daily loop + living places; the rest lives behind "More".
 const BOTTOM_NAV = [
   { to: '/', emoji: '🌅', key: 'navToday' as const },
   { to: '/practice', emoji: '🎯', key: 'navPractice' as const },
   { to: '/knowledge', emoji: '🌳', key: 'navKnowledge' as const },
-  { to: '/map', emoji: '🗺️', key: 'navMap' as const },
+  { to: '/forest', emoji: '🌲', key: 'navForest' as const },
+  { to: '/world', emoji: '🌏', key: 'navWorld' as const },
 ];
 
 const MORE_ITEMS = [
   { to: '/timeline', emoji: '⏳', key: 'navTimeline' as const },
-  { to: '/forest', emoji: '🌲', key: 'navForest' as const },
-  { to: '/world', emoji: '🌏', key: 'navWorld' as const },
+  { to: '/map', emoji: '🗺️', key: 'navMap' as const },
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
 ];
@@ -125,9 +124,9 @@ function BottomNav() {
             <span>{t(item.key)}</span>
           </NavLink>
         ))}
-        <button className="nav-link" onClick={() => setShowMore(true)}>
+        <button type="button" className="nav-link nav-link-more" onClick={() => setShowMore(true)}>
           <span className="nav-emoji">
-            🗂️
+            ⋯
             <NavBadge count={newCollectionCount} />
           </span>
           <span>{t('navMore')}</span>

@@ -93,3 +93,48 @@ export function playSfx(id: SfxId): void {
     // Autoplay or unsupported — ignore; ritual should never crash the app.
   }
 }
+
+function playChirp(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  const base = 1800 + Math.random() * 900;
+  tone(audioCtx, base, now, 0.09, 0.07 * vol, 'sine');
+  tone(audioCtx, base * 1.12, now + 0.07, 0.08, 0.05 * vol, 'sine');
+  if (Math.random() < 0.4) tone(audioCtx, base * 0.92, now + 0.16, 0.07, 0.04 * vol, 'triangle');
+}
+
+function playSoftCoo(audioCtx: AudioContext, vol: number) {
+  const now = audioCtx.currentTime;
+  tone(audioCtx, 420 + Math.random() * 40, now, 0.35, 0.05 * vol, 'triangle');
+  tone(audioCtx, 380, now + 0.18, 0.4, 0.035 * vol, 'triangle');
+}
+
+let forestLoopTimer: number | null = null;
+
+/** Sparse animal/bird ambience while the Virtue Forest tab is open. */
+export function startForestAmbience(): void {
+  stopForestAmbience();
+  const tick = () => {
+    if (useSound.getState().forestMuted) return;
+    const vol = volume();
+    if (vol <= 0.001) return;
+    try {
+      const audioCtx = getContext();
+      if (Math.random() < 0.65) playChirp(audioCtx, vol * 0.85);
+      else playSoftCoo(audioCtx, vol * 0.9);
+    } catch {
+      /* ignore */
+    }
+  };
+  // First sound after a short beat so landing on the tab isn't sudden.
+  forestLoopTimer = window.setTimeout(function loop() {
+    tick();
+    forestLoopTimer = window.setTimeout(loop, 2800 + Math.random() * 4200);
+  }, 900);
+}
+
+export function stopForestAmbience(): void {
+  if (forestLoopTimer !== null) {
+    window.clearTimeout(forestLoopTimer);
+    forestLoopTimer = null;
+  }
+}

@@ -7,7 +7,7 @@ import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
 import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
-import { meaningfulLength, TEXT_MIN } from '../../engine/textQuality';
+import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { yourNoteLabel, journalCount, minLengthHint, type UiKey } from '../../i18n/strings';
@@ -50,7 +50,10 @@ function MorningCard({ today }: { today: string }) {
         <>
           <p className="small muted">{t('intentionPrompt')}</p>
           <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('intentionPlaceholder')} />
-          <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, meaningfulLength(text), TEXT_MIN.intention)}</p>
+          <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, progressLength(text), TEXT_MIN.intention)}</p>
+          {progressLength(text) >= TEXT_MIN.intention && looksLikeNonsense(text) && (
+            <p className="small muted">{t('textNonsenseHint')}</p>
+          )}
           <button
             className="btn btn-primary"
             style={{ marginTop: 6 }}
@@ -106,11 +109,16 @@ function ChallengeCard({ today }: { today: string }) {
         <>
           <p className="small muted">{t('challengeNoteHint')}</p>
           <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('challengeNotePlaceholder')} />
+          <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, progressLength(note), TEXT_MIN.challengeNote)}</p>
+          {progressLength(note) >= TEXT_MIN.challengeNote && looksLikeNonsense(note) && (
+            <p className="small muted">{t('textNonsenseHint')}</p>
+          )}
           <button
             className="btn btn-primary"
             style={{ marginTop: 10 }}
+            disabled={meaningfulLength(note) < TEXT_MIN.challengeNote}
             onClick={() => {
-              completeChallenge(challenge.id, note.trim() || undefined);
+              completeChallenge(challenge.id, note.trim());
               playSfx('bell');
             }}
           >
@@ -170,13 +178,22 @@ function EveningCard({ today }: { today: string }) {
           <p className="small muted">{t('reflectionIntro')}</p>
           <label className="small">{t('reflectionQ1')}</label>
           <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(learned), TEXT_MIN.reflection)}</p>
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(learned), TEXT_MIN.reflection)}</p>
+          {progressLength(learned) >= TEXT_MIN.reflection && looksLikeNonsense(learned) && (
+            <p className="small muted">{t('textNonsenseHint')}</p>
+          )}
           <label className="small">{t('reflectionQ2')}</label>
           <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(virtue), TEXT_MIN.reflection)}</p>
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(virtue), TEXT_MIN.reflection)}</p>
+          {progressLength(virtue) >= TEXT_MIN.reflection && looksLikeNonsense(virtue) && (
+            <p className="small muted">{t('textNonsenseHint')}</p>
+          )}
           <label className="small">{rec.intention ? t('reflectionQ3WithIntention') : t('reflectionQ3')}</label>
           <textarea rows={2} value={improve} onChange={(e) => setImprove(e.target.value)} />
-          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, meaningfulLength(improve), TEXT_MIN.reflection)}</p>
+          <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(improve), TEXT_MIN.reflection)}</p>
+          {progressLength(improve) >= TEXT_MIN.reflection && looksLikeNonsense(improve) && (
+            <p className="small muted">{t('textNonsenseHint')}</p>
+          )}
           <button
             className="btn btn-primary"
             disabled={meaningfulLength(learned) < TEXT_MIN.reflection || meaningfulLength(virtue) < TEXT_MIN.reflection || meaningfulLength(improve) < TEXT_MIN.reflection}

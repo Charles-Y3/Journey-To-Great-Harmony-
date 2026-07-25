@@ -4,7 +4,7 @@ import { useJourney } from '../state/store';
 import { useT } from '../i18n/useT';
 import { continueBtn, minLengthHint, capstoneSubmitBtn, type UiKey } from '../i18n/strings';
 import { XP_FOR } from '../engine/progression';
-import { meaningfulLength, TEXT_MIN } from '../engine/textQuality';
+import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../engine/textQuality';
 import { playSfx } from '../engine/sfx';
 
 export function ProgressBar({
@@ -151,7 +151,10 @@ export function CapstoneModal({
       </h2>
       <p>{prompt}</p>
       <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('capstonePlaceholder')} />
-      <p className="small muted">{minLengthHint(locale, meaningfulLength(text), TEXT_MIN.capstone)}</p>
+      <p className="small muted">{minLengthHint(locale, progressLength(text), TEXT_MIN.capstone)}</p>
+      {progressLength(text) >= TEXT_MIN.capstone && looksLikeNonsense(text) && (
+        <p className="small muted">{t('textNonsenseHint')}</p>
+      )}
       <button
         className="btn btn-primary"
         disabled={meaningfulLength(text) < TEXT_MIN.capstone}

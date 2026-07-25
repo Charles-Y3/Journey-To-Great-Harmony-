@@ -211,13 +211,19 @@ export const UI = {
   challengeComplete: localized('Challenge complete ✓', '挑战完成 ✓'),
   challengeNoteLabel: localized('Your note', '你的记录'),
   challengeNotePlaceholder: localized(
-    'Optional: a few words so today’s practice is witnessed…',
-    '选填：写几句，让今天的践行被看见…',
+    'A few honest words so today’s practice is witnessed…',
+    '写几句真诚的话，让今天的践行被看见…',
   ),
   challengeNoteHint: localized(
-    'A short note turns the act into a living memory in your journal.',
-    '简短的一笔，会让这次践行成为日志里鲜活的记忆。',
+    'A short, real note turns the act into a living memory in your journal.',
+    '一句真实的短记，会让这次践行成为日志里鲜活的记忆。',
   ),
+  textNonsenseHint: localized(
+    'That looks like filler or keyboard noise — try a few real words.',
+    '这看起来像随意填充或乱按键盘 — 请试着写几句真实的话。',
+  ),
+  forestMuteLabel: localized('Mute forest sounds', '静音森林声响'),
+  forestUnmuteLabel: localized('Unmute forest sounds', '开启森林声响'),
   challengeBreathBtn: localized('Pause, then practise', '先静心，再践行'),
   challengeBtn: localized('I practised this today (+15 XP)', '我今天践行了 (+15 经验)'),
   breathGateTitle: localized('One full breath', '一次完整的呼吸'),
@@ -715,9 +721,9 @@ export function minLengthHint(locale: Locale, current: number, min: number): str
   if (current >= min) return pick(locale, '✓ Thank you for taking the time.', '✓ 感谢你用心写下这些。', '✓ 感謝你用心寫下這些。');
   return pick(
     locale,
-    `Write a few honest, meaningful words — ${current}/${min} characters counted so far`,
-    `请写下几句真诚、有意义的话 — 目前已计入 ${current}/${min} 字`,
-    `請寫下幾句真誠、有意義的話 — 目前已計入 ${current}/${min} 字`,
+    `Write a few honest, meaningful words — ${current}/${min} characters so far`,
+    `请写下几句真诚、有意义的话 — 目前 ${current}/${min} 字`,
+    `請寫下幾句真誠、有意義的話 — 目前 ${current}/${min} 字`,
   );
 }
 
