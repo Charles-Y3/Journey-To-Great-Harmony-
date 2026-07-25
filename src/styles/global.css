@@ -1106,6 +1106,16 @@ select:focus {
   font-size: 0.95rem;
 }
 
+.reminder-nudge {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-start;
+}
+
 .journal-empty-title {
   font-style: italic;
   margin: 4px 0 6px;

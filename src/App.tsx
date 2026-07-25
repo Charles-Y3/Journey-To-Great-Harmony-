@@ -311,6 +311,8 @@ function ReminderSection() {
   const setMorningTime = useReminders((s) => s.setMorningTime);
   const eveningTime = useReminders((s) => s.eveningTime);
   const setEveningTime = useReminders((s) => s.setEveningTime);
+  const markMorningCalendarAdded = useReminders((s) => s.markMorningCalendarAdded);
+  const markEveningCalendarAdded = useReminders((s) => s.markEveningCalendarAdded);
 
   function addToCalendar(kind: 'morning' | 'evening') {
     const time = kind === 'morning' ? morningTime : eveningTime;
@@ -321,10 +323,12 @@ function ReminderSection() {
       time,
     });
     downloadIcs(`${kind}-reminder.ics`, ics);
+    if (kind === 'morning') markMorningCalendarAdded();
+    else markEveningCalendarAdded();
   }
 
   return (
-    <div className="card">
+    <div className="card" id="settings-reminders">
       <h3>{t('settingsReminderTitle')}</h3>
       <p className="small muted">{t('settingsReminderDesc')}</p>
 
@@ -538,12 +542,27 @@ function RankModal({ xp, onClose }: { xp: number; onClose: () => void }) {
   );
 }
 
-function SettingsModal({ onClose }: { onClose: () => void }) {
+function SettingsModal({
+  onClose,
+  focusSection,
+}: {
+  onClose: () => void;
+  focusSection?: string | null;
+}) {
   const { t } = useT();
   const navigate = useNavigate();
   const reset = useJourney((s) => s.resetJourney);
   const resetOnboardingUi = useUi((s) => s.resetOnboardingUi);
   const [confirming, setConfirming] = useState(false);
+
+  useEffect(() => {
+    if (focusSection !== 'reminders') return;
+    const id = window.setTimeout(() => {
+      document.getElementById('settings-reminders')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+    return () => window.clearTimeout(id);
+  }, [focusSection]);
+
   return (
     <Modal onClose={onClose}>
       <h2>{t('settingsTitle')}</h2>
@@ -695,6 +714,7 @@ export default function App() {
   const setSeenPacingIntro = useUi((s) => s.setSeenPacingIntro);
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
+  const [settingsFocus, setSettingsFocus] = useState<string | null>(null);
   const [showRankModal, setShowRankModal] = useState(false);
   const [showStreakInfo, setShowStreakInfo] = useState(false);
   const [showHarmonyInfo, setShowHarmonyInfo] = useState(false);
@@ -718,7 +738,11 @@ export default function App() {
   }, [hasChosenLocale, hasSetName, seenPacingIntro]);
 
   useEffect(() => {
-    const open = () => setShowSettings(true);
+    const open = (e: Event) => {
+      const section = (e as CustomEvent<{ section?: string }>).detail?.section ?? null;
+      setSettingsFocus(section);
+      setShowSettings(true);
+    };
     window.addEventListener('journey:open-settings', open);
     return () => window.removeEventListener('journey:open-settings', open);
   }, []);
@@ -805,7 +829,15 @@ export default function App() {
       {/* Hide celebrations under onboarding modals so a primary CTA click
           cannot fall through onto a "Visit Collection" link underneath. */}
       {!showPacing && !showWelcome && <CelebrationOverlay />}
-      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
+      {showSettings && (
+        <SettingsModal
+          focusSection={settingsFocus}
+          onClose={() => {
+            setShowSettings(false);
+            setSettingsFocus(null);
+          }}
+        />
+      )}
       {showRankModal && <RankModal xp={xp} onClose={() => setShowRankModal(false)} />}
       {showStreakInfo && <StreakInfoModal onClose={() => setShowStreakInfo(false)} />}
       {showHarmonyInfo && <HarmonyInfoModal onClose={() => setShowHarmonyInfo(false)} />}

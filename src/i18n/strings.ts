@@ -103,6 +103,15 @@ export const UI = {
     "This downloads a small calendar file (.ics) that repeats daily. If you change the time above, tap \"Add to Calendar\" again to update it.",
     '这会下载一个每日重复的日历文件（.ics）。若你更改了上方的时间，请再次点击「加入日历」以更新。',
   ),
+  reminderNudgeMorning: localized(
+    'Want a daily nudge to set your intention? Add a morning reminder in Settings.',
+    '想每天被提醒立下心愿吗？可在设置中加入早晨提醒。',
+  ),
+  reminderNudgeEvening: localized(
+    'Want a daily nudge to reflect? Add an evening reminder in Settings.',
+    '想每天被提醒反思吗？可在设置中加入夜间提醒。',
+  ),
+  reminderNudgeOpenSettings: localized('Set reminder', '设置提醒'),
 
   // ── Settings: ambient music ──────────────────────────────────────────
   settingsMusicTitle: localized('Background Music', '背景音乐'),

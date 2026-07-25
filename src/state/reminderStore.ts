@@ -4,8 +4,13 @@ import { persist } from 'zustand/middleware';
 interface ReminderState {
   morningTime: string; // "HH:MM", 24-hour, local time
   eveningTime: string;
+  /** True after the user taps “Add to Calendar” for that reminder (downloads .ics). */
+  morningCalendarAdded: boolean;
+  eveningCalendarAdded: boolean;
   setMorningTime: (time: string) => void;
   setEveningTime: (time: string) => void;
+  markMorningCalendarAdded: () => void;
+  markEveningCalendarAdded: () => void;
 }
 
 // Persisted separately from journey progress and locale, since these are
@@ -20,9 +25,25 @@ export const useReminders = create<ReminderState>()(
     (set) => ({
       morningTime: '08:00',
       eveningTime: '19:00',
+      morningCalendarAdded: false,
+      eveningCalendarAdded: false,
       setMorningTime: (morningTime) => set({ morningTime }),
       setEveningTime: (eveningTime) => set({ eveningTime }),
+      markMorningCalendarAdded: () => set({ morningCalendarAdded: true }),
+      markEveningCalendarAdded: () => set({ eveningCalendarAdded: true }),
     }),
-    { name: 'journey-reminders', version: 1 },
+    {
+      name: 'journey-reminders',
+      version: 2,
+      migrate: (persisted) => {
+        const p = persisted as Partial<ReminderState>;
+        return {
+          morningTime: p.morningTime ?? '08:00',
+          eveningTime: p.eveningTime ?? '19:00',
+          morningCalendarAdded: p.morningCalendarAdded ?? false,
+          eveningCalendarAdded: p.eveningCalendarAdded ?? false,
+        };
+      },
+    },
   ),
 );

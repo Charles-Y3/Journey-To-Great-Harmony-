@@ -17,11 +17,30 @@ import { useTodayTasks } from '../home/useTodayTasks';
 import BreathGate from './BreathGate';
 import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
 import { collectPastIntentions, journalPromptFromIntentions } from '../../engine/journalPrompts';
+import { useReminders } from '../../state/reminderStore';
 
 // Evening reflection only opens from 5pm local time, up to midnight — it's
 // meant to be a look back on the day that's actually happened, not
 // something to front-load in the morning.
 const EVENING_OPEN_HOUR = 17;
+
+function openReminderSettings() {
+  window.dispatchEvent(new CustomEvent('journey:open-settings', { detail: { section: 'reminders' } }));
+}
+
+function ReminderNudge({ kind }: { kind: 'morning' | 'evening' }) {
+  const { t } = useT();
+  const added = useReminders((s) => (kind === 'morning' ? s.morningCalendarAdded : s.eveningCalendarAdded));
+  if (added) return null;
+  return (
+    <div className="reminder-nudge">
+      <p className="small muted">{t(kind === 'morning' ? 'reminderNudgeMorning' : 'reminderNudgeEvening')}</p>
+      <button type="button" className="btn" onClick={openReminderSettings}>
+        {t('reminderNudgeOpenSettings')}
+      </button>
+    </div>
+  );
+}
 
 function practiceTimeOfDay(): 'morning' | 'day' | 'evening' {
   const h = new Date().getHours();
@@ -90,6 +109,7 @@ function MorningCard({ today }: { today: string }) {
           </button>
         </>
       )}
+      <ReminderNudge kind="morning" />
     </div>
   );
 }
@@ -233,6 +253,7 @@ function EveningCard({ today }: { today: string }) {
           </button>
         </>
       )}
+      <ReminderNudge kind="evening" />
     </div>
   );
 }
