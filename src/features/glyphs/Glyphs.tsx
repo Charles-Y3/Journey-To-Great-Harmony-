@@ -6,19 +6,25 @@ import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { playSfx } from '../../engine/sfx';
 
+// Not every Chinese character spreads its ink evenly across its bounding
+// square (e.g. 仁's right-hand 二 sits only in the vertical middle), so a
+// pure font-glyph crop can leave some tiles looking nearly blank — easy to
+// mistake for the empty cell. glyph-tile-bg sits behind the character,
+// cropped by the exact same transform, and paints a continuous gradient
+// across the whole character's bounding box so every tile shows a distinct,
+// non-blank patch of color regardless of how sparse that tile's ink is.
 function TileFace({ character, tileId, size }: { character: string; tileId: number; size: number }) {
   const row = Math.floor(tileId / size);
   const col = tileId % size;
+  const layerStyle = {
+    width: `${size * 100}%`,
+    height: `${size * 100}%`,
+    transform: `translate(${-col * (100 / size)}%, ${-row * (100 / size)}%)`,
+  };
   return (
     <div className="glyph-tile-clip" aria-hidden="true">
-      <div
-        className="glyph-tile-glyph"
-        style={{
-          width: `${size * 100}%`,
-          height: `${size * 100}%`,
-          transform: `translate(${-col * (100 / size)}%, ${-row * (100 / size)}%)`,
-        }}
-      >
+      <div className="glyph-tile-bg" style={layerStyle} />
+      <div className="glyph-tile-glyph" style={layerStyle}>
         {character}
       </div>
     </div>

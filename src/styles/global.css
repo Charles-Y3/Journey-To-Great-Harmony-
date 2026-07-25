@@ -2330,6 +2330,7 @@ button.stage-step:disabled {
 button.glyph-tile {
   cursor: pointer;
   color: inherit;
+  border: 1px solid var(--line);
 }
 
 button.glyph-tile:hover {
@@ -2341,6 +2342,17 @@ button.glyph-tile:hover {
   position: absolute;
   inset: 0;
   overflow: hidden;
+}
+
+/* A continuous gradient across the whole character's bounding box, cropped
+   per-tile by the same transform as .glyph-tile-glyph — see the comment on
+   TileFace in Glyphs.tsx for why this exists. Every tile gets a distinct,
+   non-blank patch even where the character itself has no ink there. */
+.glyph-tile-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: radial-gradient(circle at 50% 50%, var(--gold-soft), var(--jade-soft) 75%);
 }
 
 .glyph-tile-glyph {
