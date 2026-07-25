@@ -36,8 +36,14 @@ export default function Today() {
   const setLastWeeklyReviewWeek = useUi((s) => s.setLastWeeklyReviewWeek);
   const lastYearlyReviewYear = useUi((s) => s.lastYearlyReviewYear);
   const setLastYearlyReviewYear = useUi((s) => s.setLastYearlyReviewYear);
+  const seenSetupTips = useUi((s) => s.seenSetupTips);
+  const setSeenSetupTips = useUi((s) => s.setSeenSetupTips);
   const [showWeekly, setShowWeekly] = useState(false);
   const [showYearly, setShowYearly] = useState(false);
+
+  function openSettings() {
+    window.dispatchEvent(new CustomEvent('journey:open-settings'));
+  }
 
   // First open of a new ISO week: seed silently once, then show the review.
   useEffect(() => {
@@ -125,6 +131,26 @@ export default function Today() {
         <p className="yesterday-strip">
           <strong>{t('yesterdayWroteLabel')}:</strong> “{yesterdayLine}”
         </p>
+      )}
+
+      {!seenSetupTips && (
+        <div className="card setup-tips-card">
+          <h3>{t('setupTipsTitle')}</h3>
+          <p className="small muted">{t('setupTipsBody')}</p>
+          <ul className="setup-tips-list">
+            <li>{t('setupTipReminders')}</li>
+            <li>{t('setupTipMusic')}</li>
+            <li>{t('setupTipInstall')}</li>
+          </ul>
+          <div className="setup-tips-actions">
+            <button type="button" className="btn btn-primary" onClick={openSettings}>
+              {t('setupTipsOpenSettings')}
+            </button>
+            <button type="button" className="btn" onClick={() => setSeenSetupTips(true)}>
+              {t('setupTipsDismiss')}
+            </button>
+          </div>
+        </div>
       )}
 
       <div className="card">

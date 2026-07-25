@@ -1072,6 +1072,24 @@ select:focus {
 .breath-circle-in { transform: scale(1.25); }
 .breath-circle-out { transform: scale(0.85); }
 
+.setup-tips-list {
+  margin: 10px 0 14px;
+  padding-left: 1.2em;
+  color: var(--ink-soft);
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.setup-tips-list li {
+  margin-bottom: 8px;
+}
+
+.setup-tips-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .today-intention-strip,
 .yesterday-strip {
   margin: 0 0 12px;

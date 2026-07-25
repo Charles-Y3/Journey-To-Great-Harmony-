@@ -99,7 +99,7 @@ export function branchCapstoneKey(branch: string): string {
 // without it, the whole Knowledge Path or Wisdom Timeline could be
 // finished in one sitting. Reaching the cap doesn't lock the reading —
 // only the XP-granting "complete" action — so learning stays accessible.
-export const DAILY_LESSON_CAP = 2;
+export const DAILY_LESSON_CAP = 3;
 export const DAILY_TIMELINE_CAP = 2;
 
 export function lessonsCompletedToday(d: JourneyData, today: string): number {

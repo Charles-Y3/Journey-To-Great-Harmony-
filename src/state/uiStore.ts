@@ -22,6 +22,9 @@ interface UiState {
   setLastFullHarmonySfxDay: (day: string) => void;
   /** After "Reset journey", re-show welcome/pacing as on a new start. */
   resetOnboardingUi: () => void;
+  /** Soft tips card on Today (reminders / music / install) has been dismissed. */
+  seenSetupTips: boolean;
+  setSeenSetupTips: (seen: boolean) => void;
 }
 
 export const useUi = create<UiState>()(
@@ -39,6 +42,8 @@ export const useUi = create<UiState>()(
       setLastEveningSfxDay: (day) => set({ lastEveningSfxDay: day }),
       lastFullHarmonySfxDay: null,
       setLastFullHarmonySfxDay: (day) => set({ lastFullHarmonySfxDay: day }),
+      seenSetupTips: false,
+      setSeenSetupTips: (seen) => set({ seenSetupTips: seen }),
       resetOnboardingUi: () =>
         set({
           lastWelcomeSeenDay: null,
@@ -47,9 +52,10 @@ export const useUi = create<UiState>()(
           lastYearlyReviewYear: null,
           lastEveningSfxDay: null,
           lastFullHarmonySfxDay: null,
+          seenSetupTips: false,
         }),
     }),
-    { name: 'journey-ui', version: 3 },
+    { name: 'journey-ui', version: 4 },
   ),
 );
 

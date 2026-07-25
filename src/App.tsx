@@ -714,6 +714,12 @@ export default function App() {
     }
   }, [hasChosenLocale, hasSetName, seenPacingIntro]);
 
+  useEffect(() => {
+    const open = () => setShowSettings(true);
+    window.addEventListener('journey:open-settings', open);
+    return () => window.removeEventListener('journey:open-settings', open);
+  }, []);
+
   if (!hasChosenLocale) {
     return <LanguageGate />;
   }

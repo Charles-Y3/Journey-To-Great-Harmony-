@@ -195,6 +195,25 @@ export const UI = {
     "Study humanity's story on the Wisdom Timeline, walk the Journey Map, cheer on fellow travellers in the Community, or browse your Collection.",
     '在智慧时间线上研读人类的故事，走上旅程地图，在社群中为同修加油，或浏览你的收藏。',
   ),
+  setupTipsTitle: localized('Settle in for the journey', '安顿好这段旅程'),
+  setupTipsBody: localized(
+    'A few optional steps help the path stay with you day to day — open Settings anytime to change them.',
+    '几件可选的事，能让这条路更好地陪你过日子 — 随时可在设置中更改。',
+  ),
+  setupTipReminders: localized(
+    'Add morning and evening reminders to your calendar, so practice finds you even when the app is closed.',
+    '把早晚提醒加入日历，即使应用关闭，修习也会找到你。',
+  ),
+  setupTipMusic: localized(
+    'Turn on soft temple bells or wind chimes while you read and reflect.',
+    '阅读与反思时，可打开轻柔的寺钟或风铃作为背景。',
+  ),
+  setupTipInstall: localized(
+    "Install this journey on your phone's home screen for offline use and a quieter focus.",
+    '把这段旅程安装到手机主屏幕，便于离线使用，也更安静专注。',
+  ),
+  setupTipsOpenSettings: localized('Open Settings', '打开设置'),
+  setupTipsDismiss: localized('Got it', '知道了'),
 
   // ── Practice ──────────────────────────────────────────────────────
   practiceTitle: localized('Daily Virtue Practice', '每日德行修习'),
