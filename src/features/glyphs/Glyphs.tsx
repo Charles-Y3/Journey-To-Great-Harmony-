@@ -19,6 +19,7 @@ import {
   occupancy,
   type KlotskiState,
 } from '../../engine/glyphKlotski';
+import { OracleGlyphSvg } from '../../assets/glyphs/oracle/OracleGlyphSvgs';
 import { useJourney } from '../../state/store';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -72,7 +73,7 @@ function OracleFace({
     <div className="glyph-tile-clip" aria-hidden="true">
       <div className="glyph-tile-bg" style={layerStyle} />
       <div className="glyph-tile-oracle" style={layerStyle}>
-        <img src={glyph.oracleSvg} alt="" draggable={false} />
+        <OracleGlyphSvg character={glyph.character} />
       </div>
     </div>
   );
@@ -350,7 +351,7 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
       {solved && (
         <div className="glyph-solved">
           <div className="glyph-solved-oracle" aria-hidden="true">
-            <img src={glyph.oracleSvg} alt="" />
+            <OracleGlyphSvg character={glyph.character} />
           </div>
           <h3>{t('glyphsSolvedTitle')}</h3>
           <p className="glyph-meaning">{L(glyph.meaning)}</p>
@@ -395,7 +396,9 @@ function GlyphCard({
     >
       <div className="glyph-card-char" aria-hidden="true">
         {isIntermediateGlyph(glyph) ? (
-          <img className="glyph-card-oracle" src={glyph.oracleSvg} alt="" />
+          <span className="glyph-card-oracle">
+            <OracleGlyphSvg character={glyph.character} />
+          </span>
         ) : (
           glyph.character
         )}

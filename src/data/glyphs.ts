@@ -37,8 +37,6 @@ export interface BeginnerGlyph extends GlyphBase {
 
 export interface IntermediateGlyph extends GlyphBase {
   tier: 'intermediate';
-  /** Public URL of the oracle-bone SVG. */
-  oracleSvg: string;
   board: { cols: number; rows: number };
   pieces: GlyphPiece[];
 }
@@ -69,7 +67,7 @@ const BAODE_BOARD = { cols: 4, rows: 5 } as const;
 function baode(
   id: string,
   character: string,
-  svgFile: string,
+  _svgFile: string,
   title: Localized<string>,
   meaning: Localized<string>,
   teaching: Localized<string>,
@@ -78,8 +76,6 @@ function baode(
     id,
     character,
     tier: 'intermediate',
-    // BASE_URL respects vite.config `base: './'` so public assets resolve in prod.
-    oracleSvg: `${import.meta.env.BASE_URL}glyphs/oracle/${svgFile}`,
     board: { cols: BAODE_BOARD.cols, rows: BAODE_BOARD.rows },
     pieces: BAODE_PIECES,
     title,
