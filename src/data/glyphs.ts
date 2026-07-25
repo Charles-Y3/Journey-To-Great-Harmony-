@@ -39,6 +39,8 @@ export interface IntermediateGlyph extends GlyphBase {
   tier: 'intermediate';
   board: { cols: number; rows: number };
   pieces: GlyphPiece[];
+  /** Short paleographic note: why the early form was carved this way. */
+  inscription: Localized<string>;
 }
 
 export type VirtueGlyph = BeginnerGlyph | IntermediateGlyph;
@@ -71,6 +73,7 @@ function baode(
   title: Localized<string>,
   meaning: Localized<string>,
   teaching: Localized<string>,
+  inscription: Localized<string>,
 ): IntermediateGlyph {
   return {
     id,
@@ -81,6 +84,7 @@ function baode(
     title,
     meaning,
     teaching,
+    inscription,
   };
 }
 
@@ -181,6 +185,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
       'Xiao 孝 begins at home: gratitude in small acts, patience when care is hard. From that root, respect for others can grow outward.',
       '孝从家庭开始：在小事上感恩，在照护艰难时仍有耐心。从这根本，对他人的敬重才能向外生长。',
     ),
+    localized(
+      'Carved as an elder (long hair, the abbreviated 老) above a child 子 — a descendant supporting the one who came before.',
+      '字形为长发长者（「老」之省）在上、子在下 — 后辈搀扶先辈之形。',
+    ),
   ),
   baode(
     'ti',
@@ -194,6 +202,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
     localized(
       'Ti 悌 is how we practice equality without rivalry: listen first, yield when pride would win, and keep the circle warm.',
       '悌是练习平等而不竞争：先听，在骄傲要赢时退让，并让圈子保持温暖。',
+    ),
+    localized(
+      'Built from 弟 (younger sibling — once a bound or ordered figure) with the heart/mind sense: how the younger stands with kin.',
+      '从「弟」（幼弟之形，古人或象束矢、次序）而生，后重心意 — 幼者在亲族中如何自处。',
     ),
   ),
   baode(
@@ -209,6 +221,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
       'Zhong 忠 is not blind obedience. It is steady fidelity to a worthy trust — and the courage to correct course when loyalty would otherwise become harm.',
       '忠不是盲目服从。它是对值得托付之事的稳定守信 — 以及当忠诚将变为伤害时，纠正航向的勇气。',
     ),
+    localized(
+      '中 (the center mark) over 心 (heart): the whole heart kept to the middle — not pulled aside by private gain.',
+      '「中」在「心」上：心守于中，不为私利所偏。',
+    ),
   ),
   baode(
     'xin-oracle',
@@ -222,6 +238,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
     localized(
       'In oracle bone form, Xin 信 still names the same bridge: a promise kept is a stone others can stand on.',
       '甲骨之形中，信仍是同一座桥：守住的承诺，是他人可以立足的石头。',
+    ),
+    localized(
+      '人 (a standing person) beside 言 (speech lines): a human being and the words they utter — trust as spoken truth.',
+      '「人」旁「言」：站立之人与口中之言 — 信是说出的真话。',
     ),
   ),
   baode(
@@ -237,6 +257,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
       'Li 禮 in early script already points to offering and measure: respect made visible, not empty show.',
       '早期字形中的礼已指向奉献与法度：可见的敬意，而非空洞的表演。',
     ),
+    localized(
+      'A ritual vessel / offering stand (豆 and related forms): respect shown by what you place before gods and elders.',
+      '祭器、豆器之形：以献于神与长者之物，显出敬意。',
+    ),
   ),
   baode(
     'yi-oracle',
@@ -250,6 +274,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
     localized(
       'Yi 義 is the fitting action — chosen when ease and profit pull the other way.',
       '义是合宜的行动 — 在安逸与利益拉向另一边时仍被选择。',
+    ),
+    localized(
+      '羊 (sheep — a proper sacrificial offering) over a self/weapon form: the right and fitting act, not the easy one.',
+      '「羊」（宜祭之牲）在「我」之上：合宜当行之事，而非便易之事。',
     ),
   ),
   baode(
@@ -265,6 +293,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
       'Lian 廉 guards the commons: when you do not skim advantage, trust can gather around you.',
       '廉洁守护公共：当你不捞取私利，信赖才能聚集在你周围。',
     ),
+    localized(
+      'A roof / hall (广) over combined elements: upright conduct kept under one roof — corner-cutting has no shelter.',
+      '「广」覆其下：堂屋之下守正，苟且无处可藏。',
+    ),
   ),
   baode(
     'chi',
@@ -278,6 +310,10 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
     localized(
       'Chi 恥 is not humiliation for show. It is the inner check that keeps character from rotting when no one is watching.',
       '耻不是给人看的羞辱。它是无人看见时，仍使品格不腐的内在约束。',
+    ),
+    localized(
+      '耳 (ear) beside 心 (heart): what you hear of yourself settles in the heart — conscience that can blush.',
+      '「耳」与「心」：闻于耳而动于心 — 能知羞的良心。',
     ),
   ),
 ];

@@ -2555,6 +2555,33 @@ button.glyph-tile:hover {
   margin: 8px 0;
 }
 
+.glyph-inscription {
+  margin: 10px 0 4px;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ink);
+}
+
+.glyph-inscription-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--jade-deep);
+  margin-bottom: 2px;
+}
+
+.glyph-card-inscription {
+  margin: 6px 0 0;
+  line-height: 1.4;
+  color: var(--ink-soft, var(--ink));
+}
+
+.glyph-card-inscription .glyph-inscription-label {
+  display: inline;
+  margin-right: 0.35em;
+}
+
 @keyframes glyph-pop {
   from {
     transform: scale(0.7);

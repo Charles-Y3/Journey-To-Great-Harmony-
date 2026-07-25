@@ -81,6 +81,7 @@ export const UI = {
   glyphsCloseBtn: localized('Continue', '继续'),
   glyphsSizeLabel: localized('Grid', '棋盘'),
   glyphsKlotskiLabel: localized('Klotski', '华容道'),
+  glyphsInscriptionLabel: localized('Why this form', '何以如此写'),
   openGlyphsCta: localized('Open Glyphs', '打开字谜'),
 
   // ── Still Waters (daily koan/dilemma card) ──────────────────────────

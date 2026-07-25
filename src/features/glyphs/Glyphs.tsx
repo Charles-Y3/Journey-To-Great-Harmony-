@@ -330,6 +330,10 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
         <>
           <p className="small muted">{t('glyphsPreviewHint')}</p>
           <KlotskiBoard glyph={glyph} state={state} onTap={() => {}} interactive={false} />
+          <p className="glyph-inscription">
+            <span className="glyph-inscription-label">{t('glyphsInscriptionLabel')}</span>
+            {L(glyph.inscription)}
+          </p>
           <div className="glyph-actions">
             <button type="button" className="btn btn-primary" onClick={start}>
               {t('glyphsStartBtn')}
@@ -355,6 +359,10 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
           </div>
           <h3>{t('glyphsSolvedTitle')}</h3>
           <p className="glyph-meaning">{L(glyph.meaning)}</p>
+          <p className="glyph-inscription">
+            <span className="glyph-inscription-label">{t('glyphsInscriptionLabel')}</span>
+            {L(glyph.inscription)}
+          </p>
           <p className="small">{L(glyph.teaching)}</p>
           <p className="small muted">{wasFirstClear ? t('glyphsFirstClearNote') : t('glyphsReplayNote')}</p>
           <button type="button" className="btn btn-primary" onClick={onClose}>
@@ -408,6 +416,12 @@ function GlyphCard({
           {glyph.character} · {L(glyph.title)}
         </strong>
         <p className="small muted">{L(glyph.meaning)}</p>
+        {isIntermediateGlyph(glyph) && (
+          <p className="small glyph-card-inscription">
+            <span className="glyph-inscription-label">{t('glyphsInscriptionLabel')}</span>
+            {L(glyph.inscription)}
+          </p>
+        )}
         <p className="small muted">
           {meta}
           {done ? ` · ${t('glyphsClearedLabel')}` : ''}
