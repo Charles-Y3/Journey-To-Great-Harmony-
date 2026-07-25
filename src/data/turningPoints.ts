@@ -97,8 +97,8 @@ export const TURNING_POINTS: TurningPoint[] = [
       '所罗门命人取来一把剑，下令将活着的孩子劈成两半，各分一半。一个妇人同意了；另一个则宁可让孩子归对方，也不愿见孩子被杀。所罗门便将孩子判给了那位为孩子求情的妇人。',
     ),
     reflectionQuestion: localized(
-      'What does the willingness to lose reveal that the willingness to win cannot?',
-      '愿意失去，能揭示出愿意获胜所不能揭示的是什么？',
+      'When both claimed the child, what did the willingness to give him up reveal?',
+      '当两人都声称孩子是自己的时，愿意放手，揭示了什么？',
     ),
   },
   {
@@ -113,9 +113,10 @@ export const TURNING_POINTS: TurningPoint[] = [
       "Diogenes, sitting where he was, replied: 'Stand a little out of my sunlight.'",
       '第欧根尼坐在原地，只说：「请你别挡住我的阳光。」',
     ),
+    // Not "what would you ask for" — that restarts Alexander's offer; Diogenes asked only that power get out of the way of what he already had.
     reflectionQuestion: localized(
-      'What would you ask for, if the most powerful person alive offered you anything?',
-      '若世上最有权势的人，愿意满足你任何愿望，你会开口要什么？',
+      'What do you already have that no ruler could grant you — only stop blocking?',
+      '你已拥有什么，是再大的权势也无法赐予、只能停止遮挡的？',
     ),
   },
   {
@@ -147,9 +148,10 @@ export const TURNING_POINTS: TurningPoint[] = [
       "Confucius replied: 'The upright in my land are different from this — a father conceals for his son, and a son conceals for his father. Uprightness lies therein.'",
       '孔子说：「吾党之直者异于是：父为子隐，子为父隐 — 直在其中矣。」',
     ),
+    // Not a generic "loyalty vs rules" — Confucius is redefining 直 (uprightness) itself.
     reflectionQuestion: localized(
-      'When does loyalty to a person outweigh loyalty to a rule?',
-      '对一个人的忠诚，何时会超越对一条规则的忠诚？',
+      "Where might 'telling the truth' and 'being upright' pull in different directions?",
+      '在哪些事上，「说实话」与「正直」可能指向不同的方向？',
     ),
   },
   {
@@ -164,9 +166,10 @@ export const TURNING_POINTS: TurningPoint[] = [
       "Hours later, the younger monk finally burst out: 'How could you touch that woman, carry her, against our rules?' The elder replied: 'I set her down at the river. Are you still carrying her?'",
       '数小时后，年轻僧人终于忍不住责问：「你怎能违背戒律，触碰并背负那妇人？」年长者答道：「我早已在河边把她放下了。你怎么还背着她？」',
     ),
+    // The younger monk never set her down — he is still carrying judgment after the need has passed.
     reflectionQuestion: localized(
-      "What are you still carrying that you set down long ago?",
-      '你还背负着什么，其实早已该被放下？',
+      'What are you still carrying long after the moment that needed it has passed?',
+      '有什么事，需要它的时刻早已过去，你却还一直背着？',
     ),
   },
   {
@@ -182,8 +185,8 @@ export const TURNING_POINTS: TurningPoint[] = [
       '他不知道：是庄周做梦变成了蝴蝶，还是蝴蝶做梦变成了庄周？他说，庄周与蝴蝶之间，必定是有分别的 — 这，就叫做「物化」。',
     ),
     reflectionQuestion: localized(
-      'How would you know, right now, which one you actually are?',
-      '此刻，你要如何知道，自己究竟是哪一个？',
+      'If waking does not settle which was the dream — what then?',
+      '若醒来仍无法断定哪一段才是梦 — 那又如何？',
     ),
   },
 ];
