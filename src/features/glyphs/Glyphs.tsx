@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   BEGINNER_GLYPHS,
   INTERMEDIATE_GLYPHS,
+  beginnerTierCleared,
   isBeginnerGlyph,
   isIntermediateGlyph,
   type BeginnerGlyph,
@@ -70,14 +71,9 @@ function OracleFace({
   return (
     <div className="glyph-tile-clip" aria-hidden="true">
       <div className="glyph-tile-bg" style={layerStyle} />
-      <div
-        className="glyph-tile-oracle"
-        style={{
-          ...layerStyle,
-          WebkitMaskImage: `url(${glyph.oracleSvg})`,
-          maskImage: `url(${glyph.oracleSvg})`,
-        }}
-      />
+      <div className="glyph-tile-oracle" style={layerStyle}>
+        <img src={glyph.oracleSvg} alt="" draggable={false} />
+      </div>
     </div>
   );
 }
@@ -353,14 +349,9 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
 
       {solved && (
         <div className="glyph-solved">
-          <div
-            className="glyph-solved-oracle"
-            aria-hidden="true"
-            style={{
-              WebkitMaskImage: `url(${glyph.oracleSvg})`,
-              maskImage: `url(${glyph.oracleSvg})`,
-            }}
-          />
+          <div className="glyph-solved-oracle" aria-hidden="true">
+            <img src={glyph.oracleSvg} alt="" />
+          </div>
           <h3>{t('glyphsSolvedTitle')}</h3>
           <p className="glyph-meaning">{L(glyph.meaning)}</p>
           <p className="small">{L(glyph.teaching)}</p>
@@ -383,10 +374,12 @@ function GlyphModal({ glyph, onClose }: { glyph: VirtueGlyph; onClose: () => voi
 function GlyphCard({
   glyph,
   done,
+  locked = false,
   onPlay,
 }: {
   glyph: VirtueGlyph;
   done: boolean;
+  locked?: boolean;
   onPlay: () => void;
 }) {
   const { t, L } = useT();
@@ -395,16 +388,14 @@ function GlyphCard({
     : `${t('glyphsKlotskiLabel')} ${glyph.board.cols}×${glyph.board.rows}`;
 
   return (
-    <div className={done ? 'card glyph-card cleared' : 'card glyph-card'}>
+    <div
+      className={
+        locked ? 'card glyph-card locked' : done ? 'card glyph-card cleared' : 'card glyph-card'
+      }
+    >
       <div className="glyph-card-char" aria-hidden="true">
         {isIntermediateGlyph(glyph) ? (
-          <span
-            className="glyph-card-oracle"
-            style={{
-              WebkitMaskImage: `url(${glyph.oracleSvg})`,
-              maskImage: `url(${glyph.oracleSvg})`,
-            }}
-          />
+          <img className="glyph-card-oracle" src={glyph.oracleSvg} alt="" />
         ) : (
           glyph.character
         )}
@@ -418,7 +409,12 @@ function GlyphCard({
           {meta}
           {done ? ` · ${t('glyphsClearedLabel')}` : ''}
         </p>
-        <button type="button" className="btn btn-primary" onClick={onPlay}>
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={onPlay}
+          disabled={locked}
+        >
           {done ? t('glyphsReplayBtn') : t('glyphsPlayBtn')}
         </button>
       </div>
@@ -430,6 +426,7 @@ export default function Glyphs() {
   const { t } = useT();
   const completedGlyphs = useJourney((s) => s.completedGlyphs ?? []);
   const [open, setOpen] = useState<VirtueGlyph | null>(null);
+  const intermediateOpen = beginnerTierCleared(completedGlyphs);
 
   return (
     <div>
@@ -450,16 +447,21 @@ export default function Glyphs() {
         </div>
       </section>
 
-      <section className="glyph-tier">
+      <section className={`glyph-tier${intermediateOpen ? '' : ' glyph-tier-locked'}`}>
         <h2 className="glyph-tier-title">{t('glyphsTierIntermediate')}</h2>
-        <p className="small muted glyph-tier-blurb">{t('glyphsTierIntermediateBlurb')}</p>
+        <p className="small muted glyph-tier-blurb">
+          {intermediateOpen ? t('glyphsTierIntermediateBlurb') : t('glyphsTierLocked')}
+        </p>
         <div className="glyph-list">
           {INTERMEDIATE_GLYPHS.map((g) => (
             <GlyphCard
               key={g.id}
               glyph={g}
               done={completedGlyphs.includes(g.id)}
-              onPlay={() => setOpen(g)}
+              locked={!intermediateOpen}
+              onPlay={() => {
+                if (intermediateOpen) setOpen(g);
+              }}
             />
           ))}
         </div>

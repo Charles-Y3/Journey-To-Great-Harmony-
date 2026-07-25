@@ -45,19 +45,23 @@ export interface IntermediateGlyph extends GlyphBase {
 
 export type VirtueGlyph = BeginnerGlyph | IntermediateGlyph;
 
-/** Shared 4×5 Klotski layout for all 八德 puzzles (18 covered + 2 empty). */
+/**
+ * Shared 4×5 Klotski layout for all 八德 puzzles (18 covered + 2 empty).
+ * Pieces are only 2×1, 1×2, and 1×1 — no 2×2 blocks.
+ */
 const BAODE_PIECES: GlyphPiece[] = [
-  { id: 'a', w: 2, h: 2, solvedR: 0, solvedC: 0 },
+  { id: 'a', w: 2, h: 1, solvedR: 0, solvedC: 0 },
   { id: 'b', w: 2, h: 1, solvedR: 0, solvedC: 2 },
-  { id: 'c', w: 1, h: 2, solvedR: 1, solvedC: 2 },
-  { id: 'd', w: 1, h: 1, solvedR: 1, solvedC: 3 },
-  { id: 'e', w: 2, h: 1, solvedR: 2, solvedC: 0 },
-  { id: 'f', w: 1, h: 1, solvedR: 2, solvedC: 3 },
-  { id: 'g', w: 1, h: 2, solvedR: 3, solvedC: 0 },
-  { id: 'h', w: 1, h: 1, solvedR: 3, solvedC: 1 },
-  { id: 'i', w: 1, h: 1, solvedR: 3, solvedC: 2 },
-  { id: 'j', w: 1, h: 1, solvedR: 3, solvedC: 3 },
-  { id: 'k', w: 1, h: 1, solvedR: 4, solvedC: 1 },
+  { id: 'c', w: 1, h: 2, solvedR: 1, solvedC: 0 },
+  { id: 'd', w: 1, h: 1, solvedR: 1, solvedC: 1 },
+  { id: 'e', w: 1, h: 1, solvedR: 1, solvedC: 2 },
+  { id: 'f', w: 1, h: 2, solvedR: 1, solvedC: 3 },
+  { id: 'g', w: 2, h: 1, solvedR: 2, solvedC: 1 },
+  { id: 'h', w: 1, h: 2, solvedR: 3, solvedC: 0 },
+  { id: 'i', w: 1, h: 1, solvedR: 3, solvedC: 1 },
+  { id: 'j', w: 1, h: 1, solvedR: 3, solvedC: 2 },
+  { id: 'k', w: 1, h: 1, solvedR: 3, solvedC: 3 },
+  { id: 'l', w: 1, h: 1, solvedR: 4, solvedC: 1 },
 ];
 
 const BAODE_BOARD = { cols: 4, rows: 5 } as const;
@@ -296,4 +300,9 @@ export function isBeginnerGlyph(g: VirtueGlyph): g is BeginnerGlyph {
 
 export function isIntermediateGlyph(g: VirtueGlyph): g is IntermediateGlyph {
   return g.tier === 'intermediate';
+}
+
+/** Intermediate unlocks only after every beginner glyph has been cleared once. */
+export function beginnerTierCleared(completedGlyphs: readonly string[]): boolean {
+  return BEGINNER_GLYPHS.every((g) => completedGlyphs.includes(g.id));
 }

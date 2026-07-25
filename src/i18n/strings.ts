@@ -48,6 +48,10 @@ export const UI = {
     'Slide mixed squares and rectangles to restore each oracle-bone form.',
     '滑动方块与长方形拼块，还原每一个甲骨字形。',
   ),
+  glyphsTierLocked: localized(
+    'Clear every Beginner glyph first to unlock this tier.',
+    '先解开入门的每一个字谜，才能解锁这一阶。',
+  ),
   glyphsClearedLabel: localized('Cleared', '已解开'),
   glyphsPlayBtn: localized('Play', '开始'),
   glyphsReplayBtn: localized('Play again', '再玩一次'),
