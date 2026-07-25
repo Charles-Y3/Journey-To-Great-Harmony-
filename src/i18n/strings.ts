@@ -412,8 +412,19 @@ export const UI = {
   // ── Knowledge ─────────────────────────────────────────────────────
   knowledgeTitle: localized('The Knowledge Path', '知识之路'),
   knowledgeSubtitle: localized(
-    'A living tree of wisdom. Each completed topic unlocks the deeper ones beneath it.',
-    '一棵生长中的智慧之树。完成每个主题，便能解锁其下更深的主题。',
+    'Three depths: foundation virtues, a second walk of new virtues, then branch mastery. Your progress is kept.',
+    '三层深度：基础德行、第二程新德行，再到分支圆满。你的进度会保留。',
+  ),
+  knowledgeDepth1: localized('Depth I · Foundation', '第一层 · 基础'),
+  knowledgeDepth2: localized('Depth II · New virtues', '第二层 · 新德行'),
+  knowledgeDepth3: localized('Depth III · Mastery', '第三层 · 圆满'),
+  knowledgeDepth2Locked: localized(
+    'Complete every Depth I topic in this branch to begin the second walk.',
+    '完成本分支第一层的全部主题后，即可开始第二程。',
+  ),
+  knowledgeDepth3Locked: localized(
+    'Complete every Depth II virtue in this branch to open mastery.',
+    '完成本分支第二层的全部德行后，即可开启圆满。',
   ),
   lockedPrevLesson: localized('complete the previous lesson first', '请先完成前一课'),
   checkUnderstanding: localized('Check your understanding', '检验你的理解'),

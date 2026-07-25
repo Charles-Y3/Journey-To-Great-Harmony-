@@ -63,10 +63,19 @@ export function completedTopicIds(completedLessons: string[]): string[] {
   return TOPICS.filter((t) => isTopicCompleted(completedLessons, t)).map((t) => t.id);
 }
 
+export function topicDepth(topic: Topic): 1 | 2 | 3 {
+  return topic.depth ?? 1;
+}
+
 export function isTopicUnlocked(completedLessons: string[], topic: Topic): boolean {
   if (!topic.parentId) return true;
   const parent = TOPICS.find((t) => t.id === topic.parentId);
-  return parent ? isTopicCompleted(completedLessons, parent) : true;
+  if (!parent || !isTopicCompleted(completedLessons, parent)) return false;
+  const depth = topicDepth(topic);
+  if (depth <= 1) return true;
+  // Second / third walk: finish every same-branch topic at the prior depth first.
+  const prior = TOPICS.filter((t) => t.branch === topic.branch && topicDepth(t) === depth - 1);
+  return prior.length > 0 && prior.every((t) => isTopicCompleted(completedLessons, t));
 }
 
 export function completedEraIds(completedTimelinePoints: string[]): string[] {

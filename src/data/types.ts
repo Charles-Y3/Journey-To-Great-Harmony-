@@ -63,6 +63,12 @@ export interface Topic {
   emoji: string;
   branch: 'root' | 'compassion' | 'character' | 'understanding';
   parentId: string | null; // topic that must be completed to unlock this one
+  /**
+   * Path depth. 1 = foundation virtues (default), 2 = second-walk virtues,
+   * 3 = branch mastery. Depth N unlocks only after every same-branch topic
+   * at depth N−1 is complete (see `isTopicUnlocked`).
+   */
+  depth?: 1 | 2 | 3;
   intro: Localized<string>;
   lessons: Lesson[];
   cardId?: string;

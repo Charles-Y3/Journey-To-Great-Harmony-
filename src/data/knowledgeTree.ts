@@ -1,7 +1,8 @@
 import type { Topic, Lesson } from './types';
 import { localized } from '../i18n/types';
+import { DEPTH_TOPICS } from './knowledgeDepth';
 
-export const TOPICS: Topic[] = [
+const FOUNDATION_TOPICS: Topic[] = [
   // ── Root ─────────────────────────────────────────────────────────────
   {
     id: 'wisdom',
@@ -713,6 +714,9 @@ export const TOPICS: Topic[] = [
     ],
   },
 ];
+
+/** Foundation (depth 1) plus second-walk virtues (2) and branch mastery (3). */
+export const TOPICS: Topic[] = [...FOUNDATION_TOPICS, ...DEPTH_TOPICS];
 
 export const ALL_LESSONS: Lesson[] = TOPICS.flatMap((t) => t.lessons);
 

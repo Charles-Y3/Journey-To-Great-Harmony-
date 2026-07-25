@@ -403,6 +403,134 @@ export const CARDS: WisdomCard[] = [
     ),
   },
 
+  // ── Knowledge Path · depth 2–3 ──────────────────────────────────────
+  {
+    id: 'card-generosity',
+    title: localized('Generosity', '慷慨'),
+    accent: '施',
+    emoji: '🎁',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'An open hand — life expands when shared, and quiet gifts protect both people.',
+      '张开的手 — 生命因分享而开阔，安静的礼物保护双方。',
+    ),
+    quote: localized(
+      'The fragrance always remains in the hand that gives the rose.',
+      '赠人玫瑰，手有余香。',
+    ),
+    unlockHint: localized('Complete the Generosity topic on the Knowledge Path.', '在知识之路上完成「慷慨」主题。'),
+    didYouKnow: localized(
+      'Buddhist dana (giving) is often listed first among the perfections — not because it is easiest, but because loosening the grip on “mine” opens the path for every other virtue.',
+      '佛教的布施常被列为波罗蜜多之首 — 并非因为它最容易，而是因为松开对「我的」的紧握，为其他一切德行打开道路。',
+    ),
+  },
+  {
+    id: 'card-courage',
+    title: localized('Courage', '勇敢'),
+    accent: '勇',
+    emoji: '🦁',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Choosing the right act while fear is present — especially the moral kind.',
+      '在恐惧仍在时选择正行 — 尤其是道德上的勇敢。',
+    ),
+    quote: localized(
+      'To see what is right and not do it is want of courage.',
+      '见义不为，无勇也。',
+    ),
+    unlockHint: localized('Complete the Courage topic on the Knowledge Path.', '在知识之路上完成「勇敢」主题。'),
+    didYouKnow: localized(
+      'Aristotle placed courage between cowardice and recklessness — a mean that still feels the fear, but does not let fear choose.',
+      '亚里士多德把勇敢放在怯懦与鲁莽之间 — 一种仍感到恐惧、却不让恐惧作主的中道。',
+    ),
+  },
+  {
+    id: 'card-listening',
+    title: localized('Listening', '倾听'),
+    accent: '听',
+    emoji: '👂',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Hearing to understand — often the rarest form of hospitality.',
+      '为理解而听 — 往往是最稀缺的一种好客。',
+    ),
+    quote: localized(
+      'We have two ears and one mouth so that we can listen twice as much as we speak.',
+      '人有两耳一口，为的是多听少说。',
+    ),
+    unlockHint: localized('Complete the Listening topic on the Knowledge Path.', '在知识之路上完成「倾听」主题。'),
+    didYouKnow: localized(
+      'In many counsel traditions, the first skill taught is not advice-giving but accurate restatement — until the speaker says, “Yes, that’s what I meant.”',
+      '在许多咨商传统中，首先教授的技能不是给建议，而是准确复述 — 直到说话者说：「对，我就是这个意思。」',
+    ),
+  },
+  {
+    id: 'card-ren-living',
+    title: localized('Living Ren', '仁的践行'),
+    accent: '仁',
+    emoji: '💗',
+    rarity: 'legendary',
+    category: 'teaching',
+    summary: localized(
+      'Compassion’s full walk — offering the face of ren each moment needs.',
+      '慈悲的全程 — 给予每一刻所需要的那一面仁。',
+    ),
+    quote: localized(
+      'The person of ren, wishing to be established, establishes others.',
+      '己欲立而立人，己欲达而达人。',
+    ),
+    unlockHint: localized('Complete Living Ren on the Knowledge Path (Depth III).', '在知识之路上完成「仁的践行」（第三层）。'),
+    didYouKnow: localized(
+      'Ren is sometimes translated as humaneness, benevolence, or authoritative conduct — each capturing a facet of a virtue that is less a feeling than a way of treating people as kin.',
+      '「仁」有时译为 humaneness、benevolence 或 authoritative conduct — 各自捕捉这一德行的一面：它与其说是一种感觉，不如说是视人为亲人的对待方式。',
+    ),
+  },
+  {
+    id: 'card-junzi',
+    title: localized('The Junzi Path', '君子之路'),
+    accent: '君',
+    emoji: '⛰️',
+    rarity: 'legendary',
+    category: 'teaching',
+    summary: localized(
+      'Character under pressure — effort becoming second nature.',
+      '压力下的品格 — 努力化为第二天性。',
+    ),
+    quote: localized(
+      'The junzi seeks within; the small person seeks without.',
+      '君子求诸己，小人求诸人。',
+    ),
+    unlockHint: localized('Complete The Junzi Path on the Knowledge Path (Depth III).', '在知识之路上完成「君子之路」（第三层）。'),
+    didYouKnow: localized(
+      'Junzi originally named a social rank (“son of a lord”) and was gradually moralised by Confucians into an ideal of character available through learning — not birth.',
+      '「君子」原指社会身份（「君之子」），后被儒家逐渐道德化，成为可通过学习达成的品格理想 — 而非出身。',
+    ),
+  },
+  {
+    id: 'card-clear-seeing',
+    title: localized('Clear Seeing', '清明看见'),
+    accent: '明',
+    emoji: '🔆',
+    rarity: 'legendary',
+    category: 'teaching',
+    summary: localized(
+      'Understanding united — seeing what is present, then living it.',
+      '合一的理解 — 看见所在，并活出来。',
+    ),
+    quote: localized(
+      'Knowing others is intelligence; knowing yourself is true wisdom.',
+      '知人者智，自知者明。',
+    ),
+    unlockHint: localized('Complete Clear Seeing on the Knowledge Path (Depth III).', '在知识之路上完成「清明看见」（第三层）。'),
+    didYouKnow: localized(
+      'Laozi’s pairing of zhi 智 and ming 明 separates clever reading of others from the rarer clarity of seeing one’s own mind — the aim of this branch’s third walk.',
+      '老子对「智」与「明」的对举，区分了读懂他人的聪明，与更罕见的自见其心的清明 — 正是这一分支第三程的目标。',
+    ),
+  },
+
   // ── Special cards ───────────────────────────────────────────────────
   {
     id: 'card-week',

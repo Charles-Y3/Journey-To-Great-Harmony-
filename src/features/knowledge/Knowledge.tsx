@@ -8,6 +8,7 @@ import {
   isBranchMastered,
   branchCapstoneKey,
   lessonsCompletedToday,
+  topicDepth,
   DAILY_LESSON_CAP,
   type JourneyData,
 } from '../../state/selectors';
@@ -206,13 +207,32 @@ export default function Knowledge() {
       {branches.map((branch) => {
         const branchTopic = TOPICS.find((tp) => tp.id === branch.id)!;
         const leaves = TOPICS.filter((tp) => tp.branch === branch.id && tp.id !== branch.id);
+        const depthLeaves = (d: 1 | 2 | 3) => leaves.filter((tp) => topicDepth(tp) === d);
         const mastered = isBranchMastered(completedLessons, branch.id);
         const hasCapstone = !!capstones[branchCapstoneKey(branch.id)];
+        const depth1Done = depthLeaves(1).every((tp) => isTopicCompleted(completedLessons, tp))
+          && isTopicCompleted(completedLessons, branchTopic);
+        const depth2Done = depthLeaves(2).every((tp) => isTopicCompleted(completedLessons, tp));
         return (
           <div className="tree-branch" key={branch.id}>
             <TopicNode topic={branchTopic} onOpen={setOpen} />
+            <p className="small muted" style={{ margin: '10px 0 4px' }}>{t('knowledgeDepth1')}</p>
             <div className="topic-leaf-list">
-              {leaves.map((leaf) => (
+              {depthLeaves(1).map((leaf) => (
+                <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
+              ))}
+            </div>
+            <p className="small muted" style={{ margin: '12px 0 4px' }}>{t('knowledgeDepth2')}</p>
+            {!depth1Done && <p className="small muted">{t('knowledgeDepth2Locked')}</p>}
+            <div className="topic-leaf-list">
+              {depthLeaves(2).map((leaf) => (
+                <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
+              ))}
+            </div>
+            <p className="small muted" style={{ margin: '12px 0 4px' }}>{t('knowledgeDepth3')}</p>
+            {!depth2Done && <p className="small muted">{t('knowledgeDepth3Locked')}</p>}
+            <div className="topic-leaf-list">
+              {depthLeaves(3).map((leaf) => (
                 <TopicNode key={leaf.id} topic={leaf} onOpen={setOpen} />
               ))}
             </div>
