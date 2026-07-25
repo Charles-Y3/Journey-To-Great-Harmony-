@@ -508,6 +508,10 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <ShareSection />
       <BackupSection />
       <div className="card">
+        <h3>{t('settingsInstallTitle')}</h3>
+        <p className="small muted">{t('settingsInstallDesc')}</p>
+      </div>
+      <div className="card">
         <h3>{t('settingsTestingTitle')}</h3>
         <p className="small muted">{advancedDaysNote(locale, today, dayOffset)}</p>
         <p className="small muted">{t('settingsTestingDesc')}</p>
@@ -544,6 +548,23 @@ function SettingsModal({ onClose }: { onClose: () => void }) {
       <p className="small muted">{t('settingsFooter')}</p>
     </Modal>
   );
+}
+
+function OfflineBanner() {
+  const { t } = useT();
+  const [offline, setOffline] = useState(!navigator.onLine);
+  useEffect(() => {
+    const on = () => setOffline(false);
+    const off = () => setOffline(true);
+    window.addEventListener('online', on);
+    window.addEventListener('offline', off);
+    return () => {
+      window.removeEventListener('online', on);
+      window.removeEventListener('offline', off);
+    };
+  }, []);
+  if (!offline) return null;
+  return <div className="offline-banner">{t('offlineBanner')}</div>;
 }
 
 export default function App() {
@@ -594,6 +615,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <OfflineBanner />
       <aside className="sidebar">
         <h1 className="sidebar-title">{t('appName')}</h1>
         <p className="sidebar-tagline">{t('appTagline')}</p>

@@ -11,6 +11,7 @@ import { useT } from '../../i18n/useT';
 import { todaySubtitle } from '../../i18n/strings';
 import { useTodayTasks } from './useTodayTasks';
 import { isoWeekKey, useUi } from '../../state/uiStore';
+import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
 
 export default function Today() {
   const state = useJourney();
@@ -27,11 +28,16 @@ export default function Today() {
   const yesterday = addDaysToKey(today, -1);
   const yRec = d.days[yesterday] ?? {};
   const yesterdayLine = yRec.reflection?.improve || yRec.intention;
+  const season = seasonalVirtueForDay(today);
+  const year = Number(today.slice(0, 4));
 
   const weekKey = isoWeekKey(today);
   const lastWeeklyReviewWeek = useUi((s) => s.lastWeeklyReviewWeek);
   const setLastWeeklyReviewWeek = useUi((s) => s.setLastWeeklyReviewWeek);
+  const lastYearlyReviewYear = useUi((s) => s.lastYearlyReviewYear);
+  const setLastYearlyReviewYear = useUi((s) => s.setLastYearlyReviewYear);
   const [showWeekly, setShowWeekly] = useState(false);
+  const [showYearly, setShowYearly] = useState(false);
 
   // First open of a new ISO week: seed silently once, then show the review.
   useEffect(() => {
@@ -43,6 +49,18 @@ export default function Today() {
       setShowWeekly(true);
     }
   }, [weekKey, lastWeeklyReviewWeek, setLastWeeklyReviewWeek]);
+
+  useEffect(() => {
+    const inWindow = isGregorianNewYearWindow(today) || isLunarNewYearWindow(today);
+    if (!inWindow) return;
+    if (lastYearlyReviewYear === null) {
+      setLastYearlyReviewYear(year);
+      return;
+    }
+    if (lastYearlyReviewYear < year) {
+      setShowYearly(true);
+    }
+  }, [today, year, lastYearlyReviewYear, setLastYearlyReviewYear]);
 
   const weekDays = useMemo(() => {
     // Collect Mon–Sun keys for the current ISO week containing `today`.
@@ -73,6 +91,11 @@ export default function Today() {
     setShowWeekly(false);
   }
 
+  function closeYearly() {
+    setLastYearlyReviewYear(year);
+    setShowYearly(false);
+  }
+
   return (
     <div>
       <PageHeader emoji="🌅" title={t('todayTitle')} subtitle={todaySubtitle(locale, today, doneCount, tasks.length)} />
@@ -80,6 +103,16 @@ export default function Today() {
       <div className="quote-card">
         <p className="quote-text">“{L(quote.text)}”</p>
         <p className="quote-author">— {L(quote.author)}</p>
+      </div>
+
+      <div className="card seasonal-virtue-card">
+        <h3>
+          {season.emoji} {t('seasonalVirtueTitle')}
+        </h3>
+        <p className="small muted" style={{ marginBottom: 4 }}>
+          {L(season.name)} · <span className="pill pill-gold">{L(season.virtue)}</span>
+        </p>
+        <p style={{ margin: 0 }}>{L(season.guidance)}</p>
       </div>
 
       {rec.intention && (
@@ -183,6 +216,22 @@ export default function Today() {
           </Link>
           <button className="btn" style={{ marginTop: 8, marginLeft: 8 }} onClick={closeWeekly}>
             {t('weeklyReviewContinue')}
+          </button>
+        </Modal>
+      )}
+
+      {showYearly && !showWeekly && (
+        <Modal onClose={closeYearly}>
+          <h2>{t('yearlyReviewTitle')}</h2>
+          <p>{t('yearlyReviewBody')}</p>
+          <p className="small muted" style={{ marginTop: 10 }}>
+            {season.emoji} {L(season.virtue)} · 🔥 {stats.streakBest} · {stats.xp} XP
+          </p>
+          <Link className="btn btn-primary" style={{ marginTop: 16, display: 'inline-block' }} to="/practice" onClick={closeYearly}>
+            {t('yearlyReviewCta')}
+          </Link>
+          <button className="btn" style={{ marginTop: 8, marginLeft: 8 }} onClick={closeYearly}>
+            {t('yearlyReviewContinue')}
           </button>
         </Modal>
       )}

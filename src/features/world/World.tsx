@@ -1,18 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
 import { useSound } from '../../state/soundStore';
-import { worldInfo, type JourneyData } from '../../state/selectors';
+import { worldInfo, completedEraIds, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
+import { CARDS } from '../../data/cards';
+import { TIMELINE } from '../../data/timeline';
+import { TOPICS } from '../../data/knowledgeTree';
 import { greetingFor } from '../../data/greetings';
 import type { Peer, WorldBuilding } from '../../data/types';
 import { localized, type Localized, type Locale } from '../../i18n/types';
 import { communityFeed, visiblePeers } from '../../engine/community';
-import { seededRandom } from '../../engine/progression';
+import { hashString, seededRandom } from '../../engine/progression';
 import { speakGreeting, speakAppText } from '../../engine/speech';
+import { playSfx } from '../../engine/sfx';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { worldProgressLabel, buildingLockedNote, yourContributionLabel } from '../../i18n/strings';
+import { worldProgressLabel, buildingLockedNote } from '../../i18n/strings';
 
 type LocalizeFn = <T>(v: Localized<T>) => T;
 
@@ -347,9 +352,32 @@ export default function World() {
   const [captionIndex, setCaptionIndex] = useState(0);
   const [captionHighlight, setCaptionHighlight] = useState(false);
   const [previewStage, setPreviewStage] = useState<number | null>(null);
+  const [civicId, setCivicId] = useState<string | null>(null);
   const highlightTimeoutRef = useRef<number | null>(null);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
+
+  const libraryQuote = useMemo(() => {
+    const owned = CARDS.filter((c) => d.unlockedCards.includes(c.id));
+    const pool = owned.length > 0 ? owned : CARDS;
+    return pool[Math.abs(hashString(`lib-${today}`)) % pool.length];
+  }, [d.unlockedCards, today]);
+
+  const cappedEras = useMemo(() => {
+    return completedEraIds(d.completedTimelinePoints).filter((id) => d.capstones[id]);
+  }, [d.completedTimelinePoints, d.capstones]);
+
+  const recentEncouragements = d.encouragementsSent;
+
+  const lastLessonTitle = useMemo(() => {
+    const lastId = d.completedLessons[d.completedLessons.length - 1];
+    if (!lastId) return null;
+    for (const topic of TOPICS) {
+      const lesson = topic.lessons.find((l) => l.id === lastId);
+      if (lesson) return lesson.title;
+    }
+    return null;
+  }, [d.completedLessons]);
 
   useEffect(() => {
     return () => {
@@ -418,7 +446,7 @@ export default function World() {
       </p>
       <p className="small muted world-walkers-hint">{t('worldWalkersHint')}</p>
 
-      <div className="stage-steps">
+      <div className="stage-steps world-stage-grid">
         {WORLD_STAGES.map((s, i) => {
           let cls = 'stage-step';
           if (i < info.stageIndex) cls += ' reached';
@@ -443,18 +471,18 @@ export default function World() {
         ) : (
           <p className="pill">{t('worldReached')}</p>
         )}
-        <div className="stat-grid">
-          <div className="stat-tile">
+        <div className="world-contrib-row" aria-label={myName ?? t('worldContribYou')}>
+          <div className="world-contrib-cell">
             <div className="stat-value">{info.user}</div>
-            <div className="stat-name">{yourContributionLabel(locale, myName)}</div>
+            <div className="stat-name">{t('worldContribYou')}</div>
           </div>
-          <div className="stat-tile">
+          <div className="world-contrib-cell">
             <div className="stat-value">{info.community}</div>
-            <div className="stat-name">{t('worldCommunityContribution')}</div>
+            <div className="stat-name">{t('worldContribCommunity')}</div>
           </div>
-          <div className="stat-tile">
+          <div className="world-contrib-cell">
             <div className="stat-value">{info.total}</div>
-            <div className="stat-name">{t('worldTotalHarmony')}</div>
+            <div className="stat-name">{t('worldContribTotal')}</div>
           </div>
         </div>
       </div>
@@ -463,13 +491,21 @@ export default function World() {
         <h3>{t('civicBuildingsTitle')}</h3>
         <div className="card-grid">
           {info.buildings.map((b) => (
-            <div key={b.id} className={b.built ? 'badge-tile' : 'badge-tile locked'}>
+            <button
+              key={b.id}
+              type="button"
+              className={b.built ? 'badge-tile civic-tile' : 'badge-tile civic-tile locked'}
+              onClick={() => {
+                setCivicId(b.id);
+                if (b.built) playSfx('chime');
+              }}
+            >
               <div className="wcard-emoji">{b.emoji}</div>
               <strong>{L(b.name)}</strong>
               <p className="small muted" style={{ margin: '4px 0 0' }}>
                 {b.built ? L(b.description) : buildingLockedNote(locale, b.threshold)}
               </p>
-            </div>
+            </button>
           ))}
         </div>
       </div>
@@ -500,6 +536,152 @@ export default function World() {
           <p className="small muted">{L(WORLD_STAGES[previewStage].description)}</p>
         </Modal>
       )}
+
+      {civicId && info.buildings.find((b) => b.id === civicId) && (
+        <CivicBuildingModal
+          building={info.buildings.find((b) => b.id === civicId)!}
+          onClose={() => setCivicId(null)}
+          lastLessonTitle={lastLessonTitle ? L(lastLessonTitle) : null}
+          libraryQuote={libraryQuote}
+          cappedEraNames={cappedEras.map((id) => {
+            const era = TIMELINE.find((e) => e.id === id);
+            return era ? L(era.name) : id;
+          })}
+          encouragementCount={recentEncouragements}
+        />
+      )}
     </div>
+  );
+}
+
+function CivicBuildingModal({
+  building,
+  onClose,
+  lastLessonTitle,
+  libraryQuote,
+  cappedEraNames,
+  encouragementCount,
+}: {
+  building: WorldBuilding & { built: boolean };
+  onClose: () => void;
+  lastLessonTitle: string | null;
+  libraryQuote: (typeof CARDS)[number];
+  cappedEraNames: string[];
+  encouragementCount: number;
+}) {
+  const { t, L } = useT();
+  if (!building.built) {
+    return (
+      <Modal onClose={onClose}>
+        <h2>
+          {building.emoji} {L(building.name)}
+        </h2>
+        <p>{t('civicTapLocked')}</p>
+        <button className="btn btn-primary" style={{ marginTop: 14 }} onClick={onClose}>
+          {t('civicTapClose')}
+        </button>
+      </Modal>
+    );
+  }
+
+  let body: ReactNode = null;
+  let cta: ReactNode = null;
+  switch (building.id) {
+    case 'school':
+      body = (
+        <>
+          <p>{t('civicTapSchool')}</p>
+          {lastLessonTitle && <p className="small muted">📖 {lastLessonTitle}</p>}
+        </>
+      );
+      cta = (
+        <Link className="btn btn-primary" to="/knowledge" onClick={onClose}>
+          {t('navKnowledge')}
+        </Link>
+      );
+      break;
+    case 'library':
+      body = (
+        <>
+          <p className="small muted">{t('civicTapLibrary')}</p>
+          <p className="quote-text">“{L(libraryQuote.quote)}”</p>
+          <p className="quote-author">— {L(libraryQuote.title)}</p>
+        </>
+      );
+      cta = (
+        <Link className="btn btn-primary" to="/collection" onClick={onClose}>
+          {t('navCollection')}
+        </Link>
+      );
+      break;
+    case 'garden':
+      body = <p>{t('civicTapGarden')}</p>;
+      cta = (
+        <Link className="btn btn-primary" to="/forest" onClick={onClose}>
+          {t('navForest')}
+        </Link>
+      );
+      break;
+    case 'care':
+      body = <p>{t('civicTapCare')}</p>;
+      cta = (
+        <Link className="btn btn-primary" to="/community" onClick={onClose}>
+          {t('navCommunity')}
+        </Link>
+      );
+      break;
+    case 'bridge':
+      body = (
+        <>
+          <p>{t('civicTapBridge')}</p>
+          <p className="small muted">
+            {t('civicEncouragementsWeek')}: {encouragementCount}
+          </p>
+        </>
+      );
+      cta = (
+        <Link className="btn btn-primary" to="/community" onClick={onClose}>
+          {t('navCommunity')}
+        </Link>
+      );
+      break;
+    case 'hall':
+      body = (
+        <>
+          <p>{t('civicTapHall')}</p>
+          {cappedEraNames.length > 0 ? (
+            <ul className="small">
+              {cappedEraNames.map((n) => (
+                <li key={n}>{n}</li>
+              ))}
+            </ul>
+          ) : (
+            <p className="small muted">—</p>
+          )}
+        </>
+      );
+      cta = (
+        <Link className="btn btn-primary" to="/timeline" onClick={onClose}>
+          {t('navTimeline')}
+        </Link>
+      );
+      break;
+    default:
+      body = <p>{L(building.description)}</p>;
+  }
+
+  return (
+    <Modal onClose={onClose}>
+      <h2>
+        {building.emoji} {L(building.name)}
+      </h2>
+      {body}
+      <div style={{ marginTop: 14, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        {cta}
+        <button className="btn" onClick={onClose}>
+          {t('civicTapClose')}
+        </button>
+      </div>
+    </Modal>
   );
 }

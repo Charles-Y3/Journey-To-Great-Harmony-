@@ -7,6 +7,7 @@ import type { Peer } from '../../data/types';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { encouragementBanner, type UiKey } from '../../i18n/strings';
+import { agedPeerEmoji, companionAgeYears } from '../../engine/companions';
 
 const TIER_KEY: Record<Peer['tier'], UiKey> = {
   active: 'peerTierActive',
@@ -36,6 +37,7 @@ export default function Community() {
   const stats = statsFromData(d);
   const forest = forestInfo(d);
   const peers = peerStats(state.startDay, today);
+  const ageYears = companionAgeYears(state.startDay, today, state.streakBest);
 
   function scoreFor(id: Category, isUser: boolean, peerIdx = 0): number {
     const p = peers[peerIdx];
@@ -53,7 +55,13 @@ export default function Community() {
 
   const rows = [
     { id: 'me', name: myName ?? t('leaderboardYou'), emoji: '🧑‍🌾', me: true, score: scoreFor(category, true) },
-    ...peers.map((p, i) => ({ id: p.peer.id, name: L(p.peer.name), emoji: p.peer.emoji, me: false, score: scoreFor(category, false, i) })),
+    ...peers.map((p, i) => ({
+      id: p.peer.id,
+      name: L(p.peer.name),
+      emoji: agedPeerEmoji(p.peer.emoji, ageYears),
+      me: false,
+      score: scoreFor(category, false, i),
+    })),
   ].sort((a, b) => b.score - a.score);
 
   const encouragersToday = visiblePeers(state.startDay, today).filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
@@ -62,6 +70,10 @@ export default function Community() {
   return (
     <div>
       <PageHeader emoji="👥" title={t('communityTitle')} subtitle={t('communitySubtitle')} />
+
+      <p className="small muted companion-age-note">
+        {ageYears > 0 ? `${ageYears} ${t('companionYearsLabel')}` : t('companionYearsNew')}
+      </p>
 
       {encouragersToday.length > 0 && (
         <div className="quote-card">
@@ -99,10 +111,15 @@ export default function Community() {
           const sentToday = state.encouragedOn[p.peer.id] === today;
           return (
             <div key={p.peer.id} className="leader-row">
-              <span className="leader-emoji">{p.peer.emoji}</span>
+              <span className="leader-emoji">{agedPeerEmoji(p.peer.emoji, ageYears)}</span>
               <span className="leader-info">
                 <strong>{L(p.peer.name)}</strong> <span className="pill pill-tier">{t(TIER_KEY[p.peer.tier])}</span>
                 <div className="small muted">“{L(p.peer.motto)}”</div>
+                {ageYears > 0 && (
+                  <div className="small muted">
+                    {ageYears} {t('companionYearsLabel')}
+                  </div>
+                )}
               </span>
               <span className="leader-score">
                 <button

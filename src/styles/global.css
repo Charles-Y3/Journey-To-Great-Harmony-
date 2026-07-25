@@ -1660,6 +1660,80 @@ select:focus {
   margin: 14px 0;
 }
 
+.world-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.world-stage-grid .stage-step {
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  justify-content: center;
+}
+
+.world-contrib-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.world-contrib-cell {
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+.world-contrib-cell .stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+button.civic-tile {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+.offline-banner {
+  background: var(--jade-deep, #1f5c44);
+  color: #fff;
+  text-align: center;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.journal-prompt-strip {
+  background: rgba(90, 120, 90, 0.08);
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 0 0 10px;
+  font-size: 0.92rem;
+}
+
+.companion-age-note {
+  margin: -4px 0 12px;
+}
+
+.seasonal-virtue-card {
+  margin-bottom: 12px;
+}
+
+@media (max-width: 480px) {
+  .world-stage-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 .stage-step {
   padding: 6px 12px;
   border-radius: 999px;

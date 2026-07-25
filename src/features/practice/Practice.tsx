@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import type { JourneyData } from '../../state/selectors';
@@ -15,6 +15,8 @@ import { playSfx } from '../../engine/sfx';
 import { useUi } from '../../state/uiStore';
 import { useTodayTasks } from '../home/useTodayTasks';
 import BreathGate from './BreathGate';
+import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
+import { collectPastIntentions, journalPromptFromIntentions } from '../../engine/journalPrompts';
 
 // Evening reflection only opens from 5pm local time, up to midnight — it's
 // meant to be a look back on the day that's actually happened, not
@@ -30,18 +32,32 @@ function practiceTimeOfDay(): 'morning' | 'day' | 'evening' {
 
 function MorningCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
+  const days = useJourney((s) => s.days);
   const setIntention = useJourney((s) => s.setIntention);
   const [text, setText] = useState('');
   const { t, L, locale } = useT();
   const quote = QUOTES[dailyQuoteIndex(today, QUOTES.length)];
+  const season = seasonalVirtueForDay(today);
+  const newYear = isGregorianNewYearWindow(today) || isLunarNewYearWindow(today);
+  const pastIntentions = useMemo(() => collectPastIntentions(days), [days]);
+  const fromPast = pastIntentions.length > 0;
+  const promptSeed = journalPromptFromIntentions(pastIntentions, `prompt-${today}`, [
+    t('journalPromptDefault1'),
+    t('journalPromptDefault2'),
+    t('journalPromptDefault3'),
+  ]);
 
   return (
     <div className="card practice-card">
-      <h3>{t('morningCardTitle')}</h3>
+      <h3>{newYear ? t('newYearRitualTitle') : t('morningCardTitle')}</h3>
+      {newYear && <p className="small muted">{t('newYearRitualHint')}</p>}
       <div className="quote-card" style={{ marginBottom: 14 }}>
         <p className="quote-text">“{L(quote.text)}”</p>
         <p className="quote-author">— {L(quote.author)}</p>
       </div>
+      <p className="small muted" style={{ marginBottom: 10 }}>
+        {season.emoji} {L(season.virtue)} — {L(season.guidance)}
+      </p>
       {rec.intention ? (
         <p>
           <span className="pill">{t('intentionSetLabel')}</span>&nbsp; “{rec.intention}”
@@ -49,6 +65,13 @@ function MorningCard({ today }: { today: string }) {
       ) : (
         <>
           <p className="small muted">{t('intentionPrompt')}</p>
+          {fromPast ? (
+            <p className="journal-prompt-strip">
+              <strong>{t('journalPromptFromPast')}:</strong> “{promptSeed}”
+            </p>
+          ) : (
+            <p className="journal-prompt-strip">{promptSeed}</p>
+          )}
           <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('intentionPlaceholder')} />
           <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, progressLength(text), TEXT_MIN.intention)}</p>
           {progressLength(text) >= TEXT_MIN.intention && looksLikeNonsense(text) && (

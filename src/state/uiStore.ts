@@ -11,6 +11,9 @@ interface UiState {
   /** ISO week key (YYYY-Www) of the last weekly harmony review shown. */
   lastWeeklyReviewWeek: string | null;
   setLastWeeklyReviewWeek: (week: string) => void;
+  /** Calendar year of the last yearly harmony review (e.g. 2026). */
+  lastYearlyReviewYear: number | null;
+  setLastYearlyReviewYear: (year: number) => void;
   /** Day key when the evening-open hush SFX last played. */
   lastEveningSfxDay: string | null;
   setLastEveningSfxDay: (day: string) => void;
@@ -19,8 +22,6 @@ interface UiState {
   setLastFullHarmonySfxDay: (day: string) => void;
 }
 
-// Persisted separately from journey progress — UI orientation markers, not
-// app progress, so resetting the journey doesn't need to touch them.
 export const useUi = create<UiState>()(
   persist(
     (set) => ({
@@ -30,12 +31,14 @@ export const useUi = create<UiState>()(
       setSeenPacingIntro: (seen) => set({ seenPacingIntro: seen }),
       lastWeeklyReviewWeek: null,
       setLastWeeklyReviewWeek: (week) => set({ lastWeeklyReviewWeek: week }),
+      lastYearlyReviewYear: null,
+      setLastYearlyReviewYear: (year) => set({ lastYearlyReviewYear: year }),
       lastEveningSfxDay: null,
       setLastEveningSfxDay: (day) => set({ lastEveningSfxDay: day }),
       lastFullHarmonySfxDay: null,
       setLastFullHarmonySfxDay: (day) => set({ lastFullHarmonySfxDay: day }),
     }),
-    { name: 'journey-ui', version: 2 },
+    { name: 'journey-ui', version: 3 },
   ),
 );
 
@@ -43,7 +46,6 @@ export const useUi = create<UiState>()(
 export function isoWeekKey(dayKey: string): string {
   const [y, m, d] = dayKey.split('-').map(Number);
   const date = new Date(y, m - 1, d);
-  // Thursday in current week decides the year (ISO).
   const thursday = new Date(date);
   thursday.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
   const week1 = new Date(thursday.getFullYear(), 0, 4);

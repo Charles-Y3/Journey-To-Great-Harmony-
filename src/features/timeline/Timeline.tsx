@@ -36,20 +36,21 @@ function LevelBody({
   const [nudgeIdx, setNudgeIdx] = useState(0);
   const { t, L, locale } = useT();
 
-  const q = level.quiz[qIndex];
   const finishedQuiz = qIndex >= level.quiz.length;
-  const answered = picked !== null;
-  const correct = answered && order[picked] === q.answer;
+  const q = finishedQuiz ? null : level.quiz[qIndex];
+  const answered = !finishedQuiz && picked !== null;
+  const correct = !!q && answered && order[picked!] === q.answer;
   const nudgeKeys = ['quizNudgeReread', 'quizNudgeBreathe', 'quizNudgeLookAgain'] as const;
-  const nudge = q.nudge ? L(q.nudge) : t(nudgeKeys[nudgeIdx % nudgeKeys.length]);
+  const nudge = q?.nudge ? L(q.nudge) : t(nudgeKeys[nudgeIdx % nudgeKeys.length]);
 
   function pick(i: number) {
-    if (picked !== null) return;
+    if (!q || picked !== null) return;
     setPicked(i);
     if (order[i] === q.answer) setCorrectCount((c) => c + 1);
   }
 
   function retry() {
+    if (!q) return;
     setOrder(shuffledIndices(q.options.en.length));
     setPicked(null);
     setNudgeIdx((n) => n + 1);
@@ -98,7 +99,7 @@ function LevelBody({
             {takeQuizBtn(locale, level.quiz.length)}
           </button>
         )
-      ) : !finishedQuiz ? (
+      ) : !finishedQuiz && q ? (
         <div className="card" style={{ marginTop: 10 }}>
           <p className="small muted">{questionProgress(locale, qIndex + 1, level.quiz.length)}</p>
           <p>
