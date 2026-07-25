@@ -48,6 +48,8 @@ export interface JourneyData {
   capstones: Record<string, { text: string; day: string }>;
   /** Card ids that have already played their first-open reveal animation. */
   revealedCards: string[];
+  /** Virtue Glyph puzzle ids cleared at least once (first clear awards XP). */
+  completedGlyphs: string[];
 }
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */

@@ -27,6 +27,7 @@ import JourneyMap from './features/map/JourneyMap';
 import World from './features/world/World';
 import Community from './features/community/Community';
 import Collection from './features/collection/Collection';
+import Glyphs from './features/glyphs/Glyphs';
 
 const SIDEBAR_NAV = [
   { to: '/', emoji: '🌅', key: 'navToday' as const },
@@ -38,6 +39,7 @@ const SIDEBAR_NAV = [
   { to: '/world', emoji: '🌏', key: 'navWorld' as const },
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
+  { to: '/glyphs', emoji: '🀄', key: 'navGlyphs' as const },
 ];
 
 // Mobile bottom nav: daily loop + living places; the rest lives behind "More".
@@ -54,6 +56,7 @@ const MORE_ITEMS = [
   { to: '/map', emoji: '🗺️', key: 'navMap' as const },
   { to: '/community', emoji: '👥', key: 'navCommunity' as const },
   { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
+  { to: '/glyphs', emoji: '🀄', key: 'navGlyphs' as const },
 ];
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
@@ -734,62 +737,67 @@ export default function App() {
   return (
     <div className="app">
       <OfflineBanner />
-      <aside className="sidebar">
-        <h1 className="sidebar-title">{t('appName')}</h1>
-        <p className="sidebar-tagline">{t('appTagline')}</p>
-        <SidebarNavLinks />
-        <div className="sidebar-footer">
-          <button className="btn" style={{ width: '100%' }} onClick={() => setShowSettings(true)}>
-            {t('settings')}
-          </button>
-        </div>
-      </aside>
-
-      <div className="main">
-        <div className="topbar">
-          <button type="button" className="topbar-rank topbar-rank-btn" onClick={() => setShowRankModal(true)}>
-            <span>{rank.emoji}</span>
-            <span>{L(rank.name)}</span>
-          </button>
-          <div className="topbar-xp">
-            <ProgressBar
-              value={next ? xp - rank.minXp : 1}
-              max={next ? next.minXp - rank.minXp : 1}
-              label={xpBarLabel(locale, xp, next ? next.minXp - xp : null, next ? L(next.name) : '')}
-            />
-          </div>
-          <div className="topbar-right">
-            <button type="button" className="streak-flame streak-flame-btn" onClick={() => setShowStreakInfo(true)} aria-label={t('statStreak')}>
-              🔥 {streak}
-            </button>
-            <button type="button" className="pill pill-btn" onClick={() => setShowHarmonyInfo(true)} aria-label={t('worldYourContribution')}>
-              🌏 {harmony}
-            </button>
-            <button
-              className="btn"
-              style={{ padding: '5px 10px' }}
-              onClick={() => setShowSettings(true)}
-              aria-label={t('settings')}
-            >
-              ⚙️
+      {/* Row shell kept separate from OfflineBanner so going offline cannot
+          insert a flex column sibling that squeezes the UI to half-width. */}
+      <div className="app-body">
+        <aside className="sidebar">
+          <h1 className="sidebar-title">{t('appName')}</h1>
+          <p className="sidebar-tagline">{t('appTagline')}</p>
+          <SidebarNavLinks />
+          <div className="sidebar-footer">
+            <button className="btn" style={{ width: '100%' }} onClick={() => setShowSettings(true)}>
+              {t('settings')}
             </button>
           </div>
-        </div>
+        </aside>
 
-        <main className="content">
-          <Routes>
-            <Route path="/" element={<Today />} />
-            <Route path="/practice" element={<Practice />} />
-            <Route path="/knowledge" element={<Knowledge />} />
-            <Route path="/timeline" element={<Timeline />} />
-            <Route path="/forest" element={<Forest />} />
-            <Route path="/map" element={<JourneyMap />} />
-            <Route path="/world" element={<World />} />
-            <Route path="/community" element={<Community />} />
-            <Route path="/collection" element={<Collection />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+        <div className="main">
+          <div className="topbar">
+            <button type="button" className="topbar-rank topbar-rank-btn" onClick={() => setShowRankModal(true)}>
+              <span>{rank.emoji}</span>
+              <span>{L(rank.name)}</span>
+            </button>
+            <div className="topbar-xp">
+              <ProgressBar
+                value={next ? xp - rank.minXp : 1}
+                max={next ? next.minXp - rank.minXp : 1}
+                label={xpBarLabel(locale, xp, next ? next.minXp - xp : null, next ? L(next.name) : '')}
+              />
+            </div>
+            <div className="topbar-right">
+              <button type="button" className="streak-flame streak-flame-btn" onClick={() => setShowStreakInfo(true)} aria-label={t('statStreak')}>
+                🔥 {streak}
+              </button>
+              <button type="button" className="pill pill-btn" onClick={() => setShowHarmonyInfo(true)} aria-label={t('worldYourContribution')}>
+                🌏 {harmony}
+              </button>
+              <button
+                className="btn"
+                style={{ padding: '5px 10px' }}
+                onClick={() => setShowSettings(true)}
+                aria-label={t('settings')}
+              >
+                ⚙️
+              </button>
+            </div>
+          </div>
+
+          <main className="content">
+            <Routes>
+              <Route path="/" element={<Today />} />
+              <Route path="/practice" element={<Practice />} />
+              <Route path="/knowledge" element={<Knowledge />} />
+              <Route path="/timeline" element={<Timeline />} />
+              <Route path="/forest" element={<Forest />} />
+              <Route path="/map" element={<JourneyMap />} />
+              <Route path="/world" element={<World />} />
+              <Route path="/community" element={<Community />} />
+              <Route path="/collection" element={<Collection />} />
+              <Route path="/glyphs" element={<Glyphs />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </div>
       </div>
 
       <BottomNav />

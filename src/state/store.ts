@@ -28,6 +28,7 @@ import { SPECIAL_CARD_RULES, cardById, RARITY_LEVEL_REQUIRED } from '../data/car
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
 import { REGIONS } from '../data/journeyMap';
+import { glyphById } from '../data/glyphs';
 import { isMeaningful, TEXT_MIN } from '../engine/textQuality';
 import { useLocale } from './localeStore';
 import { L } from '../i18n/L';
@@ -42,11 +43,13 @@ import {
   worldStageTitle,
   regionCompleteTitle,
   regionCompleteSubtitle,
+  glyphClearedTitle,
+  glyphClearedSubtitle,
 } from '../i18n/strings';
 
 export interface Celebration {
   id: string;
-  kind: 'rank' | 'badge' | 'card' | 'forest' | 'world' | 'region';
+  kind: 'rank' | 'badge' | 'card' | 'forest' | 'world' | 'region' | 'glyph';
   emoji: string;
   title: string;
   subtitle?: string;
@@ -65,6 +68,8 @@ interface JourneyActions {
   sendEncouragement: (peerId: string) => boolean;
   completeRegion: (regionId: string) => void;
   submitCapstone: (key: string, text: string) => void;
+  /** First clear of a Virtue Glyph awards XP; replays are no-ops for progress. Returns true if newly cleared. */
+  completeGlyph: (glyphId: string) => boolean;
   dismissCelebration: () => void;
   advanceDay: () => void;
   resetJourney: () => void;
@@ -100,6 +105,7 @@ function initialData(): JourneyData {
     seenCollectionCount: 0,
     capstones: {},
     revealedCards: [],
+    completedGlyphs: [],
   };
 }
 
@@ -315,6 +321,7 @@ function dataOf(s: JourneyState): JourneyData {
     seenCollectionCount: s.seenCollectionCount,
     capstones: s.capstones,
     revealedCards: s.revealedCards ?? [],
+    completedGlyphs: s.completedGlyphs ?? [],
   };
 }
 
@@ -474,6 +481,32 @@ export const useJourney = create<JourneyState>()(
             markActive(draft, today);
           }),
 
+        completeGlyph: (glyphId) => {
+          const state = get();
+          if ((state.completedGlyphs ?? []).includes(glyphId)) return false;
+          const glyph = glyphById(glyphId);
+          if (!glyph) return false;
+          apply((draft, today) => {
+            if (!draft.completedGlyphs) draft.completedGlyphs = [];
+            if (draft.completedGlyphs.includes(glyphId)) return;
+            draft.completedGlyphs.push(glyphId);
+            draft.xp += XP_FOR.glyph;
+            draft.harmonyPoints += HARMONY_FOR.glyph;
+            markActive(draft, today);
+            const locale = useLocale.getState().locale;
+            return [
+              celebration(
+                'glyph',
+                glyph.character,
+                glyphClearedTitle(locale, L(glyph.title, locale)),
+                glyphClearedSubtitle(locale, XP_FOR.glyph, HARMONY_FOR.glyph),
+                { ctaTo: '/glyphs' },
+              ),
+            ];
+          });
+          return true;
+        },
+
         dismissCelebration: () => set((s) => ({ celebrations: s.celebrations.slice(1) })),
 
         advanceDay: () => set((s) => ({ dayOffset: s.dayOffset + 1 })),
@@ -507,6 +540,7 @@ export const useJourney = create<JourneyState>()(
             encouragedOn: data.encouragedOn ?? {},
             capstones: data.capstones ?? {},
             revealedCards: data.revealedCards ?? [],
+            completedGlyphs: data.completedGlyphs ?? [],
           };
           set({ ...next, celebrations: [] });
           return true;
@@ -515,10 +549,12 @@ export const useJourney = create<JourneyState>()(
     },
     {
       name: 'journey-to-great-harmony',
-      version: 2,
-      migrate: (persisted) => {
-        const p = persisted as JourneyData & { revealedCards?: string[] };
+      version: 3,
+      migrate: (persisted, fromVersion) => {
+        const p = persisted as JourneyData & { revealedCards?: string[]; completedGlyphs?: string[] };
         if (!p.revealedCards) p.revealedCards = [];
+        if (!p.completedGlyphs) p.completedGlyphs = [];
+        void fromVersion;
         return p;
       },
       partialize: (s) => {

@@ -1,0 +1,14 @@
+---
+description: Always commit and push after finishing implementation work
+alwaysApply: true
+---
+
+# Always commit and push
+
+When implementation work is finished (feature, fix, or planned change the user asked for):
+
+1. **Commit** the relevant changes using the repo’s git commit protocol (status/diff/log, draft message, stage, commit, verify). Do not wait to be asked.
+2. **Push** to the tracked remote branch (`git push -u origin HEAD` if needed) so Vercel/CI can deploy. Do not wait to be asked.
+3. Still **do not** force-push, amend pushed commits, skip hooks, or change git config unless the user explicitly requests it.
+4. If commit or push fails, fix the issue and retry; report the failure if blocked (e.g. auth).
+5. Skip empty commits when there is nothing to commit. If already committed but not pushed, push.

@@ -50,9 +50,18 @@
 }
 
 html,
-body {
+body,
+#root {
   margin: 0;
   padding: 0;
+  /* Prefer dynamic viewport when available; standalone PWA overrides below. */
+  min-height: 100%;
+  min-height: 100dvh;
+}
+
+html {
+  /* iOS Safari / older WebKit fill of the visible frame */
+  height: -webkit-fill-available;
 }
 
 body {
@@ -61,6 +70,18 @@ body {
   font-family: var(--font-body);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  min-height: -webkit-fill-available;
+}
+
+/* Installed PWA: use layout viewport height so first paint fills the screen
+   (100dvh can resolve short on cold launch in standalone WebKit/Chromium). */
+@media all and (display-mode: standalone) {
+  html,
+  body,
+  #root {
+    min-height: 100vh;
+    height: 100%;
+  }
 }
 
 h1,
@@ -83,10 +104,13 @@ a {
 /* ── Language gate (first-run onboarding) ────────────────────────────── */
 .gate {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   background: radial-gradient(circle at 50% 0%, var(--jade-soft), var(--bg) 70%);
 }
 
@@ -159,7 +183,23 @@ a {
 /* ── App layout ────────────────────────────────────────────────────── */
 .app {
   display: flex;
+  flex-direction: column;
   min-height: 100vh;
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+}
+
+.app-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+}
+
+@media all and (display-mode: standalone) {
+  .app {
+    min-height: 100vh;
+  }
 }
 
 .sidebar {
@@ -168,13 +208,23 @@ a {
   background: var(--surface);
   border-right: 1px solid var(--line);
   padding: 18px 12px;
+  padding-top: max(18px, env(safe-area-inset-top));
   position: sticky;
   top: 0;
+  align-self: flex-start;
   height: 100vh;
+  height: 100dvh;
+  max-height: 100%;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+@media all and (display-mode: standalone) {
+  .sidebar {
+    height: 100vh;
+  }
 }
 
 .sidebar-title {
@@ -254,11 +304,17 @@ a {
   align-items: center;
   gap: 14px;
   padding: 12px 22px;
+  padding-top: max(12px, env(safe-area-inset-top));
   background: var(--surface);
   border-bottom: 1px solid var(--line);
   position: sticky;
   top: 0;
   z-index: 20;
+}
+
+/* When the offline banner owns the top safe-area, don't double-pad the topbar. */
+.app:has(.offline-banner) .topbar {
+  padding-top: 12px;
 }
 
 .topbar-rank {
@@ -1767,11 +1823,14 @@ button.civic-tile {
 }
 
 .offline-banner {
+  flex: 0 0 auto;
+  width: 100%;
   background: var(--jade-deep, #1f5c44);
   color: #fff;
   text-align: center;
   font-size: 0.85rem;
   padding: 8px 12px;
+  padding-top: max(8px, env(safe-area-inset-top));
   position: sticky;
   top: 0;
   z-index: 50;
@@ -2186,4 +2245,154 @@ button.stage-step:disabled {
 .stat-name {
   font-size: 0.75rem;
   color: var(--ink-soft);
+}
+
+/* ── Virtue Glyph sliding puzzles ──────────────────────────────────── */
+.glyph-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.glyph-card {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.glyph-card.cleared {
+  border-color: var(--jade);
+}
+
+.glyph-card-char {
+  flex-shrink: 0;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 2.4rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  color: var(--jade-deep);
+}
+
+.glyph-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.glyph-card-body .btn {
+  margin-top: 8px;
+}
+
+.glyph-board {
+  --glyph-board: min(72vw, 360px);
+  width: var(--glyph-board);
+  height: var(--glyph-board);
+  display: grid;
+  gap: 3px;
+  margin: 16px auto;
+  padding: 4px;
+  background: var(--line);
+  border-radius: 12px;
+  touch-action: manipulation;
+}
+
+.glyph-cell {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  border-radius: 6px;
+  padding: 0;
+  aspect-ratio: 1;
+  background: var(--surface);
+}
+
+.glyph-cell-empty {
+  background: var(--bg-soft);
+  opacity: 0.55;
+}
+
+button.glyph-tile {
+  cursor: pointer;
+  color: inherit;
+}
+
+button.glyph-tile:hover {
+  outline: 2px solid var(--jade);
+  outline-offset: -2px;
+}
+
+.glyph-tile-clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.glyph-tile-glyph {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: calc(var(--glyph-board) * 0.78);
+  line-height: 1;
+  color: var(--jade-deep);
+  pointer-events: none;
+  user-select: none;
+}
+
+.glyph-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.glyph-solved {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  text-align: center;
+}
+
+.glyph-solved-char {
+  font-family: var(--font-display);
+  font-size: 3.2rem;
+  color: var(--jade-deep);
+  animation: glyph-pop 0.45s ease;
+}
+
+.glyph-meaning {
+  font-weight: 600;
+  margin: 8px 0;
+}
+
+@keyframes glyph-pop {
+  from {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .glyph-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .glyph-card-char {
+    width: 56px;
+    height: 56px;
+    font-size: 2rem;
+  }
 }

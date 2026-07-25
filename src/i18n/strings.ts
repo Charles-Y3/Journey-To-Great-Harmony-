@@ -22,6 +22,7 @@ export const UI = {
   navWorld: localized('World', '世界'),
   navCommunity: localized('Companions', '同修'),
   navCollection: localized('Collection', '收藏'),
+  navGlyphs: localized('Glyphs', '字谜'),
   navMore: localized('More', '更多'),
 
   moreSheetTitle: localized('More', '更多'),
@@ -29,6 +30,33 @@ export const UI = {
     'Explore the rest of your journey.',
     '探索你旅程的其他部分。',
   ),
+
+  // ── Virtue Glyph sliding puzzles ──────────────────────────────────
+  glyphsTitle: localized('Virtue Glyphs', '德行之字'),
+  glyphsSubtitle: localized(
+    'A bonus logic puzzle: slide the tiles to restore each Chinese virtue character.',
+    '额外的逻辑谜题：滑动拼块，还原每一个德行汉字。',
+  ),
+  glyphsClearedLabel: localized('Cleared', '已解开'),
+  glyphsPlayBtn: localized('Play', '开始'),
+  glyphsReplayBtn: localized('Play again', '再玩一次'),
+  glyphsShuffleBtn: localized('Shuffle', '打乱'),
+  glyphsHint: localized(
+    'Tap a tile next to the empty space to slide it. Restore the character.',
+    '点按空格旁的拼块即可滑动。还原这个汉字。',
+  ),
+  glyphsSolvedTitle: localized('Character restored', '汉字已还原'),
+  glyphsFirstClearNote: localized(
+    'First clear — a small bonus for your journey.',
+    '首次解开 — 旅途的一点小小奖励。',
+  ),
+  glyphsReplayNote: localized(
+    'Well restored. Practice earns no further XP for this glyph.',
+    '还原得很好。此字再次练习不再给予经验。',
+  ),
+  glyphsCloseBtn: localized('Continue', '继续'),
+  glyphsSizeLabel: localized('Grid', '棋盘'),
+  openGlyphsCta: localized('Open Glyphs', '打开字谜'),
 
   // ── Settings modal ────────────────────────────────────────────────
   settingsTitle: localized('⚙️ Settings', '⚙️ 设置'),
@@ -872,4 +900,17 @@ export function regionCompleteTitle(locale: Locale, regionName: string): string 
 
 export function regionCompleteSubtitle(locale: Locale, xp: number): string {
   return pick(locale, `+${xp} XP · The road continues.`, `+${xp} 经验 · 旅途仍在继续。`, `+${xp} 經驗 · 旅途仍在繼續。`);
+}
+
+export function glyphClearedTitle(locale: Locale, glyphTitle: string): string {
+  return pick(locale, `Glyph restored: ${glyphTitle}`, `字谜还原：${glyphTitle}`, `字謎還原：${glyphTitle}`);
+}
+
+export function glyphClearedSubtitle(locale: Locale, xp: number, harmony: number): string {
+  return pick(
+    locale,
+    `+${xp} XP · +${harmony} harmony`,
+    `+${xp} 经验 · +${harmony} 和谐点`,
+    `+${xp} 經驗 · +${harmony} 和諧點`,
+  );
 }

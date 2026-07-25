@@ -175,13 +175,13 @@ export const REGIONS: MapRegion[] = [
   },
   {
     id: 'city',
-    name: localized('City of Harmony', '大同之城'),
-    emoji: '🏙️',
+    name: localized('World of Great Harmony', '大同世界'),
+    emoji: '🌏',
     unlockXp: 5000,
-    tagline: localized('Where the journey becomes a home.', '旅程化为归宿的地方。'),
+    tagline: localized('Where the journey becomes a shared world.', '旅程化为共享世界的地方。'),
     story: localized(
-      'At last: a city with open gates and no walls. In its squares, the old are cared for, the young are taught, and strangers are greeted as kin — the Great Harmony 大同, not as a dream but as a daily practice. You understand now that this city is not a destination. It is built, everywhere, by people who took the same road you did: learn, cultivate, practise, contribute.',
-      '终于到了：一座城门敞开、没有城墙的城市。广场上，老者得到奉养，幼者得到教导，陌生人被当作亲人相迎 — 大同，不再是一个梦想，而是每日的践行。此刻你明白，这座城并非终点。它在每一处被建造，由和你走过同一条路的人们共同建造：学习、修身、力行、贡献。',
+      'At last: a world with open gates and no walls. In its squares, the old are cared for, the young are taught, and strangers are greeted as kin — the Great Harmony 大同, not as a dream but as a daily practice. You understand now that this world is not a destination. It is built, everywhere, by people who took the same road you did: learn, cultivate, practise, contribute.',
+      '终于到了：一个门扉敞开、没有围墙的世界。广场上，老者得到奉养，幼者得到教导，陌生人被当作亲人相迎 — 大同，不再是一个梦想，而是每日的践行。此刻你明白，这个世界并非终点。它在每一处被建造，由和你走过同一条路的人们共同建造：学习、修身、力行、贡献。',
     ),
     challenge: localized(
       "Reach the rank of Contributor and complete every other region's challenge.",
@@ -189,8 +189,8 @@ export const REGIONS: MapRegion[] = [
     ),
     rewardXp: 120,
     epilogue: localized(
-      'This city was never really a place on the map — it was the shape every other ground was quietly building toward.',
-      '这座城，从来就不真正是地图上的一处地方 — 它是其他每一片土地，一直在悄悄建造着的那个形状。',
+      'This world was never really a place on the map — it was the shape every other ground was quietly building toward.',
+      '这个世界，从来就不真正是地图上的一处地方 — 它是其他每一片土地，一直在悄悄建造着的那个形状。',
     ),
   },
 ];

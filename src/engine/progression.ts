@@ -139,6 +139,8 @@ export const XP_FOR = {
   reflection: 10,
   encouragement: 2,
   capstone: 40,
+  /** First clear of a Virtue Glyph sliding puzzle (bonus side activity). */
+  glyph: 8,
 } as const;
 
 // Harmony points: the user's contribution to the shared Great Harmony World.
@@ -152,6 +154,7 @@ export const HARMONY_FOR = {
   encouragement: 5,
   region: 20,
   capstone: 25,
+  glyph: 4,
 } as const;
 
 // ── Virtue Forest ──────────────────────────────────────────────────────

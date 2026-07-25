@@ -81,6 +81,7 @@ function ctaLabelKey(ctaTo: string): UiKey {
   if (ctaTo === '/world') return 'celebrateVisitWorld';
   if (ctaTo === '/collection') return 'celebrateVisitCollection';
   if (ctaTo === '/map') return 'celebrateVisitMap';
+  if (ctaTo === '/glyphs') return 'openGlyphsCta';
   return 'celebrateContinue';
 }
 
