@@ -46,9 +46,9 @@ export default function TurningPoints() {
           <p style={{ marginBottom: 10 }}>
             <span className="pill">{L(point.tradition)}</span>
           </p>
+          <p>{L(point.setting)}</p>
           {!revealed ? (
             <>
-              <p>{L(point.setting)}</p>
               <p className="small muted" style={{ marginTop: 10 }}>
                 {t('turningPointsPrompt')}
               </p>
@@ -58,10 +58,12 @@ export default function TurningPoints() {
             </>
           ) : (
             <>
-              <p className="small muted" style={{ marginBottom: 4 }}>
-                <strong>{t('turningPointsResolutionLabel')}</strong>
-              </p>
-              <p>{L(point.resolution)}</p>
+              <div style={{ borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 10 }}>
+                <p className="small muted" style={{ marginBottom: 4 }}>
+                  <strong>{t('turningPointsResolutionLabel')}</strong>
+                </p>
+                <p>{L(point.resolution)}</p>
+              </div>
               <div style={{ borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 14 }}>
                 <p className="small muted" style={{ marginBottom: 4 }}>
                   <strong>{t('turningPointsQuestionLabel')}</strong>
@@ -90,7 +92,10 @@ export default function TurningPoints() {
                     <p className="small muted" style={{ margin: '4px 0' }}>
                       {p.emoji} {L(p.tradition)}
                     </p>
-                    <p className="small">{L(p.resolution)}</p>
+                    <p className="small muted">{L(p.setting)}</p>
+                    <p className="small" style={{ marginTop: 4 }}>
+                      {L(p.resolution)}
+                    </p>
                     <p className="small muted" style={{ marginTop: 4 }}>
                       {L(p.reflectionQuestion)}
                     </p>

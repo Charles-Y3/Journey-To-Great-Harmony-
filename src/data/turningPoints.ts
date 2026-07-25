@@ -27,9 +27,10 @@ export const TURNING_POINTS: TurningPoint[] = [
       '一位僧人问禅师赵州：「狗子还有佛性也无？」',
     ),
     resolution: localized("Zhaozhou said: 'Wú' — 'No.'", '赵州说：「无。」'),
+    // Not "why won't he explain" — he did answer; Mu is the whole point of sitting.
     reflectionQuestion: localized(
-      'Why might a teacher refuse to explain a single word of it?',
-      '一位老师，为何会拒绝解释这一个字？',
+      'If every being has Buddha-nature, why might a master answer a dog with no?',
+      '若一切众生皆有佛性，一位禅师为何会对「狗」答「无」？',
     ),
   },
   {
