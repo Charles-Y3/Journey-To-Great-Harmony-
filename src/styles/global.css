@@ -2354,8 +2354,8 @@ button.stage-step:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 78%;
-  height: 78%;
+  width: 92%;
+  height: 92%;
   color: var(--jade-deep);
 }
 
@@ -2570,9 +2570,13 @@ button.glyph-tile:hover {
   color: var(--jade-deep);
 }
 
+/* Stretch the seal across the full 4×5 board crop so outer pieces carry ink
+   (Shuowen forms are often tall/narrow and would otherwise sit in the centre). */
 .glyph-tile-seal .seal-inline-mask {
-  width: 78%;
-  height: 78%;
+  width: 100%;
+  height: 100%;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
 }
 
 .glyph-actions {
