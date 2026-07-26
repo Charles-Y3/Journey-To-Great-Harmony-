@@ -69,7 +69,6 @@ const BAODE_BOARD = { cols: 4, rows: 5 } as const;
 function baode(
   id: string,
   character: string,
-  _svgFile: string,
   title: Localized<string>,
   meaning: Localized<string>,
   teaching: Localized<string>,
@@ -170,12 +169,11 @@ export const BEGINNER_GLYPHS: BeginnerGlyph[] = [
   },
 ];
 
-/** Intermediate Klotski puzzles — 八德, oracle-bone SVG faces. */
+/** Intermediate Klotski puzzles — 八德, Shuowen 小篆 faces. */
 export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'xiao',
     '孝',
-    'xiao.svg',
     localized('Xiao — Filial Devotion', '孝道'),
     localized(
       'Care and respect for parents and elders — the root of humane feeling.',
@@ -193,7 +191,6 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'ti',
     '悌',
-    'ti.svg',
     localized('Ti — Fraternal Respect', '悌敬'),
     localized(
       'Kindness and deference among siblings and peers — harmony in the near circle.',
@@ -211,7 +208,6 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'zhong',
     '忠',
-    'zhong.svg',
     localized('Zhong — Loyalty', '忠诚'),
     localized(
       'Wholehearted dedication to what you serve — person, duty, or shared good.',
@@ -229,15 +225,14 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'xin-oracle',
     '信',
-    'xin.svg',
     localized('Xin — Trustworthiness', '诚信'),
     localized(
       'Keeping your word so others can rest their trust on you.',
       '信守承诺，使他人可以把信赖安放在你身上。',
     ),
     localized(
-      'In oracle bone form, Xin 信 still names the same bridge: a promise kept is a stone others can stand on.',
-      '甲骨之形中，信仍是同一座桥：守住的承诺，是他人可以立足的石头。',
+      'In the Shuowen seal form, Xin 信 still names the same bridge: a promise kept is a stone others can stand on.',
+      '说文小篆之形中，信仍是同一座桥：守住的承诺，是他人可以立足的石头。',
     ),
     localized(
       '人 (a standing person) beside 言 (speech lines): a human being and the words they utter — trust as spoken truth.',
@@ -247,7 +242,6 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'li-oracle',
     '禮',
-    'li.svg',
     localized('Li — Ritual Propriety', '礼仪'),
     localized(
       'Forms of respect that train the heart — manners with meaning.',
@@ -265,7 +259,6 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'yi-oracle',
     '義',
-    'yi.svg',
     localized('Yi — Righteousness', '道义'),
     localized(
       'Doing what ought to be done, even when it costs you.',
@@ -283,7 +276,6 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'lian',
     '廉',
-    'lian.svg',
     localized('Lian — Integrity', '廉洁'),
     localized(
       'Clean hands and a clear conscience — refusing what you should not take.',
@@ -301,7 +293,6 @@ export const INTERMEDIATE_GLYPHS: IntermediateGlyph[] = [
   baode(
     'chi',
     '恥',
-    'chi.svg',
     localized('Chi — Sense of Shame', '知耻'),
     localized(
       'A living conscience that flinches from what is base — and steers you back.',

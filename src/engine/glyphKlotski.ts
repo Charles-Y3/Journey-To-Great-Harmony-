@@ -5,6 +5,9 @@ export type Dir = 'up' | 'down' | 'left' | 'right';
 /** Current top-left of each piece by id. */
 export type KlotskiState = Record<string, { r: number; c: number }>;
 
+/** An empty cell a piece would enter when stepping in `dir`. */
+export type EmptyTarget = { r: number; c: number; dir: Dir };
+
 const DIR_DELTA: Record<Dir, { dr: number; dc: number }> = {
   up: { dr: -1, dc: 0 },
   down: { dr: 1, dc: 0 },
@@ -92,6 +95,33 @@ export function movableDirs(
   );
 }
 
+/**
+ * Empty cells the piece would enter for each legal one-cell step.
+ * Used so the player can tap a specific empty slot when multiple dirs exist.
+ */
+export function emptyTargetsForPiece(
+  state: KlotskiState,
+  glyph: IntermediateGlyph,
+  pieceId: string,
+): EmptyTarget[] {
+  const p = pieceById(glyph, pieceId);
+  const pos = state[pieceId];
+  if (!pos) return [];
+  const out: EmptyTarget[] = [];
+  for (const dir of movableDirs(state, glyph, pieceId)) {
+    if (dir === 'up') {
+      for (let c = pos.c; c < pos.c + p.w; c++) out.push({ r: pos.r - 1, c, dir });
+    } else if (dir === 'down') {
+      for (let c = pos.c; c < pos.c + p.w; c++) out.push({ r: pos.r + p.h, c, dir });
+    } else if (dir === 'left') {
+      for (let r = pos.r; r < pos.r + p.h; r++) out.push({ r, c: pos.c - 1, dir });
+    } else {
+      for (let r = pos.r; r < pos.r + p.h; r++) out.push({ r, c: pos.c + p.w, dir });
+    }
+  }
+  return out;
+}
+
 export function tryMove(
   state: KlotskiState,
   glyph: IntermediateGlyph,
@@ -108,9 +138,8 @@ export function tryMove(
 }
 
 /**
- * Tap a piece: if it has exactly one legal step direction, take it; if several,
- * prefer the direction toward the largest contiguous empty gap along an edge.
- * Returns null if the piece cannot move.
+ * Tap a piece: if it has exactly one legal step, take it.
+ * If several, return null — the UI must ask which empty slot to enter.
  */
 export function tryTapPiece(
   state: KlotskiState,
@@ -118,41 +147,8 @@ export function tryTapPiece(
   pieceId: string,
 ): KlotskiState | null {
   const dirs = movableDirs(state, glyph, pieceId);
-  if (dirs.length === 0) return null;
   if (dirs.length === 1) return tryMove(state, glyph, pieceId, dirs[0]!);
-
-  // Prefer a direction where the piece's facing edge fully borders empty cells.
-  const p = pieceById(glyph, pieceId);
-  const pos = state[pieceId]!;
-  const grid = occupancy(state, glyph);
-  let best: Dir | null = null;
-  let bestScore = -1;
-  for (const dir of dirs) {
-    const { dr, dc } = DIR_DELTA[dir];
-    let score = 0;
-    if (dr === -1) {
-      for (let c = pos.c; c < pos.c + p.w; c++) {
-        if (grid[pos.r - 1]?.[c] === null) score++;
-      }
-    } else if (dr === 1) {
-      for (let c = pos.c; c < pos.c + p.w; c++) {
-        if (grid[pos.r + p.h]?.[c] === null) score++;
-      }
-    } else if (dc === -1) {
-      for (let r = pos.r; r < pos.r + p.h; r++) {
-        if (grid[r]?.[pos.c - 1] === null) score++;
-      }
-    } else {
-      for (let r = pos.r; r < pos.r + p.h; r++) {
-        if (grid[r]?.[pos.c + p.w] === null) score++;
-      }
-    }
-    if (score > bestScore) {
-      bestScore = score;
-      best = dir;
-    }
-  }
-  return best ? tryMove(state, glyph, pieceId, best) : null;
+  return null;
 }
 
 /**

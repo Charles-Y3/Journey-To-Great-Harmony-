@@ -14,12 +14,16 @@ import {
   previewState,
   scrambleKlotski,
   tryTapPiece,
+  tryMove,
   isSolved as isKlotskiSolved,
   movableDirs,
+  emptyTargetsForPiece,
   occupancy,
+  type Dir,
+  type EmptyTarget,
   type KlotskiState,
 } from '../../engine/glyphKlotski';
-import { OracleGlyphSvg } from '../../assets/glyphs/oracle/OracleGlyphSvgs';
+import { SealGlyphSvg } from '../../assets/glyphs/seal/SealGlyphSvgs';
 import { useJourney } from '../../state/store';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -50,7 +54,7 @@ function TileFace({ character, tileId, size }: { character: string; tileId: numb
   );
 }
 
-function OracleFace({
+function SealFace({
   glyph,
   solvedR,
   solvedC,
@@ -72,8 +76,8 @@ function OracleFace({
   return (
     <div className="glyph-tile-clip" aria-hidden="true">
       <div className="glyph-tile-bg" style={layerStyle} />
-      <div className="glyph-tile-oracle" style={layerStyle}>
-        <OracleGlyphSvg character={glyph.character} />
+      <div className="glyph-tile-seal" style={layerStyle}>
+        <SealGlyphSvg character={glyph.character} />
       </div>
     </div>
   );
@@ -130,12 +134,16 @@ function PuzzleBoard({
 function KlotskiBoard({
   glyph,
   state,
-  onTap,
+  onTapPiece,
+  onTapEmpty,
+  selectedPieceId = null,
   interactive = true,
 }: {
   glyph: IntermediateGlyph;
   state: KlotskiState;
-  onTap: (pieceId: string) => void;
+  onTapPiece: (pieceId: string) => void;
+  onTapEmpty?: (dir: Dir) => void;
+  selectedPieceId?: string | null;
   interactive?: boolean;
 }) {
   const { cols, rows } = glyph.board;
@@ -145,6 +153,15 @@ function KlotskiBoard({
     for (let c = 0; c < cols; c++) {
       if (grid[r]![c] === null) empties.push({ r, c });
     }
+  }
+
+  const targets: EmptyTarget[] =
+    interactive && selectedPieceId
+      ? emptyTargetsForPiece(state, glyph, selectedPieceId)
+      : [];
+  const targetKey = new Map<string, Dir>();
+  for (const t of targets) {
+    targetKey.set(`${t.r},${t.c}`, t.dir);
   }
 
   return (
@@ -157,20 +174,38 @@ function KlotskiBoard({
       role="grid"
       aria-label={glyph.character}
     >
-      {empties.map(({ r, c }) => (
-        <div
-          key={`e-${r}-${c}`}
-          className="glyph-klotski-empty"
-          style={{ gridColumn: c + 1, gridRow: r + 1 }}
-          role="gridcell"
-        />
-      ))}
+      {empties.map(({ r, c }) => {
+        const dir = targetKey.get(`${r},${c}`);
+        const isTarget = dir !== undefined;
+        if (interactive && isTarget && onTapEmpty) {
+          return (
+            <button
+              key={`e-${r}-${c}`}
+              type="button"
+              className="glyph-klotski-empty glyph-klotski-empty-target"
+              style={{ gridColumn: c + 1, gridRow: r + 1 }}
+              role="gridcell"
+              onClick={() => onTapEmpty(dir)}
+            />
+          );
+        }
+        return (
+          <div
+            key={`e-${r}-${c}`}
+            className="glyph-klotski-empty"
+            style={{ gridColumn: c + 1, gridRow: r + 1 }}
+            role="gridcell"
+          />
+        );
+      })}
       {glyph.pieces.map((p) => {
         const pos = state[p.id];
         if (!pos) return null;
-        const canMove = interactive && movableDirs(state, glyph, p.id).length > 0;
+        const dirs = interactive ? movableDirs(state, glyph, p.id) : [];
+        const canMove = dirs.length > 0;
+        const selected = selectedPieceId === p.id;
         const face = (
-          <OracleFace glyph={glyph} solvedR={p.solvedR} solvedC={p.solvedC} w={p.w} h={p.h} />
+          <SealFace glyph={glyph} solvedR={p.solvedR} solvedC={p.solvedC} w={p.w} h={p.h} />
         );
         const style = {
           gridColumn: `${pos.c + 1} / span ${p.w}`,
@@ -178,25 +213,28 @@ function KlotskiBoard({
         };
         if (!interactive) {
           return (
-            <div
-              key={p.id}
-              className="glyph-klotski-piece"
-              style={style}
-              role="gridcell"
-            >
+            <div key={p.id} className="glyph-klotski-piece" style={style} role="gridcell">
               {face}
             </div>
           );
         }
+        const className = [
+          'glyph-klotski-piece',
+          canMove ? 'movable' : '',
+          selected ? 'selected' : '',
+        ]
+          .filter(Boolean)
+          .join(' ');
         return (
           <button
             key={p.id}
             type="button"
-            className={canMove ? 'glyph-klotski-piece movable' : 'glyph-klotski-piece'}
+            className={className}
             style={style}
             role="gridcell"
-            onClick={() => onTap(p.id)}
-            disabled={!canMove}
+            onClick={() => onTapPiece(p.id)}
+            disabled={!canMove && !selected}
+            aria-pressed={selected}
           >
             {face}
           </button>
@@ -293,32 +331,56 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
   const [state, setState] = useState<KlotskiState>(() => previewState(glyph));
   const [solved, setSolved] = useState(false);
   const [wasFirstClear, setWasFirstClear] = useState(false);
+  const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
 
   useEffect(() => {
     setStarted(false);
     setState(previewState(glyph));
     setSolved(false);
     setWasFirstClear(false);
+    setSelectedPieceId(null);
   }, [glyph]);
 
-  function start() {
-    setState(scrambleKlotski(glyph));
-    setStarted(true);
-    setSolved(false);
-    setWasFirstClear(false);
-  }
-
-  function tap(pieceId: string) {
-    if (solved) return;
-    const next = tryTapPiece(state, glyph, pieceId);
-    if (!next) return;
+  function applyMove(next: KlotskiState) {
     setState(next);
+    setSelectedPieceId(null);
     if (isKlotskiSolved(next, glyph)) {
       setSolved(true);
       playSfx('chime');
       const first = completeGlyph(glyph.id);
       setWasFirstClear(first);
     }
+  }
+
+  function start() {
+    setState(scrambleKlotski(glyph));
+    setStarted(true);
+    setSolved(false);
+    setWasFirstClear(false);
+    setSelectedPieceId(null);
+  }
+
+  function tapPiece(pieceId: string) {
+    if (solved) return;
+    if (selectedPieceId === pieceId) {
+      setSelectedPieceId(null);
+      return;
+    }
+    const dirs = movableDirs(state, glyph, pieceId);
+    if (dirs.length === 0) return;
+    if (dirs.length === 1) {
+      const next = tryTapPiece(state, glyph, pieceId);
+      if (next) applyMove(next);
+      return;
+    }
+    // Multiple empties — select and let the player tap a target slot.
+    setSelectedPieceId(pieceId);
+  }
+
+  function tapEmpty(dir: Dir) {
+    if (solved || !selectedPieceId) return;
+    const next = tryMove(state, glyph, selectedPieceId, dir);
+    if (next) applyMove(next);
   }
 
   return (
@@ -329,7 +391,7 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
       {!started ? (
         <>
           <p className="small muted">{t('glyphsPreviewHint')}</p>
-          <KlotskiBoard glyph={glyph} state={state} onTap={() => {}} interactive={false} />
+          <KlotskiBoard glyph={glyph} state={state} onTapPiece={() => {}} interactive={false} />
           <p className="glyph-inscription">
             <span className="glyph-inscription-label">{t('glyphsInscriptionLabel')}</span>
             {L(glyph.inscription)}
@@ -342,8 +404,16 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
         </>
       ) : (
         <>
-          <p className="small muted">{t('glyphsKlotskiHint')}</p>
-          <KlotskiBoard glyph={glyph} state={state} onTap={tap} />
+          <p className="small muted">
+            {selectedPieceId ? t('glyphsKlotskiChooseHint') : t('glyphsKlotskiHint')}
+          </p>
+          <KlotskiBoard
+            glyph={glyph}
+            state={state}
+            onTapPiece={tapPiece}
+            onTapEmpty={tapEmpty}
+            selectedPieceId={selectedPieceId}
+          />
           <div className="glyph-actions">
             <button type="button" className="btn" onClick={start}>
               {t('glyphsShuffleBtn')}
@@ -354,8 +424,8 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
 
       {solved && (
         <div className="glyph-solved">
-          <div className="glyph-solved-oracle" aria-hidden="true">
-            <OracleGlyphSvg character={glyph.character} />
+          <div className="glyph-solved-seal" aria-hidden="true">
+            <SealGlyphSvg character={glyph.character} />
           </div>
           <h3>{t('glyphsSolvedTitle')}</h3>
           <p className="glyph-meaning">{L(glyph.meaning)}</p>
@@ -404,8 +474,8 @@ function GlyphCard({
     >
       <div className="glyph-card-char" aria-hidden="true">
         {isIntermediateGlyph(glyph) ? (
-          <span className="glyph-card-oracle">
-            <OracleGlyphSvg character={glyph.character} />
+          <span className="glyph-card-seal">
+            <SealGlyphSvg character={glyph.character} />
           </span>
         ) : (
           glyph.character

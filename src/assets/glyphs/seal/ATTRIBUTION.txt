@@ -1,0 +1,3 @@
+Seal-script (小篆) glyph outlines sourced from 汉语国学 · 说文解字
+https://www.hanyuguoxue.com/shuowen/
+Hosted locally for the Journey to Great Harmony Intermediate (八德) puzzles.

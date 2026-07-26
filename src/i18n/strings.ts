@@ -35,8 +35,8 @@ export const UI = {
   // ── Virtue Glyph sliding puzzles ──────────────────────────────────
   glyphsTitle: localized('Virtue Glyphs', '德行之字'),
   glyphsSubtitle: localized(
-    'Bonus logic puzzles: restore virtue characters — modern slides, then oracle-bone Klotski.',
-    '额外的逻辑谜题：还原德行汉字 — 先是现代方块滑动，再是甲骨文华容道。',
+    'Bonus logic puzzles: restore virtue characters — modern slides, then Shuowen seal Klotski.',
+    '额外的逻辑谜题：还原德行汉字 — 先是现代方块滑动，再是说文小篆华容道。',
   ),
   glyphsTierBeginner: localized('Beginner — Five Constants', '入门 — 五常'),
   glyphsTierBeginnerBlurb: localized(
@@ -45,8 +45,8 @@ export const UI = {
   ),
   glyphsTierIntermediate: localized('Intermediate — Eight Virtues', '进阶 — 八德'),
   glyphsTierIntermediateBlurb: localized(
-    'Slide mixed squares and rectangles to restore each oracle-bone form.',
-    '滑动方块与长方形拼块，还原每一个甲骨字形。',
+    'Slide mixed squares and rectangles to restore each Shuowen seal form.',
+    '滑动方块与长方形拼块，还原每一个说文小篆字形。',
   ),
   glyphsTierLocked: localized(
     'Clear every Beginner glyph first to unlock this tier.',
@@ -66,8 +66,12 @@ export const UI = {
     '点按空格旁的拼块即可滑动。还原这个汉字。',
   ),
   glyphsKlotskiHint: localized(
-    'Tap a piece that borders empty space to slide it one step. Restore the oracle form.',
-    '点按紧邻空位的拼块，让它滑一步。还原这个甲骨字形。',
+    'Tap a piece that borders empty space to slide it one step. If it can go two ways, tap it, then tap the empty space you want. Restore the seal form.',
+    '点按紧邻空位的拼块，让它滑一步。若可朝两个方向移动，先点拼块，再点你想进入的空位。还原这个小篆字形。',
+  ),
+  glyphsKlotskiChooseHint: localized(
+    'Tap the highlighted empty space to slide the selected piece there.',
+    '点按高亮的空位，让选中的拼块滑入那里。',
   ),
   glyphsSolvedTitle: localized('Character restored', '汉字已还原'),
   glyphsFirstClearNote: localized(
