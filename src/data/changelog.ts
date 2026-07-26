@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 10,
+    date: '2026-07-27',
+    highlights: [
+      localized(
+        '🎨 Avatar packs unlock with your journey rank — starter faces first, rarer ones as you rise. Locked picks stay visible with an unlock hint.',
+        '🎨 头像包随旅程等级解锁 — 先有入门表情，更稀有的随等级开放。未解锁的仍可见，并提示所需等级。',
+      ),
+    ],
+  },
+  {
     version: 9,
     date: '2026-07-27',
     highlights: [

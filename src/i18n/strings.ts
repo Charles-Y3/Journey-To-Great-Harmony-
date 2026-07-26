@@ -150,9 +150,10 @@ export const UI = {
   ),
   settingsAvatarTitle: localized('Avatar', '头像'),
   settingsAvatarDesc: localized(
-    'A tiny emoji others see on Companions boards and wandering in the Great Harmony World.',
-    '同修榜单与大同世界中，他人会看到的小小表情头像。',
+    'A tiny emoji others see on Companions boards and in the Great Harmony World. More faces open as your journey rank rises.',
+    '同修榜单与大同世界中，他人会看到的小小表情头像。随着旅程等级提升，会有更多头像开放。',
   ),
+  settingsAvatarLocked: localized('Locked', '未解锁'),
   settingsSharedRoadTitle: localized('Shared road', '共享之路'),
   settingsSharedRoadDesc: localized(
     'After a short streak, you may appear on the four Companions boards and as a walker in others’ Great Harmony World. No email — only an anonymous id in this browser, plus your name, avatar, and dedication metrics.',
@@ -968,6 +969,15 @@ export function topicLessonCount(locale: Locale, done: number, total: number): s
 
 export function knowledgeProgressLabel(locale: Locale, done: number, total: number): string {
   return pick(locale, `${done}/${total} lessons completed`, `已完成 ${done}/${total} 课`, `已完成 ${done}/${total} 課`);
+}
+
+export function avatarUnlocksAt(locale: Locale, rankName: string): string {
+  return pick(
+    locale,
+    `Unlocks at ${rankName}`,
+    `达到「${rankName}」解锁`,
+    `達到「${rankName}」解鎖`,
+  );
 }
 
 export function knowledgeDepthProgressLabel(

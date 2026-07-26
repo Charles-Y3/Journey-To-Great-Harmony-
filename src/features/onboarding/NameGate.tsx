@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProfile } from '../../state/profileStore';
 import { useTextScale, type TextScale } from '../../state/textScaleStore';
-import { AVATARS } from '../../data/avatars';
+import { resolveAvatarForRank } from '../../data/avatars';
+import { AvatarPicker } from '../../components/AvatarPicker';
 import { useT } from '../../i18n/useT';
 import { isJunkName } from '../../engine/textQuality';
 import type { UiKey } from '../../i18n/strings';
@@ -12,6 +13,9 @@ const TEXT_SCALE_OPTIONS: { id: TextScale; labelKey: UiKey }[] = [
   { id: 'larger', labelKey: 'settingsTextSizeLarger' },
   { id: 'largest', labelKey: 'settingsTextSizeLargest' },
 ];
+
+/** Onboarding is always Seeker-rank for avatar unlocks. */
+const ONBOARDING_RANK_INDEX = 0;
 
 /**
  * After language: collect “You” prefs from Settings — name, text size, avatar.
@@ -27,6 +31,11 @@ export default function NameGate() {
   const setScale = useTextScale((s) => s.setScale);
   const [text, setText] = useState('');
   const junk = text.trim() !== '' && isJunkName(text);
+
+  useEffect(() => {
+    const next = resolveAvatarForRank(avatar, ONBOARDING_RANK_INDEX);
+    if (next !== avatar) setAvatar(next);
+  }, [avatar, setAvatar]);
 
   function finish(name: string | null) {
     navigate('/', { replace: true });
@@ -74,20 +83,11 @@ export default function NameGate() {
 
         <h3 className="gate-section-title">{t('settingsAvatarTitle')}</h3>
         <p className="small muted">{t('settingsAvatarDesc')}</p>
-        <div className="avatar-picker-grid" role="listbox" aria-label={t('settingsAvatarTitle')}>
-          {AVATARS.map((a) => (
-            <button
-              key={a}
-              type="button"
-              role="option"
-              aria-selected={a === avatar}
-              className={a === avatar ? 'avatar-picker-btn active' : 'avatar-picker-btn'}
-              onClick={() => setAvatar(a)}
-            >
-              {a}
-            </button>
-          ))}
-        </div>
+        <AvatarPicker
+          value={avatar}
+          rankIndex={ONBOARDING_RANK_INDEX}
+          onSelect={setAvatar}
+        />
 
         <div className="gate-options" style={{ marginTop: 16 }}>
           <button

@@ -618,6 +618,7 @@ a {
 .avatar-picker-btn {
   appearance: none;
   -webkit-appearance: none;
+  position: relative;
   border: 1px solid var(--line);
   background: var(--surface-2);
   border-radius: 10px;
@@ -631,6 +632,24 @@ a {
   border-color: var(--jade);
   background: var(--jade-soft);
   box-shadow: 0 0 0 1px var(--jade);
+}
+
+.avatar-picker-btn.locked {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.35);
+}
+
+.avatar-picker-btn.locked .avatar-picker-emoji {
+  opacity: 0.85;
+}
+
+.avatar-picker-lock {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  font-size: 0.55rem;
+  line-height: 1;
 }
 
 @media (max-width: 480px) {

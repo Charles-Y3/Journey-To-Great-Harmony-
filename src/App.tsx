@@ -11,7 +11,8 @@ import { useUi } from './state/uiStore';
 import { useProfile } from './state/profileStore';
 import { useTextScale, applyTextScale, type TextScale } from './state/textScaleStore';
 import { useTraveller, TRAVELLER_OPT_IN_STREAK } from './state/travellerStore';
-import { AVATARS } from './data/avatars';
+import { resolveAvatarForRank } from './data/avatars';
+import { AvatarPicker } from './components/AvatarPicker';
 import { flushTravellerSync, scheduleTravellerSync } from './engine/travellerSync';
 import { useTodayTasks } from './features/home/useTodayTasks';
 import { useSound, type MusicTrackId } from './state/soundStore';
@@ -227,28 +228,21 @@ function AvatarSection() {
   const avatar = useProfile((s) => s.avatar);
   const setAvatar = useProfile((s) => s.setAvatar);
   const optedIn = useTraveller((s) => s.optedIn);
+  const xp = useJourney((s) => s.xp);
+  const rankIndex = rankIndexForXp(xp);
 
   return (
     <div className="card">
       <h3>{t('settingsAvatarTitle')}</h3>
       <p className="small muted">{t('settingsAvatarDesc')}</p>
-      <div className="avatar-picker-grid" role="listbox" aria-label={t('settingsAvatarTitle')}>
-        {AVATARS.map((a) => (
-          <button
-            key={a}
-            type="button"
-            role="option"
-            aria-selected={a === avatar}
-            className={a === avatar ? 'avatar-picker-btn active' : 'avatar-picker-btn'}
-            onClick={() => {
-              setAvatar(a);
-              if (optedIn) void flushTravellerSync();
-            }}
-          >
-            {a}
-          </button>
-        ))}
-      </div>
+      <AvatarPicker
+        value={avatar}
+        rankIndex={rankIndex}
+        onSelect={(a) => {
+          setAvatar(a);
+          if (optedIn) void flushTravellerSync();
+        }}
+      />
     </div>
   );
 }
@@ -887,6 +881,8 @@ function SettingsModal({
                   onClick={() => {
                     reset();
                     resetOnboardingUi();
+                    // Journey XP returns to Seeker — clamp avatar to the starter pack.
+                    useProfile.getState().setAvatar(resolveAvatarForRank(useProfile.getState().avatar, 0));
                     navigate('/', { replace: true });
                     setConfirming(false);
                     onClose();
@@ -1062,6 +1058,15 @@ export default function App() {
   useEffect(() => {
     applyTextScale(textScale);
   }, [textScale]);
+
+  // If journey XP drops below an avatar’s unlock (e.g. Reset), fall back to default.
+  const profileAvatar = useProfile((s) => s.avatar);
+  const setProfileAvatar = useProfile((s) => s.setAvatar);
+  const journeyXp = useJourney((s) => s.xp);
+  useEffect(() => {
+    const next = resolveAvatarForRank(profileAvatar, rankIndexForXp(journeyXp));
+    if (next !== profileAvatar) setProfileAvatar(next);
+  }, [profileAvatar, journeyXp, setProfileAvatar]);
 
   // Opted-in travellers: debounce sync when dedication metrics change.
   const syncXp = useJourney((s) => s.xp);
