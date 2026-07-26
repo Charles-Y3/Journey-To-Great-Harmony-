@@ -260,6 +260,31 @@ export const UI = {
   ),
   ctaTimeline: localized('Timeline', '时间线'),
   taskChallengePrefix: localized('Virtue challenge', '德行挑战'),
+  taskHeartTitle: localized('Heart check', '心念一问'),
+  taskHeartDesc: localized(
+    'Name how you feel — then take one small fitting step.',
+    '说出此刻的感受 — 再迈出一步合宜的小行动。',
+  ),
+  taskHeartDone: localized('Heart check noted for today.', '今日心念已记下。'),
+  taskStillWatersTitle: localized('Still Waters', '静水'),
+  taskStillWatersDesc: localized(
+    'Sit with today’s short story — no quiz, only a question to carry.',
+    '静看今日的短故事 — 没有测验，只有一个可带走的问题。',
+  ),
+  taskStillWatersDone: localized('You turned today’s card.', '你已翻开今日的卡牌。'),
+  taskGlyphTitle: localized('Virtue Glyph', '德行之字'),
+  taskGlyphDesc: localized(
+    'Restore a character puzzle — modern slides or seal Klotski.',
+    '还原一个字谜 — 现代方块滑动或小篆华容道。',
+  ),
+  taskGlyphDone: localized('You practised a glyph today.', '你今天练习过字谜。'),
+  taskEncourageTitle: localized('Encourage a friend', '鼓励一位朋友'),
+  taskEncourageDesc: localized(
+    'Send a kind word to a companion on the Community board.',
+    '在社群榜上，给一位同修送出一句善意。',
+  ),
+  taskEncourageDone: localized('Encouragement sent today.', '今天已送出鼓励。'),
+  taskAlsoToday: localized('Also today', '今日也可'),
   taskEveningTitle: localized('Evening reflection', '夜间反思'),
   taskEveningDesc: localized(
     'Look back on the day with honesty and kindness.',
@@ -270,6 +295,22 @@ export const UI = {
   ctaLearn: localized('Learn', '学习'),
   ctaPractise: localized('Practise', '践行'),
   ctaReflect: localized('Reflect', '反思'),
+  ctaHeart: localized('Check in', '问一问'),
+  ctaStillWaters: localized('Sit with it', '静看'),
+  ctaGlyph: localized('Play', '开始'),
+  ctaEncourage: localized('Encourage', '鼓励'),
+  heartCardTitle: localized('Heart check', '心念一问'),
+  heartCardIntro: localized(
+    'Anytime — not a judgment. Name the weather inside, then choose a small next step.',
+    '随时可做 — 不是评判。说出内心的天气，再选一个小小的下一步。',
+  ),
+  heartCardNoteLabel: localized('Optional note', '可选一句话'),
+  heartCardNotePlaceholder: localized('One honest line…', '一句诚实的话…'),
+  heartCardSaveBtn: localized('Save heart check (+4 XP)', '记下心念（+4 经验）'),
+  heartCardUpdateBtn: localized('Update heart check', '更新心念'),
+  heartCardSaved: localized('Noted', '已记下'),
+  heartCardChange: localized('Choose again', '重新选择'),
+  eveningMoodEcho: localized('Earlier today your heart felt', '今天早些时候，你的心感到'),
   todayFullHarmony: localized(
     '🎉 Full harmony today — your forest and the world both grew!',
     '🎉 今日圆满和谐 — 你的森林与世界都成长了！',
@@ -549,6 +590,12 @@ export const UI = {
   companionYearsLabel: localized('years on the Way together', '年同修于道'),
   companionYearsNew: localized('Newly walking beside you', '初与你同修'),
   offlineBanner: localized('You’re offline — your journey continues here.', '你处于离线状态 — 旅程仍可在此继续。'),
+  updateBannerBody: localized(
+    'A new version of the journey is ready.',
+    '大同之路有新版本可用。',
+  ),
+  updateBannerReload: localized('Reload to update', '重新加载以更新'),
+  updateBannerLater: localized('Later', '稍后'),
   civicTapSchool: localized('A mind that grows here teaches another. Revisit the Knowledge Path when you can.', '在此成长的心灵，也将教导他人。有空时再走一走知识之路。'),
   civicTapLibrary: localized('From the shelves of wisdom', '来自智慧的书架'),
   civicTapGarden: localized('Patience tends this garden. Visit your Virtue Forest.', '耐心照料着这座花园。去看看你的德行森林。'),
@@ -606,9 +653,23 @@ export const UI = {
     '请先完成上一关，才能解锁这一关。',
   ),
   timelineDailyCapNote: localized(
-    "You've reached today's study limit for the Wisdom Timeline — come back tomorrow for more.",
-    '你今天在智慧时间线上的研读额度已用完 — 明天再回来继续吧。',
+    "You've reached today's study limit for the Wisdom Timeline — Ages and Lives share this budget. Come back tomorrow for more.",
+    '你今天在智慧时间线上的研读额度已用完 —「时代」与「生平」共用这一额度。明天再回来继续吧。',
   ),
+  timelineModeAges: localized('Ages', '时代'),
+  timelineModeLives: localized('Lives', '生平'),
+  livesSubtitle: localized(
+    'Walk the lives of the sages — their years, trials, and historical turning points.',
+    '走进圣哲的生平 — 他们的岁月、考验，与历史转折。',
+  ),
+  livesChaptersProgress: localized('Chapters', '篇章'),
+  livesHistoricalSetting: localized('In history', '历史背景'),
+  livesLifeStory: localized('The life', '生平叙事'),
+  livesChapterLocked: localized('Complete the chapter above first.', '请先完成上一篇章。'),
+  livesOpenLife: localized('Read the life', '阅读生平'),
+  livesOpenTeachings: localized('Study on Ages', '在「时代」中研读'),
+  livesRelatedKnowledge: localized('Related on the Knowledge Path', '知识之路上的相关主题'),
+  turningPointsReadLife: localized('Read this sage’s life', '阅读这位圣哲的生平'),
 
   // ── Forest ────────────────────────────────────────────────────────
   forestTitle: localized('Virtue Forest', '德行森林'),
@@ -787,6 +848,30 @@ export function lessonsCompletedToday(locale: Locale, n: number): string {
     `${n} learning step${n === 1 ? '' : 's'} completed today`,
     `今天已完成 ${n} 次学习`,
     `今天已完成 ${n} 次學習`,
+  );
+}
+
+/** Remaining XP-granting study slots for Today Learn task copy. */
+export function learnRemainingToday(
+  locale: Locale,
+  done: number,
+  lessonLeft: number,
+  timelineLeft: number,
+): string {
+  const left = lessonLeft + timelineLeft;
+  if (left <= 0) {
+    return pick(
+      locale,
+      `${done} learning step${done === 1 ? '' : 's'} today — daily study XP is full; you can still read.`,
+      `今天已学 ${done} 次 — 今日学习经验已满；仍可继续阅读。`,
+      `今天已學 ${done} 次 — 今日學習經驗已滿；仍可繼續閱讀。`,
+    );
+  }
+  return pick(
+    locale,
+    `${done} done today — about ${left} more XP-granting stud${left === 1 ? 'y' : 'ies'} still open.`,
+    `今天已完成 ${done} 次 — 大约还可获得 ${left} 次学习经验。`,
+    `今天已完成 ${done} 次 — 大約還可獲得 ${left} 次學習經驗。`,
   );
 }
 
@@ -981,6 +1066,23 @@ export function capstoneBranchPrompt(locale: Locale, branchName: string): string
     `你已经修完「${branchName}」分支的每一个主题。写下一篇更完整的反思，谈谈它如何塑造了你，即可获得该分支的圆满徽章。`,
     `你已經修完「${branchName}」分支的每一個主題。寫下一篇更完整的反思，談談它如何塑造了你，即可獲得該分支的圓滿徽章。`,
   );
+}
+
+export function capstoneSagePrompt(locale: Locale, sageName: string): string {
+  return pick(
+    locale,
+    `You've walked every chapter of the life of ${sageName}. Write a longer reflection on what this life asks of you to earn its life badge.`,
+    `你已经走完${sageName}生平的每一个篇章。写下一篇更完整的反思，谈谈这段生命向你提出了什么要求，即可获得该生平徽章。`,
+    `你已經走完${sageName}生平的每一個篇章。寫下一篇更完整的反思，談談這段生命向你提出了什麼要求，即可獲得該生平徽章。`,
+  );
+}
+
+export function sageBadgeTitle(locale: Locale, badgeTitle: string): string {
+  return pick(locale, `Life badge: ${badgeTitle}`, `生平徽章：${badgeTitle}`, `生平徽章：${badgeTitle}`);
+}
+
+export function livesChaptersLabel(locale: Locale, done: number, total: number): string {
+  return pick(locale, `${done} / ${total} chapters`, `${done} / ${total} 篇章`, `${done} / ${total} 篇章`);
 }
 
 export function capstoneEntryBtn(locale: Locale, name: string): string {

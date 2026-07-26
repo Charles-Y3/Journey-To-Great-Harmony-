@@ -313,7 +313,8 @@ a {
 }
 
 /* When the offline banner owns the top safe-area, don't double-pad the topbar. */
-.app:has(.offline-banner) .topbar {
+.app:has(.offline-banner) .topbar,
+.app:has(.update-banner) .topbar {
   padding-top: 12px;
 }
 
@@ -1304,6 +1305,20 @@ select:focus {
   font-size: 0.88rem;
 }
 
+.today-also-heading {
+  margin: 16px 0 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.mood-pick-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 4px;
+}
+
 .task-row {
   display: flex;
   align-items: center;
@@ -1875,6 +1890,43 @@ button.civic-tile {
   position: sticky;
   top: 0;
   z-index: 50;
+}
+
+.update-banner {
+  flex: 0 0 auto;
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 12px;
+  background: var(--jade-deep, #1f5c44);
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  padding-top: max(8px, env(safe-area-inset-top));
+  position: sticky;
+  top: 0;
+  z-index: 51;
+}
+
+.update-banner-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.update-banner .btn {
+  font-size: 0.82rem;
+  padding: 4px 10px;
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #fff;
+  background: transparent;
+}
+
+.update-banner .btn-primary {
+  background: #fff;
+  color: var(--jade-deep, #1f5c44);
+  border-color: #fff;
 }
 
 .journal-prompt-strip {

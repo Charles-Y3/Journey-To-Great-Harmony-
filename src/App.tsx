@@ -18,6 +18,7 @@ import { xpBarLabel, newItemsAriaLabel, rankXpLabel, welcomeBackTitle, type UiKe
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp, todayKey } from './engine/progression';
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
+import { applyPwaUpdate, subscribePwaNeedRefresh } from './engine/pwaUpdate';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
 import NameGate from './features/onboarding/NameGate';
@@ -776,6 +777,30 @@ function OfflineBanner() {
   return <div className="offline-banner">{t('offlineBanner')}</div>;
 }
 
+/** Shown when a waiting service worker has a newer build (production PWA only). */
+function UpdateBanner() {
+  const { t } = useT();
+  const [available, setAvailable] = useState(false);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => subscribePwaNeedRefresh(setAvailable), []);
+
+  if (!available || dismissed) return null;
+  return (
+    <div className="update-banner" role="status">
+      <span>{t('updateBannerBody')}</span>
+      <div className="update-banner-actions">
+        <button type="button" className="btn btn-primary" onClick={() => applyPwaUpdate()}>
+          {t('updateBannerReload')}
+        </button>
+        <button type="button" className="btn" onClick={() => setDismissed(true)}>
+          {t('updateBannerLater')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
@@ -941,6 +966,7 @@ export default function App() {
 
   return (
     <div className="app">
+      <UpdateBanner />
       <OfflineBanner />
       {/* Row shell kept separate from OfflineBanner so going offline cannot
           insert a flex column sibling that squeezes the UI to half-width. */}

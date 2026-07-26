@@ -36,7 +36,7 @@ export default function Community() {
 
   const stats = statsFromData(d);
   const forest = forestInfo(d);
-  const peers = peerStats(state.startDay, today);
+  const peers = peerStats(state.startDay, today, state.xp);
   const ageYears = companionAgeYears(state.startDay, today, state.streakBest);
 
   function scoreFor(id: Category, isUser: boolean, peerIdx = 0): number {

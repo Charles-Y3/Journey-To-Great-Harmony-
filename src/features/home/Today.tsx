@@ -178,20 +178,39 @@ export default function Today() {
 
       <div className="card">
         <h3>{t('todayJourneyCard')}</h3>
-        {tasks.map((tk) => (
-          <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
-            <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
-            <div>
-              <div className="task-title">{tk.title}</div>
-              <div className="task-desc">{tk.desc}</div>
+        {tasks
+          .filter((tk) => !tk.secondary)
+          .map((tk) => (
+            <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
+              <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
+              <div>
+                <div className="task-title">{tk.title}</div>
+                <div className="task-desc">{tk.desc}</div>
+              </div>
+              {!tk.done && (
+                <Link className="btn btn-primary task-action" to={tk.to}>
+                  {tk.cta}
+                </Link>
+              )}
             </div>
-            {!tk.done && (
-              <Link className="btn btn-primary task-action" to={tk.to}>
-                {tk.cta}
-              </Link>
-            )}
-          </div>
-        ))}
+          ))}
+        <h4 className="today-also-heading">{t('taskAlsoToday')}</h4>
+        {tasks
+          .filter((tk) => tk.secondary)
+          .map((tk) => (
+            <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
+              <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
+              <div>
+                <div className="task-title">{tk.title}</div>
+                <div className="task-desc">{tk.desc}</div>
+              </div>
+              {!tk.done && (
+                <Link className="btn btn-primary task-action" to={tk.to}>
+                  {tk.cta}
+                </Link>
+              )}
+            </div>
+          ))}
         {doneCount === tasks.length && (
           <>
             <p className="pill" style={{ marginTop: 12 }}>{t('todayFullHarmony')}</p>

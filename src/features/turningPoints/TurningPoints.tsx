@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useToday } from '../../state/store';
 import { useTurningPoints } from '../../state/turningPointStore';
 import { dailyTurningPoint } from '../../data/turningPoints';
+import { sageForTurningPoint } from '../../data/sages';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 
@@ -15,6 +17,8 @@ export default function TurningPoints() {
   const [showArchive, setShowArchive] = useState(false);
 
   const point = dailyTurningPoint(today);
+  const relatedSage = sageForTurningPoint(point.id);
+  const relatedChapter = relatedSage?.chapters.find((c) => c.relatedTurningPointId === point.id);
   const flippedToday = flippedDays.includes(today);
   const [revealed, setRevealed] = useState(flippedToday);
   const [flipping, setFlipping] = useState(false);
@@ -70,6 +74,16 @@ export default function TurningPoints() {
                 </p>
                 <p>{L(point.reflectionQuestion)}</p>
               </div>
+              {relatedSage && (
+                <Link
+                  to="/timeline"
+                  state={{ mode: 'lives', sageId: relatedSage.id, chapterId: relatedChapter?.id }}
+                  className="btn"
+                  style={{ marginTop: 12, display: 'inline-block' }}
+                >
+                  {relatedSage.emoji} {t('turningPointsReadLife')}
+                </Link>
+              )}
             </>
           )}
         </div>

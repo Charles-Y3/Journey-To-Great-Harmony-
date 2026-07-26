@@ -24,11 +24,30 @@ export function communityHarmony(startDay: string, today: string): number {
   return total;
 }
 
-/** A peer's simulated total XP as of today. */
-export function peerXp(peer: Peer, startDay: string, today: string): number {
+/** How close each tier stays to the user's XP (before pace / jitter). */
+const TIER_XP_FRAC: Record<Peer['tier'], number> = {
+  active: 0.9,
+  normal: 0.76,
+  occasional: 0.62,
+};
+
+/**
+ * A peer's simulated total XP as of today.
+ * Calendar floor keeps early journeys company; rubber-band to `userXp` so
+ * serious travellers no longer leave friends permanently behind.
+ */
+export function peerXp(peer: Peer, startDay: string, today: string, userXp = 0): number {
   const days = communityAge(startDay, today);
   const noise = seededRandom(`xp:${peer.id}`) * 40;
-  return Math.floor(30 + noise + peer.pace * days * 46);
+  const calendarXp = Math.floor(30 + noise + peer.pace * days * 46);
+  if (userXp <= 0) return calendarXp;
+
+  const frac = Math.min(0.97, TIER_XP_FRAC[peer.tier] * (0.88 + peer.pace * 0.12));
+  const week = Math.floor(days / 7);
+  const jitter = 0.94 + seededRandom(`xpband:${peer.id}:${week}`) * 0.06;
+  const target = Math.floor(userXp * frac * jitter);
+  const capped = Math.min(target, Math.floor(userXp * 0.98));
+  return Math.max(calendarXp, capped);
 }
 
 /**
@@ -54,15 +73,20 @@ export interface PeerStats {
   growthPct: number; // recent improvement, for the Growth leaderboard
 }
 
-export function peerStats(startDay: string, today: string): PeerStats[] {
+export function peerStats(startDay: string, today: string, userXp = 0): PeerStats[] {
   const days = communityAge(startDay, today);
   return visiblePeers(startDay, today).map((peer) => {
-    const xp = peerXp(peer, startDay, today);
+    const xp = peerXp(peer, startDay, today, userXp);
     return {
       peer,
       xp,
       lessons: Math.floor(xp / 60),
-      streak: Math.max(1, Math.floor((days % 14) * seededRandom(`st:${peer.id}:${Math.floor(days / 14)}`) + peer.pace * 2)),
+      streak: Math.max(
+        1,
+        Math.floor(
+          (days % 14) * seededRandom(`st:${peer.id}:${Math.floor(days / 14)}`) + peer.pace * 2,
+        ),
+      ),
       encouragements: Math.floor(xp / 45),
       growthPct: Math.round(4 + seededRandom(`gr:${peer.id}:${today}`) * 22),
     };
@@ -107,8 +131,8 @@ export function communityFeed(startDay: string, today: string): FeedItem[] {
   const items: FeedItem[] = [];
   const count = 4 + Math.floor(seededRandom(`feedn:${today}`) * 3);
   for (let i = 0; i < count; i++) {
-    const peer = pool[Math.floor(seededRandom(`feedp:${today}:${i}`) * pool.length)];
-    const action = FEED_ACTIONS[Math.floor(seededRandom(`feeda:${today}:${i}`) * FEED_ACTIONS.length)];
+    const peer = pool[Math.floor(seededRandom(`feedp:${today}:${i}`) * pool.length)]!;
+    const action = FEED_ACTIONS[Math.floor(seededRandom(`feeda:${today}:${i}`) * FEED_ACTIONS.length)]!;
     if (items.some((it) => it.peer.id === peer.id && it.text === action)) continue;
     items.push({ peer, text: action });
   }
@@ -129,10 +153,12 @@ export function communityFeed(startDay: string, today: string): FeedItem[] {
 export function dailyChallenge(today: string, maxTier: 1 | 2 | 3, rerollCount = 0) {
   const pool = CHALLENGES.filter((c) => c.tier <= maxTier);
   const originalIdx = Math.floor(seededRandom(`challenge:${maxTier}:${today}`) * pool.length);
-  if (rerollCount <= 0) return pool[originalIdx];
+  if (rerollCount <= 0) return pool[originalIdx]!;
   const rerollPool = pool.filter((_, i) => i !== originalIdx);
-  const idx = Math.floor(seededRandom(`challenge:${maxTier}:${today}:reroll${rerollCount}`) * rerollPool.length);
-  return rerollPool[idx];
+  const idx = Math.floor(
+    seededRandom(`challenge:${maxTier}:${today}:reroll${rerollCount}`) * rerollPool.length,
+  );
+  return rerollPool[idx]!;
 }
 
 export function dailyQuoteIndex(today: string, quoteCount: number): number {

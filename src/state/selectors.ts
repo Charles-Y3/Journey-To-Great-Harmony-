@@ -30,6 +30,10 @@ export interface JourneyData {
       reflection?: { learned: string; virtue: string; improve: string };
       lessons?: number;
       timelineStudies?: number;
+      /** Light Heart check — mood id from data/moods.ts; optional one-line note. */
+      mood?: { id: string; note?: string };
+      /** Solved a Virtue Glyph puzzle today (first clear or replay). */
+      glyphPractice?: boolean;
     }
   >;
   streakCurrent: number;
@@ -54,6 +58,11 @@ export interface JourneyData {
   revealedCards: string[];
   /** Virtue Glyph puzzle ids cleared at least once (first clear awards XP). */
   completedGlyphs: string[];
+  /**
+   * Sage Lives chapters completed once, keyed by chapter id.
+   * Never written into timelinePointLevels — keeps Ages wave / forest / era badges intact.
+   */
+  sageChapters: Record<string, true>;
 }
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
@@ -120,12 +129,18 @@ export function branchCapstoneKey(branch: string): string {
   return `branch-${branch}`;
 }
 
+/** Storage key for a sage life's capstone (kept distinct from era / branch keys). */
+export function sageCapstoneKey(sageId: string): string {
+  return `sage-${sageId}`;
+}
+
 // A deliberate daily pace limit (see engine/progression.ts pacing notes):
 // without it, the whole Knowledge Path or Wisdom Timeline could be
 // finished in one sitting. Reaching the cap doesn't lock the reading —
 // only the XP-granting "complete" action — so learning stays accessible.
 export const DAILY_LESSON_CAP = 10;
-export const DAILY_TIMELINE_CAP = 2;
+/** Raised in v1.1 so midday study is not exhausted after two Timeline hits. */
+export const DAILY_TIMELINE_CAP = 4;
 
 export function lessonsCompletedToday(d: JourneyData, today: string): number {
   return d.days[today]?.lessons ?? 0;

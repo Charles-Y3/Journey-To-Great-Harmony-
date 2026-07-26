@@ -19,6 +19,7 @@ import {
   completedTopicIds,
   isBranchMastered,
   branchCapstoneKey,
+  sageCapstoneKey,
   worldInfo,
   DAILY_LESSON_CAP,
   DAILY_TIMELINE_CAP,
@@ -26,12 +27,14 @@ import {
   timelineStudiesToday,
   type JourneyData,
 } from './selectors';
-import { BADGES, eraBadgeId, branchBadgeId, badgeById, MASTERABLE_BRANCHES } from '../data/badges';
+import { BADGES, eraBadgeId, branchBadgeId, badgeById, MASTERABLE_BRANCHES, sageBadgeId } from '../data/badges';
 import { SPECIAL_CARD_RULES, cardById, RARITY_LEVEL_REQUIRED } from '../data/cards';
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
+import { SAGES, chapterById, isSageLifeComplete } from '../data/sages';
 import { REGIONS } from '../data/journeyMap';
 import { glyphById } from '../data/glyphs';
+import { moodById } from '../data/moods';
 import { isMeaningful, TEXT_MIN } from '../engine/textQuality';
 import { useLocale } from './localeStore';
 import { L } from '../i18n/L';
@@ -40,6 +43,7 @@ import {
   badgeEarnedTitle,
   eraBadgeTitle,
   branchBadgeTitle,
+  sageBadgeTitle,
   wisdomCardTitle,
   forestGrewTitle,
   forestGrewSubtitle,
@@ -65,16 +69,22 @@ export interface Celebration {
 interface JourneyActions {
   completeLesson: (lessonId: string, answeredCorrectly: boolean) => void;
   completeTimelineLevel: (pointId: string, levelIndex: number, correctCount: number) => void;
+  /** First clear of a Sage Lives chapter — shares DAILY_TIMELINE_CAP with Ages study. */
+  completeSageChapter: (chapterId: string, correctCount: number) => void;
   setIntention: (text: string) => void;
   completeChallenge: (challengeId: string, note?: string) => void;
   /** Swap today's tier-3 challenge for a different one from the same pool. Once per day, only before it's completed. */
   rerollChallenge: () => void;
   submitReflection: (learned: string, virtue: string, improve: string) => void;
+  /** Light Heart check — first set today awards XP; can change mood later without re-pay. */
+  setMoodCheck: (moodId: string, note?: string) => void;
   sendEncouragement: (peerId: string) => boolean;
   completeRegion: (regionId: string) => void;
   submitCapstone: (key: string, text: string) => void;
   /** First clear of a Virtue Glyph awards XP; replays are no-ops for progress. Returns true if newly cleared. */
   completeGlyph: (glyphId: string) => boolean;
+  /** Mark that the user solved a glyph today (first clear or replay) for Today tasks. */
+  noteGlyphPractice: () => void;
   dismissCelebration: () => void;
   advanceDay: () => void;
   resetJourney: () => void;
@@ -111,6 +121,7 @@ function initialData(): JourneyData {
     capstones: {},
     revealedCards: [],
     completedGlyphs: [],
+    sageChapters: {},
   };
 }
 
@@ -222,6 +233,26 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
     }
   }
 
+  // Sage Lives badges (all chapters + namespaced capstone — never via ALL_POINTS)
+  for (const sage of SAGES) {
+    const id = sageBadgeId(sage.id);
+    const key = sageCapstoneKey(sage.id);
+    if (
+      !after.unlockedBadges.includes(id) &&
+      isSageLifeComplete(after.sageChapters, sage) &&
+      after.capstones[key]
+    ) {
+      after.unlockedBadges.push(id);
+      const b = badgeById(id);
+      if (b)
+        out.push(
+          celebration('badge', b.emoji, sageBadgeTitle(locale, L(b.title, locale)), L(b.description, locale), {
+            ctaTo: '/collection',
+          }),
+        );
+    }
+  }
+
   // Cards attached to timeline points: the rarer the card, the more of
   // that point's 3 levels must be completed first (see RARITY_LEVEL_REQUIRED).
   for (const p of ALL_POINTS) {
@@ -254,6 +285,21 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
           }),
         );
     }
+  }
+
+  // Cards attached to completed Sage Lives (biography tracks — not Ages points)
+  for (const sage of SAGES) {
+    if (!sage.cardId || after.unlockedCards.includes(sage.cardId)) continue;
+    if (!isSageLifeComplete(after.sageChapters, sage)) continue;
+    after.unlockedCards.push(sage.cardId);
+    const c = cardById(sage.cardId);
+    if (c)
+      out.push(
+        celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale), {
+          ctaTo: '/collection',
+          major: c.rarity === 'legendary',
+        }),
+      );
   }
 
   // Special cards
@@ -327,6 +373,7 @@ function dataOf(s: JourneyState): JourneyData {
     capstones: s.capstones,
     revealedCards: s.revealedCards ?? [],
     completedGlyphs: s.completedGlyphs ?? [],
+    sageChapters: s.sageChapters ?? {},
   };
 }
 
@@ -402,6 +449,28 @@ export const useJourney = create<JourneyState>()(
             markActive(draft, today);
           }),
 
+        completeSageChapter: (chapterId, correctCount) =>
+          apply((draft, today) => {
+            const found = chapterById(chapterId);
+            if (!found) return;
+            if (!draft.sageChapters) draft.sageChapters = {};
+            if (draft.sageChapters[chapterId]) return;
+            // Chapters within a sage must be completed in order.
+            const { sage, index } = found;
+            for (let i = 0; i < index; i++) {
+              if (!draft.sageChapters[sage.chapters[i].id]) return;
+            }
+            // Shares the Ages midday study budget so Lives cannot double daily XP.
+            if (timelineStudiesToday(draft, today) >= DAILY_TIMELINE_CAP) return;
+            draft.sageChapters[chapterId] = true;
+            const rec = dayRec(draft, today);
+            rec.timelineStudies = (rec.timelineStudies ?? 0) + 1;
+            draft.xp += XP_FOR.sageChapter + correctCount * XP_FOR.quizCorrect;
+            draft.harmonyPoints += HARMONY_FOR.sageChapter + correctCount * HARMONY_FOR.quizCorrect;
+            draft.quizCorrect += correctCount;
+            markActive(draft, today);
+          }),
+
         setIntention: (text) =>
           apply((draft, today) => {
             if (!isMeaningful(text, TEXT_MIN.intention)) return;
@@ -453,6 +522,21 @@ export const useJourney = create<JourneyState>()(
             if (firstTime) {
               draft.xp += XP_FOR.reflection;
               draft.harmonyPoints += HARMONY_FOR.reflection;
+              markActive(draft, today);
+            }
+          }),
+
+        setMoodCheck: (moodId, note) =>
+          apply((draft, today) => {
+            if (!moodById(moodId)) return;
+            const trimmed = note?.trim() ?? '';
+            if (trimmed && !isMeaningful(trimmed, TEXT_MIN.intention)) return;
+            const rec = dayRec(draft, today);
+            const firstTime = !rec.mood;
+            rec.mood = trimmed ? { id: moodId, note: trimmed } : { id: moodId };
+            if (firstTime) {
+              draft.xp += XP_FOR.moodCheck;
+              draft.harmonyPoints += HARMONY_FOR.moodCheck;
               markActive(draft, today);
             }
           }),
@@ -513,6 +597,7 @@ export const useJourney = create<JourneyState>()(
             draft.completedGlyphs.push(glyphId);
             draft.xp += XP_FOR.glyph;
             draft.harmonyPoints += HARMONY_FOR.glyph;
+            dayRec(draft, today).glyphPractice = true;
             markActive(draft, today);
             const locale = useLocale.getState().locale;
             return [
@@ -527,6 +612,12 @@ export const useJourney = create<JourneyState>()(
           });
           return true;
         },
+
+        noteGlyphPractice: () =>
+          apply((draft, today) => {
+            dayRec(draft, today).glyphPractice = true;
+            markActive(draft, today);
+          }),
 
         dismissCelebration: () => set((s) => ({ celebrations: s.celebrations.slice(1) })),
 
@@ -562,6 +653,7 @@ export const useJourney = create<JourneyState>()(
             capstones: data.capstones ?? {},
             revealedCards: data.revealedCards ?? [],
             completedGlyphs: data.completedGlyphs ?? [],
+            sageChapters: data.sageChapters ?? {},
           };
           set({ ...next, celebrations: [] });
           return true;
@@ -570,11 +662,16 @@ export const useJourney = create<JourneyState>()(
     },
     {
       name: 'journey-to-great-harmony',
-      version: 3,
+      version: 4,
       migrate: (persisted, fromVersion) => {
-        const p = persisted as JourneyData & { revealedCards?: string[]; completedGlyphs?: string[] };
+        const p = persisted as JourneyData & {
+          revealedCards?: string[];
+          completedGlyphs?: string[];
+          sageChapters?: Record<string, true>;
+        };
         if (!p.revealedCards) p.revealedCards = [];
         if (!p.completedGlyphs) p.completedGlyphs = [];
+        if (!p.sageChapters) p.sageChapters = {};
         void fromVersion;
         return p;
       },

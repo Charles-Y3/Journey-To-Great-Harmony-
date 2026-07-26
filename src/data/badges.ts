@@ -2,6 +2,7 @@ import type { Badge, Topic } from './types';
 import { localized, type Localized } from '../i18n/types';
 import { TIMELINE } from './timeline';
 import { ALL_LESSONS } from './knowledgeTree';
+import { SAGES, sageBadgeId } from './sages';
 
 const STATIC_BADGES: Badge[] = [
   { id: 'b-first-step', title: localized('First Step', '迈出第一步'), emoji: '🌱', description: localized('Take your first action on the journey.', '踏上旅程的第一个行动。'), check: (s) => s.xp > 0 },
@@ -65,7 +66,23 @@ const BRANCH_BADGES: Badge[] = BRANCH_MASTERY.map((b) => ({
   check: () => false,
 }));
 
-export const BADGES: Badge[] = [...STATIC_BADGES, ...ERA_BADGES, ...BRANCH_BADGES];
+function sageBadgeDescription(sageName: Localized<string>): Localized<string> {
+  return localized(
+    `Complete every chapter of the life of ${sageName.en} on Sage Lives and write its capstone reflection.`,
+    `在圣哲生平中完成${sageName.zh}的每一个篇章，并写下该生平的圆满反思。`,
+  );
+}
+
+// One badge per sage life — granted by the engine when all chapters + capstone are done.
+const SAGE_BADGES: Badge[] = SAGES.map((sage) => ({
+  id: sageBadgeId(sage.id),
+  title: sage.badgeTitle,
+  emoji: sage.emoji,
+  description: sageBadgeDescription(sage.name),
+  check: () => false,
+}));
+
+export const BADGES: Badge[] = [...STATIC_BADGES, ...ERA_BADGES, ...BRANCH_BADGES, ...SAGE_BADGES];
 
 // Era badges are keyed by era id rather than a Stats predicate.
 export function eraBadgeId(eraId: string): string {
@@ -77,7 +94,10 @@ export function branchBadgeId(branch: string): string {
   return `b-branch-${branch}`;
 }
 
+export { sageBadgeId };
+
 export const MASTERABLE_BRANCHES = BRANCH_MASTERY.map((b) => b.branch);
+export const MASTERABLE_SAGES = SAGES.map((s) => s.id);
 
 export function badgeById(id: string): Badge | undefined {
   return BADGES.find((b) => b.id === id);

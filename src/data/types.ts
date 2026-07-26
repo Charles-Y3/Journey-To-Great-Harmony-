@@ -48,6 +48,36 @@ export interface TimelineEra {
   badgeTitle: Localized<string>; // era badge earned when all points are complete
 }
 
+/** One chronological chapter in a sage's life (Lives mode on Timeline). */
+export interface SageChapter {
+  id: string;
+  title: Localized<string>;
+  /** Brief historical framing — what was happening in the world. */
+  historicalSetting: Localized<string>;
+  /** Narrative of this stretch of the sage's life. */
+  lifeStory: Localized<string>;
+  quiz: QuizQuestion[];
+  /** Optional Still Waters anecdote that deep-links here. */
+  relatedTurningPointId?: string;
+  /** Optional Ages-mode Timeline point for cross-navigation. */
+  relatedTimelinePointId?: string;
+}
+
+/** A sage biography track — separate from TIMELINE / ALL_POINTS progress. */
+export interface Sage {
+  id: string;
+  name: Localized<string>;
+  years: Localized<string>;
+  emoji: string;
+  summary: Localized<string>;
+  badgeTitle: Localized<string>;
+  chapters: SageChapter[];
+  relatedTimelinePointIds?: string[];
+  relatedTopicIds?: string[];
+  /** Wisdom card unlocked when every chapter of this life is complete. */
+  cardId?: string;
+}
+
 export interface Lesson {
   id: string;
   title: Localized<string>;

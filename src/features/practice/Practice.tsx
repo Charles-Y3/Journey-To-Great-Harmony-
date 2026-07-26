@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import type { JourneyData } from '../../state/selectors';
 import { forestInfo, worldInfo } from '../../state/selectors';
@@ -19,6 +19,7 @@ import StillnessTimer from './StillnessTimer';
 import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
 import { collectPastIntentions, journalPromptFromIntentions } from '../../engine/journalPrompts';
 import { useReminders } from '../../state/reminderStore';
+import { MOODS, moodById } from '../../data/moods';
 
 function openReminderSettings() {
   window.dispatchEvent(new CustomEvent('journey:open-settings', { detail: { section: 'reminders' } }));
@@ -209,6 +210,121 @@ function ChallengeCard({ today }: { today: string }) {
   );
 }
 
+function scrollToPracticeFocus(focusId: string) {
+  document.getElementById(focusId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function HeartCheckCard({ today }: { today: string }) {
+  const rec = useJourney((s) => s.days[today] ?? {});
+  const setMoodCheck = useJourney((s) => s.setMoodCheck);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t, L, locale } = useT();
+  const saved = rec.mood ? moodById(rec.mood.id) : undefined;
+  const [picked, setPicked] = useState<string | null>(saved?.id ?? null);
+  const [note, setNote] = useState(rec.mood?.note ?? '');
+  const [editing, setEditing] = useState(!saved);
+
+  useEffect(() => {
+    setPicked(rec.mood?.id ?? null);
+    setNote(rec.mood?.note ?? '');
+    setEditing(!rec.mood);
+  }, [today, rec.mood?.id, rec.mood?.note]);
+
+  const option = picked ? moodById(picked) : undefined;
+  const noteOk = !note.trim() || meaningfulLength(note) >= TEXT_MIN.intention;
+
+  function followMoodAction() {
+    if (!saved?.actionTo) return;
+    if (saved.actionFocus) {
+      if (location.pathname === '/practice' || location.pathname === saved.actionTo) {
+        scrollToPracticeFocus(saved.actionFocus);
+        return;
+      }
+      navigate(saved.actionTo, { state: { focus: saved.actionFocus } });
+      return;
+    }
+    navigate(saved.actionTo);
+  }
+
+  return (
+    <div className="card practice-card" id="heart-check">
+      <h3>{t('heartCardTitle')}</h3>
+      <p className="small muted">{t('heartCardIntro')}</p>
+      {!editing && saved ? (
+        <>
+          <p>
+            <span className="pill">{t('heartCardSaved')}</span>&nbsp; {saved.emoji} {L(saved.label)}
+          </p>
+          {rec.mood?.note && <p className="small">“{rec.mood.note}”</p>}
+          <p className="small muted">{L(saved.response)}</p>
+          <div className="glyph-actions" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
+            {saved.actionTo && saved.actionCta && (
+              <button type="button" className="btn btn-primary" onClick={followMoodAction}>
+                {L(saved.actionCta)}
+              </button>
+            )}
+            <button type="button" className="btn" onClick={() => setEditing(true)}>
+              {t('heartCardChange')}
+            </button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="mood-pick-row">
+            {MOODS.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                className={picked === m.id ? 'btn tab-btn active' : 'btn tab-btn'}
+                onClick={() => setPicked(m.id)}
+              >
+                {m.emoji} {L(m.label)}
+              </button>
+            ))}
+          </div>
+          {option && <p className="small muted" style={{ marginTop: 10 }}>{L(option.response)}</p>}
+          <label className="small" style={{ display: 'block', marginTop: 10 }}>
+            {t('heartCardNoteLabel')}
+          </label>
+          <textarea
+            rows={2}
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            placeholder={t('heartCardNotePlaceholder')}
+          />
+          {note.trim() && (
+            <p className="small muted" style={{ marginTop: 4 }}>
+              {minLengthHint(locale, progressLength(note), TEXT_MIN.intention)}
+            </p>
+          )}
+          {progressLength(note) >= TEXT_MIN.intention && looksLikeNonsense(note) && (
+            <p className="small muted">{t('textNonsenseHint')}</p>
+          )}
+          <button
+            type="button"
+            className="btn btn-primary"
+            style={{ marginTop: 8 }}
+            disabled={
+              !picked ||
+              !noteOk ||
+              (note.trim().length > 0 && looksLikeNonsense(note))
+            }
+            onClick={() => {
+              if (!picked) return;
+              setMoodCheck(picked, note.trim() || undefined);
+              setEditing(false);
+              playSfx('chime');
+            }}
+          >
+            {saved ? t('heartCardUpdateBtn') : t('heartCardSaveBtn')}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
+
 function EveningCard({ today }: { today: string }) {
   const rec = useJourney((s) => s.days[today] ?? {});
   const submitReflection = useJourney((s) => s.submitReflection);
@@ -217,8 +333,9 @@ function EveningCard({ today }: { today: string }) {
   const [improve, setImprove] = useState('');
   const [breathing, setBreathing] = useState(false);
   const [breathDone, setBreathDone] = useState(false);
-  const { t, locale } = useT();
+  const { t, L, locale } = useT();
   const eveningOpen = new Date().getHours() >= EVENING_OPEN_HOUR;
+  const mood = rec.mood ? moodById(rec.mood.id) : undefined;
   const onBreathReady = useCallback(() => {
     setBreathing(false);
     setBreathDone(true);
@@ -258,6 +375,12 @@ function EveningCard({ today }: { today: string }) {
           {rec.intention && (
             <p className="evening-intention-echo">
               {t('eveningIntentionEcho')} <em>“{rec.intention}”</em>
+            </p>
+          )}
+          {mood && (
+            <p className="evening-intention-echo">
+              {t('eveningMoodEcho')} {mood.emoji} <em>{L(mood.label)}</em>
+              {rec.mood?.note ? ` — “${rec.mood.note}”` : ''}
             </p>
           )}
           {breathing ? (
@@ -419,7 +542,7 @@ function QuietMomentCard() {
   const [minutes, setMinutes] = useState<number | null>(null);
 
   return (
-    <div className="card practice-card">
+    <div className="card practice-card" id="quiet-moment">
       <h3>{t('quietMomentTitle')}</h3>
       <p className="small muted">{t('quietMomentDesc')}</p>
       {minutes === null ? (
@@ -467,6 +590,7 @@ function GrowthVisitBanners({ today }: { today: string }) {
 export default function Practice() {
   const today = useToday();
   const { t } = useT();
+  const location = useLocation();
   const time = practiceTimeOfDay();
   const { doneCount, tasks } = useTodayTasks();
   const lastFullHarmonySfxDay = useUi((s) => s.lastFullHarmonySfxDay);
@@ -479,12 +603,20 @@ export default function Practice() {
     }
   }, [doneCount, tasks.length, today, lastFullHarmonySfxDay, setLastFullHarmonySfxDay]);
 
+  useEffect(() => {
+    const focus = (location.state as { focus?: string } | null)?.focus;
+    if (!focus) return;
+    const timer = window.setTimeout(() => scrollToPracticeFocus(focus), 50);
+    return () => window.clearTimeout(timer);
+  }, [location.state]);
+
   return (
     <div className="practice-page" data-time={time}>
       <PageHeader emoji="🎯" title={t('practiceTitle')} subtitle={t('practiceSubtitle')} />
       <GrowthVisitBanners today={today} />
       <MorningCard today={today} />
       <ChallengeCard today={today} />
+      <HeartCheckCard today={today} />
       <EveningCard today={today} />
       <Journal />
       <QuietMomentCard />

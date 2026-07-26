@@ -644,6 +644,88 @@ export const CARDS: WisdomCard[] = [
       '这张卡牌的名字，与你旅程中另一处已在运作的理念相呼应：知识之路上更深的主题，唯有在同一分支的每个主题都走过一遍之后，才会开启 — 一次刻意的，而非偶然的，「二度而行」。',
     ),
   },
+
+  // ── Sage Lives (biography tracks — unlocked via sageChapters, not ALL_POINTS) ──
+  {
+    id: 'card-life-confucius',
+    title: localized('The Wandering Teacher', '周游的老师'),
+    emoji: '🚶',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A life of courts that would not listen — and a classroom that outlasted every throne he left behind.',
+      '一段朝廷不肯听从的生命 — 以及比他离开的每一座王座都更长久的教室。',
+    ),
+    quote: localized(
+      'To learn and to practise what is learned at due times — is this not a pleasure?',
+      '学而时习之，不亦说乎？',
+    ),
+    unlockHint: localized('Complete every chapter of Confucius’s life on Sage Lives.', '在圣哲生平中完成孔子的每一个篇章。'),
+    didYouKnow: localized(
+      'This card is earned from Sage Lives, not from the Ages study of Confucius’s teachings — biography and doctrine are two walks on the same road.',
+      '这张卡牌来自「圣哲生平」，而非「时代」中对孔子思想的研读 — 传记与义理，是同一条路上的两趟行走。',
+    ),
+  },
+  {
+    id: 'card-life-mencius',
+    title: localized('Sprouts and Ox Mountain', '善端与牛山'),
+    emoji: '🌱',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A life spent telling kings that the people come first — and that goodness withers only when we stop tending it.',
+      '一生告诉君主：民为贵 — 而善唯有在我们停止照料时，才会枯萎。',
+    ),
+    quote: localized(
+      'The great person is one who does not lose the child’s heart.',
+      '大人者，不失其赤子之心者也。',
+    ),
+    unlockHint: localized('Complete every chapter of Mencius’s life on Sage Lives.', '在圣哲生平中完成孟子的每一个篇章。'),
+    didYouKnow: localized(
+      'Mencius’s mother moving three times is remembered less as real-estate advice than as a parable of environment: habits grow where we plant them.',
+      '孟母三迁被记住的，与其说是置产建议，不如说是环境的寓言：习惯生长在我们栽种之处。',
+    ),
+  },
+  {
+    id: 'card-life-laozi',
+    title: localized('At the Pass', '关隘之际'),
+    emoji: '🚪',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A keeper of archives who left a short book at the edge of the world — then slipped into legend like water finding the low place.',
+      '一位守藏史，在世界边缘留下一本短书 — 然后如水趋下，隐入传说。',
+    ),
+    quote: localized(
+      'The softest thing in the world overcomes the hardest.',
+      '天下之至柔，驰骋天下之至坚。',
+    ),
+    unlockHint: localized('Complete every chapter of Laozi’s life on Sage Lives.', '在圣哲生平中完成老子的每一个篇章。'),
+    didYouKnow: localized(
+      'Whether Laozi was one person or many, the Daodejing’s brevity is part of its power — short enough to carry when courts will not listen.',
+      '无论老子是一人还是群像，《道德经》的短小正是其力量的一部分 — 短到足以在朝廷不听时随身携带。',
+    ),
+  },
+  {
+    id: 'card-life-socrates',
+    title: localized('The Cup', '那一杯'),
+    emoji: '☠️',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A barefoot questioner who wrote nothing — and whose last drink taught Athens that inquiry can outlive a body.',
+      '一位不著书的赤足发问者 — 他最后一杯酒，让雅典明白：探究可以比肉身更长久。',
+    ),
+    quote: localized(
+      'The unexamined life is not worth living.',
+      '未经省察的人生，不值得度过。',
+    ),
+    unlockHint: localized('Complete every chapter of Socrates’s life on Sage Lives.', '在圣哲生平中完成苏格拉底的每一个篇章。'),
+    didYouKnow: localized(
+      'Everything we “know” of Socrates comes through students — chiefly Plato. The life and the legend arrived together.',
+      '我们对苏格拉底「所知」的一切，都来自学生 — 尤其是柏拉图。生平与传说，是一同抵达的。',
+    ),
+  },
 ];
 
 // Timeline-linked wisdom cards (see TimelinePoint.cardId) get harder to

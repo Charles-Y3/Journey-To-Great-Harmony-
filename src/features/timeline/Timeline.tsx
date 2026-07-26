@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { TIMELINE, ALL_POINTS } from '../../data/timeline';
 import type { TimelinePoint, TimelineEra, TimelineLevel } from '../../data/types';
+import { sageForTimelinePoint } from '../../data/sages';
 import { useJourney } from '../../state/store';
 import {
   fullyMasteredEraIds,
@@ -25,6 +27,9 @@ import {
   capstoneEntryBtn,
 } from '../../i18n/strings';
 import { shuffledIndices } from '../../engine/quiz';
+import Lives from './Lives';
+
+type TimelineMode = 'ages' | 'lives';
 
 function LevelBody({
   level,
@@ -165,7 +170,15 @@ function LevelBody({
   );
 }
 
-function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => void }) {
+function PointModal({
+  point,
+  onClose,
+  onOpenLife,
+}: {
+  point: TimelinePoint;
+  onClose: () => void;
+  onOpenLife?: (sageId: string) => void;
+}) {
   const timelinePointLevels = useJourney((s) => s.timelinePointLevels);
   const completeTimelineLevel = useJourney((s) => s.completeTimelineLevel);
   const today = useToday();
@@ -174,6 +187,7 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
   const capReached = timelineStudiesToday(data, today) >= DAILY_TIMELINE_CAP;
   const [openLevel, setOpenLevel] = useState<number | null>(levelsDone < 3 ? levelsDone : null);
   const { t, L, locale } = useT();
+  const relatedSage = sageForTimelinePoint(point.id);
 
   return (
     <Modal onClose={onClose} wide>
@@ -181,6 +195,12 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
         {point.emoji} {L(point.title)}
       </h2>
       <p className="small muted">{L(point.years)}</p>
+
+      {relatedSage && onOpenLife && (
+        <button type="button" className="btn" style={{ marginBottom: 10 }} onClick={() => onOpenLife(relatedSage.id)}>
+          {relatedSage.emoji} {t('livesOpenLife')}
+        </button>
+      )}
 
       {point.levels.map((lvl, i) => {
         const done = i < levelsDone;
@@ -223,7 +243,13 @@ function PointModal({ point, onClose }: { point: TimelinePoint; onClose: () => v
   );
 }
 
-export default function Timeline() {
+function AgesView({
+  onOpenLife,
+  focusPointId,
+}: {
+  onOpenLife: (sageId: string) => void;
+  focusPointId?: string;
+}) {
   const completedPoints = useJourney((s) => s.completedTimelinePoints);
   const timelinePointLevels = useJourney((s) => s.timelinePointLevels);
   const capstones = useJourney((s) => s.capstones);
@@ -234,9 +260,12 @@ export default function Timeline() {
   const masteredEras = fullyMasteredEraIds(timelinePointLevels);
   const totalPoints = TIMELINE.reduce((n, e) => n + e.points.length, 0);
 
-  // A single bar tracking whichever wave is currently in progress: it
-  // shows Level 1 progress until every point has foundation, then
-  // switches to Level 2, then Level 3 — never two bars at once.
+  useEffect(() => {
+    if (!focusPointId) return;
+    const point = ALL_POINTS.find((p) => p.id === focusPointId);
+    if (point) setOpen(point);
+  }, [focusPointId]);
+
   const level1Count = completedPoints.length;
   const level2Count = timelinePointsReadyForWave(timelinePointLevels, 2);
   const level3Count = timelinePointsReadyForWave(timelinePointLevels, 3);
@@ -252,8 +281,7 @@ export default function Timeline() {
   }
 
   return (
-    <div>
-      <PageHeader emoji="⏳" title={t('timelineTitle')} subtitle={t('timelineSubtitle')} />
+    <>
       <div className="card">
         <ProgressBar
           value={currentWaveCount}
@@ -297,7 +325,16 @@ export default function Timeline() {
       </div>
       <p className="small muted">{t('timelineScrollHint')}</p>
 
-      {open && <PointModal point={open} onClose={() => setOpen(null)} />}
+      {open && (
+        <PointModal
+          point={open}
+          onClose={() => setOpen(null)}
+          onOpenLife={(sageId) => {
+            setOpen(null);
+            onOpenLife(sageId);
+          }}
+        />
+      )}
       {capstoneEra && (
         <CapstoneModal
           name={L(capstoneEra.name)}
@@ -307,6 +344,80 @@ export default function Timeline() {
             setCapstoneEra(null);
           }}
           onClose={() => setCapstoneEra(null)}
+        />
+      )}
+    </>
+  );
+}
+
+export default function Timeline() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { t } = useT();
+  const navState = location.state as {
+    mode?: TimelineMode;
+    sageId?: string;
+    chapterId?: string;
+    pointId?: string;
+  } | null;
+
+  const [mode, setMode] = useState<TimelineMode>(navState?.mode === 'lives' ? 'lives' : 'ages');
+  const [focusSageId, setFocusSageId] = useState<string | undefined>(navState?.sageId);
+  const [focusChapterId, setFocusChapterId] = useState<string | undefined>(navState?.chapterId);
+  const [focusPointId, setFocusPointId] = useState<string | undefined>(navState?.pointId);
+
+  useEffect(() => {
+    const st = location.state as {
+      mode?: TimelineMode;
+      sageId?: string;
+      chapterId?: string;
+      pointId?: string;
+    } | null;
+    if (!st) return;
+    if (st.mode === 'lives' || st.mode === 'ages') setMode(st.mode);
+    if (st.sageId) setFocusSageId(st.sageId);
+    if (st.chapterId) setFocusChapterId(st.chapterId);
+    if (st.pointId) setFocusPointId(st.pointId);
+    // Clear one-shot nav state so back/refresh doesn't re-open modals forever.
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, navigate]);
+
+  return (
+    <div>
+      <PageHeader emoji="⏳" title={t('timelineTitle')} subtitle={t('timelineSubtitle')} />
+      <div className="tab-row" style={{ marginBottom: 14 }}>
+        <button
+          type="button"
+          className={mode === 'ages' ? 'btn tab-btn active' : 'btn tab-btn'}
+          onClick={() => setMode('ages')}
+        >
+          {t('timelineModeAges')}
+        </button>
+        <button
+          type="button"
+          className={mode === 'lives' ? 'btn tab-btn active' : 'btn tab-btn'}
+          onClick={() => setMode('lives')}
+        >
+          {t('timelineModeLives')}
+        </button>
+      </div>
+
+      {mode === 'ages' ? (
+        <AgesView
+          focusPointId={focusPointId}
+          onOpenLife={(sageId) => {
+            setFocusSageId(sageId);
+            setMode('lives');
+          }}
+        />
+      ) : (
+        <Lives
+          focusSageId={focusSageId}
+          focusChapterId={focusChapterId}
+          onSwitchToAges={(pointId) => {
+            setFocusPointId(pointId);
+            setMode('ages');
+          }}
         />
       )}
     </div>

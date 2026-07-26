@@ -247,6 +247,7 @@ function KlotskiBoard({
 function BeginnerModal({ glyph, onClose }: { glyph: BeginnerGlyph; onClose: () => void }) {
   const { t, L } = useT();
   const completeGlyph = useJourney((s) => s.completeGlyph);
+  const noteGlyphPractice = useJourney((s) => s.noteGlyphPractice);
   const [started, setStarted] = useState(false);
   const [board, setBoard] = useState<GlyphBoard>(() => fullBoard(glyph.size));
   const [solved, setSolved] = useState(false);
@@ -275,6 +276,7 @@ function BeginnerModal({ glyph, onClose }: { glyph: BeginnerGlyph; onClose: () =
       setSolved(true);
       playSfx('chime');
       const first = completeGlyph(glyph.id);
+      if (!first) noteGlyphPractice();
       setWasFirstClear(first);
     }
   }
@@ -327,6 +329,7 @@ function BeginnerModal({ glyph, onClose }: { glyph: BeginnerGlyph; onClose: () =
 function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClose: () => void }) {
   const { t, L } = useT();
   const completeGlyph = useJourney((s) => s.completeGlyph);
+  const noteGlyphPractice = useJourney((s) => s.noteGlyphPractice);
   const [started, setStarted] = useState(false);
   const [state, setState] = useState<KlotskiState>(() => previewState(glyph));
   const [solved, setSolved] = useState(false);
@@ -348,6 +351,7 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
       setSolved(true);
       playSfx('chime');
       const first = completeGlyph(glyph.id);
+      if (!first) noteGlyphPractice();
       setWasFirstClear(first);
     }
   }

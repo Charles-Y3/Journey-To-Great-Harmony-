@@ -141,6 +141,10 @@ export const XP_FOR = {
   capstone: 40,
   /** First clear of a Virtue Glyph sliding puzzle (bonus side activity). */
   glyph: 8,
+  /** First Heart check (mood) of the day. */
+  moodCheck: 4,
+  /** First clear of a Sage Lives chapter (slightly below timeline foundation). */
+  sageChapter: 12,
 } as const;
 
 // Harmony points: the user's contribution to the shared Great Harmony World.
@@ -155,6 +159,8 @@ export const HARMONY_FOR = {
   region: 20,
   capstone: 25,
   glyph: 4,
+  moodCheck: 2,
+  sageChapter: 6,
 } as const;
 
 // ── Virtue Forest ──────────────────────────────────────────────────────

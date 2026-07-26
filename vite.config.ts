@@ -8,7 +8,8 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      // Prompt so the UI can ask before reloading — see engine/pwaUpdate.ts.
+      registerType: 'prompt',
       includeAssets: ['pwa-192.png', 'pwa-512.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'Journey to Great Harmony',

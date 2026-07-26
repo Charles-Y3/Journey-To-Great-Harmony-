@@ -1,6 +1,8 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { TOPICS } from '../../data/knowledgeTree';
 import type { Topic, Lesson } from '../../data/types';
+import { sageForTopic } from '../../data/sages';
 import { useJourney, useToday } from '../../state/store';
 import {
   isTopicCompleted,
@@ -137,6 +139,20 @@ function TopicModal({ topic, onClose, capReached }: { topic: Topic; onClose: () 
             {topic.emoji} {L(topic.name)}
           </h2>
           <p className="muted">{L(topic.intro)}</p>
+          {(() => {
+            const relatedSage = sageForTopic(topic.id);
+            if (!relatedSage) return null;
+            return (
+              <Link
+                to="/timeline"
+                state={{ mode: 'lives', sageId: relatedSage.id }}
+                className="btn"
+                style={{ marginBottom: 12, display: 'inline-block' }}
+              >
+                {relatedSage.emoji} {t('livesOpenLife')}
+              </Link>
+            );
+          })()}
           {topic.lessons.map((lesson, i) => {
             const done = completedLessons.includes(lesson.id);
             const prevDone = i === 0 || completedLessons.includes(topic.lessons[i - 1].id);
