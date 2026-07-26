@@ -69,7 +69,7 @@ export const UI = {
     'Tap a piece that borders empty space to slide it one step. If it can go two ways, tap it, then tap the empty space you want. Restore the seal form.',
     '点按紧邻空位的拼块，让它滑一步。若可朝两个方向移动，先点拼块，再点你想进入的空位。还原这个小篆字形。',
   ),
-  glyphsOracleRefLabel: localized('Seal form', '小篆字形'),
+  glyphsOracleRefLabel: localized('Oracle form', '甲骨字形'),
   glyphsKlotskiChooseHint: localized(
     'Tap the highlighted empty space to slide the selected piece there.',
     '点按高亮的空位，让选中的拼块滑入那里。',
