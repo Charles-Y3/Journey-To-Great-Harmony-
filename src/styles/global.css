@@ -2386,6 +2386,13 @@ button.stage-step:disabled {
   margin-top: 8px;
 }
 
+.glyph-board,
+.glyph-klotski-board {
+  /* Gutter + piece edge: light mode keeps the warm line; dark mode overrides below. */
+  --glyph-gutter: var(--line);
+  --glyph-piece-border: color-mix(in srgb, var(--ink) 14%, var(--line));
+}
+
 .glyph-board {
   --glyph-board: min(72vw, 360px);
   width: var(--glyph-board);
@@ -2394,7 +2401,7 @@ button.stage-step:disabled {
   gap: 3px;
   margin: 16px auto;
   padding: 4px;
-  background: var(--line);
+  background: var(--glyph-gutter);
   border-radius: 12px;
   touch-action: manipulation;
 }
@@ -2408,9 +2415,18 @@ button.stage-step:disabled {
   gap: 3px;
   margin: 16px auto;
   padding: 4px;
-  background: var(--line);
+  background: var(--glyph-gutter);
   border-radius: 12px;
   touch-action: manipulation;
+}
+
+@media (prefers-color-scheme: dark) {
+  .glyph-board,
+  .glyph-klotski-board {
+    /* Darker channels between tiles; lighter borders so piece edges read clearly. */
+    --glyph-gutter: #0e0c09;
+    --glyph-piece-border: color-mix(in srgb, var(--ink-soft) 65%, var(--line));
+  }
 }
 
 .glyph-klotski-empty {
@@ -2448,7 +2464,7 @@ button.glyph-klotski-empty-target:hover {
 .glyph-klotski-piece {
   position: relative;
   overflow: hidden;
-  border: 1px solid var(--line);
+  border: 1px solid var(--glyph-piece-border, var(--line));
   border-radius: 6px;
   padding: 0;
   background: var(--surface);
@@ -2498,7 +2514,7 @@ button.glyph-klotski-piece.selected {
 
 .glyph-tile {
   color: inherit;
-  border: 1px solid var(--line);
+  border: 1px solid var(--glyph-piece-border, var(--line));
 }
 
 button.glyph-tile {
