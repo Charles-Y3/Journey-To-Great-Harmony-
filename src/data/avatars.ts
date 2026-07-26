@@ -26,6 +26,13 @@ export const AVATARS: readonly string[] = [
   '🦀',
   '🦋',
   '🌅',
+  // Extra row (6-up desktop grid)
+  '☯️',
+  '🙏',
+  '🌍',
+  '💫',
+  '🪴',
+  '🪔',
 ] as const;
 
 const AVATAR_SET = new Set<string>(AVATARS);

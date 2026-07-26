@@ -69,6 +69,7 @@ export const UI = {
     'Tap a piece that borders empty space to slide it one step. If it can go two ways, tap it, then tap the empty space you want. Restore the seal form.',
     '点按紧邻空位的拼块，让它滑一步。若可朝两个方向移动，先点拼块，再点你想进入的空位。还原这个小篆字形。',
   ),
+  glyphsOracleRefLabel: localized('Seal form', '小篆字形'),
   glyphsKlotskiChooseHint: localized(
     'Tap the highlighted empty space to slide the selected piece there.',
     '点按高亮的空位，让选中的拼块滑入那里。',
@@ -246,6 +247,12 @@ export const UI = {
   ),
 
   // ── Name onboarding gate ────────────────────────────────────────────
+  youGateTitle: localized('About you', '关于你'),
+  youGateSubtitle: localized(
+    'Choose how you appear and how large text should be. You can change these anytime in Settings.',
+    '选择你如何现身，以及文字大小。随时可在设置中更改。',
+  ),
+  youGateChangeLater: localized('You can change these in Settings → You.', '可在「设置 → 你」中随时更改。'),
   nameGateTitle: localized('What should we call you?', '我们该如何称呼你？'),
   nameGateSubtitle: localized(
     'This is how Companions of the Way will know you in the shared world.',
@@ -253,7 +260,7 @@ export const UI = {
   ),
   nameGatePlaceholder: localized('Your name', '你的名字'),
   nameGateContinue: localized('Continue', '继续'),
-  nameGateSkip: localized('Skip for now', '暂时跳过'),
+  nameGateSkip: localized('Skip name for now', '暂时跳过姓名'),
   nameJunkHint: localized(
     'Please enter a real name — not just a repeated character.',
     '请输入一个真实的名字 — 而不只是重复的字符。',

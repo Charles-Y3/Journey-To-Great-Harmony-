@@ -411,13 +411,22 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
           <p className="small muted">
             {selectedPieceId ? t('glyphsKlotskiChooseHint') : t('glyphsKlotskiHint')}
           </p>
-          <KlotskiBoard
-            glyph={glyph}
-            state={state}
-            onTapPiece={tapPiece}
-            onTapEmpty={tapEmpty}
-            selectedPieceId={selectedPieceId}
-          />
+          <div className="glyph-play-with-ref">
+            <div className="glyph-oracle-ref" title={t('glyphsOracleRefLabel')} aria-label={t('glyphsOracleRefLabel')}>
+              <span className="glyph-oracle-ref-label">{t('glyphsOracleRefLabel')}</span>
+              <SealGlyphSvg character={glyph.character} />
+              <span className="glyph-oracle-ref-modern" aria-hidden="true">
+                {glyph.character}
+              </span>
+            </div>
+            <KlotskiBoard
+              glyph={glyph}
+              state={state}
+              onTapPiece={tapPiece}
+              onTapEmpty={tapEmpty}
+              selectedPieceId={selectedPieceId}
+            />
+          </div>
           <div className="glyph-actions">
             <button type="button" className="btn" onClick={start}>
               {t('glyphsShuffleBtn')}

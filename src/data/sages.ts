@@ -1,5 +1,6 @@
 import type { Sage, SageChapter, QuizQuestion } from './types';
 import { localized } from '../i18n/types';
+import { TIMELINE } from './timeline';
 
 function q(question: [string, string], options: [string[], string[]], answer: number): QuizQuestion {
   return { q: localized(question[0], question[1]), options: localized(options[0], options[1]), answer };
@@ -1574,6 +1575,26 @@ export function sageForTimelinePoint(pointId: string): Sage | undefined {
 /** All sage lives linked to an Ages timeline point (e.g. Gandhi + King). */
 export function sagesForTimelinePoint(pointId: string): Sage[] {
   return SAGES.filter((s) => s.relatedTimelinePointIds?.includes(pointId));
+}
+
+/** Lives list order — follows Wisdom Timeline Ages (and point order within an Age). */
+export function sagesInTimelineOrder(): Sage[] {
+  const ordered: Sage[] = [];
+  const seen = new Set<string>();
+  for (const era of TIMELINE) {
+    for (const point of era.points) {
+      for (const sage of sagesForTimelinePoint(point.id)) {
+        if (seen.has(sage.id)) continue;
+        seen.add(sage.id);
+        ordered.push(sage);
+      }
+    }
+  }
+  for (const sage of SAGES) {
+    if (seen.has(sage.id)) continue;
+    ordered.push(sage);
+  }
+  return ordered;
 }
 
 export function sageForTopic(topicId: string): Sage | undefined {

@@ -128,6 +128,26 @@ a {
   padding: 40px 30px;
 }
 
+.gate-card-you {
+  max-width: 520px;
+  max-height: min(92vh, 900px);
+  overflow-y: auto;
+  text-align: left;
+}
+
+.gate-card-you .gate-title,
+.gate-card-you .gate-subtitle,
+.gate-card-you .gate-emoji,
+.gate-card-you .gate-footnote {
+  text-align: center;
+}
+
+.gate-section-title {
+  font-size: 1rem;
+  margin: 18px 0 6px;
+  color: var(--ink);
+}
+
 .gate-emoji {
   font-size: 2.6rem;
   margin-bottom: 8px;
@@ -2804,6 +2824,68 @@ button.glyph-tile:hover {
   margin: 0 auto;
   color: var(--jade-deep);
   animation: glyph-pop 0.45s ease;
+}
+
+.glyph-play-with-ref {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.glyph-oracle-ref {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  width: 64px;
+  padding: 4px 4px 6px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  text-align: center;
+  color: var(--jade-deep);
+  pointer-events: none;
+}
+
+.glyph-oracle-ref-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  margin-bottom: 2px;
+  line-height: 1.2;
+}
+
+.glyph-oracle-ref .seal-inline-mask,
+.glyph-oracle-ref svg {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  display: block;
+}
+
+.glyph-oracle-ref-modern {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  line-height: 1;
+}
+
+@media (max-width: 480px) {
+  .glyph-oracle-ref {
+    width: 56px;
+    right: 2px;
+  }
+
+  .glyph-oracle-ref .seal-inline-mask,
+  .glyph-oracle-ref svg {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 .glyph-meaning {

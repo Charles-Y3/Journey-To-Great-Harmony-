@@ -1212,11 +1212,7 @@ export default function App() {
             setShowSettings(false);
             setSettingsFocus(null);
           }}
-          onOpenRecap={() => {
-            setShowSettings(false);
-            setSettingsFocus(null);
-            setShowRecap(true);
-          }}
+          onOpenRecap={() => setShowRecap(true)}
         />
       )}
       {showRecap && <JourneyRecapModal onClose={() => setShowRecap(false)} />}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { SAGES, isSageLifeComplete } from '../../data/sages';
+import { SAGES, isSageLifeComplete, sagesInTimelineOrder } from '../../data/sages';
 import type { Sage, SageChapter } from '../../data/types';
 import { TOPICS } from '../../data/knowledgeTree';
 import { useJourney, useToday } from '../../state/store';
@@ -280,6 +280,7 @@ export default function Lives({
     if (sage) setOpen(sage);
   }, [focusSageId]);
 
+  const sages = sagesInTimelineOrder();
   const totalChapters = SAGES.reduce((n, s) => n + s.chapters.length, 0);
   const doneChapters = Object.keys(sageChapters).length;
 
@@ -296,7 +297,7 @@ export default function Lives({
         />
       </div>
 
-      {SAGES.map((sage) => {
+      {sages.map((sage) => {
         const done = sage.chapters.filter((c) => sageChapters[c.id]).length;
         const lifeComplete = isSageLifeComplete(sageChapters, sage);
         const key = sageCapstoneKey(sage.id);
