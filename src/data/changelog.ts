@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 7,
+    date: '2026-07-27',
+    highlights: [
+      localized(
+        '⏳ Sage Lives now covers every Age — Ptahhotep, the Buddha, Jesus, Rumi, Kant, Gandhi, and King join Confucius, Mencius, Laozi, and Socrates.',
+        '⏳ 圣哲生平现已覆盖每一个时代 — 普塔霍特普、佛陀、耶稣、鲁米、康德、甘地与金恩，加入孔子、孟子、老子与苏格拉底。',
+      ),
+      localized(
+        '🔗 Ages study points with more than one life (e.g. Gandhi & King) offer a button for each biography.',
+        '🔗 对应多条生平的时代研读点（如甘地与金恩）会为每一位提供入口按钮。',
+      ),
+    ],
+  },
+  {
     version: 6,
     date: '2026-07-27',
     highlights: [

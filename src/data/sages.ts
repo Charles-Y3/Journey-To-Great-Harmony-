@@ -583,6 +583,965 @@ export const SAGES: Sage[] = [
       ),
     ],
   },
+  {
+    id: 'ptahhotep',
+    name: localized('Ptahhotep', '普塔霍特普'),
+    years: localized('c. 24th century BCE', '约公元前24世纪'),
+    emoji: '𓂀',
+    summary: localized(
+      'An Egyptian vizier whose Maxims taught that a good name outlasts wealth — and that listening is the beginning of wise rule.',
+      '一位埃及宰相，其《箴言》教导：美名比财富更长久 — 而倾听，是明智统治的开端。',
+    ),
+    badgeTitle: localized('Life of Ptahhotep', '普塔霍特普生平'),
+    cardId: 'card-life-ptahhotep',
+    relatedTimelinePointIds: ['ancient-first'],
+    relatedTopicIds: ['humility', 'integrity'],
+    chapters: [
+      chapter(
+        'ptahhotep-court',
+        ['Vizier of Ma’at', '玛阿特的宰相'],
+        [
+          'In Old Kingdom Egypt, the vizier stood between pharaoh and the land. Ma’at — truth, balance, right order — was the measure of a just court.',
+          '在古王国埃及，宰相立于法老与国土之间。「玛阿特」— 真理、平衡与正当秩序 — 是公正朝廷的尺度。',
+        ],
+        [
+          'Ptahhotep served as vizier under a Fifth Dynasty king. Tradition remembers him as a man who had seen power close up and still urged restraint: do not be proud of what you know; take counsel; let the heart stay open. Wisdom, for him, was how a house and a kingdom stay upright.',
+          '普塔霍特普曾任第五王朝某王的宰相。传统记他近距离见过权力，仍劝人节制：勿以所知自骄；多纳谏言；让心保持敞开。对他而言，智慧就是使家与国得以直立的方式。',
+        ],
+        [
+          q(
+            ['Ptahhotep served mainly as…', '普塔霍特普主要担任……'],
+            [
+              ['A desert hermit', 'Vizier — chief counsellor of the court', 'A foreign merchant', 'A pyramid architect only'],
+              ['沙漠隐士', '宰相 — 朝廷首席顾问', '外国商人', '仅金字塔建筑师'],
+            ],
+            1,
+          ),
+          q(
+            ['Ma’at in his world meant…', '在他的世界里，玛阿特意味着……'],
+            [
+              ['Military conquest only', 'Truth, balance, and right order', 'Gold storage', 'Silence forever'],
+              ['仅军事征服', '真理、平衡与正当秩序', '贮藏黄金', '永远沉默'],
+            ],
+            1,
+          ),
+        ],
+        { relatedTimelinePointId: 'ancient-first' },
+      ),
+      chapter(
+        'ptahhotep-maxims',
+        ['The Maxims', '箴言集'],
+        [
+          'Instruction literature trained the young elite to speak carefully and govern without crushing the weak.',
+          '「教谕」文学训练年轻精英谨慎言说，治理时不欺压弱者。',
+        ],
+        [
+          'He set down Maxims for his son and successors: listen before you speak; a good name endures longer than a storehouse; do not terrify people for sport. The words are practical — how to sit in council, how to correct without humiliation — yet they aim at a moral sky: live so that Ma’at is not a slogan but a habit.',
+          '他为儿子与后继者写下箴言：先听后言；美名比仓廪更长久；勿以恐吓百姓为乐。这些话很实用 — 如何坐在议事之中，如何纠正而不羞辱 — 却指向道德的天空：让玛阿特不是口号，而是习惯。',
+        ],
+        [
+          q(
+            ['Ptahhotep taught that a good name…', '普塔霍特普教导：美名……'],
+            [
+              ['Matters less than gold', 'Outlasts wealth', 'Is useless in court', 'Belongs only to kings'],
+              ['不如黄金重要', '比财富更长久', '在朝廷无用', '只属于国王'],
+            ],
+            1,
+          ),
+          q(
+            ['His Maxims urge leaders to…', '他的箴言敦促领导者……'],
+            [
+              ['Listen before speaking', 'Conquer first, ask later', 'Hide all mistakes', 'Ignore the weak'],
+              ['先听后言', '先征服再问', '隐瞒一切过错', '忽视弱者'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'ptahhotep-listening',
+        ['The art of hearing', '倾听之艺'],
+        [
+          'Egyptian courts prized eloquence, but Ptahhotep ranked hearing above display.',
+          '埃及朝廷看重辞令，普塔霍特普却把倾听置于炫耀之上。',
+        ],
+        [
+          '“If you are a leader, listen calmly to a petitioner’s speech,” the Maxims say in spirit — even when the words are tangled. Patience in hearing is not weakness; it is how truth enters a room where power already sits. That lesson travels easily into any age that confuses volume with wisdom.',
+          '箴言大意说：你若居上位，当平静倾听陈情者的话 — 即使话语纷乱。耐心倾听不是软弱；它是真理进入权力已坐满之室的方式。这课轻易传到任何把音量误当作智慧的时代。',
+        ],
+        [
+          q(
+            ['For Ptahhotep, listening carefully is…', '对普塔霍特普而言，仔细倾听是……'],
+            [
+              ['A waste of a ruler’s time', 'How truth can enter a room of power', 'Only for servants', 'A form of magic'],
+              ['浪费统治者时间', '真理进入权力之室的方式', '只属于仆人', '一种魔法'],
+            ],
+            1,
+          ),
+          q(
+            ['He warns against confusing…', '他告诫勿把……混淆'],
+            [
+              ['Volume with wisdom', 'Bread with water', 'Night with day', 'Boats with carts'],
+              ['音量与智慧', '面包与水', '夜与日', '船与车'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'ptahhotep-legacy',
+        ['An early lamp', '一盏早灯'],
+        [
+          'The Maxims of Ptahhotep are among the oldest surviving wisdom books — proof that the hunger for harmony is ancient.',
+          '《普塔霍特普箴言》是现存最古老的智慧书之一 — 证明对和谐的渴望古已有之。',
+        ],
+        [
+          'Long before Greece named “philosophy,” an Egyptian elder was already teaching character as public craft. His lamp still burns wherever someone chooses a good name over a quick win — and wherever Ma’at is practised as daily balance, not museum stone.',
+          '早在希腊为「哲学」命名之前，一位埃及长者已在把品格当作公共技艺来教。凡有人选择美名而非速胜之处，凡把玛阿特当作日常平衡而非博物馆石刻之处，他的灯仍在燃烧。',
+        ],
+        [
+          q(
+            ['Ptahhotep’s Maxims show that…', '普塔霍特普的箴言表明……'],
+            [
+              ['Wisdom began only in Greece', 'The longing for wise living is very old', 'Egypt had no ethics', 'Viziers never wrote'],
+              ['智慧只始于希腊', '对智慧生活的渴望极为古老', '埃及没有伦理', '宰相从不写作'],
+            ],
+            1,
+          ),
+          q(
+            ['His lasting theme is…', '他持久的主题是……'],
+            [
+              ['Character as public craft under Ma’at', 'Secret alchemy', 'Naval tactics', 'Tax evasion'],
+              ['在玛阿特之下，品格作为公共技艺', '秘密炼金', '海战战术', '逃税'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
+  {
+    id: 'buddha',
+    name: localized('The Buddha', '佛陀'),
+    years: localized('c. 563–483 BCE', '约公元前563–483年'),
+    emoji: '🪷',
+    summary: localized(
+      'Siddhartha Gautama left the palace, awoke beneath the Bodhi tree, and taught a Middle Way of compassion — suffering understood, craving loosened, kindness widened to all beings.',
+      '悉达多·乔达摩离开王宫，在菩提树下觉悟，教导慈悲的中道 — 知苦、松绑贪爱，把慈爱扩及一切众生。',
+    ),
+    badgeTitle: localized('Life of the Buddha', '佛陀生平'),
+    cardId: 'card-life-buddha',
+    relatedTimelinePointIds: ['buddhism-buddha'],
+    relatedTopicIds: ['compassion', 'awareness'],
+    chapters: [
+      chapter(
+        'buddha-palace',
+        ['Leaving the palace', '出离王宫'],
+        [
+          'In the kingdoms of the Gangetic plain, luxury and caste framed many lives — and also hid sickness, age, and death from royal eyes.',
+          '在恒河平原的诸国，奢华与种姓框定了许多人生 — 也把病、老、死从王室眼前藏起。',
+        ],
+        [
+          'Tradition tells that Prince Siddhartha was shielded from suffering until he saw an old person, a sick person, a corpse, and a seeker. The sight broke the palace spell. He left home not to scorn the world, but to find why beings suffer — and whether freedom was possible.',
+          '传统说，悉达多王子被隔开苦难，直到他见到老人、病人、尸体与求道者。那一见打破了王宫的迷咒。他离家并非鄙弃世界，而是要寻问：众生为何受苦 — 以及自由是否可能。',
+        ],
+        [
+          q(
+            ['Siddhartha left the palace after seeing…', '悉达多见了……之后离开王宫'],
+            [
+              ['A treasure map', 'Old age, sickness, death, and a seeker', 'Only a festival', 'A foreign army'],
+              ['寻宝图', '老、病、死与求道者', '仅一场节日', '外国军队'],
+            ],
+            1,
+          ),
+          q(
+            ['He left mainly in order to…', '他离开主要为了……'],
+            [
+              ['Conquer neighbouring kingdoms', 'Understand suffering and whether freedom is possible', 'Become richer', 'Forget the world entirely'],
+              ['征服邻国', '了解苦，以及自由是否可能', '变得更富', '彻底忘记世界'],
+            ],
+            1,
+          ),
+        ],
+      ),
+      chapter(
+        'buddha-awakening',
+        ['Awakening under the tree', '树下觉悟'],
+        [
+          'Ascetics of the time often swung between indulgence and harsh self-denial. Siddhartha tried both extremes and found them wanting.',
+          '当时的苦行者常在纵欲与严苛自制之间摇摆。悉达多试过两个极端，都觉不足。',
+        ],
+        [
+          'After years of searching and nearly destroying his body with austerity, he took nourishment, sat beneath the Bodhi tree, and awoke as the Buddha — “the awakened one.” He saw that craving fuels suffering, and that a clear mind can loosen the knot. The Middle Way was not compromise for comfort; it was a path sturdy enough to walk for a lifetime.',
+          '历经多年寻觅，几乎因苦行毁坏身体后，他进食，坐在菩提树下，觉悟为佛陀 — 「觉醒者」。他看见贪爱助长苦，而清明的心能松开那个结。中道不是为了安逸的妥协；它是一条足以走一生的稳路。',
+        ],
+        [
+          q(
+            ['“Buddha” means…', '「佛陀」意为……'],
+            [
+              ['The richest king', 'The awakened one', 'The silent mountain', 'The lawgiver of taxes'],
+              ['最富有的国王', '觉醒者', '沉默的山', '税法制定者'],
+            ],
+            1,
+          ),
+          q(
+            ['The Middle Way lies between…', '中道位于……之间'],
+            [
+              ['Indulgence and harsh self-denial', 'East and West only', 'Speech and silence forever', 'War and trade'],
+              ['纵欲与严苛自制', '仅东与西', '永远的言语与沉默', '战争与贸易'],
+            ],
+            0,
+          ),
+        ],
+        { relatedTimelinePointId: 'buddhism-buddha' },
+      ),
+      chapter(
+        'buddha-turning',
+        ['Turning the Wheel', '转法轮'],
+        [
+          'After awakening he hesitated, then chose to teach — beginning at Sarnath with companions who had left him.',
+          '觉悟后他曾犹豫，最终选择教导 — 在鹿野苑从曾离开他的同伴开始。',
+        ],
+        [
+          'He taught the Four Noble Truths and the Eightfold Path: see suffering clearly, loosen craving, cultivate ethics, mindfulness, and wisdom together. Compassion (karuna) and loving-kindness (metta) were not ornaments; they were how awakening meets other beings. The sangha — community of practice — became a living vessel for the teaching.',
+          '他教导四圣谛与八正道：看清苦，松绑贪爱，将戒、正念与智慧一同修持。慈悲与慈爱不是装饰；它们是觉悟遇见众生的方式。僧伽 — 修行的共同体 — 成了承载教法的活的容器。',
+        ],
+        [
+          q(
+            ['According to the Buddha, suffering arises from…', '根据佛陀，苦生于……'],
+            [
+              ['Bad luck alone', 'Craving and attachment', 'Other people’s success', 'The weather'],
+              ['仅厄运', '贪爱与执着', '他人的成功', '天气'],
+            ],
+            1,
+          ),
+          q(
+            ['Karuna and metta name…', '「悲」与「慈」指的是……'],
+            [
+              ['Compassion and loving-kindness', 'Taxes and tribute', 'War and peace treaties', 'Music scales'],
+              ['慈悲与慈爱', '税与贡品', '战争与和约', '音阶'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'buddha-legacy',
+        ['A path across Asia', '穿越亚洲之路'],
+        [
+          'The teaching spread along trade routes and into many cultures, adapting without losing the heart of liberation and care.',
+          '教法沿商路传入多种文化，适应而不失解脱与关怀之心。',
+        ],
+        [
+          'From early councils to traditions across Asia, the Buddha’s life remained a pattern: leave what blinds you, sit until you see, then walk back toward others with open hands. Great Harmony hears in that pattern a familiar rhythm — personal awakening that refuses to stop at the self.',
+          '从早期结集到亚洲各地传统，佛陀的一生仍是一个范式：离开蒙蔽你的，安坐直到看见，然后张开双手走回人群。大同在那范式中听见熟悉的节奏 — 个人的觉醒，却拒绝停在自我。',
+        ],
+        [
+          q(
+            ['The Buddha’s path ends not in isolation but in…', '佛陀之路的终点不是孤立，而是……'],
+            [
+              ['Returning toward others with compassion', 'Building taller palaces', 'Erasing all memory', 'Ruling as emperor'],
+              ['以慈悲走回他人', '建造更高王宫', '抹去一切记忆', '以皇帝统治'],
+            ],
+            0,
+          ),
+          q(
+            ['His life pattern emphasises…', '他的人生范式强调……'],
+            [
+              ['Awakening that includes care for beings', 'Wealth first', 'Fame at any cost', 'Never teaching'],
+              ['包含关怀众生的觉醒', '财富优先', '不惜代价求名', '永不教导'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
+  {
+    id: 'jesus',
+    name: localized('Jesus of Nazareth', '拿撒勒人耶稣'),
+    years: localized('c. 4 BCE–30 CE', '约公元前4年–公元30年'),
+    emoji: '✝️',
+    summary: localized(
+      'A teacher in Roman Galilee who blessed the merciful and the peacemakers, told of neighbours beyond every boundary, and made love — even of enemies — the measure of a life.',
+      '罗马治下加利利的一位老师，祝福怜悯人的与使人和睦的，讲述跨越界限的邻舍，并以爱 — 甚至爱仇敌 — 作为人生的尺度。',
+    ),
+    badgeTitle: localized('Life of Jesus', '耶稣生平'),
+    cardId: 'card-life-jesus',
+    relatedTimelinePointIds: ['christianity-jesus'],
+    relatedTopicIds: ['forgiveness', 'kindness'],
+    chapters: [
+      chapter(
+        'jesus-galilee',
+        ['Among the villages', '行走乡间'],
+        [
+          'Galilee under Rome was tense with taxes, hope for liberation, and debates over how to keep faith amid empire.',
+          '罗马治下的加利利，税赋、解放的盼望，与如何在帝国中持守信仰的争论交织。',
+        ],
+        [
+          'Jesus grew up in Nazareth and walked the villages teaching in synagogues and on hillsides. He spoke of a kingdom not built on swords: the meek, the merciful, and the peacemakers are blessed. Crowds came for healing and for words that rearranged who counted as neighbour.',
+          '耶稣在拿撒勒长大，走遍乡村，在会堂与山坡上教导。他讲论的国不以刀剑建立：温柔的、怜悯人的、使人和睦的有福了。人群为医治而来，也为那重新安排「谁算邻舍」的话语而来。',
+        ],
+        [
+          q(
+            ['Jesus taught mainly in…', '耶稣主要在……教导'],
+            [
+              ['Roman senate halls', 'Villages, synagogues, and hillsides of Galilee', 'Only distant deserts forever', 'Egyptian temples'],
+              ['罗马元老院大厅', '加利利的乡村、会堂与山坡', '永远只在遥远沙漠', '埃及神庙'],
+            ],
+            1,
+          ),
+          q(
+            ['In the Sermon on the Mount he blessed…', '在登山宝训中，他祝福……'],
+            [
+              ['Only the wealthy', 'The meek, the merciful, and the peacemakers', 'Generals alone', 'Tax collectors exclusively'],
+              ['仅富人', '温柔的、怜悯人的与使人和睦的', '仅将军', '仅税吏'],
+            ],
+            1,
+          ),
+        ],
+      ),
+      chapter(
+        'jesus-love',
+        ['The ethic of love', '爱的伦理'],
+        [
+          'Religious and civic lines often decided who deserved care. Jesus crossed those lines in story and in practice.',
+          '宗教与公民界限常决定谁值得被关怀。耶稣在故事与实践中跨越那些界限。',
+        ],
+        [
+          'He summed the law as love of God and love of neighbour — and stretched “neighbour” to include the enemy and the stranger. The Golden Rule and parables like the Good Samaritan made compassion concrete: mercy is proved on the road, not only in the temple.',
+          '他把律法总结为爱神与爱人 — 并把「邻舍」伸展到仇敌与陌生人。金律与好撒玛利亚人等比喻使慈悲具体：怜悯在路上得证，不只在圣殿里。',
+        ],
+        [
+          q(
+            ['The Golden Rule teaches…', '金律教导……'],
+            [
+              ['Treat others as you would have them treat you', 'An eye for an eye', 'Ignore strangers', 'Win every argument'],
+              ['你想别人怎样待你，你也要怎样待人', '以眼还眼', '忽视陌生人', '赢得每次争论'],
+            ],
+            0,
+          ),
+          q(
+            ['The Good Samaritan shows that…', '好撒玛利亚人表明……'],
+            [
+              ['Compassion crosses social boundaries', 'Only priests may help', 'Roads are unsafe so stay home', 'Love is optional'],
+              ['慈悲跨越社会界限', '只有祭司可以帮忙', '路不安全所以待在家', '爱是可选项'],
+            ],
+            0,
+          ),
+        ],
+        { relatedTimelinePointId: 'christianity-jesus' },
+      ),
+      chapter(
+        'jesus-table',
+        ['Table and forgiveness', '筵席与宽恕'],
+        [
+          'Who you ate with signalled honour. Jesus’s open table unsettled that map.',
+          '与谁同席标示尊荣。耶稣敞开的筵席扰动了那张地图。',
+        ],
+        [
+          'He welcomed the overlooked and the criticised, and taught forgiveness that restores what shame and debt break. The Prodigal Son’s father runs to meet the returning child — a picture of mercy that moves first. For Jesus, holiness was not distance from the wounded; it was presence that heals.',
+          '他欢迎被忽视与被指摘的人，教导能修复羞耻与亏欠所破碎之物的宽恕。浪子回头的父亲奔跑迎接归来的孩子 — 一幅主动施怜悯的图画。对耶稣而言，圣洁不是远离受伤者；而是带来医治的同在。',
+        ],
+        [
+          q(
+            ['Jesus’s open table mainly signalled…', '耶稣敞开的筵席主要标示……'],
+            [
+              ['Welcome beyond honour maps', 'Exclusive club membership', 'Roman loyalty tests', 'Military recruitment'],
+              ['超越尊荣地图的欢迎', '专属俱乐部会员', '罗马忠诚测试', '军事征召'],
+            ],
+            0,
+          ),
+          q(
+            ['The Prodigal Son highlights…', '浪子回头突出……'],
+            [
+              ['Mercy that moves toward the returning one', 'Permanent exile', 'Wealth as the only good', 'Never forgiving'],
+              ['主动迎向归来者的怜悯', '永久放逐', '财富为唯一的善', '永不宽恕'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'jesus-legacy',
+        ['A vision that travelled', '远行的愿景'],
+        [
+          'After his death under Roman power, communities carried his ethic across the Mediterranean and far beyond.',
+          '他在罗马权力下死后，群体把他的伦理带到地中海沿岸与更远之处。',
+        ],
+        [
+          'Whatever one believes about his nature, the moral vision remains: love that crosses enmity, service over domination, peacemaking as blessed work. Great Harmony recognises in that ethic a companion to Datong — a world where no one is left outside the circle of care.',
+          '无论人如何理解他的本质，道德愿景仍在：跨越仇恨的爱，服务胜过宰制，使人和睦为有福的工作。大同在那伦理中认出与「天下为公」相伴的声音 — 一个无人被留在关怀圈外的世界。',
+        ],
+        [
+          q(
+            ['A central lasting note of his teaching is…', '其教导一个持久的核心是……'],
+            [
+              ['Love that includes even enemies', 'Victory by any means', 'Silence as the only prayer', 'Empire first'],
+              ['甚至包括仇敌的爱', '不择手段的胜利', '沉默为唯一祷告', '帝国优先'],
+            ],
+            0,
+          ),
+          q(
+            ['Peacemakers in his teaching are…', '在他的教导中，使人和睦的人……'],
+            [
+              ['Blessed', 'Ignored', 'Punished always', 'Only for the rich'],
+              ['有福的', '被忽视的', '总是受罚', '只属于富人'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
+  {
+    id: 'rumi',
+    name: localized('Rumi', '鲁米'),
+    years: localized('1207–1273', '1207–1273年'),
+    emoji: '🌙',
+    summary: localized(
+      'A scholar of Konya who, after friendship and loss, became a poet of the field beyond right and wrong — singing a love that gathers all beings.',
+      '科尼亚的一位学者，在友谊与失去之后，成为歌唱「是非之外那片旷野」的诗人 — 咏唱聚拢万物的爱。',
+    ),
+    badgeTitle: localized('Life of Rumi', '鲁米生平'),
+    cardId: 'card-life-rumi',
+    relatedTimelinePointIds: ['islamic-golden-age'],
+    relatedTopicIds: ['compassion', 'awareness'],
+    chapters: [
+      chapter(
+        'rumi-scholar',
+        ['Scholar of Konya', '科尼亚的学者'],
+        [
+          'In the Seljuk lands of Anatolia, Islamic learning, Persian poetry, and travelling mystics met in busy cities.',
+          '在安纳托利亚的塞尔柱领地，伊斯兰学问、波斯诗歌与行走的神秘家在繁忙城市相遇。',
+        ],
+        [
+          'Jalal al-Din Rumi inherited a learned household and taught law and faith with respect. He was already respected when friendship would overturn the order of his days — proving that scholarship alone does not finish a heart.',
+          '贾拉鲁丁·鲁米承继书香之家，以敬重之心教授律法与信仰。他已受人尊敬，而友谊将颠覆他日子的秩序 — 证明单靠学问，不足以完成一颗心。',
+        ],
+        [
+          q(
+            ['Rumi first lived mainly as…', '鲁米起初主要作为……生活'],
+            [
+              ['A pirate captain', 'A respected teacher of law and faith', 'A silent hermit from birth', 'A Roman senator'],
+              ['海盗船长', '受人尊敬的律法与信仰教师', '生来就沉默的隐士', '罗马元老'],
+            ],
+            1,
+          ),
+          q(
+            ['His city, Konya, sat in…', '他的城市科尼亚位于……'],
+            [
+              ['Anatolia, where many traditions met', 'Only the Antarctic', 'Isolation from all books', 'A single closed village forever'],
+              ['安纳托利亚，多种传统交会之处', '仅南极', '与一切书籍隔绝', '永远封闭的单一村庄'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'rumi-shams',
+        ['Friendship with Shams', '与沙姆斯的友谊'],
+        [
+          'Sufi paths sought direct love of the Divine. Companionship could become the furnace of that love.',
+          '苏菲之路寻求对神圣的直接之爱。同伴之谊可成为那爱的熔炉。',
+        ],
+        [
+          'The wandering dervish Shams of Tabriz entered Rumi’s life like a spark. Their friendship burned away pride and caution; when Shams vanished, grief opened Rumi into poetry. Loss did not end the teaching — it became the door through which love spoke in verse.',
+          '大不里士的行走托钵僧沙姆斯如火花进入鲁米的生命。他们的友谊烧掉骄傲与谨慎；当沙姆斯消失，哀伤把鲁米打开成诗。失去没有结束教导 — 它成了爱以诗句说话的门。',
+        ],
+        [
+          q(
+            ['Shams of Tabriz was…', '大不里士的沙姆斯是……'],
+            [
+              ['A wandering spiritual friend who transformed Rumi', 'Rumi’s tax collector', 'A fictional horse', 'A crusader general'],
+              ['改变鲁米的行走心灵挚友', '鲁米的税吏', '虚构的马', '十字军将军'],
+            ],
+            0,
+          ),
+          q(
+            ['After Shams vanished, Rumi…', '沙姆斯消失后，鲁米……'],
+            [
+              ['Turned grief into poetry of love', 'Quit all teaching forever', 'Became a merchant only', 'Burned every book'],
+              ['把哀伤化为爱的诗歌', '永远停止一切教导', '只做商人', '烧掉每一本书'],
+            ],
+            0,
+          ),
+        ],
+        { relatedTimelinePointId: 'islamic-golden-age' },
+      ),
+      chapter(
+        'rumi-field',
+        ['The field beyond', '是非之外的旷野'],
+        [
+          'Courts and schools argued right and wrong. Rumi pointed past the quarrel to a meeting place of the heart.',
+          '宫廷与学院争论是非。鲁米指向争吵之外，那心灵相遇之处。',
+        ],
+        [
+          '“Out beyond ideas of wrongdoing and rightdoing, there is a field. I’ll meet you there.” The line is not laziness about ethics; it is an invitation to a love larger than winning debates — the Sufi sense that unity waits where ego loosens.',
+          '「在是非对错的观念之外，有一片旷野，我们在那里相遇。」这句不是对伦理的懒惰；它是邀请进入比赢得辩论更大的爱 — 苏菲所感：当自我松开，合一在等待。',
+        ],
+        [
+          q(
+            ['Rumi’s “field” is mainly an image of…', '鲁米的「旷野」主要是……的意象'],
+            [
+              ['A place of meeting beyond harsh judgment', 'A sports stadium', 'A tax office', 'A battlefield only'],
+              ['超越苛刻评判的相遇之地', '体育场', '税务所', '仅战场'],
+            ],
+            0,
+          ),
+          q(
+            ['His poetry invites…', '他的诗邀请……'],
+            [
+              ['Love larger than winning arguments', 'Never listening', 'Strict silence about God', 'Hate of strangers'],
+              ['比赢得争论更大的爱', '永不倾听', '对神严格沉默', '憎恨陌生人'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'rumi-legacy',
+        ['A song that crossed borders', '越过边界的歌'],
+        [
+          'The Masnavi and the lyrics travelled through Persian, Turkish, and later world languages.',
+          '《玛斯纳维》与抒情诗穿越波斯语、土耳其语，以及后来的世界语言。',
+        ],
+        [
+          'Rumi’s whirling, his teaching circle, and his verses made love a public craft again — not private sentiment alone. In the Great Harmony journey he stands with the Golden Age scholars: reason and faith can illuminate one another, and the heart has its own scholarship of reunion.',
+          '鲁米的旋转、他的教圈与诗句，使爱再次成为公共技艺 — 不只是私密情感。在大同之路上，他与黄金时代的学者并列：理性与信仰可以彼此照亮，而心自有其重逢的学问。',
+        ],
+        [
+          q(
+            ['Rumi belongs to the wider story of…', '鲁米属于……的更广故事'],
+            [
+              ['Islamic Golden Age wisdom and Sufi love', 'Only Norse myth', 'Roman road building', 'Silent trade guilds'],
+              ['伊斯兰黄金时代智慧与苏菲之爱', '仅北欧神话', '罗马筑路', '沉默的商会'],
+            ],
+            0,
+          ),
+          q(
+            ['His lasting gift is often named as…', '他持久的礼物常被称为……'],
+            [
+              ['Poetry that gathers beings in love', 'A code of naval law', 'A map of buried gold', 'A ban on music'],
+              ['以爱聚拢众生的诗歌', '一部海法', '藏金地图', '禁止音乐'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
+  {
+    id: 'kant',
+    name: localized('Immanuel Kant', '伊曼努尔·康德'),
+    years: localized('1724–1804', '1724–1804年'),
+    emoji: '💡',
+    summary: localized(
+      'A Königsberg thinker who dared people to use their own understanding — and to treat every person as an end, never merely a means.',
+      '一位柯尼斯堡的思想家，鼓励人运用自己的理智 — 并把每个人当作目的本身，绝不仅仅当作手段。',
+    ),
+    badgeTitle: localized('Life of Kant', '康德生平'),
+    cardId: 'card-life-kant',
+    relatedTimelinePointIds: ['enlightenment-reason'],
+    relatedTopicIds: ['integrity', 'discernment'],
+    chapters: [
+      chapter(
+        'kant-konigsberg',
+        ['The regular walk', '规律的散步'],
+        [
+          'Enlightenment Europe argued about reason, faith, science, and the rights of persons — often from salons and universities far from Königsberg’s quiet streets.',
+          '启蒙时代的欧洲争论理性、信仰、科学与人的权利 — 往往在远离柯尼斯堡安静街道的沙龙与大学里。',
+        ],
+        [
+          'Kant rarely left his city, yet his mind travelled the whole map of knowledge. Neighbours timed their clocks by his walk; he timed his life by rigorous study. Outer calm held an inner revolution: what can we know, and how should we act?',
+          '康德极少离开他的城市，思想却走遍知识的全图。邻人以他的散步对时；他以严谨的研读安排人生。外在的平静里藏着内在的革命：我们能知道什么，又应当如何行动？',
+        ],
+        [
+          q(
+            ['Kant spent most of his life in…', '康德大半生在……度过'],
+            [
+              ['Königsberg', 'Only Paris cafés', 'A desert monastery', 'The British navy'],
+              ['柯尼斯堡', '仅巴黎咖啡馆', '沙漠修道院', '英国海军'],
+            ],
+            0,
+          ),
+          q(
+            ['His outer routine is remembered as…', '他外在的规律被记为……'],
+            [
+              ['A calm frame for radical questions about knowledge and duty', 'Proof he never thought', 'A refusal to read', 'A plan for conquest'],
+              ['为知识与义务的激进问题而设的平静框架', '证明他从不思考', '拒绝阅读', '征服计划'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'kant-aude',
+        ['Sapere aude', '敢于求知'],
+        [
+          'Many lived by borrowed opinions. Kant named Enlightenment as exit from self-incurred immaturity.',
+          '许多人靠借来的意见生活。康德把启蒙称为走出自己加于自己的不成熟。',
+        ],
+        [
+          '“Sapere aude” — dare to know — became his motto for the age: have the courage to use your own understanding. Critique was not cynicism; it was clearing space so reason could serve freedom without pretending to know what it cannot.',
+          '「Sapere aude」— 敢于求知 — 成了他给时代的座右铭：要有勇气运用你自己的理智。批判不是犬儒；它是清理空间，使理性能服务自由，却不假装知道它所不能知的。',
+        ],
+        [
+          q(
+            ['“Sapere aude” means…', '「Sapere aude」意为……'],
+            [
+              ['Dare to know', 'Obey quietly', 'Sleep early', 'Spend freely'],
+              ['敢于求知', '安静服从', '早睡', '自由花钱'],
+            ],
+            0,
+          ),
+          q(
+            ['For Kant, Enlightenment is courage to…', '对康德而言，启蒙是勇于……'],
+            [
+              ['Use your own understanding', 'Never ask questions', 'Follow every rumour', 'Abandon all ethics'],
+              ['运用自己的理智', '永不提问', '听从每个谣言', '放弃一切伦理'],
+            ],
+            0,
+          ),
+        ],
+        { relatedTimelinePointId: 'enlightenment-reason' },
+      ),
+      chapter(
+        'kant-end',
+        ['Persons as ends', '人为目的'],
+        [
+          'Markets and states can treat humans as tools. Kant drew a bright line.',
+          '市场与国家可能把人当作工具。康德划下一道明线。',
+        ],
+        [
+          'Act only on principles you could will as universal law; treat humanity in yourself and others always as an end, never merely as a means. Dignity is not a luxury good — it is the ground of a shared moral world, echoing older dreams that the world be shared by all.',
+          '只依据你愿意成为普遍法则的原则行动；永远把你自己与他人中的人性当作目的，绝不仅仅当作手段。尊严不是奢侈品 — 它是共享道德世界的地基，呼应着天下为公的古老梦想。',
+        ],
+        [
+          q(
+            ['Kant taught that every person must be treated as…', '康德教导：每个人都必须被当作……'],
+            [
+              ['An end, never merely a means', 'A tool for the state only', 'A means to profit alone', 'Optional'],
+              ['目的本身，绝不仅仅是手段', '仅国家的工具', '仅营利的手段', '可有可无'],
+            ],
+            0,
+          ),
+          q(
+            ['The categorical imperative asks you to will principles…', '定言令式要求你愿意原则……'],
+            [
+              ['As if they could be universal law', 'Only when convenient', 'Never out loud', 'For your friends alone'],
+              ['如同它们能成为普遍法则', '仅在方便时', '永不说出', '只为你的朋友'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'kant-legacy',
+        ['Dignity after Königsberg', '柯尼斯堡之后的尊严'],
+        [
+          'Later human-rights language drank from many wells; Kant’s insistence on universal dignity was one deep spring.',
+          '后来的人权语言饮自许多井；康德对普遍尊严的坚持，是其中一口深泉。',
+        ],
+        [
+          'He never marched with crowds, yet his ideas marched into constitutions and classrooms: think for yourself, and never use a person as furniture for your plans. On the road to Great Harmony, that is civic love in the language of reason.',
+          '他从未与人群一同游行，思想却走进宪法与课堂：独立思考，永不把人当作你计划的家具。在通向大同的路上，那是以理性语言说出的公民之爱。',
+        ],
+        [
+          q(
+            ['Kant’s moral legacy emphasises…', '康德的道德遗产强调……'],
+            [
+              ['Universal dignity and thinking for oneself', 'Blind obedience', 'Wealth ranking', 'Secret codes only'],
+              ['普遍尊严与独立思考', '盲目服从', '财富排名', '仅密码'],
+            ],
+            0,
+          ),
+          q(
+            ['Great Harmony can hear in Kant…', '大同可在康德那里听见……'],
+            [
+              ['A shared moral world where persons are never mere tools', 'A call to abandon neighbours', 'Praise of tyranny', 'Silence about rights'],
+              ['人永不只是工具的共享道德世界', '抛弃邻人的号召', '赞美暴政', '对权利沉默'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
+  {
+    id: 'gandhi',
+    name: localized('Mahatma Gandhi', '圣雄甘地'),
+    years: localized('1869–1948', '1869–1948年'),
+    emoji: '🕊️',
+    summary: localized(
+      'A lawyer who made ahimsa and satyagraha — non-harm and truth-force — into a public path that sought freedom without hatred.',
+      '一位律师，把不害与真理的力量 — 非暴力与真理之力 — 变成寻求自由却不怀仇恨的公共道路。',
+    ),
+    badgeTitle: localized('Life of Gandhi', '甘地生平'),
+    cardId: 'card-life-gandhi',
+    relatedTimelinePointIds: ['modern-gandhi-king'],
+    relatedTopicIds: ['service', 'integrity'],
+    chapters: [
+      chapter(
+        'gandhi-south',
+        ['South Africa awakening', '南非的觉醒'],
+        [
+          'Colonial law ranked bodies by race. A young Indian lawyer met that ranking on a train — and refused to stay seated in humiliation.',
+          '殖民法律按种族排列身体。一位年轻的印度律师在火车上遇见那排列 — 并拒绝屈辱地坐着不动。',
+        ],
+        [
+          'In South Africa Gandhi learned how law can wound, and how disciplined non-cooperation can answer without mirroring hate. Experiments in simple living and communal work began there — a workshop for the India struggle still ahead.',
+          '在南非，甘地学会法律如何伤害人，以及有纪律的不合作如何回应而不镜像仇恨。简朴生活与共同劳动的实验在那里开始 — 那是前方印度斗争的工坊。',
+        ],
+        [
+          q(
+            ['Gandhi’s early political awakening is linked to…', '甘地早期的政治觉醒与……相关'],
+            [
+              ['Racial humiliation under colonial law in South Africa', 'Winning a lottery', 'Becoming a general', 'Abandoning all ethics'],
+              ['南非殖民法律下的种族屈辱', '中彩票', '成为将军', '放弃一切伦理'],
+            ],
+            0,
+          ),
+          q(
+            ['He began practising…', '他开始践行……'],
+            [
+              ['Disciplined non-cooperation without mirroring hate', 'Revenge at all costs', 'Silence forever', 'Luxury only'],
+              ['不镜像仇恨的有纪律不合作', '不惜代价报复', '永远沉默', '仅奢华'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'gandhi-satyagraha',
+        ['Satyagraha', '真理的力量'],
+        [
+          'India under empire sought freedom. Gandhi offered a method: hold to truth, refuse violence, accept suffering rather than inflict it.',
+          '帝国下的印度寻求自由。甘地提供一种方法：持守真理，拒绝暴力，宁愿承受苦难也不施加苦难。',
+        ],
+        [
+          'Satyagraha — truth-force — joined ahimsa (non-harm) with courage. Salt marches and boycotts were not stunts; they trained a people to stand upright without becoming the cruelty they opposed. He insisted the means are the ends in the making.',
+          '「真理的力量」把不害与勇气相连。盐游行与抵制不是噱头；它们训练一个民族直立，而不变成他所反对的残忍。他坚持：手段即正在生成的目的。',
+        ],
+        [
+          q(
+            ['Satyagraha means roughly…', 'Satyagraha 大意是……'],
+            [
+              ['Truth-force', 'Silent wealth', 'Hidden weapons', 'Royal decree'],
+              ['真理的力量', '沉默的财富', '隐藏武器', '王室法令'],
+            ],
+            0,
+          ),
+          q(
+            ['Gandhi taught that means and ends…', '甘地教导：手段与目的……'],
+            [
+              ['Are woven together — violent means corrupt freedom', 'Never relate', 'Only ends matter', 'Only means matter'],
+              ['彼此交织 — 暴力手段会败坏自由', '从无关联', '只有目的重要', '只有手段重要'],
+            ],
+            0,
+          ),
+        ],
+        { relatedTimelinePointId: 'modern-gandhi-king' },
+      ),
+      chapter(
+        'gandhi-india',
+        ['Freedom and the wound of partition', '自由与分治的伤'],
+        [
+          'Independence arrived with joy and with the trauma of partition. Gandhi walked among the grieving, pleading for peace between communities.',
+          '独立带着喜悦与分治的创伤到来。甘地走在哀伤的人群中，恳求共同体之间的和平。',
+        ],
+        [
+          'He fasted and travelled to cool riots, insisting that swaraj without neighbour-love is hollow. His life’s last chapter was not triumph alone but stubborn care for a fractured people — until assassination cut the walk short.',
+          '他绝食、奔走以平息暴乱，坚持没有邻人之爱的自治是空洞的。生命最后一章不只是胜利，更是对撕裂民族的固执关怀 — 直到暗杀截断了那步行。',
+        ],
+        [
+          q(
+            ['After independence Gandhi focused on…', '独立后甘地专注于……'],
+            [
+              ['Calming violence and pleading for communal peace', 'Collecting medals only', 'Leaving India forever', 'Building a private palace'],
+              ['平息暴力并恳求共同体和平', '仅收集勋章', '永远离开印度', '建造私人宫殿'],
+            ],
+            0,
+          ),
+          q(
+            ['He held that self-rule without neighbour-love is…', '他认为没有邻人之爱的自治是……'],
+            [
+              ['Hollow', 'Perfect', 'Optional forever', 'Only for elites'],
+              ['空洞的', '完美的', '永远可有可无', '只属于精英'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'gandhi-legacy',
+        ['A torch passed on', '传递的火炬'],
+        [
+          'Movements worldwide studied his method. Martin Luther King Jr. named the debt openly.',
+          '世界各地的运动研习他的方法。马丁·路德·金公开承认这债。',
+        ],
+        [
+          'Be the change; refuse to answer hate with hate; organise courage as carefully as armies organise force. On the Great Harmony road, Gandhi is proof that ancient non-harm can become modern public power — when ordinary people hold the line together.',
+          '成为你愿见的改变；拒以恨报恨；像军队组织武力一样仔细地组织勇气。在大同之路上，甘地证明：古老的不害可以成为现代的公共力量 — 当普通人一同守住那条线。',
+        ],
+        [
+          q(
+            ['Gandhi’s global legacy is tied to…', '甘地的全球遗产与……相连'],
+            [
+              ['Nonviolent struggle as public power', 'Giving up all hope', 'Secret violence only', 'Ignoring the poor'],
+              ['作为公共力量的非暴力斗争', '放弃一切希望', '仅秘密暴力', '忽视穷人'],
+            ],
+            0,
+          ),
+          q(
+            ['He is often linked with the call to…', '他常与……的号召相连'],
+            [
+              ['Be the change you wish to see', 'Fear your neighbours', 'Never organise', 'Worship empire'],
+              ['成为你愿见的改变', '惧怕邻人', '永不组织', '崇拜帝国'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
+  {
+    id: 'king',
+    name: localized('Martin Luther King Jr.', '马丁·路德·金'),
+    years: localized('1929–1968', '1929–1968年'),
+    emoji: '🔔',
+    summary: localized(
+      'A pastor who joined the ethic of love with the demand for justice — teaching that only light drives out darkness, and that the arc of the moral universe bends toward justice when people walk it.',
+      '一位牧师，把爱的伦理与对正义的要求相连 — 教导唯有光明能驱散黑暗，而道德宇宙的弧线，在人们行走时弯向正义。',
+    ),
+    badgeTitle: localized('Life of King', '金恩生平'),
+    cardId: 'card-life-king',
+    relatedTimelinePointIds: ['modern-gandhi-king'],
+    relatedTopicIds: ['compassion', 'service'],
+    chapters: [
+      chapter(
+        'king-montgomery',
+        ['Montgomery', '蒙哥马利'],
+        [
+          'Jim Crow segregation ordered American life by race. A bus boycott in Montgomery became a school of disciplined hope.',
+          '吉姆·克劳隔离按种族安排美国生活。蒙哥马利的巴士抵制，成了有纪律的希望的学校。',
+        ],
+        [
+          'Young pastor Martin Luther King Jr. helped lead the Montgomery bus boycott after Rosa Parks’s arrest. The method was clear: nonviolent resistance, dignity under insult, organisation that outlasts a single march. A local fight became a national mirror.',
+          '年轻的牧师马丁·路德·金在罗莎·帕克斯被捕后，协助领导蒙哥马利巴士抵制。方法清晰：非暴力抵抗，受辱中的尊严，比单次游行更耐久的组织。一场地方斗争成了全国的镜子。',
+        ],
+        [
+          q(
+            ['King first rose to wide notice during…', '金恩首先因……广为人知'],
+            [
+              ['The Montgomery bus boycott', 'A silent retreat only', 'A royal coronation', 'A space launch'],
+              ['蒙哥马利巴士抵制', '仅一次静修', '王室加冕', '航天发射'],
+            ],
+            0,
+          ),
+          q(
+            ['The boycott trained people in…', '抵制训练人们……'],
+            [
+              ['Disciplined nonviolent resistance', 'Random revenge', 'Giving up voting forever', 'Ignoring neighbours'],
+              ['有纪律的非暴力抵抗', '随意报复', '永远放弃投票', '忽视邻人'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'king-love',
+        ['Love and justice', '爱与正义'],
+        [
+          'Some said love was soft; some said justice was only force. King refused the split.',
+          '有人说爱软弱；有人说正义只是武力。金恩拒绝这种分裂。',
+        ],
+        [
+          'He preached that agape love could confront unjust laws without becoming hatred. “Darkness cannot drive out darkness; only light can do that.” Gandhi’s satyagraha met the Black church’s hope — and the demand that America keep its own promises.',
+          '他宣讲：圣爱可以对抗不义之法而不变成仇恨。「黑暗不能驱走黑暗；唯有光明可以。」甘地的真理之力与黑人教会的盼望相遇 — 并要求美国兑现自己的承诺。',
+        ],
+        [
+          q(
+            ['King taught that darkness is driven out by…', '金恩教导：驱走黑暗的是……'],
+            [
+              ['Light — not more darkness', 'Louder hatred', 'Silence forever', 'Gold alone'],
+              ['光明 — 而非更多黑暗', '更大的恨', '永远沉默', '仅黄金'],
+            ],
+            0,
+          ),
+          q(
+            ['He joined the ethic of love with…', '他把爱的伦理与……相连'],
+            [
+              ['The demand for justice', 'Abandoning the poor', 'Fear of voting', 'Praise of segregation'],
+              ['对正义的要求', '抛弃穷人', '惧怕投票', '赞美隔离'],
+            ],
+            0,
+          ),
+        ],
+        { relatedTimelinePointId: 'modern-gandhi-king' },
+      ),
+      chapter(
+        'king-dream',
+        ['The dream spoken', '说出的梦'],
+        [
+          'The March on Washington put a dream into the world’s ear — work unfinished, yet unmistakable.',
+          '向华盛顿进军把一个梦送进世界的耳朵 — 工作未完，却清晰可辨。',
+        ],
+        [
+          '“I have a dream” was not escape from struggle; it was a public imagination of children judged by character, not colour. King kept organising after the cameras left — for voting rights, for the poor, against the numbness that follows a single speech.',
+          '「我有一个梦」不是逃离斗争；它是对孩童以品格而非肤色被衡量的公共想象。镜头离开后，金恩仍在组织 — 为投票权，为穷人，对抗一场演讲之后的麻木。',
+        ],
+        [
+          q(
+            ['The “dream” speech imagined children judged by…', '「梦想」演讲想象孩童被……衡量'],
+            [
+              ['Character, not colour', 'Wealth only', 'Fear', 'Silence'],
+              ['品格，而非肤色', '仅财富', '恐惧', '沉默'],
+            ],
+            0,
+          ),
+          q(
+            ['After the famous speech King…', '著名演讲之后，金恩……'],
+            [
+              ['Kept organising for rights and against poverty', 'Retired from all justice work', 'Became silent forever', 'Left the country'],
+              ['继续为权利与反贫困组织', '退出一切正义工作', '永远沉默', '离开国家'],
+            ],
+            0,
+          ),
+        ],
+      ),
+      chapter(
+        'king-legacy',
+        ['The arc and the walk', '弧线与行走'],
+        [
+          'Assassination ended his years, not the work. Later movements still quote his insistence that injustice anywhere threatens justice everywhere.',
+          '暗杀结束了他的岁月，而非那工作。后来的运动仍引用他的坚持：任何地方的不公，都威胁所有地方的正义。',
+        ],
+        [
+          'He left a grammar for moral courage in public: organise, love without surrendering truth, accept that the arc bends only when hands pull. Beside Gandhi on this Age’s path, King shows Great Harmony as street-level practice — not a slogan for later.',
+          '他留下公共道德勇气的语法：组织起来，爱而不放弃真理，明白弧线唯有手去拉才会弯曲。在这个时代之路上与甘地并列，金恩显示大同是街巷中的实践 — 不是留给以后的口号。',
+        ],
+        [
+          q(
+            ['King warned that injustice anywhere…', '金恩警告：任何地方的不公……'],
+            [
+              ['Threatens justice everywhere', 'Is someone else’s problem only', 'Never matters', 'Should be ignored'],
+              ['威胁所有地方的正义', '只是别人的问题', '从不重要', '应当忽视'],
+            ],
+            0,
+          ),
+          q(
+            ['His life pairs with Gandhi’s as…', '他的一生与甘地并列，作为……'],
+            [
+              ['Modern nonviolent struggle for a shared moral world', 'A call to abandon hope', 'Proof that love is useless', 'A ban on marching'],
+              ['为共享道德世界的现代非暴力斗争', '放弃希望的号召', '证明爱无用', '禁止游行'],
+            ],
+            0,
+          ),
+        ],
+      ),
+    ],
+  },
 ];
 
 export const ALL_SAGE_CHAPTERS: SageChapter[] = SAGES.flatMap((s) => s.chapters);
@@ -609,7 +1568,12 @@ export function isSageLifeComplete(sageChapters: Record<string, true> | undefine
 }
 
 export function sageForTimelinePoint(pointId: string): Sage | undefined {
-  return SAGES.find((s) => s.relatedTimelinePointIds?.includes(pointId));
+  return sagesForTimelinePoint(pointId)[0];
+}
+
+/** All sage lives linked to an Ages timeline point (e.g. Gandhi + King). */
+export function sagesForTimelinePoint(pointId: string): Sage[] {
+  return SAGES.filter((s) => s.relatedTimelinePointIds?.includes(pointId));
 }
 
 export function sageForTopic(topicId: string): Sage | undefined {

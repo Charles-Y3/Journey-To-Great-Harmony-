@@ -726,6 +726,146 @@ export const CARDS: WisdomCard[] = [
       '我们对苏格拉底「所知」的一切，都来自学生 — 尤其是柏拉图。生平与传说，是一同抵达的。',
     ),
   },
+  {
+    id: 'card-life-ptahhotep',
+    title: localized('A Good Name', '美名'),
+    emoji: '𓂀',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'An Old Kingdom vizier who taught that listening is how truth enters a room of power.',
+      '一位古王国宰相，教导倾听是真理进入权力之室的方式。',
+    ),
+    quote: localized(
+      'A good name outlasts wealth.',
+      '美名比财富更长久。',
+    ),
+    unlockHint: localized('Complete every chapter of Ptahhotep’s life on Sage Lives.', '在圣哲生平中完成普塔霍特普的每一个篇章。'),
+    didYouKnow: localized(
+      'The Maxims of Ptahhotep are among the oldest wisdom books still readable — Ma’at as daily craft, not museum stone.',
+      '《普塔霍特普箴言》是仍可读的最古老智慧书之一 — 玛阿特是日常技艺，不是博物馆石刻。',
+    ),
+  },
+  {
+    id: 'card-life-buddha',
+    title: localized('Under the Bodhi Tree', '菩提树下'),
+    emoji: '🪷',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A prince who left the palace, awoke, and walked back toward beings with a Middle Way of compassion.',
+      '一位离开王宫的王子，觉悟后以慈悲的中道走回众生。',
+    ),
+    quote: localized(
+      'Hatred does not cease by hatred; hatred ceases by love.',
+      '仇恨不能止息仇恨，唯有慈爱才能止息仇恨。',
+    ),
+    unlockHint: localized('Complete every chapter of the Buddha’s life on Sage Lives.', '在圣哲生平中完成佛陀的每一个篇章。'),
+    didYouKnow: localized(
+      '“Buddha” is a title — the awakened one — not a family name. The path begins wherever craving is seen clearly.',
+      '「佛陀」是称号 — 觉醒者 — 不是姓氏。路从看清贪爱之处开始。',
+    ),
+  },
+  {
+    id: 'card-life-jesus',
+    title: localized('Across the Road', '路的另一边'),
+    emoji: '✝️',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A Galilean teacher who stretched “neighbour” past every boundary and blessed the peacemakers.',
+      '一位加利利的老师，把「邻舍」伸过一切界限，并祝福使人和睦的人。',
+    ),
+    quote: localized(
+      'Love your neighbour as yourself.',
+      '爱人如己。',
+    ),
+    unlockHint: localized('Complete every chapter of Jesus’s life on Sage Lives.', '在圣哲生平中完成耶稣的每一个篇章。'),
+    didYouKnow: localized(
+      'The Good Samaritan shocked first hearers because compassion came from the “wrong” side of the road — mercy proved in motion.',
+      '好撒玛利亚人曾令初闻者震惊，因慈悲来自路的「错误」一侧 — 怜悯在行动中得证。',
+    ),
+  },
+  {
+    id: 'card-life-rumi',
+    title: localized('The Field', '那片旷野'),
+    emoji: '🌙',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A Konya scholar whose friendship and grief opened into poetry of a love that meets beyond right and wrong.',
+      '一位科尼亚学者，友谊与哀伤打开成诗：在是非之外相遇的爱。',
+    ),
+    quote: localized(
+      'Out beyond ideas of wrongdoing and rightdoing, there is a field. I’ll meet you there.',
+      '在是非对错的观念之外，有一片旷野，我们在那里相遇。',
+    ),
+    unlockHint: localized('Complete every chapter of Rumi’s life on Sage Lives.', '在圣哲生平中完成鲁米的每一个篇章。'),
+    didYouKnow: localized(
+      'Shams of Tabriz is remembered less as biography detail than as the spark that turned a teacher into a singer of reunion.',
+      '大不里士的沙姆斯被记起，与其说是传记细节，不如说是把教师变为重逢之歌者的火花。',
+    ),
+  },
+  {
+    id: 'card-life-kant',
+    title: localized('Dare to Know', '敢于求知'),
+    emoji: '💡',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A Königsberg walker who rarely left town — and still taught the world to treat persons as ends.',
+      '一位极少离城的柯尼斯堡散步者 — 仍教会世界把人当作目的本身。',
+    ),
+    quote: localized(
+      'Sapere aude — dare to know.',
+      'Sapere aude — 敢于求知。',
+    ),
+    unlockHint: localized('Complete every chapter of Kant’s life on Sage Lives.', '在圣哲生平中完成康德的每一个篇章。'),
+    didYouKnow: localized(
+      'Neighbours joked they could set clocks by his walk. The outer rhythm held an inner revolution about freedom and duty.',
+      '邻人开玩笑说可以按他的散步对时。外在的节奏里，藏着关于自由与义务的内在革命。',
+    ),
+  },
+  {
+    id: 'card-life-gandhi',
+    title: localized('Truth-Force', '真理的力量'),
+    emoji: '🕊️',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A life that made ahimsa public power — freedom sought without becoming the cruelty it opposed.',
+      '一生使不害成为公共力量 — 寻求自由，却不变成它所反对的残忍。',
+    ),
+    quote: localized(
+      'Be the change you wish to see in the world.',
+      '想要世界如何改变，自己先成为那样的改变。',
+    ),
+    unlockHint: localized('Complete every chapter of Gandhi’s life on Sage Lives.', '在圣哲生平中完成甘地的每一个篇章。'),
+    didYouKnow: localized(
+      'Satyagraha is often translated “truth-force”: courage that refuses both passivity and hatred.',
+      'Satyagraha 常译为「真理的力量」：既拒绝消极、也拒绝仇恨的勇气。',
+    ),
+  },
+  {
+    id: 'card-life-king',
+    title: localized('Only Light', '唯有光明'),
+    emoji: '🔔',
+    rarity: 'rare',
+    category: 'story',
+    summary: localized(
+      'A pastor who joined love to justice — and kept organising after the cameras left the dream speech.',
+      '一位把爱连于正义的牧师 — 在镜头离开梦想演讲之后，仍继续组织。',
+    ),
+    quote: localized(
+      'Darkness cannot drive out darkness; only light can do that.',
+      '黑暗不能驱逐黑暗，唯有光明可以。',
+    ),
+    unlockHint: localized('Complete every chapter of King’s life on Sage Lives.', '在圣哲生平中完成金恩的每一个篇章。'),
+    didYouKnow: localized(
+      'King openly credited Gandhi’s method — satyagraha crossing an ocean into the American struggle.',
+      '金恩公开归功于甘地的方法 — 真理之力跨海进入美国的斗争。',
+    ),
+  },
 ];
 
 // Timeline-linked wisdom cards (see TimelinePoint.cardId) get harder to

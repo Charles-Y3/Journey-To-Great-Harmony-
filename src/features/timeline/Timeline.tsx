@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { TIMELINE, ALL_POINTS } from '../../data/timeline';
 import type { TimelinePoint, TimelineEra, TimelineLevel } from '../../data/types';
-import { sageForTimelinePoint } from '../../data/sages';
+import { sagesForTimelinePoint } from '../../data/sages';
 import { useJourney } from '../../state/store';
 import {
   fullyMasteredEraIds,
@@ -187,7 +187,7 @@ function PointModal({
   const capReached = timelineStudiesToday(data, today) >= DAILY_TIMELINE_CAP;
   const [openLevel, setOpenLevel] = useState<number | null>(levelsDone < 3 ? levelsDone : null);
   const { t, L, locale } = useT();
-  const relatedSage = sageForTimelinePoint(point.id);
+  const relatedSages = sagesForTimelinePoint(point.id);
 
   return (
     <Modal onClose={onClose} wide>
@@ -196,10 +196,14 @@ function PointModal({
       </h2>
       <p className="small muted">{L(point.years)}</p>
 
-      {relatedSage && onOpenLife && (
-        <button type="button" className="btn" style={{ marginBottom: 10 }} onClick={() => onOpenLife(relatedSage.id)}>
-          {relatedSage.emoji} {t('livesOpenLife')}
-        </button>
+      {relatedSages.length > 0 && onOpenLife && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 10 }}>
+          {relatedSages.map((sage) => (
+            <button key={sage.id} type="button" className="btn" onClick={() => onOpenLife(sage.id)}>
+              {sage.emoji} {t('livesOpenLife')} · {L(sage.name)}
+            </button>
+          ))}
+        </div>
       )}
 
       {point.levels.map((lvl, i) => {
