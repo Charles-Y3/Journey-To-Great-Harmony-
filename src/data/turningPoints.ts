@@ -1,5 +1,5 @@
 import { localized, type Localized } from '../i18n/types';
-import { seededRandom } from '../engine/progression';
+import { EXTRA_TURNING_POINTS } from './turningPointsExtra';
 
 /**
  * A real, well-documented traditional story — a koan, parable, or
@@ -17,7 +17,7 @@ export interface TurningPoint {
   reflectionQuestion: Localized<string>;
 }
 
-export const TURNING_POINTS: TurningPoint[] = [
+const FOUNDATION_TURNING_POINTS: TurningPoint[] = [
   {
     id: 'zhaozhou-dog',
     emoji: '🐕',
@@ -27,7 +27,6 @@ export const TURNING_POINTS: TurningPoint[] = [
       '一位僧人问禅师赵州：「狗子还有佛性也无？」',
     ),
     resolution: localized("Zhaozhou said: 'Wú' — 'No.'", '赵州说：「无。」'),
-    // Not "why won't he explain" — he did answer; Mu is the whole point of sitting.
     reflectionQuestion: localized(
       'If every being has Buddha-nature, why might a master answer a dog with no?',
       '若一切众生皆有佛性，一位禅师为何会对「狗」答「无」？',
@@ -113,7 +112,6 @@ export const TURNING_POINTS: TurningPoint[] = [
       "Diogenes, sitting where he was, replied: 'Stand a little out of my sunlight.'",
       '第欧根尼坐在原地，只说：「请你别挡住我的阳光。」',
     ),
-    // Not "what would you ask for" — that restarts Alexander's offer; Diogenes asked only that power get out of the way of what he already had.
     reflectionQuestion: localized(
       'What do you already have that no ruler could grant you — only stop blocking?',
       '你已拥有什么，是再大的权势也无法赐予、只能停止遮挡的？',
@@ -148,7 +146,6 @@ export const TURNING_POINTS: TurningPoint[] = [
       "Confucius replied: 'The upright in my land are different from this — a father conceals for his son, and a son conceals for his father. Uprightness lies therein.'",
       '孔子说：「吾党之直者异于是：父为子隐，子为父隐 — 直在其中矣。」',
     ),
-    // Not a generic "loyalty vs rules" — Confucius is redefining 直 (uprightness) itself.
     reflectionQuestion: localized(
       "Where might 'telling the truth' and 'being upright' pull in different directions?",
       '在哪些事上，「说实话」与「正直」可能指向不同的方向？',
@@ -166,7 +163,6 @@ export const TURNING_POINTS: TurningPoint[] = [
       "Hours later, the younger monk finally burst out: 'How could you touch that woman, carry her, against our rules?' The elder replied: 'I set her down at the river. Are you still carrying her?'",
       '数小时后，年轻僧人终于忍不住责问：「你怎能违背戒律，触碰并背负那妇人？」年长者答道：「我早已在河边把她放下了。你怎么还背着她？」',
     ),
-    // The younger monk never set her down — he is still carrying judgment after the need has passed.
     reflectionQuestion: localized(
       'What are you still carrying long after the moment that needed it has passed?',
       '有什么事，需要它的时刻早已过去，你却还一直背着？',
@@ -191,8 +187,28 @@ export const TURNING_POINTS: TurningPoint[] = [
   },
 ];
 
-/** Deterministic per-day pick — same entry for everyone on a given day, cycling through the pool. */
-export function dailyTurningPoint(today: string): TurningPoint {
-  const idx = Math.floor(seededRandom(`turning-point:${today}`) * TURNING_POINTS.length);
-  return TURNING_POINTS[idx];
+export const TURNING_POINTS: TurningPoint[] = [...FOUNDATION_TURNING_POINTS, ...EXTRA_TURNING_POINTS];
+
+const BY_ID = new Map(TURNING_POINTS.map((p) => [p.id, p]));
+
+export function turningPointById(id: string): TurningPoint | undefined {
+  return BY_ID.get(id);
+}
+
+/**
+ * Pick the next card from a no-repeat cycle.
+ * When every id in `cycleSeen` has been drawn, the cycle resets and reshuffles.
+ */
+export function pickNextTurningPointId(cycleSeen: string[]): { id: string; nextCycleSeen: string[] } {
+  const seen = new Set(cycleSeen.filter((id) => BY_ID.has(id)));
+  let pool = TURNING_POINTS.filter((p) => !seen.has(p.id));
+  let nextSeen = [...seen];
+  if (pool.length === 0) {
+    pool = [...TURNING_POINTS];
+    nextSeen = [];
+  }
+  const idx = Math.floor(Math.random() * pool.length);
+  const id = pool[idx]!.id;
+  nextSeen.push(id);
+  return { id, nextCycleSeen: nextSeen };
 }

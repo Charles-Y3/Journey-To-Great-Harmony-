@@ -99,9 +99,7 @@ export const UI = {
   turningPointsFlipBtn: localized('Turn the card', '翻开卡牌'),
   turningPointsResolutionLabel: localized('What happened', '后来发生的事'),
   turningPointsQuestionLabel: localized('To sit with', '留待细想'),
-  turningPointsArchiveTitle: localized('Past Reflections', '过往的沉思'),
-  turningPointsArchiveBrowse: localized('Browse', '浏览'),
-  turningPointsArchiveClose: localized('Close', '关闭'),
+  turningPointsYesterdayTitle: localized('Yesterday’s card', '昨日的卡牌'),
 
   // ── Settings modal ────────────────────────────────────────────────
   settingsTitle: localized('⚙️ Settings', '⚙️ 设置'),

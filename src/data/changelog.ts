@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 9,
+    date: '2026-07-27',
+    highlights: [
+      localized(
+        '💧 Still Waters grew to ~50 stories with a personal no-repeat shuffle — you only revisit a card after the whole deck has turned. Looking back shows yesterday’s card only.',
+        '💧「静水」扩充至约 50 则故事，并采用个人不重复洗牌 — 整副牌走完前不会重遇同一则。回看只保留昨日卡牌。',
+      ),
+    ],
+  },
+  {
     version: 8,
     date: '2026-07-27',
     highlights: [
