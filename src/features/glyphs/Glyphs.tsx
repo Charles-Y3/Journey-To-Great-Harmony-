@@ -24,7 +24,6 @@ import {
   type KlotskiState,
 } from '../../engine/glyphKlotski';
 import { SealGlyphSvg } from '../../assets/glyphs/seal/SealGlyphSvgs';
-import { OracleGlyphSvg } from '../../assets/glyphs/oracle/OracleGlyphSvgs';
 import { useJourney } from '../../state/store';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -390,13 +389,7 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
 
   return (
     <Modal onClose={onClose}>
-      <h2 className="glyph-modal-title">
-        <span className="glyph-modal-oracle" aria-hidden="true">
-          <OracleGlyphSvg character={glyph.character} />
-        </span>
-        <span>{L(glyph.title)}</span>
-        <span className="sr-only">{glyph.character}</span>
-      </h2>
+      <h2>{L(glyph.title)}</h2>
       {!started ? (
         <>
           <p className="small muted">{t('glyphsPreviewHint')}</p>
@@ -416,10 +409,11 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
           <p className="small muted">
             {selectedPieceId ? t('glyphsKlotskiChooseHint') : t('glyphsKlotskiHint')}
           </p>
-          <div className="glyph-play-stack">
-            <div className="glyph-oracle-ref" title={t('glyphsOracleRefLabel')} aria-label={t('glyphsOracleRefLabel')}>
-              <span className="glyph-oracle-ref-label">{t('glyphsOracleRefLabel')}</span>
-              <OracleGlyphSvg character={glyph.character} />
+          {/* Same SealGlyphSvg asset as puzzle tiles — sits top-left above the board, never over pieces. */}
+          <div className="glyph-play-with-ref">
+            <div className="glyph-seal-ref" title={t('glyphsOracleRefLabel')} aria-label={t('glyphsOracleRefLabel')}>
+              <span className="glyph-seal-ref-label">{t('glyphsOracleRefLabel')}</span>
+              <SealGlyphSvg character={glyph.character} />
             </div>
             <KlotskiBoard
               glyph={glyph}
