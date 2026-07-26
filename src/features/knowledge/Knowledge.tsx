@@ -11,17 +11,20 @@ import {
   branchCapstoneKey,
   lessonsCompletedToday,
   topicDepth,
+  activeKnowledgeDepth,
+  knowledgeLessonsAtDepth,
   DAILY_LESSON_CAP,
   type JourneyData,
 } from '../../state/selectors';
 import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import {
-  knowledgeProgressLabel,
+  knowledgeDepthProgressLabel,
   topicLessonCount,
   backToTopic,
   capstoneBranchPrompt,
   capstoneEntryBtn,
+  type UiKey,
 } from '../../i18n/strings';
 import { shuffledIndices } from '../../engine/quiz';
 
@@ -206,13 +209,25 @@ export default function Knowledge() {
   const root = TOPICS.find((t) => t.id === 'wisdom')!;
   const branches: { id: Topic['branch'] }[] = [{ id: 'compassion' }, { id: 'character' }, { id: 'understanding' }];
 
-  const totalLessons = TOPICS.reduce((n, tp) => n + tp.lessons.length, 0);
+  const DEPTH_LABEL: Record<1 | 2 | 3, UiKey> = {
+    1: 'knowledgeDepth1',
+    2: 'knowledgeDepth2',
+    3: 'knowledgeDepth3',
+  };
+  const activeDepth = activeKnowledgeDepth(completedLessons);
+  const depthLessonIds = knowledgeLessonsAtDepth(activeDepth).map((l) => l.id);
+  const depthDone = depthLessonIds.filter((id) => completedLessons.includes(id)).length;
+  const depthTotal = depthLessonIds.length;
 
   return (
     <div>
       <PageHeader emoji="🌳" title={t('knowledgeTitle')} subtitle={t('knowledgeSubtitle')} />
       <div className="card">
-        <ProgressBar value={completedLessons.length} max={totalLessons} label={knowledgeProgressLabel(locale, completedLessons.length, totalLessons)} />
+        <ProgressBar
+          value={depthDone}
+          max={Math.max(1, depthTotal)}
+          label={knowledgeDepthProgressLabel(locale, t(DEPTH_LABEL[activeDepth]), depthDone, depthTotal)}
+        />
         {capReached && <p className="small muted" style={{ marginTop: 8 }}>{t('knowledgeDailyCapNote')}</p>}
       </div>
 

@@ -82,6 +82,19 @@ export function topicDepth(topic: Topic): 1 | 2 | 3 {
   return topic.depth ?? 1;
 }
 
+/** Lowest unfinished Knowledge Path depth (1–3). Used for the per-depth progress bar. */
+export function activeKnowledgeDepth(completedLessons: string[]): 1 | 2 | 3 {
+  for (const d of [1, 2] as const) {
+    const topics = TOPICS.filter((t) => topicDepth(t) === d);
+    if (topics.length === 0 || !topics.every((t) => isTopicCompleted(completedLessons, t))) return d;
+  }
+  return 3;
+}
+
+export function knowledgeLessonsAtDepth(depth: 1 | 2 | 3): { id: string }[] {
+  return TOPICS.filter((t) => topicDepth(t) === depth).flatMap((t) => t.lessons);
+}
+
 export function isTopicUnlocked(completedLessons: string[], topic: Topic): boolean {
   if (!topic.parentId) return true;
   const parent = TOPICS.find((t) => t.id === topic.parentId);
@@ -138,7 +151,7 @@ export function sageCapstoneKey(sageId: string): string {
 // without it, the whole Knowledge Path or Wisdom Timeline could be
 // finished in one sitting. Reaching the cap doesn't lock the reading —
 // only the XP-granting "complete" action — so learning stays accessible.
-export const DAILY_LESSON_CAP = 10;
+export const DAILY_LESSON_CAP = 8;
 /** Raised in v1.1 so midday study is not exhausted after two Timeline hits. */
 export const DAILY_TIMELINE_CAP = 4;
 

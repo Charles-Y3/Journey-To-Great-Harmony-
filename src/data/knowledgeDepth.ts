@@ -1,13 +1,15 @@
 import type { Topic } from './types';
 import { localized } from '../i18n/types';
+import { MASTERY_INTRO_OVERRIDES, mergeDepthExtras } from './knowledgeDepthExtra';
 
 /**
  * Knowledge Path depths 2–3: a second walk of different virtues, then a
  * synthesis (mastery) topic per branch. Foundation topics stay in
  * knowledgeTree.ts; these append after them. Unlocking is gated by
  * `Topic.depth` in selectors.isTopicUnlocked — L1 progress is never wiped.
+ * Extra lessons/topics (v1.2) merge via knowledgeDepthExtra.ts.
  */
-export const DEPTH_TOPICS: Topic[] = [
+const BASE_DEPTH_TOPICS: Topic[] = [
   // ── Compassion · Depth 2 ───────────────────────────────────────────
   {
     id: 'generosity',
@@ -531,8 +533,8 @@ export const DEPTH_TOPICS: Topic[] = [
         id: 'compassion-mastery-1',
         title: localized('One Heart, Many Acts', '一心，万行'),
         reading: localized(
-          'Ren 仁 is not a single mood; it is a family of acts that grow from seeing others as kin. Kindness is the daily tone; forgiveness repairs rupture; service carries weight; generosity loosens the hand; gentleness protects dignity; hospitality widens the circle. Mastery is not collecting virtues like badges — it is noticing which face of ren a moment needs, and offering that without forcing the others.',
-          '仁不是单一情绪；它是从视人为亲人而生的一簇行动。仁慈是日常语气；宽恕修补破裂；服务承担重量；慷慨松开手；温柔护住尊严；好客扩大圈子。圆满不是像徽章一样收集德行 — 而是察觉这一刻需要仁的哪一面，并给予那一面，而不强行塞入其他。',
+          'Ren 仁 is not a single mood; it is a family of acts that grow from seeing others as kin. Kindness is the daily tone; forgiveness repairs rupture; service carries weight; generosity loosens the hand; gentleness protects dignity; hospitality widens the circle; solidarity stands beside struggle. Mastery is not collecting virtues like badges — it is noticing which face of ren a moment needs, and offering that without forcing the others.',
+          '仁不是单一情绪；它是从视人为亲人而生的一簇行动。仁慈是日常语气；宽恕修补破裂；服务承担重量；慷慨松开手；温柔护住尊严；好客扩大圈子；休戚与共站在挣扎身旁。圆满不是像徽章一样收集德行 — 而是察觉这一刻需要仁的哪一面，并给予那一面，而不强行塞入其他。',
         ),
         question: {
           q: localized('What is mastery of ren in this lesson?', '在本课中，仁的圆满是什么？'),
@@ -551,8 +553,8 @@ export const DEPTH_TOPICS: Topic[] = [
         id: 'compassion-mastery-2',
         title: localized('Compassion at Scale', '扩大的慈悲'),
         reading: localized(
-          'Personal compassion becomes Great Harmony when it shapes how we build tables, rules, and neighbourhoods — not only how we feel in private. The Liyun vision of datong begins in hearts that refuse to treat strangers as disposable. Your second walk ends not with a certificate, but with a question you will keep answering: whom have I made more at home in the world?',
-          '个人的慈悲成为大同，是当它塑造我们如何建餐桌、规则与邻里 — 而不只是私下的感觉。《礼运》的大同，始于拒绝把陌生人当作可弃之物的心。你的第二程不以证书结束，而以一个你会持续回答的问题结束：我使谁在世界上更有家的感觉？',
+          'Personal compassion becomes Great Harmony when it shapes how we build tables, rules, and neighbourhoods — not only how we feel in private. The Liyun vision of datong begins in hearts that refuse to treat strangers as disposable. Your deeper walk ends not with a certificate, but with a question you will keep answering: whom have I made more at home in the world?',
+          '个人的慈悲成为大同，是当它塑造我们如何建餐桌、规则与邻里 — 而不只是私下的感觉。《礼运》的大同，始于拒绝把陌生人当作可弃之物的心。你更深的路程不以证书结束，而以一个你会持续回答的问题结束：我使谁在世界上更有家的感觉？',
         ),
         question: {
           q: localized('How does personal compassion become Great Harmony here?', '在这里，个人慈悲如何成为大同？'),
@@ -587,8 +589,8 @@ export const DEPTH_TOPICS: Topic[] = [
         id: 'character-mastery-1',
         title: localized('Character Under Pressure', '压力下的品格'),
         reading: localized(
-          'The junzi 君子 is not a perfect person; it is a direction — the self that holds under pressure. Humility keeps learning open; patience outlasts friction; integrity aligns word and act; courage does the hard right; temperance frees you from appetite’s tyranny; gratitude keeps entitlement from rotting the heart. Under stress, one of these will be tested first. Knowing your weakest link is already half the training.',
-          '君子不是完美之人；它是一个方向 — 在压力下仍站得住的自我。谦逊保持可学；耐心熬过摩擦；正直对齐言与行；勇敢做艰难的正确；节制使你免于欲望暴政；感恩使「理所当然」不腐蚀心。压力之下，其中一环会先被考验。知道自己最弱的一环，已是训练的一半。',
+          'The junzi 君子 is not a perfect person; it is a direction — the self that holds under pressure. Humility keeps learning open; patience outlasts friction; integrity aligns word and act; courage does the hard right; temperance frees you from appetite’s tyranny; gratitude keeps entitlement from rotting the heart; perseverance returns after delay. Under stress, one of these will be tested first. Knowing your weakest link is already half the training.',
+          '君子不是完美之人；它是一个方向 — 在压力下仍站得住的自我。谦逊保持可学；耐心熬过摩擦；正直对齐言与行；勇敢做艰难的正确；节制使你免于欲望暴政；感恩使「理所当然」不腐蚀心；恒心在拖延之后归回。压力之下，其中一环会先被考验。知道自己最弱的一环，已是训练的一半。',
         ),
         question: {
           q: localized('What is the junzi in this lesson?', '在本课中，君子是什么？'),
@@ -643,8 +645,8 @@ export const DEPTH_TOPICS: Topic[] = [
         id: 'understanding-mastery-1',
         title: localized('The Unified Practice', '统一的练习'),
         reading: localized(
-          'Understanding’s virtues are one practice with different gates. Reflection reviews the day; discernment chooses among options; awareness returns to now; listening receives the other; wonder keeps you teachable; stillness makes room for all of them. When they fragment, you get cleverness without wisdom. When they unite, you see what is present — including your own bias — and act with fewer illusions.',
-          '理解的诸德，是一门练习的不同门户。反思回顾一日；明辨在选项中选择；觉察回到当下；倾听接收对方；惊奇使你可教；静定给这一切腾出空间。当它们分裂，你得到没有智慧的聪明。当它们合一，你看见所在 — 包括自己的偏见 — 并以更少幻觉行动。',
+          'Understanding’s virtues are one practice with different gates. Reflection reviews the day; discernment chooses among options; awareness returns to now; listening receives the other; wonder keeps you teachable; stillness makes room for all of them; perspective holds more than one angle. When they fragment, you get cleverness without wisdom. When they unite, you see what is present — including your own bias — and act with fewer illusions.',
+          '理解的诸德，是一门练习的不同门户。反思回顾一日；明辨在选项中选择；觉察回到当下；倾听接收对方；惊奇使你可教；静定给这一切腾出空间；视角持守不止一个角度。当它们分裂，你得到没有智慧的聪明。当它们合一，你看见所在 — 包括自己的偏见 — 并以更少幻觉行动。',
         ),
         question: {
           q: localized('What happens when understanding’s virtues unite?', '当理解的诸德合一，会发生什么？'),
@@ -682,3 +684,8 @@ export const DEPTH_TOPICS: Topic[] = [
     ],
   },
 ];
+
+export const DEPTH_TOPICS: Topic[] = mergeDepthExtras(BASE_DEPTH_TOPICS).map((t) => {
+  const intro = MASTERY_INTRO_OVERRIDES[t.id];
+  return intro ? { ...t, intro } : t;
+});

@@ -7,11 +7,14 @@ import { fetchLeaderboard, type LeaderboardCategory, type LeaderboardRow } from 
 import { statsFromData, forestInfo, type JourneyData } from '../../state/selectors';
 import type { Peer } from '../../data/types';
 import { DEFAULT_AVATAR, isAllowedAvatar } from '../../data/avatars';
-import { rankForXp } from '../../engine/progression';
+import { rankForXp, rankIndexForXp } from '../../engine/progression';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { encouragementBanner, type UiKey } from '../../i18n/strings';
 import { agedPeerEmoji, companionAgeYears } from '../../engine/companions';
+
+/** Show companions within ±1 journey rank of the user (all four boards). */
+const NEARBY_RANK_BAND = 1;
 
 const TIER_KEY: Record<Peer['tier'], UiKey> = {
   active: 'peerTierActive',
@@ -35,6 +38,8 @@ interface BoardRow {
   me: boolean;
   score: number;
   rankLabel: string;
+  /** Journey XP — used only for the nearby rank band, not the board score. */
+  journeyXp: number;
 }
 
 export default function Community() {
@@ -86,6 +91,7 @@ export default function Community() {
 
   const avatar = isAllowedAvatar(myAvatar) ? myAvatar : DEFAULT_AVATAR;
   const myRank = rankForXp(stats.xp);
+  const myRankIdx = rankIndexForXp(stats.xp);
   const meRow: BoardRow = {
     id: 'me',
     name: myName ?? t('leaderboardYou'),
@@ -93,6 +99,7 @@ export default function Community() {
     me: true,
     score: scoreFor(category, true),
     rankLabel: `${myRank.emoji} ${L(myRank.name)}`,
+    journeyXp: stats.xp,
   };
 
   const npcRows: BoardRow[] = peers.map((p, i) => {
@@ -104,13 +111,15 @@ export default function Community() {
       me: false,
       score: scoreFor(category, false, i),
       rankLabel: `${rank.emoji} ${L(rank.name)}`,
+      journeyXp: p.xp,
     };
   });
 
   const realRows: BoardRow[] = (remoteRows ?? [])
     .filter((r) => r.id !== myTravellerId)
     .map((r) => {
-      const rank = rankForXp(typeof r.xp === 'number' ? r.xp : 0);
+      const xp = typeof r.xp === 'number' ? r.xp : 0;
+      const rank = rankForXp(xp);
       return {
         id: `real-${r.id}`,
         name: r.name,
@@ -118,12 +127,13 @@ export default function Community() {
         me: false,
         score: r.score,
         rankLabel: `${rank.emoji} ${L(rank.name)}`,
+        journeyXp: xp,
       };
     });
 
-  const rows = [...(optedIn ? [meRow, ...realRows, ...npcRows] : [meRow, ...npcRows])].sort(
-    (a, b) => b.score - a.score,
-  );
+  const rows = [...(optedIn ? [meRow, ...realRows, ...npcRows] : [meRow, ...npcRows])]
+    .filter((r) => r.me || Math.abs(rankIndexForXp(r.journeyXp) - myRankIdx) <= NEARBY_RANK_BAND)
+    .sort((a, b) => b.score - a.score);
 
   const encouragersToday = visiblePeers(state.startDay, today).filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
   const activeCategory = CATEGORIES.find((c) => c.id === category)!;
@@ -152,6 +162,7 @@ export default function Community() {
           ))}
         </div>
         <p className="small muted">{t(activeCategory.descKey)}</p>
+        <p className="small muted">{t('leaderboardsNearbyNote')}</p>
         {rows.map((row, i) => (
           <div key={row.id} className={row.me ? 'leader-row me' : 'leader-row'}>
             <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>

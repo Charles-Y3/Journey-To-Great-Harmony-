@@ -1,5 +1,8 @@
 import type { Stats } from '../data/types';
 import { localized, type Localized } from '../i18n/types';
+import { PACING_FOREST_THRESHOLDS, PACING_RANK_MIN_XP } from './pacingBudget';
+
+export { XP_FOR, HARMONY_FOR } from './rewards';
 
 // ── Ranks ──────────────────────────────────────────────────────────────
 export interface Rank {
@@ -11,18 +14,14 @@ export interface Rank {
   blurb: Localized<string>;
 }
 
-// Thresholds climb more steeply from Cultivator onward — the top ranks are
-// meant to be a long-term aspiration (weeks to months of real daily
-// practice), not something a single binge session can reach.
-// XP thresholds span the expanded Knowledge Path (50 lessons), Timeline
-// mastery, map regions, and months of daily practice — top ranks are not
-// reachable from study alone.
+// minXp comes from pacingBudget.ts — run `npm run check:pacing` after content changes.
+// Top ranks require months of practice beyond finishing all finite study content.
 export const RANKS: Rank[] = [
   {
     id: 'seeker',
     name: localized('Seeker', '求道者'),
     emoji: '🔦',
-    minXp: 0,
+    minXp: PACING_RANK_MIN_XP.seeker,
     blurb: localized(
       'You have lit the lamp. The path is still mostly questions — and that is exactly where wisdom begins.',
       '你已点燃灯火。路上多为疑问 — 而这正是智慧开始的地方。',
@@ -32,7 +31,7 @@ export const RANKS: Rank[] = [
     id: 'explorer',
     name: localized('Explorer', '探索者'),
     emoji: '🧭',
-    minXp: 120,
+    minXp: PACING_RANK_MIN_XP.explorer,
     blurb: localized(
       'Curiosity has become a habit. You are mapping the first landmarks of compassion, character, and understanding.',
       '好奇已成为习惯。你正在标出慈悲、品格与理解的第一批地标。',
@@ -42,7 +41,7 @@ export const RANKS: Rank[] = [
     id: 'learner',
     name: localized('Learner', '学者'),
     emoji: '📖',
-    minXp: 350,
+    minXp: PACING_RANK_MIN_XP.learner,
     blurb: localized(
       'Study is taking root. You return to teachings not only to know them, but to let them change how you live.',
       '学问正在生根。你重读教导，不只为知晓，更为让它们改变你如何生活。',
@@ -52,7 +51,7 @@ export const RANKS: Rank[] = [
     id: 'practitioner',
     name: localized('Practitioner', '实行者'),
     emoji: '🥋',
-    minXp: 750,
+    minXp: PACING_RANK_MIN_XP.practitioner,
     blurb: localized(
       'Knowing and doing begin to meet. Daily practice — intention, challenge, reflection — is becoming your shape.',
       '知与行开始相遇。每日的践行 — 立愿、挑战、反思 — 正在成为你的形状。',
@@ -62,7 +61,7 @@ export const RANKS: Rank[] = [
     id: 'cultivator',
     name: localized('Cultivator', '修行者'),
     emoji: '🌱',
-    minXp: 1400,
+    minXp: PACING_RANK_MIN_XP.cultivator,
     blurb: localized(
       'You tend the inner field with patience. Growth is slower, deeper — measured in seasons of effort, not bursts.',
       '你以耐心照料内心的田地。成长更慢、更深 — 以努力的季节衡量，而非爆发。',
@@ -72,7 +71,7 @@ export const RANKS: Rank[] = [
     id: 'contributor',
     name: localized('Contributor', '贡献者'),
     emoji: '🤝',
-    minXp: 2300,
+    minXp: PACING_RANK_MIN_XP.contributor,
     blurb: localized(
       'Your practice overflows toward others. Encouragement, service, and shared harmony become part of the path.',
       '你的修习向他人溢出。鼓励、服务与共享的和谐，成为道路的一部分。',
@@ -82,7 +81,7 @@ export const RANKS: Rank[] = [
     id: 'harmony-builder',
     name: localized('Harmony Builder', '大同建设者'),
     emoji: '🌉',
-    minXp: 3600,
+    minXp: PACING_RANK_MIN_XP.harmonyBuilder,
     blurb: localized(
       'You help lay planks others will cross. Great Harmony is no longer only a vision — it is work you take part in.',
       '你帮助铺设他人将跨越的木板。大同不再只是愿景 — 它是你参与其中的工作。',
@@ -92,7 +91,7 @@ export const RANKS: Rank[] = [
     id: 'wisdom-keeper',
     name: localized('Wisdom Keeper', '守智者'),
     emoji: '🏮',
-    minXp: 5200,
+    minXp: PACING_RANK_MIN_XP.wisdomKeeper,
     blurb: localized(
       'You hold the lantern steady for those still climbing. Mastery here means guarding what you have learned by living it.',
       '你为仍在攀登的人稳稳举起灯笼。此处的圆满，意味着以活出来的方式守护所学。',
@@ -129,39 +128,7 @@ export function maxChallengeTierForRankIndex(rankIndex: number): 1 | 2 | 3 {
   return 1;
 }
 
-// ── Reward values ──────────────────────────────────────────────────────
-export const XP_FOR = {
-  lesson: 20,
-  quizCorrect: 5,
-  timelinePoint: 15,
-  challenge: 15,
-  intention: 5,
-  reflection: 10,
-  encouragement: 2,
-  capstone: 40,
-  /** First clear of a Virtue Glyph sliding puzzle (bonus side activity). */
-  glyph: 8,
-  /** First Heart check (mood) of the day. */
-  moodCheck: 4,
-  /** First clear of a Sage Lives chapter (slightly below timeline foundation). */
-  sageChapter: 12,
-} as const;
-
-// Harmony points: the user's contribution to the shared Great Harmony World.
-export const HARMONY_FOR = {
-  lesson: 10,
-  quizCorrect: 2,
-  timelinePoint: 8,
-  challenge: 12,
-  intention: 3,
-  reflection: 8,
-  encouragement: 5,
-  region: 20,
-  capstone: 25,
-  glyph: 4,
-  moodCheck: 2,
-  sageChapter: 6,
-} as const;
+// Reward values: XP_FOR / HARMONY_FOR re-exported from ./rewards above.
 
 // ── Virtue Forest ──────────────────────────────────────────────────────
 export interface ForestStage {
@@ -174,12 +141,12 @@ export interface ForestStage {
 // Growth score spans Knowledge Depth I–III, Timeline, map, and daily
 // practice — Sanctuary should feel like a late-journey place.
 export const FOREST_STAGES: ForestStage[] = [
-  { id: 'seed', name: localized('Seed', '种子'), emoji: '🌰', threshold: 0 },
-  { id: 'sprout', name: localized('Sprout', '幼苗'), emoji: '🌱', threshold: 35 },
-  { id: 'tree', name: localized('Tree', '树木'), emoji: '🌳', threshold: 90 },
-  { id: 'forest', name: localized('Forest', '树林'), emoji: '🌲', threshold: 180 },
-  { id: 'oasis', name: localized('Oasis', '绿洲'), emoji: '🌴', threshold: 320 },
-  { id: 'sanctuary', name: localized('Sanctuary', '圣境'), emoji: '⛩️', threshold: 520 },
+  { id: 'seed', name: localized('Seed', '种子'), emoji: '🌰', threshold: PACING_FOREST_THRESHOLDS.seed },
+  { id: 'sprout', name: localized('Sprout', '幼苗'), emoji: '🌱', threshold: PACING_FOREST_THRESHOLDS.sprout },
+  { id: 'tree', name: localized('Tree', '树木'), emoji: '🌳', threshold: PACING_FOREST_THRESHOLDS.tree },
+  { id: 'forest', name: localized('Forest', '树林'), emoji: '🌲', threshold: PACING_FOREST_THRESHOLDS.forest },
+  { id: 'oasis', name: localized('Oasis', '绿洲'), emoji: '🌴', threshold: PACING_FOREST_THRESHOLDS.oasis },
+  { id: 'sanctuary', name: localized('Sanctuary', '圣境'), emoji: '⛩️', threshold: PACING_FOREST_THRESHOLDS.sanctuary },
 ];
 
 export function growthScore(s: Stats): number {

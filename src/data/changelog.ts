@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 8,
+    date: '2026-07-27',
+    highlights: [
+      localized(
+        '👥 Companions boards show a nearby band — travellers within one journey rank of you — on all four dedication boards.',
+        '👥「同修」四个坚持榜单改为邻近区间 — 只显示与你相差不超过一个旅程等级的旅人。',
+      ),
+      localized(
+        '🌳 Knowledge Path progress tracks your current depth only; daily lesson cap is 8. Depth II–III gained new virtues and lessons.',
+        '🌳「知识之路」进度只显示当前层级；每日课程额度改为 8。第二、三层新增德行与课文。',
+      ),
+    ],
+  },
+  {
     version: 7,
     date: '2026-07-27',
     highlights: [

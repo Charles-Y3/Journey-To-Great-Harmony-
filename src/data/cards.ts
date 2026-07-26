@@ -469,6 +469,69 @@ export const CARDS: WisdomCard[] = [
     ),
   },
   {
+    id: 'card-solidarity',
+    title: localized('Solidarity', '休戚与共'),
+    accent: '共',
+    emoji: '🤝',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Standing beside another’s struggle — sharing risk, time, or voice.',
+      '站在他人挣扎的身旁 — 分担风险、时间或声音。',
+    ),
+    quote: localized(
+      'When we see others as ourselves, help ceases to be charity and becomes kinship.',
+      '视人如己时，帮助不再是施舍，而成了亲缘。',
+    ),
+    unlockHint: localized('Complete the Solidarity topic on the Knowledge Path.', '在知识之路上完成「休戚与共」主题。'),
+    didYouKnow: localized(
+      'Mutual aid networks — from traditional village harvest help to modern community fridges — practise solidarity as structure, not only as feeling.',
+      '互助网络 — 从传统村落的收割相助到现代社区冰箱 — 把休戚与共练成结构，而不只是感觉。',
+    ),
+  },
+  {
+    id: 'card-perseverance',
+    title: localized('Perseverance', '恒心'),
+    accent: '恒',
+    emoji: '🏔️',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Returning after delay — keeping the aim while adapting the means.',
+      '拖延之后仍归回 — 保持目标，调整手段。',
+    ),
+    quote: localized(
+      'It does not matter how slowly you go as long as you do not stop.',
+      '不怕慢，只怕站。',
+    ),
+    unlockHint: localized('Complete the Perseverance topic on the Knowledge Path.', '在知识之路上完成「恒心」主题。'),
+    didYouKnow: localized(
+      'In Buddhist lists of perfections, viriya (energy/effort) pairs with patience — grit without cruelty to the self.',
+      '在佛教波罗蜜多的名单中，精进与忍辱相配 — 有毅力而不苛待自己。',
+    ),
+  },
+  {
+    id: 'card-perspective',
+    title: localized('Perspective', '视角'),
+    accent: '视',
+    emoji: '🔭',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Holding more than one angle so judgment grows slower and fairer.',
+      '持守不止一个角度，好让判断更慢、更公允。',
+    ),
+    quote: localized(
+      'We do not see things as they are; we see them as we are.',
+      '我们看事物，并非如其所是；而是如我们之所是。',
+    ),
+    unlockHint: localized('Complete the Perspective topic on the Knowledge Path.', '在知识之路上完成「视角」主题。'),
+    didYouKnow: localized(
+      'Classical Chinese historiography often retells the same reign from multiple offices — a cultural habit of checking one seat’s story against another.',
+      '中国古典史书常从多个职司重述同一朝代 — 一种用另一座位核对故事的文化习惯。',
+    ),
+  },
+  {
     id: 'card-ren-living',
     title: localized('Living Ren', '仁的践行'),
     accent: '仁',

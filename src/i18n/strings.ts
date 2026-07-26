@@ -135,8 +135,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1.1 — your progress is stored privately in this browser.',
-    '大同之路 v1.1 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.2 — your progress is stored privately in this browser.',
+    '大同之路 v1.2 — 你的进度私密地保存在此浏览器中。',
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(
@@ -815,8 +815,12 @@ export const UI = {
   communityRealPill: localized('shared road', '共享之路'),
   leaderboardsTitle: localized('Shared dedication', '共同的坚持'),
   leaderboardsFooter: localized(
-    'These boards honour consistency and contribution, never worth. Everyone here walks the same road.',
-    '这些榜单致敬的是坚持与贡献，而非价值高低。这里的每个人都走在同一条路上。',
+    'You see companions within one journey rank of you — consistency and contribution, never worth. Everyone here walks the same road.',
+    '你看见的是与你相差不超过一个旅程等级的同修 — 致敬坚持与贡献，而非价值高低。这里的每个人都走在同一条路上。',
+  ),
+  leaderboardsNearbyNote: localized(
+    'Nearby band: your rank, and one above or below.',
+    '邻近区间：你的等级，以及上下各一档。',
   ),
   sendEncouragementTitle: localized('Send encouragement 🌸', '送出鼓励 🌸'),
   sendEncouragementDesc: localized(
@@ -966,6 +970,20 @@ export function topicLessonCount(locale: Locale, done: number, total: number): s
 
 export function knowledgeProgressLabel(locale: Locale, done: number, total: number): string {
   return pick(locale, `${done}/${total} lessons completed`, `已完成 ${done}/${total} 课`, `已完成 ${done}/${total} 課`);
+}
+
+export function knowledgeDepthProgressLabel(
+  locale: Locale,
+  depthLabel: string,
+  done: number,
+  total: number,
+): string {
+  return pick(
+    locale,
+    `${depthLabel} · ${done}/${total} lessons`,
+    `${depthLabel} · ${done}/${total} 课`,
+    `${depthLabel} · ${done}/${total} 課`,
+  );
 }
 
 // A single bar tracks whichever wave is currently active (see Timeline.tsx)
