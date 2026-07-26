@@ -2845,6 +2845,22 @@ button.glyph-tile:hover {
   animation: glyph-pop 0.45s ease;
 }
 
+/* Both Klotski hints occupy the same box; only one is visible — no layout jump. */
+.glyph-klotski-hint {
+  display: grid;
+  margin: 0 0 10px;
+  min-height: 2.8em;
+}
+
+.glyph-klotski-hint > span {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.glyph-klotski-hint > span.is-active {
+  visibility: visible;
+}
+
 .glyph-play-with-ref {
   position: relative;
   display: flex;

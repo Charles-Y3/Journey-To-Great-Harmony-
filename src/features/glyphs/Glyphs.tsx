@@ -406,8 +406,14 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
         </>
       ) : (
         <>
-          <p className="small muted">
-            {selectedPieceId ? t('glyphsKlotskiChooseHint') : t('glyphsKlotskiHint')}
+          {/* Stack both hints in one slot so switching lines never shifts the board. */}
+          <p className="glyph-klotski-hint small muted">
+            <span className={selectedPieceId ? undefined : 'is-active'} aria-hidden={!!selectedPieceId}>
+              {t('glyphsKlotskiHint')}
+            </span>
+            <span className={selectedPieceId ? 'is-active' : undefined} aria-hidden={!selectedPieceId}>
+              {t('glyphsKlotskiChooseHint')}
+            </span>
           </p>
           {/* Same SealGlyphSvg asset as puzzle tiles — sits top-left above the board, never over pieces. */}
           <div className="glyph-play-with-ref">
