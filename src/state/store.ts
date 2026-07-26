@@ -511,19 +511,18 @@ export const useJourney = create<JourneyState>()(
 
         submitReflection: (learned, virtue, improve) =>
           apply((draft, today) => {
+            const rec = dayRec(draft, today);
+            // Locked once written — past (and today's) journal entries are not overwritten.
+            if (rec.reflection) return;
             if (
               !isMeaningful(learned, TEXT_MIN.reflection) ||
               !isMeaningful(virtue, TEXT_MIN.reflection) ||
               !isMeaningful(improve, TEXT_MIN.reflection)
             ) return;
-            const rec = dayRec(draft, today);
-            const firstTime = !rec.reflection;
             rec.reflection = { learned, virtue, improve };
-            if (firstTime) {
-              draft.xp += XP_FOR.reflection;
-              draft.harmonyPoints += HARMONY_FOR.reflection;
-              markActive(draft, today);
-            }
+            draft.xp += XP_FOR.reflection;
+            draft.harmonyPoints += HARMONY_FOR.reflection;
+            markActive(draft, today);
           }),
 
         setMoodCheck: (moodId, note) =>

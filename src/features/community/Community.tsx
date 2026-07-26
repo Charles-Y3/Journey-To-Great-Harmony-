@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
+import { useTraveller } from '../../state/travellerStore';
 import { peerStats, peerEncouragesToday, visiblePeers } from '../../engine/community';
+import { fetchLeaderboard, type LeaderboardCategory, type LeaderboardRow } from '../../engine/travellerApi';
 import { statsFromData, forestInfo, type JourneyData } from '../../state/selectors';
 import type { Peer } from '../../data/types';
+import { DEFAULT_AVATAR, isAllowedAvatar } from '../../data/avatars';
+import { rankForXp } from '../../engine/progression';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { encouragementBanner, type UiKey } from '../../i18n/strings';
@@ -15,7 +19,7 @@ const TIER_KEY: Record<Peer['tier'], UiKey> = {
   occasional: 'peerTierOccasional',
 };
 
-type Category = 'wisdom' | 'practice' | 'compassion' | 'growth';
+type Category = LeaderboardCategory;
 
 const CATEGORIES: { id: Category; emoji: string; nameKey: UiKey; descKey: UiKey }[] = [
   { id: 'wisdom', emoji: '📚', nameKey: 'catWisdomName', descKey: 'catWisdomDesc' },
@@ -24,6 +28,15 @@ const CATEGORIES: { id: Category; emoji: string; nameKey: UiKey; descKey: UiKey 
   { id: 'growth', emoji: '🌱', nameKey: 'catGrowthName', descKey: 'catGrowthDesc' },
 ];
 
+interface BoardRow {
+  id: string;
+  name: string;
+  emoji: string;
+  me: boolean;
+  score: number;
+  rankLabel: string;
+}
+
 export default function Community() {
   const state = useJourney();
   const today = useToday();
@@ -31,13 +44,31 @@ export default function Community() {
   const sendEncouragement = useJourney((s) => s.sendEncouragement);
   const [category, setCategory] = useState<Category>('wisdom');
   const [sentFlash, setSentFlash] = useState<string | null>(null);
+  const [remoteRows, setRemoteRows] = useState<LeaderboardRow[] | null>(null);
   const { t, L, locale } = useT();
   const myName = useProfile((s) => s.name);
+  const myAvatar = useProfile((s) => s.avatar);
+  const optedIn = useTraveller((s) => s.optedIn);
+  const myTravellerId = useTraveller((s) => s.travellerId);
 
   const stats = statsFromData(d);
   const forest = forestInfo(d);
   const peers = peerStats(state.startDay, today, state.xp);
   const ageYears = companionAgeYears(state.startDay, today, state.streakBest);
+
+  useEffect(() => {
+    if (!optedIn) {
+      setRemoteRows(null);
+      return;
+    }
+    let cancelled = false;
+    void fetchLeaderboard(category).then((rows) => {
+      if (!cancelled) setRemoteRows(rows);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [optedIn, category, stats.xp, stats.streakCurrent, stats.encouragementsSent]);
 
   function scoreFor(id: Category, isUser: boolean, peerIdx = 0): number {
     const p = peers[peerIdx];
@@ -53,16 +84,46 @@ export default function Community() {
     }
   }
 
-  const rows = [
-    { id: 'me', name: myName ?? t('leaderboardYou'), emoji: '🧑‍🌾', me: true, score: scoreFor(category, true) },
-    ...peers.map((p, i) => ({
+  const avatar = isAllowedAvatar(myAvatar) ? myAvatar : DEFAULT_AVATAR;
+  const myRank = rankForXp(stats.xp);
+  const meRow: BoardRow = {
+    id: 'me',
+    name: myName ?? t('leaderboardYou'),
+    emoji: avatar,
+    me: true,
+    score: scoreFor(category, true),
+    rankLabel: `${myRank.emoji} ${L(myRank.name)}`,
+  };
+
+  const npcRows: BoardRow[] = peers.map((p, i) => {
+    const rank = rankForXp(p.xp);
+    return {
       id: p.peer.id,
       name: L(p.peer.name),
       emoji: agedPeerEmoji(p.peer.emoji, ageYears),
       me: false,
       score: scoreFor(category, false, i),
-    })),
-  ].sort((a, b) => b.score - a.score);
+      rankLabel: `${rank.emoji} ${L(rank.name)}`,
+    };
+  });
+
+  const realRows: BoardRow[] = (remoteRows ?? [])
+    .filter((r) => r.id !== myTravellerId)
+    .map((r) => {
+      const rank = rankForXp(typeof r.xp === 'number' ? r.xp : 0);
+      return {
+        id: `real-${r.id}`,
+        name: r.name,
+        emoji: isAllowedAvatar(r.avatar) ? r.avatar : DEFAULT_AVATAR,
+        me: false,
+        score: r.score,
+        rankLabel: `${rank.emoji} ${L(rank.name)}`,
+      };
+    });
+
+  const rows = [...(optedIn ? [meRow, ...realRows, ...npcRows] : [meRow, ...npcRows])].sort(
+    (a, b) => b.score - a.score,
+  );
 
   const encouragersToday = visiblePeers(state.startDay, today).filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
   const activeCategory = CATEGORIES.find((c) => c.id === category)!;
@@ -95,7 +156,10 @@ export default function Community() {
           <div key={row.id} className={row.me ? 'leader-row me' : 'leader-row'}>
             <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
             <span className="leader-emoji">{row.emoji}</span>
-            <span className="leader-info">{row.name}</span>
+            <span className="leader-info">
+              <span className="leader-name">{row.name}</span>
+              <span className="leader-rank small muted">{row.rankLabel}</span>
+            </span>
             <span className="leader-score">{row.score}</span>
           </div>
         ))}

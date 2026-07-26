@@ -336,6 +336,7 @@ function EveningCard({ today }: { today: string }) {
   const { t, L, locale } = useT();
   const eveningOpen = new Date().getHours() >= EVENING_OPEN_HOUR;
   const mood = rec.mood ? moodById(rec.mood.id) : undefined;
+  const doneChallenge = rec.challengeId ? CHALLENGES.find((c) => c.id === rec.challengeId) : undefined;
   const onBreathReady = useCallback(() => {
     setBreathing(false);
     setBreathDone(true);
@@ -358,6 +359,7 @@ function EveningCard({ today }: { today: string }) {
           <p>
             <span className="pill">{t('reflectionDone')}</span>
           </p>
+          <p className="small muted">{t('reflectionLockedNote')}</p>
           <p className="small">
             <strong>{t('reflectionLearnedLabel')}:</strong> {rec.reflection.learned}
           </p>
@@ -383,6 +385,18 @@ function EveningCard({ today }: { today: string }) {
               {rec.mood?.note ? ` — “${rec.mood.note}”` : ''}
             </p>
           )}
+          {rec.challengeDone && (
+            <p className="evening-intention-echo">
+              {t('eveningChallengeEcho')}{' '}
+              {doneChallenge && <span className="pill pill-gold">{L(doneChallenge.virtue)}</span>}
+              {rec.challengeNote ? (
+                <>
+                  {' '}
+                  <em>“{rec.challengeNote}”</em>
+                </>
+              ) : null}
+            </p>
+          )}
           {breathing ? (
             <BreathGate onReady={onBreathReady} />
           ) : !breathDone ? (
@@ -398,7 +412,9 @@ function EveningCard({ today }: { today: string }) {
               {progressLength(learned) >= TEXT_MIN.reflection && looksLikeNonsense(learned) && (
                 <p className="small muted">{t('textNonsenseHint')}</p>
               )}
-              <label className="small">{t('reflectionQ2')}</label>
+              <label className="small">
+                {rec.challengeDone ? t('reflectionQ2AfterChallenge') : t('reflectionQ2')}
+              </label>
               <textarea rows={2} value={virtue} onChange={(e) => setVirtue(e.target.value)} />
               <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(virtue), TEXT_MIN.reflection)}</p>
               {progressLength(virtue) >= TEXT_MIN.reflection && looksLikeNonsense(virtue) && (
@@ -429,17 +445,19 @@ function EveningCard({ today }: { today: string }) {
   );
 }
 
-type JournalFilter = 'all' | 'intention' | 'challenge' | 'reflection';
+type JournalFilter = 'all' | 'intention' | 'mood' | 'challenge' | 'reflection';
 
 const JOURNAL_FILTERS: { id: JournalFilter; emoji: string; key: UiKey }[] = [
   { id: 'all', emoji: '📔', key: 'journalFilterAll' },
   { id: 'intention', emoji: '🌅', key: 'journalFilterIntentions' },
+  { id: 'mood', emoji: '💛', key: 'journalFilterMoods' },
   { id: 'challenge', emoji: '🎯', key: 'journalFilterChallenges' },
   { id: 'reflection', emoji: '🪞', key: 'journalFilterReflections' },
 ];
 
 function matchesJournalFilter(rec: JourneyData['days'][string], filter: JournalFilter): boolean {
   if (filter === 'intention') return !!rec.intention;
+  if (filter === 'mood') return !!rec.mood;
   if (filter === 'challenge') return !!rec.challengeDone;
   if (filter === 'reflection') return !!rec.reflection;
   return true;
@@ -452,7 +470,7 @@ function Journal() {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const { t, L, locale } = useT();
   const allEntries = Object.entries(days)
-    .filter(([, rec]) => rec.intention || rec.reflection || rec.challengeDone)
+    .filter(([, rec]) => rec.intention || rec.mood || rec.reflection || rec.challengeDone)
     .sort(([a], [b]) => (a < b ? 1 : -1));
   const entries = allEntries.filter(([day, rec]) => matchesJournalFilter(rec, filter) && (dateFilter === 'all' || day >= dateFilter));
 
@@ -496,12 +514,24 @@ function Journal() {
           {entries.length === 0 && <p className="small muted">{t('journalFilterEmpty')}</p>}
           {entries.map(([day, rec]) => {
             const ch = rec.challengeId ? CHALLENGES.find((c) => c.id === rec.challengeId) : undefined;
+            const mood = rec.mood ? moodById(rec.mood.id) : undefined;
             return (
               <div key={day} style={{ borderTop: '1px solid var(--line)', paddingTop: 10, marginTop: 10 }}>
                 <strong>{day}</strong>
                 {(filter === 'all' || filter === 'intention') && rec.intention && (
                   <p className="small" style={{ margin: '4px 0' }}>
                     🌅 “{rec.intention}”
+                  </p>
+                )}
+                {(filter === 'all' || filter === 'mood') && mood && (
+                  <p className="small" style={{ margin: '4px 0' }}>
+                    💛 {t('journalMoodLabel')}: {mood.emoji} {L(mood.label)}
+                    {rec.mood?.note ? (
+                      <>
+                        {' '}
+                        — <em>“{rec.mood.note}”</em>
+                      </>
+                    ) : null}
                   </p>
                 )}
                 {(filter === 'all' || filter === 'challenge') && rec.challengeDone && (

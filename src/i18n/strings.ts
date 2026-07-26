@@ -104,6 +104,10 @@ export const UI = {
 
   // ── Settings modal ────────────────────────────────────────────────
   settingsTitle: localized('⚙️ Settings', '⚙️ 设置'),
+  settingsTabYou: localized('You', '你'),
+  settingsTabJourney: localized('Journey', '旅程'),
+  settingsTabDevice: localized('Device', '设备'),
+  settingsTabAbout: localized('About', '关于'),
   settingsLanguageTitle: localized('Language', '语言'),
   settingsLanguageDesc: localized(
     'Choose your language. You can change this anytime.',
@@ -135,8 +139,8 @@ export const UI = {
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(
-    'This app is a personal-growth and reflection tool, offered for educational and entertainment purposes. It is not professional medical, psychological, legal, or financial advice, and its content — interpretations of classical teachings — is not a substitute for guidance from a qualified professional or a community you trust. All progress is stored only in this browser; there is no account or backup beyond what you export yourself in Settings, and no guarantee against data loss. Use the app and its content at your own discretion.',
-    '本应用是一款个人成长与自省工具，仅供学习与娱乐之用。它并非专业的医疗、心理、法律或财务建议，其内容 — 对经典教导的诠释 — 也不能替代合格专业人士或你所信任的群体所给予的指导。所有进度仅保存在此浏览器中；除非你在设置中自行导出备份，否则没有账号或云端备份，也不保证数据不会遗失。使用本应用及其内容，请自行判断、自负其责。',
+    'This app is a personal-growth and reflection tool, offered for educational and entertainment purposes. It is not professional medical, psychological, legal, or financial advice, and its content — interpretations of classical teachings — is not a substitute for guidance from a qualified professional or a community you trust. Progress is stored in this browser by default. If you opt in to the shared road in Settings, your display name, avatar, and a few dedication metrics (XP, streak, challenges, encouragements, growth) are sent to a small server so other travellers can see you on Companions boards and in the Great Harmony World — still no email account. There is no guarantee against data loss. Use the app and its content at your own discretion.',
+    '本应用是一款个人成长与自省工具，仅供学习与娱乐之用。它并非专业的医疗、心理、法律或财务建议，其内容 — 对经典教导的诠释 — 也不能替代合格专业人士或你所信任的群体所给予的指导。进度默认只保存在此浏览器中。若你在设置中选择走上共享之路，你的显示名、头像，以及少量坚持相关的数值（经验、连续记录、挑战、鼓励、成长）会传到一台小服务器，好让其他旅人在「同修」榜单与大同世界中看见你 — 仍无需邮箱账号。不保证数据不会遗失。使用本应用及其内容，请自行判断、自负其责。',
   ),
 
   // ── Settings: name ───────────────────────────────────────────────────
@@ -144,6 +148,28 @@ export const UI = {
   settingsNameDesc: localized(
     'How Companions of the Way see you in the shared Great Harmony World.',
     '这是「道上同修」在共享大同世界中看到你的名字。',
+  ),
+  settingsAvatarTitle: localized('Avatar', '头像'),
+  settingsAvatarDesc: localized(
+    'A tiny emoji others see on Companions boards and wandering in the Great Harmony World.',
+    '同修榜单与大同世界中，他人会看到的小小表情头像。',
+  ),
+  settingsSharedRoadTitle: localized('Shared road', '共享之路'),
+  settingsSharedRoadDesc: localized(
+    'After a short streak, you may appear on the four Companions boards and as a walker in others’ Great Harmony World. No email — only an anonymous id in this browser, plus your name, avatar, and dedication metrics.',
+    '有了短暂的连续记录后，你可以出现在同修的四个榜单上，并在他人的大同世界中漫步。无需邮箱 — 只在此浏览器中保存匿名编号，连同你的名字、头像与坚持相关的数值。',
+  ),
+  settingsSharedRoadLocked: localized(
+    'Set a name and keep a 3-day streak to unlock.',
+    '先设定名字，并保持连续 3 天，即可解锁。',
+  ),
+  settingsSharedRoadJoin: localized('Appear on the shared road', '出现在共享之路上'),
+  settingsSharedRoadLeave: localized('Step off the shared road', '离开共享之路'),
+  settingsSharedRoadOn: localized('You are visible to other travellers.', '其他旅人可以看见你。'),
+  settingsSharedRoadOff: localized('You are only walking with companion archetypes for now.', '目前你只与典型同修同行。'),
+  settingsSharedRoadSyncFail: localized(
+    'Could not reach the shared road right now. Your choice is saved here — try again later.',
+    '此刻无法连上共享之路。你的选择已保存在本地 — 请稍后再试。',
   ),
   settingsNameSave: localized('Save', '保存'),
 
@@ -390,12 +416,12 @@ export const UI = {
   challengeComplete: localized('Challenge complete ✓', '挑战完成 ✓'),
   challengeNoteLabel: localized('Your note', '你的记录'),
   challengeNotePlaceholder: localized(
-    'A few honest words so today’s practice is witnessed…',
-    '写几句真诚的话，让今天的践行被看见…',
+    'What did you actually do? One concrete act is enough…',
+    '你实际做了什么？一件具体的事就够…',
   ),
   challengeNoteHint: localized(
-    'A short, real note turns the act into a living memory in your journal.',
-    '一句真实的短记，会让这次践行成为日志里鲜活的记忆。',
+    'Witness the act itself — evening reflection is for meaning, not a second report of the same virtue.',
+    '记下践行本身 — 夜间反思留给意义，不必再写一遍同一种德行。',
   ),
   textNonsenseHint: localized(
     'That looks like filler or keyboard noise — try a few real words.',
@@ -434,19 +460,31 @@ export const UI = {
   reflectionVirtueLabel: localized('Virtue practised', '践行的德行'),
   reflectionTomorrowLabel: localized('Tomorrow', '明日'),
   reflectionIntro: localized(
-    'Three questions, honestly but kindly. A sentence each is plenty.',
-    '三个问题，诚实而温柔地回答。每题一句话就够了。',
+    'Evening is for meaning and tomorrow — not another list of what you did. A sentence each is plenty.',
+    '夜间留给意义与明日 — 不是再列一遍今天做了什么。每题一句话就够了。',
   ),
   eveningIntentionEcho: localized('This morning you set out to:', '今早你立下的心愿是：'),
+  eveningChallengeEcho: localized('Today’s virtue practice:', '今天的德行践行：'),
   reflectionBreathBtn: localized('Pause, then reflect', '先静心，再反思'),
   reflectionQ1: localized('What did I learn today?', '我今天学到了什么？'),
-  reflectionQ2: localized('What virtue did I practise?', '我践行了哪种德行？'),
+  reflectionQ2: localized(
+    'Where did virtue (or its absence) shape you today?',
+    '今天，德行（或它的缺席）如何塑造了你？',
+  ),
+  reflectionQ2AfterChallenge: localized(
+    'What did that practice teach you — beyond the act itself?',
+    '那次践行，在行动之外，教会了你什么？',
+  ),
   reflectionQ3: localized('How can I improve tomorrow?', '明天我可以如何做得更好？'),
   reflectionQ3WithIntention: localized(
     'How did today’s intention go — and how can tomorrow deepen it?',
     '今天的心愿践行得如何 — 明天又可以如何加深？',
   ),
   reflectionBtn: localized('Save reflection (+10 XP)', '保存反思 (+10 经验)'),
+  reflectionLockedNote: localized(
+    'Today’s reflection is saved in your journal and cannot be rewritten.',
+    '今天的反思已写入日志，不可再改写。',
+  ),
   eveningLockedNote: localized(
     'Evening Reflection opens at 5pm, once your day has actually happened — come back then.',
     '夜间反思在下午5点后开放，待今天真正过去一些再来吧。',
@@ -461,9 +499,11 @@ export const UI = {
   journalClose: localized('Close journal', '关闭日志'),
   journalFilterAll: localized('All', '全部'),
   journalFilterIntentions: localized('Intentions', '心愿'),
+  journalFilterMoods: localized('Heart', '心念'),
   journalFilterChallenges: localized('Challenges', '挑战'),
   journalFilterReflections: localized('Reflections', '反思'),
   journalFilterEmpty: localized('No entries of this kind yet.', '目前还没有这类记录。'),
+  journalMoodLabel: localized('Heart', '心念'),
   journalDateFilterAll: localized('All dates', '所有日期'),
   journalDateFilterFromPrefix: localized('From', '从'),
   todayIntentionLabel: localized("Today’s intention", '今日心愿'),
@@ -736,6 +776,10 @@ export const UI = {
   worldTotalHarmony: localized('total harmony', '和谐总量'),
   civicBuildingsTitle: localized('Civic buildings', '公共建筑'),
   todayInCommunity: localized('Today in the community', '今日社群动态'),
+  worldTravellerGreeting: localized('A fellow companion waves.', '一位同修向您挥手。'),
+  worldSelfGreeting: localized("That's you.", '那是你。'),
+  worldYouName: localized('You', '你'),
+  worldTravellerLang: localized('Shared road', '共享之路'),
   worldWalkersHint: localized(
     'Tap a traveller to hear them say hello, or tap a building to learn about it. Use the arrows to look around the world.',
     '点击一位旅人，听听他们如何打招呼；点击一座建筑，了解它的故事。使用箭头环顾这个世界。',
@@ -757,6 +801,11 @@ export const UI = {
     'Archetypal fellow travellers on the road to Great Harmony — companions of the Way, not a contest of worth.',
     '通往大同之路上的典型同修 — 道上的伙伴，而非价值的较量。',
   ),
+  communityRealTravellersNote: localized(
+    'Names with a shared-road mark are real opted-in travellers; the rest are companion archetypes.',
+    '带有共享之路标记的名字是真实选择加入的旅人；其余为典型同修。',
+  ),
+  communityRealPill: localized('shared road', '共享之路'),
   leaderboardsTitle: localized('Shared dedication', '共同的坚持'),
   leaderboardsFooter: localized(
     'These boards honour consistency and contribution, never worth. Everyone here walks the same road.',

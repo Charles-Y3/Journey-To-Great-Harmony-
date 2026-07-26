@@ -10,6 +10,9 @@ import { useReminders } from './state/reminderStore';
 import { useUi } from './state/uiStore';
 import { useProfile } from './state/profileStore';
 import { useTextScale, applyTextScale, type TextScale } from './state/textScaleStore';
+import { useTraveller, TRAVELLER_OPT_IN_STREAK } from './state/travellerStore';
+import { AVATARS } from './data/avatars';
+import { flushTravellerSync, scheduleTravellerSync } from './engine/travellerSync';
 import { useTodayTasks } from './features/home/useTodayTasks';
 import { useSound, type MusicTrackId } from './state/soundStore';
 import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
@@ -215,6 +218,77 @@ function NameSection() {
         </button>
       </div>
       {junk && <p className="small muted">{t('nameJunkHint')}</p>}
+    </div>
+  );
+}
+
+function AvatarSection() {
+  const { t } = useT();
+  const avatar = useProfile((s) => s.avatar);
+  const setAvatar = useProfile((s) => s.setAvatar);
+  const optedIn = useTraveller((s) => s.optedIn);
+
+  return (
+    <div className="card">
+      <h3>{t('settingsAvatarTitle')}</h3>
+      <p className="small muted">{t('settingsAvatarDesc')}</p>
+      <div className="avatar-picker-grid" role="listbox" aria-label={t('settingsAvatarTitle')}>
+        {AVATARS.map((a) => (
+          <button
+            key={a}
+            type="button"
+            role="option"
+            aria-selected={a === avatar}
+            className={a === avatar ? 'avatar-picker-btn active' : 'avatar-picker-btn'}
+            onClick={() => {
+              setAvatar(a);
+              if (optedIn) void flushTravellerSync();
+            }}
+          >
+            {a}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SharedRoadSection() {
+  const { t } = useT();
+  const name = useProfile((s) => s.name);
+  const hasSetName = useProfile((s) => s.hasSetName);
+  const streakBest = useJourney((s) => s.streakBest);
+  const optedIn = useTraveller((s) => s.optedIn);
+  const setOptedIn = useTraveller((s) => s.setOptedIn);
+  const ensureId = useTraveller((s) => s.ensureId);
+  const [syncNote, setSyncNote] = useState<'ok' | 'fail' | null>(null);
+  const unlocked = hasSetName && !!name?.trim() && streakBest >= TRAVELLER_OPT_IN_STREAK;
+
+  async function toggle() {
+    if (!unlocked) return;
+    const next = !optedIn;
+    if (next) ensureId();
+    setOptedIn(next);
+    const ok = await flushTravellerSync();
+    setSyncNote(ok ? 'ok' : 'fail');
+    window.setTimeout(() => setSyncNote(null), 4000);
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsSharedRoadTitle')}</h3>
+      <p className="small muted">{t('settingsSharedRoadDesc')}</p>
+      {!unlocked ? (
+        <p className="small muted">{t('settingsSharedRoadLocked')}</p>
+      ) : (
+        <>
+          <p className="small muted">{optedIn ? t('settingsSharedRoadOn') : t('settingsSharedRoadOff')}</p>
+          <button type="button" className={optedIn ? 'btn' : 'btn btn-primary'} onClick={() => void toggle()}>
+            {optedIn ? t('settingsSharedRoadLeave') : t('settingsSharedRoadJoin')}
+          </button>
+          {syncNote === 'fail' && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsSharedRoadSyncFail')}</p>}
+        </>
+      )}
     </div>
   );
 }
@@ -724,6 +798,15 @@ function JourneyRecapSection({ onOpen }: { onOpen: () => void }) {
   );
 }
 
+type SettingsTabId = 'you' | 'journey' | 'device' | 'about';
+
+const SETTINGS_TABS: { id: SettingsTabId; labelKey: UiKey }[] = [
+  { id: 'you', labelKey: 'settingsTabYou' },
+  { id: 'journey', labelKey: 'settingsTabJourney' },
+  { id: 'device', labelKey: 'settingsTabDevice' },
+  { id: 'about', labelKey: 'settingsTabAbout' },
+];
+
 function SettingsModal({
   onClose,
   focusSection,
@@ -738,9 +821,11 @@ function SettingsModal({
   const reset = useJourney((s) => s.resetJourney);
   const resetOnboardingUi = useUi((s) => s.resetOnboardingUi);
   const [confirming, setConfirming] = useState(false);
+  const [tab, setTab] = useState<SettingsTabId>(focusSection === 'reminders' ? 'journey' : 'you');
 
   useEffect(() => {
     if (focusSection !== 'reminders') return;
+    setTab('journey');
     const id = window.setTimeout(() => {
       document.getElementById('settings-reminders')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
@@ -750,45 +835,78 @@ function SettingsModal({
   return (
     <Modal onClose={onClose}>
       <h2>{t('settingsTitle')}</h2>
-      <LanguageSection />
-      <TextSizeSection />
-      <NameSection />
-      <JourneyRecapSection onOpen={onOpenRecap} />
-      <ReminderSection />
-      <MusicSection />
-      <ShareSection />
-      <BackupSection />
-      <InstallSection />
-      <DisclaimerSection />
-      <div className="card">
-        <h3>{t('settingsResetTitle')}</h3>
-        <p className="small muted">{t('settingsResetDesc')}</p>
-        {confirming ? (
-          <>
-            <button
-              className="btn"
-              style={{ borderColor: 'var(--seal)', color: 'var(--seal)', marginRight: 8 }}
-              onClick={() => {
-                reset();
-                resetOnboardingUi();
-                navigate('/', { replace: true });
-                setConfirming(false);
-                onClose();
-              }}
-            >
-              {t('settingsResetConfirm')}
-            </button>
-            <button className="btn" onClick={() => setConfirming(false)}>
-              {t('settingsCancel')}
-            </button>
-          </>
-        ) : (
-          <button className="btn" onClick={() => setConfirming(true)}>
-            {t('settingsResetBtn')}
+      <div className="tab-row settings-tab-row" role="tablist" aria-label={t('settingsTitle')}>
+        {SETTINGS_TABS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === item.id}
+            className={tab === item.id ? 'btn tab-btn active' : 'btn tab-btn'}
+            onClick={() => setTab(item.id)}
+          >
+            {t(item.labelKey)}
           </button>
-        )}
+        ))}
       </div>
-      <p className="small muted">{t('settingsFooter')}</p>
+
+      {tab === 'you' && (
+        <>
+          <NameSection />
+          <AvatarSection />
+          <LanguageSection />
+          <TextSizeSection />
+        </>
+      )}
+      {tab === 'journey' && (
+        <>
+          <SharedRoadSection />
+          <JourneyRecapSection onOpen={onOpenRecap} />
+          <ReminderSection />
+          <MusicSection />
+        </>
+      )}
+      {tab === 'device' && (
+        <>
+          <ShareSection />
+          <BackupSection />
+          <InstallSection />
+        </>
+      )}
+      {tab === 'about' && (
+        <>
+          <DisclaimerSection />
+          <div className="card">
+            <h3>{t('settingsResetTitle')}</h3>
+            <p className="small muted">{t('settingsResetDesc')}</p>
+            {confirming ? (
+              <>
+                <button
+                  className="btn"
+                  style={{ borderColor: 'var(--seal)', color: 'var(--seal)', marginRight: 8 }}
+                  onClick={() => {
+                    reset();
+                    resetOnboardingUi();
+                    navigate('/', { replace: true });
+                    setConfirming(false);
+                    onClose();
+                  }}
+                >
+                  {t('settingsResetConfirm')}
+                </button>
+                <button className="btn" onClick={() => setConfirming(false)}>
+                  {t('settingsCancel')}
+                </button>
+              </>
+            ) : (
+              <button className="btn" onClick={() => setConfirming(true)}>
+                {t('settingsResetBtn')}
+              </button>
+            )}
+          </div>
+          <p className="small muted">{t('settingsFooter')}</p>
+        </>
+      )}
     </Modal>
   );
 }
@@ -944,6 +1062,17 @@ export default function App() {
   useEffect(() => {
     applyTextScale(textScale);
   }, [textScale]);
+
+  // Opted-in travellers: debounce sync when dedication metrics change.
+  const syncXp = useJourney((s) => s.xp);
+  const syncStreak = useJourney((s) => s.streakCurrent);
+  const syncEncouragements = useJourney((s) => s.encouragementsSent);
+  const syncHarmony = useJourney((s) => s.harmonyPoints);
+  const syncOptedIn = useTraveller((s) => s.optedIn);
+  useEffect(() => {
+    if (!syncOptedIn) return;
+    scheduleTravellerSync();
+  }, [syncXp, syncStreak, syncEncouragements, syncHarmony, syncOptedIn]);
 
   // Once per calendar day (and only past the language/name gates), greet
   // the user with a quick progress + to-do summary instead of dropping

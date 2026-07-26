@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 6,
+    date: '2026-07-27',
+    highlights: [
+      localized(
+        '👥 Shared road (opt-in) — after a short streak, join anonymous Companions leaderboards and appear with your emoji avatar in others’ Great Harmony World. Needs Upstash Redis on the host; without it, companions stay as before.',
+        '👥 共享之路（可选）— 短暂连续记录后，可匿名加入同修榜单，并以表情头像出现在他人的大同世界。需主机配置 Upstash Redis；未配置时，同修仍与以往相同。',
+      ),
+      localized(
+        '🎨 Pick a tiny avatar in Settings — shown on boards and as a World walker when you opt in.',
+        '🎨 在设置中选择小小头像 — 加入后会显示在榜单与世界漫步者上。',
+      ),
+    ],
+  },
+  {
     version: 5,
     date: '2026-07-26',
     highlights: [

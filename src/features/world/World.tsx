@@ -2,17 +2,21 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
+import { useTraveller } from '../../state/travellerStore';
 import { useSound } from '../../state/soundStore';
-import { worldInfo, fullyMasteredEraIds, type JourneyData } from '../../state/selectors';
+import { worldInfo, fullyMasteredEraIds, statsFromData, type JourneyData } from '../../state/selectors';
 import { WORLD_STAGES } from '../../data/world';
 import { CARDS } from '../../data/cards';
 import { TIMELINE } from '../../data/timeline';
 import { TOPICS } from '../../data/knowledgeTree';
 import { greetingFor } from '../../data/greetings';
 import type { Peer, WorldBuilding } from '../../data/types';
+import { DEFAULT_AVATAR, isAllowedAvatar } from '../../data/avatars';
 import { localized, type Localized, type Locale } from '../../i18n/types';
-import { communityFeed, visiblePeers } from '../../engine/community';
-import { hashString, seededRandom } from '../../engine/progression';
+import { communityFeed, peerStats } from '../../engine/community';
+import { fetchActiveTravellers, type ActiveTraveller } from '../../engine/travellerApi';
+import { walkerCapsForStage } from '../../engine/worldWalkers';
+import { hashString, rankForXp, seededRandom } from '../../engine/progression';
 import { speakGreeting, speakAppText } from '../../engine/speech';
 import { playSfx } from '../../engine/sfx';
 import { Modal, PageHeader, ProgressBar } from '../../components/ui';
@@ -91,6 +95,10 @@ function WorldLandmark({ stageIndex, x }: { stageIndex: number; x: number }) {
           <animateMotion path="M-60,8 L 60,8 L -60,8" dur="16s" repeatCount="indefinite" />
           🛒
         </text>
+        <text fontSize={10} opacity="0.9">
+          <animateMotion path="M40,-20 q 30 -18 60 0" dur="11s" repeatCount="indefinite" />
+          🐦
+        </text>
       </g>
     );
   }
@@ -101,6 +109,10 @@ function WorldLandmark({ stageIndex, x }: { stageIndex: number; x: number }) {
         <circle cx={0} cy={-46} r={9} fill="#fdf6e3" stroke="#5c6270" />
         <line x1={0} y1={-46} x2={0} y2={-51} stroke="#5c6270" strokeWidth="1.4" />
         <line x1={0} y1={-46} x2={4} y2={-44} stroke="#5c6270" strokeWidth="1.4" />
+        {/* Secondary civic silhouette so City reads denser than Town. */}
+        <rect x={28} y={-36} width={12} height={36} fill="#9aa0a8" stroke="#5c6270" opacity="0.85" />
+        <rect x={30} y={-28} width={3} height={4} fill="#cfe0f0" />
+        <rect x={35} y={-28} width={3} height={4} fill="#cfe0f0" />
         <text fontSize={13}>
           <animateMotion path="M-70,6 L 70,6 L -70,6" dur="12s" repeatCount="indefinite" />
           🚲
@@ -118,18 +130,27 @@ function WorldLandmark({ stageIndex, x }: { stageIndex: number; x: number }) {
         <animateMotion path="M-50,-30 q 25 -14 50 0 t 50 0" dur="15s" repeatCount="indefinite" />
         🕊️
       </text>
+      <text fontSize={11} opacity="0.85">
+        <animateMotion path="M30,-18 q -20 -10 -40 0" dur="13s" repeatCount="indefinite" />
+        🕊️
+      </text>
     </g>
   );
 }
 
+const HOUSE_CEILING_BY_STAGE = [28, 48, 72, 96];
+
 function WorldGround({ stageIndex, width = STRIP_WIDTH, faceCount = FACE_COUNT }: { stageIndex: number; width?: number; faceCount?: number }) {
-  const palette = STAGE_GROUND_PALETTE[Math.min(stageIndex, STAGE_GROUND_PALETTE.length - 1)];
-  const houseCount = Math.min(56, (3 + stageIndex * 3) * faceCount);
+  const stage = Math.min(stageIndex, HOUSE_CEILING_BY_STAGE.length - 1);
+  const palette = STAGE_GROUND_PALETTE[stage];
+  const ceiling = HOUSE_CEILING_BY_STAGE[stage];
+  const houseCount = Math.min(ceiling, (3 + stage * 4) * faceCount);
+  const tallThreshold = stage >= 3 ? 0.35 : stage >= 2 ? 0.45 : 1;
   const houses = Array.from({ length: houseCount }, (_, i) => ({
     x: 40 + seededRandom(`house-x-${i}`) * (width - 80),
     size: 0.8 + seededRandom(`house-s-${i}`) * 0.55,
     roof: palette.roofs[i % palette.roofs.length],
-    tall: stageIndex >= 2 && seededRandom(`house-tall-${i}`) > 0.6,
+    tall: stage >= 2 && seededRandom(`house-tall-${i}`) > tallThreshold,
   }));
   const faceWidth = width / faceCount;
   const hills = Array.from({ length: faceCount }, (_, f) => f).flatMap((f) => [
@@ -140,6 +161,7 @@ function WorldGround({ stageIndex, width = STRIP_WIDTH, faceCount = FACE_COUNT }
   let riverPath = 'M0 250 q 150 14 300 4 ';
   for (let i = 1; i < riverSegments; i++) riverPath += 't 300 6 ';
   riverPath += `v 40 h -${width} z`;
+  const lanternSpacing = stage >= 3 ? 90 : 140;
 
   return (
     <svg className="world-ground" viewBox={`0 0 ${width} 300`} preserveAspectRatio="none">
@@ -149,7 +171,17 @@ function WorldGround({ stageIndex, width = STRIP_WIDTH, faceCount = FACE_COUNT }
       <rect y="245" width={width} height="55" fill={palette.ground} />
       <path d={riverPath} fill="#9fc6de" opacity="0.8" />
       {/* City and World stage sit behind a low wall — a visible sign of a more built-up stage. */}
-      {stageIndex >= 2 && <rect y="238" width={width} height="6" fill="#8a8f98" opacity="0.7" />}
+      {stage >= 2 && <rect y="238" width={width} height="6" fill="#8a8f98" opacity="0.7" />}
+      {stage >= 2 &&
+        Array.from({ length: faceCount }, (_, f) => {
+          const base = f * faceWidth + faceWidth * 0.72;
+          return (
+            <g key={`civic-${f}`} opacity="0.7">
+              <rect x={base} y={196} width={18} height={42} fill="#8a8f98" stroke="#5c6270" />
+              <rect x={base + 22} y={208} width={14} height={30} fill="#9aa0a8" stroke="#5c6270" />
+            </g>
+          );
+        })}
       {houses.map((h, i) => (
         <g key={i} transform={`translate(${h.x} 232) scale(${h.size})`}>
           {h.tall ? (
@@ -167,10 +199,10 @@ function WorldGround({ stageIndex, width = STRIP_WIDTH, faceCount = FACE_COUNT }
           )}
         </g>
       ))}
-      {/* World stage: paper lanterns strung along the skyline. */}
-      {stageIndex >= 3 &&
-        Array.from({ length: Math.round(width / 140) }, (_, i) => {
-          const x = 60 + i * 140 + seededRandom(`lantern-x-${i}`) * 40;
+      {/* World stage: denser paper lanterns along the skyline. */}
+      {stage >= 3 &&
+        Array.from({ length: Math.round(width / lanternSpacing) }, (_, i) => {
+          const x = 40 + i * lanternSpacing + seededRandom(`lantern-x-${i}`) * 30;
           return (
             <g key={`lantern-${i}`}>
               <line x1={x} y1="0" x2={x} y2="60" stroke="#d8a943" strokeWidth="0.8" opacity="0.5" />
@@ -178,13 +210,25 @@ function WorldGround({ stageIndex, width = STRIP_WIDTH, faceCount = FACE_COUNT }
             </g>
           );
         })}
-      <WorldLandmark stageIndex={stageIndex} x={faceWidth / 2} />
+      {Array.from({ length: faceCount }, (_, f) => (
+        <WorldLandmark key={`landmark-${f}`} stageIndex={stage} x={f * faceWidth + faceWidth / 2} />
+      ))}
     </svg>
   );
 }
 
+interface WalkerPerson {
+  id: string;
+  displayName: string;
+  emoji: string;
+  kind: 'npc' | 'traveller' | 'self';
+  peer?: Peer;
+  /** Localized rank label for self + remote travellers (emoji + name). */
+  rankLabel?: string;
+}
+
 interface WalkerLayout {
-  peer: Peer;
+  person: WalkerPerson;
   top: number;
   x0: number;
   x1: number;
@@ -192,24 +236,28 @@ interface WalkerLayout {
   delay: number;
 }
 
-// Deterministic (peer.id-seeded, not array-position-seeded) so a given
-// peer keeps the same "home range" across visits regardless of who else is
+// Deterministic (id-seeded, not array-position-seeded) so a given
+// walker keeps the same "home range" across visits regardless of who else is
 // currently visible — the roster grows and occasionally loses a traveller
 // over time (see visiblePeers() in engine/community.ts), so a lane based on
 // array index would otherwise reshuffle everyone's walk whenever the cast
 // changes. Percentages are relative to the full strip, so peers may roam
 // across face boundaries.
-function buildWalkers(peers: Peer[]): WalkerLayout[] {
-  return peers.map((peer) => {
-    // Kept within 64–78% so walkers stay on the hills/ground (houses sit at
-    // ~77%) and never reach the river band, which starts around 82%.
-    const lane = 64 + Math.floor(seededRandom(`walk-lane-${peer.id}`) * 4) * 4 + seededRandom(`walk-top-${peer.id}`) * 2;
-    const spread = 12 + seededRandom(`walk-spread-${peer.id}`) * 30;
-    const x0 = 2 + seededRandom(`walk-x0-${peer.id}`) * Math.max(1, 96 - spread);
+function buildWalkers(people: WalkerPerson[], stageIndex: number): WalkerLayout[] {
+  // City/World widen the vertical band so denser crowds don't stack on one path.
+  const laneBase = stageIndex >= 2 ? 60 : 64;
+  const laneSteps = stageIndex >= 2 ? 6 : 4;
+  return people.map((person) => {
+    const lane =
+      laneBase +
+      Math.floor(seededRandom(`walk-lane-${person.id}`) * laneSteps) * 3.5 +
+      seededRandom(`walk-top-${person.id}`) * 2;
+    const spread = 12 + seededRandom(`walk-spread-${person.id}`) * 30;
+    const x0 = 2 + seededRandom(`walk-x0-${person.id}`) * Math.max(1, 96 - spread);
     const x1 = Math.min(98, x0 + spread);
-    const duration = 20 + seededRandom(`walk-dur-${peer.id}`) * 16;
-    const delay = -seededRandom(`walk-delay-${peer.id}`) * duration;
-    return { peer, top: lane, x0, x1, duration, delay };
+    const duration = 20 + seededRandom(`walk-dur-${person.id}`) * 16;
+    const delay = -seededRandom(`walk-delay-${person.id}`) * duration;
+    return { person, top: Math.min(80, lane), x0, x1, duration, delay };
   });
 }
 
@@ -234,23 +282,44 @@ function WorldWalkers({
   walkers,
   onGreet,
   speakingId,
-  L,
+  travellerGreeting,
+  selfGreeting,
+  travellerLang,
 }: {
   walkers: WalkerLayout[];
-  onGreet: (peerId: string) => void;
+  onGreet: (personId: string) => void;
   speakingId: string | null;
-  L: LocalizeFn;
+  travellerGreeting: string;
+  selfGreeting: string;
+  travellerLang: string;
 }) {
   return (
     <div className="world-walkers">
-      {walkers.map(({ peer, top, x0, x1, duration, delay }) => {
-        const greeting = greetingFor(peer);
-        const speaking = speakingId === peer.id;
+      {walkers.map(({ person, top, x0, x1, duration, delay }) => {
+        const speaking = speakingId === person.id;
+        const isSelf = person.kind === 'self';
+        const isRemote = person.kind === 'traveller';
+        const bubbleText = isSelf
+          ? selfGreeting
+          : isRemote || !person.peer
+            ? travellerGreeting
+            : greetingFor(person.peer).text;
+        const bubbleLang = isSelf
+          ? null
+          : isRemote || !person.peer
+            ? travellerLang
+            : greetingFor(person.peer).lang;
+        const aria = person.rankLabel
+          ? `${person.displayName}, ${person.rankLabel}`
+          : person.displayName;
+        const className = ['world-walker', isSelf ? 'world-walker-self' : '', speaking ? 'speaking' : '']
+          .filter(Boolean)
+          .join(' ');
         return (
           <button
-            key={peer.id}
+            key={person.id}
             type="button"
-            className={speaking ? 'world-walker speaking' : 'world-walker'}
+            className={className}
             style={{
               top: `${top}%`,
               '--x0': `${x0}%`,
@@ -258,18 +327,24 @@ function WorldWalkers({
               animationDuration: `${duration}s`,
               animationDelay: `${delay}s`,
             } as React.CSSProperties}
-            onClick={() => onGreet(peer.id)}
-            aria-label={L(peer.name)}
-            title={L(peer.name)}
+            onClick={() => onGreet(person.id)}
+            aria-label={aria}
+            title={aria}
           >
             <span className="world-walker-emoji" aria-hidden="true">
-              {peer.emoji}
+              {person.emoji}
             </span>
             {speaking && (
-              <span className="world-bubble" role="status">
-                <strong>{L(peer.name)}</strong>
-                <span className="world-bubble-text">{greeting.text}</span>
-                <span className="world-bubble-lang">{greeting.lang}</span>
+              <span className="world-bubble world-bubble-wide" role="status">
+                <strong>{person.displayName}</strong>
+                <span className="world-bubble-avatar" aria-hidden="true">
+                  {person.emoji}
+                </span>
+                {person.rankLabel && (
+                  <span className="world-bubble-rank">{person.rankLabel}</span>
+                )}
+                <span className="world-bubble-text">{bubbleText}</span>
+                {bubbleLang && <span className="world-bubble-lang">{bubbleLang}</span>}
               </span>
             )}
           </button>
@@ -341,21 +416,84 @@ export default function World() {
   const d = state as unknown as JourneyData;
   const info = worldInfo(d, today);
   const feed = communityFeed(state.startDay, today);
-  const peers = visiblePeers(state.startDay, today);
-  const walkers = buildWalkers(peers);
+  const peers = peerStats(state.startDay, today, state.xp);
   const { t, L, locale } = useT();
   const myName = useProfile((s) => s.name);
+  const myAvatar = useProfile((s) => s.avatar);
+  const myTravellerId = useTraveller((s) => s.travellerId);
   const speechMuted = useSound((s) => s.speechMuted);
   const setSpeechMuted = useSound((s) => s.setSpeechMuted);
+  const myXp = statsFromData(d).xp;
 
   const [faceIndex, setFaceIndex] = useState(0);
   const [captionIndex, setCaptionIndex] = useState(0);
   const [captionHighlight, setCaptionHighlight] = useState(false);
   const [previewStage, setPreviewStage] = useState<number | null>(null);
   const [civicId, setCivicId] = useState<string | null>(null);
+  const [activeTravellers, setActiveTravellers] = useState<ActiveTraveller[]>([]);
   const highlightTimeoutRef = useRef<number | null>(null);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
+
+  useEffect(() => {
+    let cancelled = false;
+    void fetchActiveTravellers().then((list) => {
+      if (!cancelled && list) setActiveTravellers(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [today]);
+
+  const walkers = useMemo(() => {
+    const { cap, maxReals } = walkerCapsForStage(info.stageIndex);
+    const selfRank = rankForXp(myXp);
+    const self: WalkerPerson = {
+      id: myTravellerId ? `self-${myTravellerId}` : 'walker-self',
+      displayName: myName?.trim() || t('worldYouName'),
+      emoji: isAllowedAvatar(myAvatar) ? myAvatar : DEFAULT_AVATAR,
+      kind: 'self',
+      rankLabel: `${selfRank.emoji} ${L(selfRank.name)}`,
+    };
+    const reals: WalkerPerson[] = [...activeTravellers]
+      .filter((tr) => tr.id !== myTravellerId)
+      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
+      .slice(0, maxReals)
+      .map((tr) => {
+        const rank = rankForXp(typeof tr.xp === 'number' ? tr.xp : 0);
+        return {
+          id: `traveller-${tr.id}`,
+          displayName: tr.name,
+          emoji: isAllowedAvatar(tr.avatar) ? tr.avatar : DEFAULT_AVATAR,
+          kind: 'traveller' as const,
+          rankLabel: `${rank.emoji} ${L(rank.name)}`,
+        };
+      });
+    const npcSlots = Math.max(0, cap - reals.length);
+    const npcs: WalkerPerson[] = peers.slice(0, npcSlots).map((p) => {
+      const rank = rankForXp(p.xp);
+      return {
+        id: p.peer.id,
+        displayName: L(p.peer.name),
+        emoji: p.peer.emoji,
+        kind: 'npc' as const,
+        peer: p.peer,
+        rankLabel: `${rank.emoji} ${L(rank.name)}`,
+      };
+    });
+    // Self is always present and never counts against the stage cap.
+    return buildWalkers([self, ...reals, ...npcs], info.stageIndex);
+  }, [
+    peers,
+    activeTravellers,
+    myTravellerId,
+    myName,
+    myAvatar,
+    myXp,
+    info.stageIndex,
+    L,
+    t,
+  ]);
 
   const libraryQuote = useMemo(() => {
     const owned = CARDS.filter((c) => d.unlockedCards.includes(c.id));
@@ -389,12 +527,20 @@ export default function World() {
     setFaceIndex((f) => (f + dir + FACE_COUNT) % FACE_COUNT);
   }
 
-  function greet(peerId: string) {
-    peerBubble.trigger(peerId);
-    if (!speechMuted) {
-      const peer = peers.find((p) => p.id === peerId);
-      if (peer) speakGreeting(greetingFor(peer));
+  function greet(personId: string) {
+    peerBubble.trigger(personId);
+    if (speechMuted) return;
+    const layout = walkers.find((w) => w.person.id === personId);
+    if (!layout) return;
+    if (layout.person.kind === 'npc' && layout.person.peer) {
+      speakGreeting(greetingFor(layout.person.peer));
+      return;
     }
+    if (layout.person.kind === 'self') {
+      speakAppText(t('worldSelfGreeting'), locale);
+      return;
+    }
+    speakAppText(t('worldTravellerGreeting'), locale);
   }
 
   function clickSun() {
@@ -418,7 +564,14 @@ export default function World() {
         >
           <WorldGround stageIndex={info.stageIndex} />
           <WorldBuildings buildings={info.buildings} activeId={buildingBubble.activeId} onSelect={buildingBubble.trigger} L={L} locale={locale} />
-          <WorldWalkers walkers={walkers} onGreet={greet} speakingId={peerBubble.activeId} L={L} />
+          <WorldWalkers
+            walkers={walkers}
+            onGreet={greet}
+            speakingId={peerBubble.activeId}
+            travellerGreeting={t('worldTravellerGreeting')}
+            selfGreeting={t('worldSelfGreeting')}
+            travellerLang={t('worldTravellerLang')}
+          />
         </div>
         <button type="button" className="world-rotate world-rotate-left" onClick={() => rotate(-1)} aria-label={t('worldRotateLeft')}>
           ‹

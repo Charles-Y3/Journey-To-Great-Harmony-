@@ -588,6 +588,37 @@ a {
   line-height: 1.5;
 }
 
+.avatar-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.avatar-picker-btn {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  border-radius: 10px;
+  padding: 8px 4px;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.avatar-picker-btn.active {
+  border-color: var(--jade);
+  background: var(--jade-soft);
+  box-shadow: 0 0 0 1px var(--jade);
+}
+
+@media (max-width: 480px) {
+  .avatar-picker-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .page-header h1 {
   font-size: 1.7rem;
   margin-bottom: 0.15em;
@@ -1763,6 +1794,15 @@ select:focus {
   z-index: 5;
 }
 
+.world-walker-self {
+  z-index: 3;
+}
+
+.world-walker-self .world-walker-emoji {
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px rgba(46, 125, 91, 0.55), 0 0 0 4px rgba(253, 246, 227, 0.85);
+}
+
 @keyframes world-walk {
   0%,
   100% {
@@ -1833,6 +1873,57 @@ select:focus {
   font-size: 0.64rem;
   color: var(--gold);
   margin-top: 1px;
+}
+
+.world-bubble-avatar {
+  display: block;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  margin: 2px 0 1px;
+}
+
+.world-bubble-rank {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--jade-deep);
+  margin-bottom: 3px;
+}
+
+.world-walker-plate {
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(253, 246, 227, 0.92);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2px 6px;
+  min-width: 52px;
+  max-width: 88px;
+  text-align: center;
+  line-height: 1.15;
+  pointer-events: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+.world-walker-plate-name {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.world-walker-plate-rank {
+  display: block;
+  font-size: 0.52rem;
+  color: var(--jade-deep);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .world-bubble-wide {
@@ -2153,6 +2244,22 @@ button.stage-step:disabled {
 .leader-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.leader-name {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.leader-rank {
+  display: block;
+  font-weight: 500;
+  line-height: 1.2;
 }
 
 .leader-score {
@@ -2184,6 +2291,11 @@ button.stage-step:disabled {
 
 /* The four leaderboard categories always show two-per-row, rather than
    wrapping to a fifth line or spilling into an uneven flex-wrap layout. */
+.settings-tab-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
 .leaderboard-tab-row {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
