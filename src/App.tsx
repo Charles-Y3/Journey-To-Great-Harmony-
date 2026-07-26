@@ -9,6 +9,7 @@ import { useLocale } from './state/localeStore';
 import { useReminders } from './state/reminderStore';
 import { useUi } from './state/uiStore';
 import { useProfile } from './state/profileStore';
+import { useTextScale, applyTextScale, type TextScale } from './state/textScaleStore';
 import { useTodayTasks } from './features/home/useTodayTasks';
 import { useSound, type MusicTrackId } from './state/soundStore';
 import { playMusicTrack, stopMusic, setMusicVolume as applyMusicVolume } from './engine/music';
@@ -92,7 +93,7 @@ function SidebarNavLinks() {
             {item.emoji}
             {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
           </span>
-          <span>{t(item.key)}</span>
+          <span className="nav-label">{t(item.key)}</span>
         </NavLink>
       ))}
     </>
@@ -131,7 +132,7 @@ function BottomNav() {
         {BOTTOM_NAV.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <span className="nav-emoji">{item.emoji}</span>
-            <span>{t(item.key)}</span>
+            <span className="nav-label">{t(item.key)}</span>
           </NavLink>
         ))}
         <button type="button" className="nav-link nav-link-more" onClick={() => setShowMore(true)}>
@@ -139,7 +140,7 @@ function BottomNav() {
             ⋯
             <NavBadge count={newCollectionCount} />
           </span>
-          <span>{t('navMore')}</span>
+          <span className="nav-label">{t('navMore')}</span>
         </button>
       </nav>
       {showMore && <MoreSheet onClose={() => setShowMore(false)} />}
@@ -161,6 +162,37 @@ function LanguageSection() {
           </button>
         ))}
       </div>
+    </div>
+  );
+}
+
+const TEXT_SCALE_OPTIONS: { id: TextScale; labelKey: UiKey }[] = [
+  { id: 'default', labelKey: 'settingsTextSizeDefault' },
+  { id: 'larger', labelKey: 'settingsTextSizeLarger' },
+  { id: 'largest', labelKey: 'settingsTextSizeLargest' },
+];
+
+function TextSizeSection() {
+  const { t } = useT();
+  const scale = useTextScale((s) => s.scale);
+  const setScale = useTextScale((s) => s.setScale);
+  return (
+    <div className="card">
+      <h3>{t('settingsTextSizeTitle')}</h3>
+      <p className="small muted">{t('settingsTextSizeDesc')}</p>
+      <div className="tab-row">
+        {TEXT_SCALE_OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            type="button"
+            className={opt.id === scale ? 'btn tab-btn active' : 'btn tab-btn'}
+            onClick={() => setScale(opt.id)}
+          >
+            {t(opt.labelKey)}
+          </button>
+        ))}
+      </div>
+      <p className="text-size-preview">{t('settingsTextSizePreview')}</p>
     </div>
   );
 }
@@ -719,6 +751,7 @@ function SettingsModal({
     <Modal onClose={onClose}>
       <h2>{t('settingsTitle')}</h2>
       <LanguageSection />
+      <TextSizeSection />
       <NameSection />
       <JourneyRecapSection onOpen={onOpenRecap} />
       <ReminderSection />
@@ -885,6 +918,7 @@ export default function App() {
   const harmony = useJourney((s) => s.harmonyPoints);
   const hasChosenLocale = useLocale((s) => s.hasChosen);
   const hasSetName = useProfile((s) => s.hasSetName);
+  const textScale = useTextScale((s) => s.scale);
   const today = useToday();
   const lastWelcomeSeenDay = useUi((s) => s.lastWelcomeSeenDay);
   const setLastWelcomeSeenDay = useUi((s) => s.setLastWelcomeSeenDay);
@@ -905,6 +939,11 @@ export default function App() {
   const [showPacing, setShowPacing] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
+
+  // Keep <html> --text-scale in sync (also applied on persist rehydrate).
+  useEffect(() => {
+    applyTextScale(textScale);
+  }, [textScale]);
 
   // Once per calendar day (and only past the language/name gates), greet
   // the user with a quick progress + to-do summary instead of dropping

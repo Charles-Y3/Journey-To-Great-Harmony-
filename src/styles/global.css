@@ -62,6 +62,9 @@ body,
 html {
   /* iOS Safari / older WebKit fill of the visible frame */
   height: -webkit-fill-available;
+  /* Reading scale from Settings (journey-text-scale). Nav chrome counters this. */
+  --text-scale: 1;
+  font-size: calc(100% * var(--text-scale));
 }
 
 body {
@@ -249,7 +252,15 @@ a {
   border-radius: 10px;
   color: var(--ink);
   text-decoration: none;
-  font-size: 0.92rem;
+  /* Divide by --text-scale so sidebar labels stay one line when reading size grows. */
+  font-size: calc(0.92rem / var(--text-scale, 1));
+  white-space: nowrap;
+}
+
+.nav-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .nav-link:hover {
@@ -265,9 +276,10 @@ a {
 .nav-emoji {
   position: relative;
   display: inline-block;
-  font-size: 1.1rem;
+  font-size: calc(1.1rem / var(--text-scale, 1));
   width: 1.4em;
   text-align: center;
+  flex-shrink: 0;
 }
 
 .nav-badge {
@@ -478,17 +490,29 @@ a {
   .bottom-nav .nav-link {
     flex-direction: column;
     gap: 2px;
-    font-size: 0.58rem;
-    line-height: 1.2;
+    /* Keep bottom-tab labels at default visual size + never wrap when text scale grows. */
+    font-size: calc(0.58rem / var(--text-scale, 1));
+    line-height: 1.15;
     font-weight: 400;
     font-family: inherit;
-    padding: 6px 2px;
+    padding: 6px 1px;
     text-align: center;
     justify-content: center;
     border-radius: 8px;
     width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    white-space: nowrap;
+  }
+  .bottom-nav .nav-label {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bottom-nav .nav-emoji {
+    font-size: calc(1.15rem / var(--text-scale, 1));
   }
   .bottom-nav button.nav-link-more {
     background: transparent;
@@ -498,10 +522,11 @@ a {
     appearance: none;
     -webkit-appearance: none;
     /* Keep the same type scale as NavLink tabs — do not use font:inherit (resets size). */
-    font-size: 0.58rem;
-    line-height: 1.2;
+    font-size: calc(0.58rem / var(--text-scale, 1));
+    line-height: 1.15;
     font-weight: 400;
     font-family: inherit;
+    white-space: nowrap;
   }
   .bottom-nav button.nav-link-more:hover {
     background: var(--surface-2);
@@ -554,6 +579,15 @@ a {
 }
 
 /* ── Page & cards ──────────────────────────────────────────────────── */
+.text-size-preview {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  line-height: 1.5;
+}
+
 .page-header h1 {
   font-size: 1.7rem;
   margin-bottom: 0.15em;

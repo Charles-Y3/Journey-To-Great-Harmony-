@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 5,
+    date: '2026-07-26',
+    highlights: [
+      localized(
+        '🔤 Text size in Settings — enlarge reading text (Default / Larger / Largest). Tab labels stay compact so the bottom bar does not wrap.',
+        '🔤 设置中的字号 — 放大阅读文字（默认 / 较大 / 最大）。标签栏保持紧凑，底部导航不会换行。',
+      ),
+    ],
+  },
+  {
     version: 4,
     date: '2026-07-26',
     highlights: [

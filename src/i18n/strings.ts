@@ -109,6 +109,18 @@ export const UI = {
     'Choose your language. You can change this anytime.',
     '选择你的语言，随时可以更改。',
   ),
+  settingsTextSizeTitle: localized('Text size', '字号'),
+  settingsTextSizeDesc: localized(
+    'Enlarge reading text. Tab labels stay the same so the navigation bar does not wrap.',
+    '放大阅读文字。标签栏文字保持原样，以免导航换行。',
+  ),
+  settingsTextSizeDefault: localized('Default', '默认'),
+  settingsTextSizeLarger: localized('Larger', '较大'),
+  settingsTextSizeLargest: localized('Largest', '最大'),
+  settingsTextSizePreview: localized(
+    'Preview: The examined life is worth living — and so is a clear line of type.',
+    '预览：经过省察的人生值得度过 — 清晰的文字亦然。',
+  ),
   settingsResetTitle: localized('Reset', '重置'),
   settingsResetDesc: localized(
     'Erase all progress and begin the journey again as a Seeker.',
