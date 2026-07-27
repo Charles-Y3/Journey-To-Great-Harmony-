@@ -814,8 +814,8 @@ export const UI = {
   communityRealPill: localized('shared road', '共享之路'),
   leaderboardsTitle: localized('Shared dedication', '共同的坚持'),
   leaderboardsFooter: localized(
-    'You see companions within one journey rank of you — consistency and contribution, never worth. Everyone here walks the same road.',
-    '你看见的是与你相差不超过一个旅程等级的同修 — 致敬坚持与贡献，而非价值高低。这里的每个人都走在同一条路上。',
+    'You see fellow travellers within one journey rank of you. These boards are about shared dedication — not a competition or a comparison. Everyone here walks the same road.',
+    '你看见的是与你相差不超过一个旅程等级的同修。这些榜单关乎共同的坚持，而非竞赛或比较。这里的每个人都走在同一条路上。',
   ),
   leaderboardsNearbyNote: localized(
     'Nearby band: your rank, and one above or below.',
