@@ -64,8 +64,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   ]);
 
   // Drop travellers idle longer than 30 days from the World active set.
-  const staleBefore = updatedAt - 30 * 24 * 60 * 60 * 1000;
-  await redis.zremrangebyscore(ACTIVE_KEY, 0, staleBefore);
+  // Doesn't need to run on every sync — throttle to ~1 in 20 writes; idle
+  // rows just get pruned on a later sync instead.
+  if (Math.random() < 0.05) {
+    const staleBefore = updatedAt - 30 * 24 * 60 * 60 * 1000;
+    await redis.zremrangebyscore(ACTIVE_KEY, 0, staleBefore);
+  }
 
   return res.status(200).json({ ok: true, optedIn: true });
 }

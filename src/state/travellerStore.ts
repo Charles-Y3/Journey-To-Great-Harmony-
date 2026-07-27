@@ -11,9 +11,12 @@ function newTravellerId(): string {
 interface TravellerState {
   travellerId: string | null;
   optedIn: boolean;
+  /** Serialized payload of the last successful /api/traveller/sync call, to skip no-op resyncs. */
+  lastSyncedHash: string | null;
   /** Ensure an id exists (call on first opt-in). */
   ensureId: () => string;
   setOptedIn: (optedIn: boolean) => void;
+  setLastSyncedHash: (hash: string | null) => void;
 }
 
 // Separate from journey progress / profile so Reset journey does not erase
@@ -23,6 +26,7 @@ export const useTraveller = create<TravellerState>()(
     (set, get) => ({
       travellerId: null,
       optedIn: false,
+      lastSyncedHash: null,
       ensureId: () => {
         const existing = get().travellerId;
         if (existing) return existing;
@@ -37,8 +41,9 @@ export const useTraveller = create<TravellerState>()(
         }
         set({ optedIn });
       },
+      setLastSyncedHash: (hash) => set({ lastSyncedHash: hash }),
     }),
-    { name: 'journey-traveller', version: 1 },
+    { name: 'journey-traveller', version: 2 },
   ),
 );
 

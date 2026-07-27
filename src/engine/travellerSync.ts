@@ -42,10 +42,16 @@ export async function flushTravellerSync(): Promise<boolean> {
   }
   const payload = buildPayload();
   if (!payload) return false;
+  // Skip the network round-trip when nothing has changed since the last
+  // successful sync (e.g. reopening the app with no new progress).
+  const hash = JSON.stringify(payload);
+  if (hash === useTraveller.getState().lastSyncedHash) return true;
   if (inflight) return false;
   inflight = true;
   try {
-    return await syncTraveller(payload);
+    const ok = await syncTraveller(payload);
+    if (ok) useTraveller.getState().setLastSyncedHash(hash);
+    return ok;
   } finally {
     inflight = false;
   }
