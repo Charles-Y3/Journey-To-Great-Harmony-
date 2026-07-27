@@ -47,7 +47,7 @@
         line-height: 1.25;
         min-height: 1.25em;
       }
-      /* Fixed slots above/below the stage so hints & messages never shove the board. */
+      /* Keep riddle height steady so the board doesn't jump between puzzles. */
       .meta {
         color: var(--muted);
         font-size: 0.8rem;
@@ -77,7 +77,6 @@
       .actions {
         display: flex; flex-wrap: wrap; gap: 8px;
         margin: 12px 0 0;
-        min-height: 44px;
         align-content: flex-start;
       }
       .btn {
@@ -89,18 +88,14 @@
       .btn:disabled { opacity: 0.4; cursor: not-allowed; }
       .feedback {
         margin: 10px 0 0;
-        height: 5.6em;
-        overflow: auto;
         font-size: 0.84rem; color: var(--muted); line-height: 1.4;
         white-space: pre-wrap;
       }
+      .feedback:empty { margin: 0; }
       .feedback.warn { color: var(--warn); }
       .feedback.ok { color: #9fd6b5; }
-      .solved-slot {
-        margin-top: 12px;
-        height: 8.5em;
-        overflow: auto;
-      }
+      .solved-slot { margin-top: 0; }
+      .solved-slot:has(.solved-box:not([hidden])) { margin-top: 12px; }
       .solved-box {
         padding: 12px; border-radius: 12px;
         background: rgba(61,155,110,0.12); border: 1px solid rgba(61,155,110,0.35);
@@ -169,8 +164,7 @@
             'Two figures share a bowl and a resting mat inside one ring, under a small sun: harmony as life held in common — circle, nourishment, rest, and light belonging together.',
           hints: [
             'Something round should hold the whole scene.',
-            'Nourishment sits between the two who share it.',
-            'Rest and light also belong inside the shared circle.',
+            'Nourishment sits between the two who share it — with rest and light inside the circle too.',
           ],
           parts: [
             {
@@ -247,9 +241,8 @@
           teaching:
             'A round table holds equal seats around one bowl and a central lamp. Footprints arrive from different sides: community is shared ground made visible — not a fortress, but a place prepared for many.',
           hints: [
-            'The meal belongs at the heart of the table.',
-            'Seats should gather around, not cluster on one side.',
-            'Footprints show that people arrive from more than one direction.',
+            'The meal and lamp belong at the heart of the table.',
+            'Seats gather around; footprints arrive from more than one side.',
           ],
           parts: [
             {
@@ -360,8 +353,7 @@
             'Twin weights hang from one beam over a fulcrum, with a plumb line marking the center and a base that steadies the whole: balance as even measure — not a crown, not a tip.',
           hints: [
             'Something must support from below, on a steady base.',
-            'Two similar weights should answer each other across a line.',
-            'A hanging mark can show where the true center is.',
+            'Two similar weights should answer each other across a centered line.',
           ],
           parts: [
             {
@@ -444,8 +436,7 @@
             'Two figures face each other across a shared mirror of measure: what leaves one hand returns in kind. Reciprocity is not scorekeeping — it is refusing to deal to others what you would refuse yourself.',
           hints: [
             'Two people should meet as equals, face to face.',
-            'Something between them should measure the exchange.',
-            'Gifts should answer each other — not pile on one side.',
+            'A measure between them — and gifts that answer from both sides.',
           ],
           parts: [
             {
@@ -523,8 +514,7 @@
             'Courage is not the absence of the storm. A figure advances with a bright heart while the dark weather stays ahead — and a small companion light follows, so bravery is not lonely recklessness.',
           hints: [
             'The storm belongs in front of the one who walks.',
-            'A heart should travel with the walker.',
-            'A small light can follow behind — courage need not walk alone.',
+            'A heart travels with the walker; a small light may follow behind.',
           ],
           parts: [
             {
@@ -599,8 +589,7 @@
           teaching:
             'A spoken sign and a walking path align beneath an open eye: sincerity is when what you say and what you do do not pull apart. A seal of trust rests where they meet.',
           hints: [
-            'Speech and footsteps should share one direction.',
-            'Clear seeing watches from above.',
+            'Speech and footsteps should share one direction under clear seeing.',
             'A seal of trust belongs where word and deed meet.',
           ],
           parts: [
@@ -766,6 +755,7 @@
         solved = false;
         stageWrap.classList.remove('solved');
         solvedEl.hidden = true;
+        hintBtn.disabled = false;
         const margin = 28;
         for (const p of puzzle.parts) {
           pose[p.id] = {
@@ -877,20 +867,19 @@
 
       function giveHint() {
         if (solved) return;
-        if (hintLevel >= puzzle.hints.length) {
-          setFeedback(visibleHintsText() + (visibleHintsText() ? '\n' : '') + 'No further hints — only arranging will tell you.', 'warn');
-          return;
-        }
+        if (hintLevel >= puzzle.hints.length) return;
         hintLevel += 1;
         setFeedback(visibleHintsText(), 'warn');
+        if (hintLevel >= puzzle.hints.length) {
+          hintBtn.disabled = true;
+        }
       }
 
-      /** Keep up to the last 2 hints on screen so earlier guidance is not lost. */
+      /** Both hints stay visible (max 2 total per puzzle). */
       function visibleHintsText() {
         if (hintLevel <= 0) return '';
-        const start = Math.max(0, hintLevel - 2);
         const lines = [];
-        for (let i = start; i < hintLevel; i++) {
+        for (let i = 0; i < hintLevel; i++) {
           lines.push(`Hint ${i + 1}/${puzzle.hints.length}: ${puzzle.hints[i]}`);
         }
         return lines.join('\n');
@@ -945,6 +934,7 @@
 
       function boot() {
         titleEl.textContent = puzzle.title;
+        hintBtn.disabled = false;
         scatter();
         renderPicker();
       }
