@@ -89,9 +89,10 @@
       .btn:disabled { opacity: 0.4; cursor: not-allowed; }
       .feedback {
         margin: 10px 0 0;
-        height: 4.2em;
+        height: 5.6em;
         overflow: auto;
         font-size: 0.84rem; color: var(--muted); line-height: 1.4;
+        white-space: pre-wrap;
       }
       .feedback.warn { color: var(--warn); }
       .feedback.ok { color: #9fd6b5; }
@@ -877,14 +878,22 @@
       function giveHint() {
         if (solved) return;
         if (hintLevel >= puzzle.hints.length) {
-          setFeedback('No further hints — only arranging will tell you.', 'warn');
+          setFeedback(visibleHintsText() + (visibleHintsText() ? '\n' : '') + 'No further hints — only arranging will tell you.', 'warn');
           return;
         }
         hintLevel += 1;
-        setFeedback(
-          `Hint ${hintLevel}/${puzzle.hints.length}: ${puzzle.hints[hintLevel - 1]}`,
-          'warn',
-        );
+        setFeedback(visibleHintsText(), 'warn');
+      }
+
+      /** Keep up to the last 2 hints on screen so earlier guidance is not lost. */
+      function visibleHintsText() {
+        if (hintLevel <= 0) return '';
+        const start = Math.max(0, hintLevel - 2);
+        const lines = [];
+        for (let i = start; i < hintLevel; i++) {
+          lines.push(`Hint ${i + 1}/${puzzle.hints.length}: ${puzzle.hints[i]}`);
+        }
+        return lines.join('\n');
       }
 
       function clientToSvg(event) {
