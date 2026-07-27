@@ -102,9 +102,9 @@
       <header>
         <h1>Totem Arrange</h1>
         <p>
-          Harder advanced prototype: no sockets, no labels that spoil the answer.
-          Drag parts freely. Press <strong>Contemplate</strong> when the composition
-          feels right — the puzzle checks <em>relations</em> (what signifies what), not snap targets.
+          Harder advanced prototype: no sockets, no spoiler labels, no decoys.
+          More shards to place. Drag freely, then <strong>Contemplate</strong> —
+          the puzzle checks <em>relations</em> among every piece.
         </p>
       </header>
 
@@ -129,197 +129,247 @@
         <p class="feedback" id="feedback"></p>
         <div class="solved-box" id="solved" hidden></div>
         <p class="rules">
-          Win condition is relational: e.g. “the people must stand inside the ring, with the bowl between them.”
-          A decoy piece can sit on the stage and still fail you if it breaks the meaning — or if a required part is missing from the right relationship.
+          Win condition is relational: every shard belongs in the meaning.
+          Arrange freely, then Contemplate — feedback names what relationship is still missing.
         </p>
       </div>
     </div>
 
     <script>
       /**
-       * Free-arrangement advanced prototype.
-       * Each puzzle: parts (svg + size), optional decoys, and relation rules checked on Contemplate.
-       *
-       * Relations (evaluated in viewBox space using each part's current center):
-       *   inside(a,b)     — center of a within radius of b
-       *   between(a,b,c)  — a lies roughly between b and c
-       *   above(a,b)      — a.y < b.y - margin
-       *   below(a,b)
-       *   near(a,b,d)
-       *   unused(id)      — decoy must NOT be among "meaningful" cluster (or must stay far)
-       *   used(id)        — required on stage (always true if we auto-place all; we keep all on stage)
+       * Free-arrangement advanced prototype (no decoys — more required pieces).
+       * Relations checked on Contemplate using each part's current center.
        */
 
       const PUZZLES = [
         {
           id: 'harmony',
           codename: 'Emblem I',
-          // Title/meaning hidden until solved
           revealTitle: 'Harmony',
-          riddle: 'Make a picture of shared life — not victory, not solitude.',
+          riddle: 'Make a picture of shared life under one sky — companions, meal, and shelter together.',
           teaching:
-            'Two figures share a bowl inside one ring: harmony as life held in common, not a contest. The lone blade never belonged in that meaning.',
+            'Two figures share a bowl and a resting mat inside one ring, under a small sun: harmony as life held in common — circle, nourishment, rest, and light belonging together.',
           hints: [
             'Something round should hold the whole scene.',
             'Nourishment sits between the two who share it.',
-            'A weapon has no place inside that circle.',
+            'Rest and light also belong inside the shared circle.',
           ],
           parts: [
             {
               id: 'ring',
-              svg: `<circle cx="0" cy="0" r="36" fill="none" stroke="#c5a15a" stroke-width="7"/>
-                    <circle cx="0" cy="0" r="28" fill="none" stroke="#c5a15a" stroke-width="2" opacity="0.45"/>`,
-              r: 40,
+              svg: `<circle cx="0" cy="0" r="42" fill="none" stroke="#c5a15a" stroke-width="6"/>
+                    <circle cx="0" cy="0" r="34" fill="none" stroke="#c5a15a" stroke-width="2" opacity="0.4"/>`,
+              r: 46,
             },
             {
               id: 'bowl',
-              svg: `<ellipse cx="0" cy="2" rx="16" ry="6" fill="#c5a15a"/>
-                    <path d="M-16 2 Q0 18 16 2" fill="none" stroke="#8a6a2e" stroke-width="3"/>
-                    <ellipse cx="0" cy="0" rx="13" ry="4" fill="#e2c57a"/>`,
-              r: 18,
+              svg: `<ellipse cx="0" cy="2" rx="14" ry="5" fill="#c5a15a"/>
+                    <path d="M-14 2 Q0 16 14 2" fill="none" stroke="#8a6a2e" stroke-width="3"/>
+                    <ellipse cx="0" cy="0" rx="11" ry="3.5" fill="#e2c57a"/>`,
+              r: 16,
             },
             {
               id: 'figL',
-              svg: `<circle cx="0" cy="-14" r="5" fill="#c5a15a"/>
-                    <path d="M0 -9 v16 M-7 -2 h14 M-5 7 l-4 10 M5 7 l4 10" stroke="#c5a15a" stroke-width="3" stroke-linecap="round" fill="none"/>`,
-              r: 16,
+              svg: `<circle cx="0" cy="-12" r="4.5" fill="#c5a15a"/>
+                    <path d="M0 -7 v14 M-6 -1 h12 M-4 7 l-3 8 M4 7 l3 8" stroke="#c5a15a" stroke-width="2.8" stroke-linecap="round" fill="none"/>`,
+              r: 14,
             },
             {
               id: 'figR',
-              svg: `<circle cx="0" cy="-14" r="5" fill="#c5a15a"/>
-                    <path d="M0 -9 v16 M-7 -2 h14 M-5 7 l-4 10 M5 7 l4 10" stroke="#c5a15a" stroke-width="3" stroke-linecap="round" fill="none"/>`,
+              svg: `<circle cx="0" cy="-12" r="4.5" fill="#c5a15a"/>
+                    <path d="M0 -7 v14 M-6 -1 h12 M-4 7 l-3 8 M4 7 l3 8" stroke="#c5a15a" stroke-width="2.8" stroke-linecap="round" fill="none"/>`,
+              r: 14,
+            },
+            {
+              id: 'mat',
+              svg: `<rect x="-18" y="-4" width="36" height="8" rx="2" fill="none" stroke="#c5a15a" stroke-width="3"/>
+                    <path d="M-14 0 H14" stroke="#8a6a2e" stroke-width="2"/>`,
               r: 16,
             },
             {
-              id: 'blade',
-              decoy: true,
-              svg: `<path d="M0 -22 L4 10 L0 26 L-4 10 Z" fill="#c5a15a"/>
-                    <rect x="-8" y="24" width="16" height="6" rx="1" fill="#8a6a2e"/>`,
+              id: 'sun',
+              svg: `<circle cx="0" cy="0" r="8" fill="#e2c57a"/>
+                    <path d="M0 -14 V-10 M0 10 V14 M-14 0 H-10 M10 0 H14 M-10 -10 L-7 -7 M7 7 L10 10 M10 -10 L7 -7 M-7 7 L-10 10" stroke="#c5a15a" stroke-width="2" stroke-linecap="round"/>`,
               r: 14,
             },
+            {
+              id: 'steam',
+              svg: `<path d="M-4 8 Q-8 -2 -2 -10 M2 8 Q6 -2 0 -10 M8 6 Q10 -2 6 -8" fill="none" stroke="#c5a15a" stroke-width="2" stroke-linecap="round" opacity="0.85"/>`,
+              r: 12,
+            },
           ],
-          // All must hold on Contemplate
           rules: [
             { type: 'inside', a: 'figL', b: 'ring', msg: 'One figure stands outside the shared circle.' },
             { type: 'inside', a: 'figR', b: 'ring', msg: 'One figure stands outside the shared circle.' },
             { type: 'inside', a: 'bowl', b: 'ring', msg: 'The shared meal is outside the circle.' },
+            { type: 'inside', a: 'mat', b: 'ring', msg: 'The resting place is outside the circle.' },
+            { type: 'inside', a: 'sun', b: 'ring', msg: 'The light should warm the shared circle, not shine elsewhere.' },
             { type: 'between', a: 'bowl', b: 'figL', c: 'figR', msg: 'The bowl is not held between the two figures.' },
-            { type: 'outside', a: 'blade', b: 'ring', msg: 'A blade inside the circle turns harmony into threat.' },
-            { type: 'apart', a: 'figL', b: 'figR', min: 22, msg: 'The two figures are merged — they should stand as companions, not one body.' },
+            { type: 'below', a: 'mat', b: 'bowl', msg: 'The mat should support from below the meal.' },
+            { type: 'near', a: 'steam', b: 'bowl', max: 28, msg: 'The rising warmth belongs with the bowl.' },
+            { type: 'above', a: 'steam', b: 'bowl', msg: 'Warmth should rise above the meal.' },
+            { type: 'above', a: 'sun', b: 'bowl', msg: 'Light belongs higher in the scene than the meal.' },
+            { type: 'apart', a: 'figL', b: 'figR', min: 20, msg: 'The two figures are merged — they should stand as companions.' },
+            { type: 'level', a: 'figL', b: 'figR', max: 16, msg: 'The companions should meet as equals — one stands much higher.' },
           ],
         },
         {
           id: 'commons',
           codename: 'Emblem II',
           revealTitle: 'The commons',
-          riddle: 'Arrange an open place people can approach from every side — not a fortress.',
+          riddle: 'Arrange an open meeting-place people can approach from every side.',
           teaching:
-            'Four paths meet an open court with a shared hearth. A sealed wall denies the commons: what is held together must remain approachable.',
+            'Four paths meet an open court: hearth at the center, a well for shared water, a gate of welcome, a tree for shade. The commons is approachable life — not a sealed fortress.',
           hints: [
-            'Let roads arrive from more than one direction.',
-            'Warmth belongs at the meeting place.',
-            'A blank wall blocks the meaning.',
+            'Let roads arrive from every direction.',
+            'Warmth and water belong at the meeting place.',
+            'Welcome and shade complete an open court.',
           ],
           parts: [
             {
               id: 'court',
-              svg: `<rect x="-28" y="-24" width="56" height="48" rx="4" fill="none" stroke="#c5a15a" stroke-width="4"/>
-                    <rect x="-12" y="4" width="24" height="20" fill="#141c18" stroke="#c5a15a" stroke-width="3"/>`,
-              r: 34,
+              svg: `<rect x="-30" y="-26" width="60" height="52" rx="4" fill="none" stroke="#c5a15a" stroke-width="4"/>`,
+              r: 36,
             },
             {
               id: 'hearth',
-              svg: `<circle cx="0" cy="0" r="10" fill="#e07a45"/>
-                    <path d="M0 -12 Q6 -2 0 10 Q-6 -2 0 -12" fill="#f0b060"/>`,
-              r: 14,
+              svg: `<circle cx="0" cy="0" r="9" fill="#e07a45"/>
+                    <path d="M0 -11 Q5 -2 0 9 Q-5 -2 0 -11" fill="#f0b060"/>`,
+              r: 12,
+            },
+            {
+              id: 'well',
+              svg: `<circle cx="0" cy="0" r="9" fill="none" stroke="#c5a15a" stroke-width="3"/>
+                    <circle cx="0" cy="0" r="5" fill="#4a7a8a"/>
+                    <path d="M-11 -2 H11 M-11 2 H11" stroke="#8a6a2e" stroke-width="2"/>`,
+              r: 12,
             },
             {
               id: 'pathN',
-              svg: `<path d="M0 -8 V-28" stroke="#c5a15a" stroke-width="6" stroke-linecap="round"/>`,
-              r: 12,
+              svg: `<path d="M0 -6 V-30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
+              r: 11,
+            },
+            {
+              id: 'pathS',
+              svg: `<path d="M0 6 V30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
+              r: 11,
             },
             {
               id: 'pathE',
-              svg: `<path d="M8 0 H28" stroke="#c5a15a" stroke-width="6" stroke-linecap="round"/>`,
-              r: 12,
+              svg: `<path d="M6 0 H30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
+              r: 11,
             },
             {
               id: 'pathW',
-              svg: `<path d="M-8 0 H-28" stroke="#c5a15a" stroke-width="6" stroke-linecap="round"/>`,
-              r: 12,
+              svg: `<path d="M-6 0 H-30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
+              r: 11,
             },
             {
-              id: 'wall',
-              decoy: true,
-              svg: `<rect x="-30" y="-16" width="60" height="32" fill="#c5a15a"/>
-                    <rect x="-20" y="-8" width="10" height="10" fill="#141c18"/>
-                    <rect x="-5" y="-8" width="10" height="10" fill="#141c18"/>
-                    <rect x="10" y="-8" width="10" height="10" fill="#141c18"/>`,
-              r: 28,
+              id: 'gate',
+              svg: `<path d="M-14 12 V-8 H14 V12" fill="none" stroke="#c5a15a" stroke-width="3"/>
+                    <path d="M-8 -8 V4 M8 -8 V4" stroke="#c5a15a" stroke-width="3"/>`,
+              r: 16,
+            },
+            {
+              id: 'tree',
+              svg: `<path d="M0 14 V0" stroke="#8a6a2e" stroke-width="3"/>
+                    <circle cx="0" cy="-6" r="12" fill="#3d9b6e" opacity="0.85"/>
+                    <circle cx="-7" cy="-2" r="7" fill="#2a6b4c"/>
+                    <circle cx="7" cy="-2" r="7" fill="#2a6b4c"/>`,
+              r: 16,
             },
           ],
           rules: [
             { type: 'inside', a: 'hearth', b: 'court', msg: 'The hearth is not in the open court.' },
-            { type: 'near', a: 'pathN', b: 'court', max: 55, msg: 'A path does not reach the court.' },
-            { type: 'near', a: 'pathE', b: 'court', max: 55, msg: 'A path does not reach the court.' },
-            { type: 'near', a: 'pathW', b: 'court', max: 55, msg: 'A path does not reach the court.' },
-            { type: 'above', a: 'pathN', b: 'court', msg: 'The north path should approach from above the court.' },
-            { type: 'aside', a: 'pathE', b: 'court', side: 'right', msg: 'An east path should sit to the right of the court.' },
-            { type: 'aside', a: 'pathW', b: 'court', side: 'left', msg: 'A west path should sit to the left of the court.' },
-            { type: 'far', a: 'wall', b: 'court', min: 50, msg: 'The sealed wall is crowding the commons — set it aside.' },
+            { type: 'inside', a: 'well', b: 'court', msg: 'Shared water should sit inside the court.' },
+            { type: 'apart', a: 'hearth', b: 'well', min: 18, msg: 'Fire and water need a little space — they are crowding each other.' },
+            { type: 'near', a: 'pathN', b: 'court', max: 52, msg: 'A path does not reach the court.' },
+            { type: 'near', a: 'pathS', b: 'court', max: 52, msg: 'A path does not reach the court.' },
+            { type: 'near', a: 'pathE', b: 'court', max: 52, msg: 'A path does not reach the court.' },
+            { type: 'near', a: 'pathW', b: 'court', max: 52, msg: 'A path does not reach the court.' },
+            { type: 'above', a: 'pathN', b: 'court', msg: 'The north path should approach from above.' },
+            { type: 'below', a: 'pathS', b: 'court', msg: 'The south path should approach from below.' },
+            { type: 'aside', a: 'pathE', b: 'court', side: 'right', msg: 'An east path should sit to the right.' },
+            { type: 'aside', a: 'pathW', b: 'court', side: 'left', msg: 'A west path should sit to the left.' },
+            { type: 'near', a: 'gate', b: 'pathS', max: 36, msg: 'The gate of welcome belongs with the approach from below.' },
+            { type: 'below', a: 'gate', b: 'court', msg: 'The gate should open toward those who arrive from outside.' },
+            { type: 'near', a: 'tree', b: 'court', max: 58, msg: 'Shade should stand near the meeting place.' },
+            { type: 'aside', a: 'tree', b: 'court', side: 'right', msg: 'Let the tree stand beside the court, not blocking its center.' },
           ],
         },
         {
           id: 'mean',
           codename: 'Emblem III',
           revealTitle: 'The centered mean',
-          riddle: 'Neither side should win. Find a still point that holds two equal weights.',
+          riddle: 'Neither side should win. Build a still balance that holds equal weights.',
           teaching:
-            'Twin weights rest on one beam over a fulcrum: the Mean as balance, not a crown above others. Hierarchy tips the emblem; centeredness steadies it.',
+            'Twin weights hang from one beam over a fulcrum, with a plumb line marking the center and a base that steadies the whole: the Mean as even measure — not a crown, not a tip.',
           hints: [
-            'Something must support from below.',
+            'Something must support from below, on a steady base.',
             'Two similar weights should answer each other across a line.',
-            'A crown wants height and dominance — that is not this virtue.',
+            'A hanging mark can show where the true center is.',
           ],
           parts: [
             {
               id: 'beam',
-              svg: `<rect x="-48" y="-4" width="96" height="8" rx="2" fill="#c5a15a"/>`,
-              r: 50,
+              svg: `<rect x="-52" y="-3" width="104" height="7" rx="2" fill="#c5a15a"/>`,
+              r: 54,
             },
             {
               id: 'fulcrum',
-              svg: `<path d="M0 -6 L14 28 H-14 Z" fill="#c5a15a"/>
-                    <circle cx="0" cy="-8" r="5" fill="#e2c57a"/>`,
+              svg: `<path d="M0 -4 L12 22 H-12 Z" fill="#c5a15a"/>
+                    <circle cx="0" cy="-6" r="4" fill="#e2c57a"/>`,
+              r: 18,
+            },
+            {
+              id: 'base',
+              svg: `<rect x="-22" y="-3" width="44" height="7" rx="2" fill="#8a6a2e"/>`,
               r: 20,
             },
             {
               id: 'wL',
-              svg: `<circle cx="0" cy="0" r="11" fill="#c5a15a"/>`,
+              svg: `<circle cx="0" cy="0" r="10" fill="#c5a15a"/>
+                    <path d="M0 -10 V-18" stroke="#8a6a2e" stroke-width="2"/>`,
               r: 12,
             },
             {
               id: 'wR',
-              svg: `<circle cx="0" cy="0" r="11" fill="#c5a15a"/>`,
+              svg: `<circle cx="0" cy="0" r="10" fill="#c5a15a"/>
+                    <path d="M0 -10 V-18" stroke="#8a6a2e" stroke-width="2"/>`,
               r: 12,
             },
             {
-              id: 'crown',
-              decoy: true,
-              svg: `<path d="M-22 10 L-12 -14 L0 4 L12 -14 L22 10 Z" fill="#c5a15a"/>
-                    <rect x="-22" y="8" width="44" height="8" fill="#8a6a2e"/>`,
-              r: 22,
+              id: 'cordL',
+              svg: `<path d="M0 -12 V12" stroke="#c5a15a" stroke-width="2.5" stroke-linecap="round"/>`,
+              r: 10,
+            },
+            {
+              id: 'cordR',
+              svg: `<path d="M0 -12 V12" stroke="#c5a15a" stroke-width="2.5" stroke-linecap="round"/>`,
+              r: 10,
+            },
+            {
+              id: 'plumb',
+              svg: `<path d="M0 -16 V10" stroke="#c5a15a" stroke-width="2"/>
+                    <circle cx="0" cy="14" r="5" fill="#e2c57a"/>`,
+              r: 12,
             },
           ],
           rules: [
             { type: 'below', a: 'fulcrum', b: 'beam', msg: 'The support should sit under the beam.' },
-            { type: 'near', a: 'fulcrum', b: 'beam', max: 36, msg: 'The fulcrum is too far from the beam.' },
-            { type: 'near', a: 'wL', b: 'beam', max: 40, msg: 'A weight is not resting with the beam.' },
-            { type: 'near', a: 'wR', b: 'beam', max: 40, msg: 'A weight is not resting with the beam.' },
+            { type: 'near', a: 'fulcrum', b: 'beam', max: 34, msg: 'The fulcrum is too far from the beam.' },
+            { type: 'below', a: 'base', b: 'fulcrum', msg: 'A base should steady the fulcrum from below.' },
+            { type: 'near', a: 'base', b: 'fulcrum', max: 30, msg: 'The base is not under the support.' },
+            { type: 'near', a: 'wL', b: 'beam', max: 48, msg: 'A weight is not with the beam.' },
+            { type: 'near', a: 'wR', b: 'beam', max: 48, msg: 'A weight is not with the beam.' },
             { type: 'aside', a: 'wL', b: 'fulcrum', side: 'left', msg: 'Weights should answer each other across the center.' },
             { type: 'aside', a: 'wR', b: 'fulcrum', side: 'right', msg: 'Weights should answer each other across the center.' },
-            { type: 'level', a: 'wL', b: 'wR', max: 18, msg: 'The weights are uneven — one side is winning.' },
-            { type: 'far', a: 'crown', b: 'beam', min: 45, msg: 'A crown above the balance turns the Mean into rank.' },
+            { type: 'level', a: 'wL', b: 'wR', max: 14, msg: 'The weights are uneven — one side is winning.' },
+            { type: 'apart', a: 'wL', b: 'wR', min: 40, msg: 'The weights are too close to read as two sides.' },
+            { type: 'between', a: 'cordL', b: 'beam', c: 'wL', msg: 'A cord should hang between beam and left weight.' },
+            { type: 'between', a: 'cordR', b: 'beam', c: 'wR', msg: 'A cord should hang between beam and right weight.' },
+            { type: 'below', a: 'plumb', b: 'beam', msg: 'The plumb should hang down from the beam.' },
+            { type: 'near', a: 'plumb', b: 'fulcrum', max: 28, msg: 'The plumb should mark the true center above the fulcrum.' },
           ],
         },
       ];
@@ -473,10 +523,10 @@
 
       function renderTray() {
         tray.innerHTML = '';
-        for (const p of puzzle.parts) {
+        for (let i = 0; i < puzzle.parts.length; i++) {
           const chip = document.createElement('span');
           chip.className = 'chip';
-          chip.textContent = p.decoy ? 'shard · ?' : 'shard';
+          chip.textContent = 'shard';
           tray.appendChild(chip);
         }
       }
