@@ -269,25 +269,6 @@ export default function Today() {
         </div>
       )}
 
-      <div className="card">
-        <h3>{t('keepExploringTitle')}</h3>
-        <p className="small muted">{t('keepExploringBody')}</p>
-        <div className="keep-exploring-links">
-          <Link className="keep-exploring-link" to="/turning-points">
-            <span className="keep-exploring-emoji">💧</span>
-            <span>{t('keepExploringStillWaters')}</span>
-          </Link>
-          <Link className="keep-exploring-link" to="/community">
-            <span className="keep-exploring-emoji">🌸</span>
-            <span>{t('keepExploringCompanions')}</span>
-          </Link>
-          <Link className="keep-exploring-link" to="/knowledge">
-            <span className="keep-exploring-emoji">📖</span>
-            <span>{t('keepExploringLearn')}</span>
-          </Link>
-        </div>
-      </div>
-
       {showEchoCard && echoCard && <CardModal card={echoCard} onClose={() => setShowEchoCard(false)} />}
 
       {showWeekly && (

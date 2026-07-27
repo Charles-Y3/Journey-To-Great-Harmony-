@@ -1,5 +1,6 @@
 /* ── Design tokens ─────────────────────────────────────────────────── */
 :root {
+  color-scheme: light;
   --bg: #f5efe3;
   --bg-soft: #efe6d4;
   --surface: #fffdf6;
@@ -25,6 +26,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    color-scheme: dark;
     --bg: #191611;
     --bg-soft: #14110d;
     --surface: #232019;
@@ -815,6 +817,13 @@ select:focus {
 .journal-date-input {
   width: 100%;
   box-sizing: border-box;
+  color-scheme: inherit;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-family: var(--font-body);
 }
 
 .journal-date-clear {
@@ -846,7 +855,7 @@ select:focus {
   flex: 1;
   min-width: 110px;
   width: auto;
-  color-scheme: light;
+  color-scheme: inherit;
 }
 
 /* Label/description stack full-width above the time+button controls,
@@ -1310,7 +1319,6 @@ select:focus {
   gap: 8px;
 }
 
-.keep-exploring-links,
 .first-day-guide-links {
   display: flex;
   flex-direction: column;
@@ -1318,7 +1326,6 @@ select:focus {
   margin-top: 12px;
 }
 
-.keep-exploring-link,
 .first-day-guide-link {
   display: flex;
   align-items: flex-start;
@@ -1326,19 +1333,17 @@ select:focus {
   padding: 14px 16px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background: var(--paper);
+  background: var(--surface);
   color: inherit;
   text-decoration: none;
   font-weight: 600;
 }
 
-.keep-exploring-link:hover,
 .first-day-guide-link:hover {
   border-color: var(--gold);
   background: var(--gold-soft);
 }
 
-.keep-exploring-emoji,
 .first-day-guide-emoji {
   font-size: 1.35rem;
   line-height: 1.2;

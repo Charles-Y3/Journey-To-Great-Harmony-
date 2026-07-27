@@ -345,7 +345,7 @@ export const UI = {
     '在社群榜上，给一位同修送出一句善意。',
   ),
   taskEncourageDone: localized('Encouragement sent today.', '今天已送出鼓励。'),
-  taskAlsoToday: localized('Also today', '今日也可'),
+  taskAlsoToday: localized('Optional', '可选'),
   taskEveningTitle: localized('Evening reflection', '夜间反思'),
   taskEveningDesc: localized(
     'Look back on the day with honesty and kindness.',
@@ -384,14 +384,6 @@ export const UI = {
   statWorld: localized('world', '世界'),
   statVisit: localized('visit', '前往'),
   statWisdomXp: localized('wisdom XP', '智慧经验'),
-  keepExploringTitle: localized('Keep exploring', '继续探索'),
-  keepExploringBody: localized(
-    'Still waters, companions, or a little more learning — whenever you have a quiet moment.',
-    '静水、同行，或再学一点 — 有安静片刻时再来。',
-  ),
-  keepExploringStillWaters: localized('Still Waters', '静水'),
-  keepExploringCompanions: localized('Companions', '同行'),
-  keepExploringLearn: localized('Learn', '学习'),
   weeklyEchoTitle: localized('Card of the week', '本周之卡'),
   weeklyEchoSubtitle: localized('A wisdom card from your collection, revisited.', '从你的收藏中，重访一张智慧卡牌。'),
   journeyRecapTitle: localized('My Journey so far', '我的旅程至今'),
