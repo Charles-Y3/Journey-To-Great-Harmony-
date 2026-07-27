@@ -212,105 +212,123 @@
           },
         },
         {
-          id: 'commons',
-          title: 'Commons',
-          riddle: 'Arrange an open meeting-place people can approach from every side.',
+          id: 'community',
+          title: 'Community',
+          riddle: 'Set a round table where equals meet — shared meal at the center, paths arriving from many sides.',
           teaching:
-            'Four paths meet an open court: hearth at the center, a well for shared water, a gate of welcome, a tree for shade. The commons is approachable life — not a sealed fortress.',
+            'A round table holds equal seats around one bowl and a central lamp. Footprints arrive from different sides: community is shared ground made visible — not a fortress, but a place prepared for many.',
           hints: [
-            'Let roads arrive from every direction.',
-            'Warmth and water belong at the meeting place.',
-            'Welcome and shade complete an open court.',
+            'The meal belongs at the heart of the table.',
+            'Seats should gather around, not cluster on one side.',
+            'Footprints show that people arrive from more than one direction.',
           ],
           parts: [
             {
-              id: 'court',
-              svg: `<rect x="-30" y="-26" width="60" height="52" rx="4" fill="none" stroke="#c5a15a" stroke-width="4"/>`,
-              r: 36,
+              id: 'table',
+              svg: `<ellipse cx="0" cy="0" rx="40" ry="28" fill="none" stroke="#c5a15a" stroke-width="5"/>
+                    <ellipse cx="0" cy="0" rx="32" ry="20" fill="none" stroke="#8a6a2e" stroke-width="2" opacity="0.5"/>`,
+              r: 42,
             },
             {
-              id: 'hearth',
-              svg: `<circle cx="0" cy="0" r="9" fill="#e07a45"/>
-                    <path d="M0 -11 Q5 -2 0 9 Q-5 -2 0 -11" fill="#f0b060"/>`,
+              id: 'bowl',
+              svg: `<ellipse cx="0" cy="2" rx="12" ry="5" fill="#c5a15a"/>
+                    <path d="M-12 2 Q0 14 12 2" fill="none" stroke="#8a6a2e" stroke-width="2.5"/>
+                    <ellipse cx="0" cy="0" rx="9" ry="3" fill="#e2c57a"/>`,
+              r: 14,
+            },
+            {
+              id: 'lamp',
+              svg: `<path d="M0 8 V0" stroke="#8a6a2e" stroke-width="2"/>
+                    <path d="M-5 0 L0 -10 L5 0 Z" fill="#e2c57a"/>
+                    <circle cx="0" cy="-3" r="2.5" fill="#f0b060"/>`,
+              r: 10,
+            },
+            {
+              id: 'seatN',
+              svg: `<rect x="-10" y="-6" width="20" height="10" rx="2" fill="none" stroke="#c5a15a" stroke-width="2.5"/>
+                    <path d="M-6 4 V10 M6 4 V10" stroke="#c5a15a" stroke-width="2"/>`,
               r: 12,
             },
             {
-              id: 'well',
-              svg: `<circle cx="0" cy="0" r="9" fill="none" stroke="#c5a15a" stroke-width="3"/>
-                    <circle cx="0" cy="0" r="5" fill="#4a7a8a"/>
-                    <path d="M-11 -2 H11 M-11 2 H11" stroke="#8a6a2e" stroke-width="2"/>`,
+              id: 'seatS',
+              svg: `<rect x="-10" y="-6" width="20" height="10" rx="2" fill="none" stroke="#c5a15a" stroke-width="2.5"/>
+                    <path d="M-6 4 V10 M6 4 V10" stroke="#c5a15a" stroke-width="2"/>`,
               r: 12,
             },
             {
-              id: 'pathN',
-              svg: `<path d="M0 -6 V-30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
-              r: 11,
+              id: 'seatE',
+              svg: `<rect x="-10" y="-6" width="20" height="10" rx="2" fill="none" stroke="#c5a15a" stroke-width="2.5"/>
+                    <path d="M-6 4 V10 M6 4 V10" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 12,
             },
             {
-              id: 'pathS',
-              svg: `<path d="M0 6 V30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
-              r: 11,
+              id: 'seatW',
+              svg: `<rect x="-10" y="-6" width="20" height="10" rx="2" fill="none" stroke="#c5a15a" stroke-width="2.5"/>
+                    <path d="M-6 4 V10 M6 4 V10" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 12,
             },
             {
-              id: 'pathE',
-              svg: `<path d="M6 0 H30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
-              r: 11,
+              id: 'printsN',
+              svg: `<ellipse cx="-4" cy="-8" rx="4" ry="6" fill="none" stroke="#c5a15a" stroke-width="2"/>
+                    <ellipse cx="4" cy="2" rx="4" ry="6" fill="none" stroke="#c5a15a" stroke-width="2"/>
+                    <ellipse cx="-2" cy="12" rx="4" ry="6" fill="none" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 14,
             },
             {
-              id: 'pathW',
-              svg: `<path d="M-6 0 H-30" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
-              r: 11,
+              id: 'printsE',
+              svg: `<ellipse cx="-8" cy="-4" rx="6" ry="4" fill="none" stroke="#c5a15a" stroke-width="2"/>
+                    <ellipse cx="2" cy="2" rx="6" ry="4" fill="none" stroke="#c5a15a" stroke-width="2"/>
+                    <ellipse cx="12" cy="-2" rx="6" ry="4" fill="none" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 14,
             },
             {
-              id: 'gate',
-              svg: `<path d="M-14 12 V-8 H14 V12" fill="none" stroke="#c5a15a" stroke-width="3"/>
-                    <path d="M-8 -8 V4 M8 -8 V4" stroke="#c5a15a" stroke-width="3"/>`,
-              r: 16,
-            },
-            {
-              id: 'tree',
-              svg: `<path d="M0 14 V0" stroke="#8a6a2e" stroke-width="3"/>
-                    <circle cx="0" cy="-6" r="12" fill="#3d9b6e" opacity="0.85"/>
-                    <circle cx="-7" cy="-2" r="7" fill="#2a6b4c"/>
-                    <circle cx="7" cy="-2" r="7" fill="#2a6b4c"/>`,
-              r: 16,
+              id: 'printsW',
+              svg: `<ellipse cx="8" cy="-4" rx="6" ry="4" fill="none" stroke="#c5a15a" stroke-width="2"/>
+                    <ellipse cx="-2" cy="2" rx="6" ry="4" fill="none" stroke="#c5a15a" stroke-width="2"/>
+                    <ellipse cx="-12" cy="-2" rx="6" ry="4" fill="none" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 14,
             },
           ],
           rules: [
-            { type: 'inside', a: 'hearth', b: 'court', msg: 'The hearth is not in the open court.' },
-            { type: 'inside', a: 'well', b: 'court', msg: 'Shared water should sit inside the court.' },
-            { type: 'apart', a: 'hearth', b: 'well', min: 18, msg: 'Fire and water need a little space — they are crowding each other.' },
-            { type: 'near', a: 'pathN', b: 'court', max: 52, msg: 'A path does not reach the court.' },
-            { type: 'near', a: 'pathS', b: 'court', max: 52, msg: 'A path does not reach the court.' },
-            { type: 'near', a: 'pathE', b: 'court', max: 52, msg: 'A path does not reach the court.' },
-            { type: 'near', a: 'pathW', b: 'court', max: 52, msg: 'A path does not reach the court.' },
-            { type: 'above', a: 'pathN', b: 'court', msg: 'The north path should approach from above.' },
-            { type: 'below', a: 'pathS', b: 'court', msg: 'The south path should approach from below.' },
-            { type: 'aside', a: 'pathE', b: 'court', side: 'right', msg: 'An east path should sit to the right.' },
-            { type: 'aside', a: 'pathW', b: 'court', side: 'left', msg: 'A west path should sit to the left.' },
-            { type: 'near', a: 'gate', b: 'pathS', max: 36, msg: 'The gate of welcome belongs with the approach from below.' },
-            { type: 'below', a: 'gate', b: 'court', msg: 'The gate should open toward those who arrive from outside.' },
-            { type: 'near', a: 'tree', b: 'court', max: 58, msg: 'Shade should stand near the meeting place.' },
-            { type: 'aside', a: 'tree', b: 'court', side: 'right', msg: 'Let the tree stand beside the court, not blocking its center.' },
+            { type: 'inside', a: 'bowl', b: 'table', msg: 'The shared meal should sit at the heart of the table.' },
+            { type: 'inside', a: 'lamp', b: 'table', msg: 'The lamp should light the center of the gathering.' },
+            { type: 'near', a: 'lamp', b: 'bowl', max: 28, msg: 'Lamp and meal belong together at the center.' },
+            { type: 'above', a: 'seatN', b: 'table', msg: 'A seat should wait above the table.' },
+            { type: 'below', a: 'seatS', b: 'table', msg: 'A seat should wait below the table.' },
+            { type: 'aside', a: 'seatE', b: 'table', side: 'right', msg: 'A seat should wait to the right of the table.' },
+            { type: 'aside', a: 'seatW', b: 'table', side: 'left', msg: 'A seat should wait to the left of the table.' },
+            { type: 'near', a: 'seatN', b: 'table', max: 55, msg: 'A seat has drifted too far from the table.' },
+            { type: 'near', a: 'seatS', b: 'table', max: 55, msg: 'A seat has drifted too far from the table.' },
+            { type: 'near', a: 'seatE', b: 'table', max: 55, msg: 'A seat has drifted too far from the table.' },
+            { type: 'near', a: 'seatW', b: 'table', max: 55, msg: 'A seat has drifted too far from the table.' },
+            { type: 'apart', a: 'seatN', b: 'seatS', min: 50, msg: 'Opposite seats should face across the table, not huddle.' },
+            { type: 'apart', a: 'seatE', b: 'seatW', min: 50, msg: 'Opposite seats should face across the table, not huddle.' },
+            { type: 'above', a: 'printsN', b: 'seatN', msg: 'Footprints should approach the north seat from outside.' },
+            { type: 'aside', a: 'printsE', b: 'seatE', side: 'right', msg: 'Footprints should approach the east seat from outside.' },
+            { type: 'aside', a: 'printsW', b: 'seatW', side: 'left', msg: 'Footprints should approach the west seat from outside.' },
+            { type: 'near', a: 'printsN', b: 'seatN', max: 40, msg: 'Northern footprints should lead toward a seat.' },
+            { type: 'near', a: 'printsE', b: 'seatE', max: 40, msg: 'Eastern footprints should lead toward a seat.' },
+            { type: 'near', a: 'printsW', b: 'seatW', max: 40, msg: 'Western footprints should lead toward a seat.' },
           ],
           solution: {
-            court: { x: 100, y: 100 },
-            hearth: { x: 90, y: 96 },
-            well: { x: 112, y: 104 },
-            pathN: { x: 100, y: 62 },
-            pathS: { x: 100, y: 142 },
-            pathE: { x: 142, y: 100 },
-            pathW: { x: 58, y: 100 },
-            gate: { x: 100, y: 158 },
-            tree: { x: 150, y: 90 },
+            table: { x: 100, y: 108 },
+            bowl: { x: 100, y: 112 },
+            lamp: { x: 100, y: 96 },
+            seatN: { x: 100, y: 62 },
+            seatS: { x: 100, y: 154 },
+            seatE: { x: 152, y: 110 },
+            seatW: { x: 48, y: 110 },
+            printsN: { x: 100, y: 36 },
+            printsE: { x: 176, y: 110 },
+            printsW: { x: 24, y: 110 },
           },
         },
         {
-          id: 'mean',
-          title: 'Mean',
+          id: 'balance',
+          title: 'Balance',
           riddle: 'Neither side should win. Build a still balance that holds equal weights.',
           teaching:
-            'Twin weights hang from one beam over a fulcrum, with a plumb line marking the center and a base that steadies the whole: the Mean as even measure — not a crown, not a tip.',
+            'Twin weights hang from one beam over a fulcrum, with a plumb line marking the center and a base that steadies the whole: balance as even measure — not a crown, not a tip.',
           hints: [
             'Something must support from below, on a steady base.',
             'Two similar weights should answer each other across a line.',
