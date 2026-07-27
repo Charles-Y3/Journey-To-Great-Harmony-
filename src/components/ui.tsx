@@ -167,6 +167,15 @@ export function CapstoneModal({
   );
 }
 
+/** Emoji avatar with an optional collision ring — shared between World.tsx and Community.tsx. */
+export function AvatarGlyph({ emoji, ringed, className }: { emoji: string; ringed?: boolean; className?: string }) {
+  return (
+    <span className={[className, ringed ? 'avatar-ring-collision' : ''].filter(Boolean).join(' ')} aria-hidden="true">
+      {emoji}
+    </span>
+  );
+}
+
 export function PageHeader({ emoji, title, subtitle }: { emoji: string; title: string; subtitle: string }) {
   return (
     <header className="page-header">

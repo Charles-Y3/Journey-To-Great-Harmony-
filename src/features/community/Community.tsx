@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useJourney, useToday } from '../../state/store';
 import { useProfile } from '../../state/profileStore';
 import { useTraveller } from '../../state/travellerStore';
@@ -8,7 +8,8 @@ import { statsFromData, forestInfo, type JourneyData } from '../../state/selecto
 import type { Peer } from '../../data/types';
 import { DEFAULT_AVATAR, isAllowedAvatar } from '../../data/avatars';
 import { rankForXp, rankIndexForXp } from '../../engine/progression';
-import { PageHeader } from '../../components/ui';
+import { findNameCollisions, travellerTag } from '../../engine/travellerTags';
+import { AvatarGlyph, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { encouragementBanner, type UiKey } from '../../i18n/strings';
 import { agedPeerEmoji, companionAgeYears } from '../../engine/companions';
@@ -135,6 +136,18 @@ export default function Community() {
     .filter((r) => r.me || Math.abs(rankIndexForXp(r.journeyXp) - myRankIdx) <= NEARBY_RANK_BAND)
     .sort((a, b) => b.score - a.score);
 
+  // Only real travellers are candidates for the duplicate-name tag — NPCs are a
+  // fixed roster and "me" is already visually distinct.
+  const collisionIds = useMemo(
+    () => findNameCollisions(realRows.map((r) => ({ id: r.id, name: r.name }))),
+    [realRows],
+  );
+  const [revealedId, setRevealedId] = useState<string | null>(null);
+  function revealTag(id: string) {
+    setRevealedId(id);
+    window.setTimeout(() => setRevealedId((cur) => (cur === id ? null : cur)), 3000);
+  }
+
   const encouragersToday = visiblePeers(state.startDay, today).filter((p) => peerEncouragesToday(p.id, state.encouragedOn[p.id], today));
   const activeCategory = CATEGORIES.find((c) => c.id === category)!;
 
@@ -163,17 +176,30 @@ export default function Community() {
         </div>
         <p className="small muted">{t(activeCategory.descKey)}</p>
         <p className="small muted">{t('leaderboardsNearbyNote')}</p>
-        {rows.map((row, i) => (
-          <div key={row.id} className={row.me ? 'leader-row me' : 'leader-row'}>
-            <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
-            <span className="leader-emoji">{row.emoji}</span>
-            <span className="leader-info">
-              <span className="leader-name">{row.name}</span>
-              <span className="leader-rank small muted">{row.rankLabel}</span>
-            </span>
-            <span className="leader-score">{row.score}</span>
-          </div>
-        ))}
+        {rows.map((row, i) => {
+          const hasCollision = collisionIds.has(row.id);
+          const tag = hasCollision ? travellerTag(row.id) : null;
+          return (
+            <div
+              key={row.id}
+              className={row.me ? 'leader-row me' : 'leader-row'}
+              title={tag ? `${row.name} · ${tag}` : undefined}
+              onClick={tag ? () => revealTag(row.id) : undefined}
+              style={tag ? { cursor: 'pointer' } : undefined}
+            >
+              <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
+              <AvatarGlyph emoji={row.emoji} ringed={hasCollision} className="leader-emoji" />
+              <span className="leader-info">
+                <span className="leader-name">
+                  {row.name}
+                  {tag && revealedId === row.id && <span className="leader-tag">{tag}</span>}
+                </span>
+                <span className="leader-rank small muted">{row.rankLabel}</span>
+              </span>
+              <span className="leader-score">{row.score}</span>
+            </div>
+          );
+        })}
         <p className="small muted" style={{ marginTop: 8 }}>
           {t('leaderboardsFooter')}
         </p>

@@ -63,12 +63,23 @@ export async function fetchLeaderboard(cat: LeaderboardCategory): Promise<Leader
   }
 }
 
-export async function fetchActiveTravellers(): Promise<ActiveTraveller[] | null> {
+export interface ActiveTravellersResult {
+  travellers: ActiveTraveller[];
+  /** Real travellers near the caller's own rank tier, only populated when `myId`/`myXp` are passed. */
+  nearby: ActiveTraveller[];
+}
+
+export async function fetchActiveTravellers(me?: { myId?: string; myXp?: number }): Promise<ActiveTravellersResult | null> {
   try {
-    const res = await fetch('/api/travellers/active');
+    const params = new URLSearchParams();
+    if (me?.myId) params.set('myId', me.myId);
+    if (typeof me?.myXp === 'number') params.set('myXp', String(me.myXp));
+    const qs = params.toString();
+    const res = await fetch(qs ? `/api/travellers/active?${qs}` : '/api/travellers/active');
     if (!res.ok) return null;
-    const data = await readJson<{ travellers?: ActiveTraveller[] }>(res);
-    return data?.travellers ?? null;
+    const data = await readJson<{ travellers?: ActiveTraveller[]; nearby?: ActiveTraveller[] }>(res);
+    if (!data) return null;
+    return { travellers: data.travellers ?? [], nearby: data.nearby ?? [] };
   } catch {
     return null;
   }

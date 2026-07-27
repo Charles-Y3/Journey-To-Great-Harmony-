@@ -1842,6 +1842,27 @@ select:focus {
   box-shadow: 0 0 0 2px rgba(46, 125, 91, 0.55), 0 0 0 4px rgba(253, 246, 227, 0.85);
 }
 
+/* Shown when a traveller's name collides with another one in the same list. */
+.avatar-ring-collision {
+  border-radius: 999px;
+  box-shadow: 0 0 0 2px var(--sky), 0 0 0 4px rgba(253, 246, 227, 0.85);
+}
+
+.world-bubble-tag {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-top: 1px;
+}
+
+.leader-tag {
+  font-size: 0.68rem;
+  font-weight: 500;
+  color: var(--ink-soft);
+  margin-left: 4px;
+}
+
 @keyframes world-walk {
   0%,
   100% {

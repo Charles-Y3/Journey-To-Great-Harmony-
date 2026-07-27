@@ -1,4 +1,5 @@
 import { AVATARS, isAllowedAvatar } from '../../src/data/avatars.js';
+import { RANKS, rankIndexForXp } from '../../src/engine/progression.js';
 import type { LbCategory } from './redis.js';
 
 export { AVATARS, isAllowedAvatar };
@@ -75,6 +76,16 @@ export function scoreForCategory(rec: Pick<TravellerRecord, 'xp' | 'streak' | 'c
     case 'growth':
       return rec.growth;
   }
+}
+
+/** XP range spanning the caller's rank tier ±1, for "near my rank" queries. */
+export function rankXpBand(xp: number): { min: number; max: number } {
+  const idx = rankIndexForXp(xp);
+  const lo = Math.max(0, idx - 1);
+  const hi = Math.min(RANKS.length - 1, idx + 1);
+  const min = RANKS[lo].minXp;
+  const max = hi + 1 < RANKS.length ? RANKS[hi + 1].minXp - 1 : Number.MAX_SAFE_INTEGER;
+  return { min, max };
 }
 
 /** Normalize Upstash zrange+withScores results across SDK shapes. */

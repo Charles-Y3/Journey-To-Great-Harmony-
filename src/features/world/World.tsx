@@ -17,9 +17,10 @@ import { communityFeed, peerStats } from '../../engine/community';
 import { fetchActiveTravellers, type ActiveTraveller } from '../../engine/travellerApi';
 import { walkerCapsForStage } from '../../engine/worldWalkers';
 import { hashString, rankForXp, seededRandom } from '../../engine/progression';
+import { findNameCollisions, travellerTag } from '../../engine/travellerTags';
 import { speakGreeting, speakAppText } from '../../engine/speech';
 import { playSfx } from '../../engine/sfx';
-import { Modal, PageHeader, ProgressBar } from '../../components/ui';
+import { AvatarGlyph, Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { worldProgressLabel, buildingLockedNote } from '../../i18n/strings';
 
@@ -225,6 +226,8 @@ interface WalkerPerson {
   peer?: Peer;
   /** Localized rank label for self + remote travellers (emoji + name). */
   rankLabel?: string;
+  /** Set only when this traveller's name collides with another real traveller's. */
+  tag?: string | null;
 }
 
 interface WalkerLayout {
@@ -309,9 +312,10 @@ function WorldWalkers({
           : isRemote || !person.peer
             ? travellerLang
             : greetingFor(person.peer).lang;
-        const aria = person.rankLabel
+        const baseAria = person.rankLabel
           ? `${person.displayName}, ${person.rankLabel}`
           : person.displayName;
+        const aria = person.tag ? `${baseAria} · ${person.tag}` : baseAria;
         const className = ['world-walker', isSelf ? 'world-walker-self' : '', speaking ? 'speaking' : '']
           .filter(Boolean)
           .join(' ');
@@ -331,9 +335,7 @@ function WorldWalkers({
             aria-label={aria}
             title={aria}
           >
-            <span className="world-walker-emoji" aria-hidden="true">
-              {person.emoji}
-            </span>
+            <AvatarGlyph emoji={person.emoji} ringed={!!person.tag} className="world-walker-emoji" />
             {speaking && (
               <span className="world-bubble world-bubble-wide" role="status">
                 <strong>{person.displayName}</strong>
@@ -343,6 +345,7 @@ function WorldWalkers({
                 {person.rankLabel && (
                   <span className="world-bubble-rank">{person.rankLabel}</span>
                 )}
+                {person.tag && <span className="world-bubble-tag">{person.tag}</span>}
                 <span className="world-bubble-text">{bubbleText}</span>
                 {bubbleLang && <span className="world-bubble-lang">{bubbleLang}</span>}
               </span>
@@ -431,19 +434,22 @@ export default function World() {
   const [previewStage, setPreviewStage] = useState<number | null>(null);
   const [civicId, setCivicId] = useState<string | null>(null);
   const [activeTravellers, setActiveTravellers] = useState<ActiveTraveller[]>([]);
+  const [nearbyTravellers, setNearbyTravellers] = useState<ActiveTraveller[]>([]);
   const highlightTimeoutRef = useRef<number | null>(null);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
 
   useEffect(() => {
     let cancelled = false;
-    void fetchActiveTravellers().then((list) => {
-      if (!cancelled && list) setActiveTravellers(list);
+    void fetchActiveTravellers({ myId: myTravellerId ?? undefined, myXp }).then((result) => {
+      if (cancelled || !result) return;
+      setActiveTravellers(result.travellers);
+      setNearbyTravellers(result.nearby);
     });
     return () => {
       cancelled = true;
     };
-  }, [today]);
+  }, [today, myTravellerId, myXp]);
 
   const walkers = useMemo(() => {
     const { cap, maxReals } = walkerCapsForStage(info.stageIndex);
@@ -455,11 +461,26 @@ export default function World() {
       kind: 'self',
       rankLabel: `${selfRank.emoji} ${L(selfRank.name)}`,
     };
-    const reals: WalkerPerson[] = [...activeTravellers]
-      .filter((tr) => tr.id !== myTravellerId)
-      .sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0))
-      .slice(0, maxReals)
-      .map((tr) => {
+    // Reserve a "top few" quota of the most recently-active real travellers, then
+    // fill the rest of the budget with real travellers near the user's own rank
+    // (so near-rank picks can't be crowded out by a pure recency sort), backfilling
+    // from the remaining recents if there aren't enough near-rank candidates.
+    const topFew = Math.min(8, maxReals);
+    const excludeSelf = (tr: ActiveTraveller) => tr.id !== myTravellerId;
+    const byRecency = (a: ActiveTraveller, b: ActiveTraveller) => (b.updatedAt || 0) - (a.updatedAt || 0);
+    const recentSorted = [...activeTravellers].filter(excludeSelf).sort(byRecency);
+    const topPicks = recentSorted.slice(0, topFew);
+    const usedIds = new Set(topPicks.map((tr) => tr.id));
+    const nearPicks = nearbyTravellers
+      .filter((tr) => excludeSelf(tr) && !usedIds.has(tr.id))
+      .slice(0, Math.max(0, maxReals - topPicks.length));
+    nearPicks.forEach((tr) => usedIds.add(tr.id));
+    const backfill = recentSorted
+      .filter((tr) => !usedIds.has(tr.id))
+      .slice(0, Math.max(0, maxReals - topPicks.length - nearPicks.length));
+    const realTravellers = [...topPicks, ...nearPicks, ...backfill].slice(0, maxReals);
+    const collisionIds = findNameCollisions(realTravellers.map((tr) => ({ id: tr.id, name: tr.name })));
+    const reals: WalkerPerson[] = realTravellers.map((tr) => {
         const rank = rankForXp(typeof tr.xp === 'number' ? tr.xp : 0);
         return {
           id: `traveller-${tr.id}`,
@@ -467,6 +488,7 @@ export default function World() {
           emoji: isAllowedAvatar(tr.avatar) ? tr.avatar : DEFAULT_AVATAR,
           kind: 'traveller' as const,
           rankLabel: `${rank.emoji} ${L(rank.name)}`,
+          tag: collisionIds.has(tr.id) ? travellerTag(tr.id) : null,
         };
       });
     const npcSlots = Math.max(0, cap - reals.length);
@@ -486,6 +508,7 @@ export default function World() {
   }, [
     peers,
     activeTravellers,
+    nearbyTravellers,
     myTravellerId,
     myName,
     myAvatar,
