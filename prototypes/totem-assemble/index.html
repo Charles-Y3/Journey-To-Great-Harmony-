@@ -61,15 +61,6 @@
       }
       .draggable { cursor: grab; }
       .draggable.dragging { cursor: grabbing; opacity: 0.92; }
-      .tray {
-        display: flex; flex-wrap: wrap; gap: 8px;
-        margin-top: 12px; min-height: 44px;
-      }
-      .chip {
-        border: 1px solid #456055; background: #16201b; color: var(--muted);
-        border-radius: 999px; padding: 7px 11px; font-size: 0.75rem;
-      }
-      .chip.in-play { opacity: 0.35; }
       .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
       .btn {
         appearance: none; border: none; border-radius: 10px;
@@ -117,8 +108,6 @@
         <div class="stage-wrap" id="stageWrap">
           <svg class="stage-svg" id="stage" viewBox="0 0 200 200" aria-label="Arrangement stage"></svg>
         </div>
-
-        <div class="tray" id="tray"></div>
 
         <div class="actions">
           <button type="button" class="btn btn-primary" id="checkBtn">Contemplate</button>
@@ -403,6 +392,243 @@
             plumb: { x: 100, y: 108 },
           },
         },
+        {
+          id: 'reciprocity',
+          codename: 'Emblem IV',
+          revealTitle: 'Reciprocity',
+          riddle: 'What you would not suffer, do not place upon another — arrange a fair exchange.',
+          teaching:
+            'Two figures face each other across a shared mirror of measure: what leaves one hand returns in kind. Reciprocity is not scorekeeping — it is refusing to deal to others what you would refuse yourself.',
+          hints: [
+            'Two people should meet as equals, face to face.',
+            'Something between them should measure the exchange.',
+            'Gifts should answer each other — not pile on one side.',
+          ],
+          parts: [
+            {
+              id: 'figL',
+              svg: `<circle cx="0" cy="-12" r="4.5" fill="#c5a15a"/>
+                    <path d="M0 -7 v14 M-6 -1 h12 M-4 7 l-3 8 M4 7 l3 8" stroke="#c5a15a" stroke-width="2.8" stroke-linecap="round" fill="none"/>`,
+              r: 14,
+            },
+            {
+              id: 'figR',
+              svg: `<circle cx="0" cy="-12" r="4.5" fill="#c5a15a"/>
+                    <path d="M0 -7 v14 M-6 -1 h12 M-4 7 l-3 8 M4 7 l3 8" stroke="#c5a15a" stroke-width="2.8" stroke-linecap="round" fill="none"/>`,
+              r: 14,
+            },
+            {
+              id: 'mirror',
+              svg: `<ellipse cx="0" cy="0" rx="10" ry="22" fill="none" stroke="#c5a15a" stroke-width="3"/>
+                    <path d="M-4 -10 L4 0 L-4 10" fill="none" stroke="#e2c57a" stroke-width="2"/>`,
+              r: 16,
+            },
+            {
+              id: 'giftL',
+              svg: `<rect x="-8" y="-6" width="16" height="12" rx="2" fill="#c5a15a"/>
+                    <path d="M-8 0 H8 M0 -6 V6" stroke="#8a6a2e" stroke-width="2"/>`,
+              r: 12,
+            },
+            {
+              id: 'giftR',
+              svg: `<rect x="-8" y="-6" width="16" height="12" rx="2" fill="#c5a15a"/>
+                    <path d="M-8 0 H8 M0 -6 V6" stroke="#8a6a2e" stroke-width="2"/>`,
+              r: 12,
+            },
+            {
+              id: 'handL',
+              svg: `<path d="M-10 4 Q-2 -8 8 2" fill="none" stroke="#c5a15a" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="8" cy="2" r="3" fill="#e2c57a"/>`,
+              r: 12,
+            },
+            {
+              id: 'handR',
+              svg: `<path d="M10 4 Q2 -8 -8 2" fill="none" stroke="#c5a15a" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="-8" cy="2" r="3" fill="#e2c57a"/>`,
+              r: 12,
+            },
+          ],
+          rules: [
+            { type: 'aside', a: 'figL', b: 'mirror', side: 'left', msg: 'One person should stand on each side of the measure.' },
+            { type: 'aside', a: 'figR', b: 'mirror', side: 'right', msg: 'One person should stand on each side of the measure.' },
+            { type: 'level', a: 'figL', b: 'figR', max: 14, msg: 'The two should meet as equals — one stands much higher.' },
+            { type: 'apart', a: 'figL', b: 'figR', min: 40, msg: 'They need space to face each other across the exchange.' },
+            { type: 'between', a: 'mirror', b: 'figL', c: 'figR', msg: 'The measure should stand between the two people.' },
+            { type: 'near', a: 'giftL', b: 'figL', max: 32, msg: 'A gift should stay with the one who offers it.' },
+            { type: 'near', a: 'giftR', b: 'figR', max: 32, msg: 'A gift should stay with the one who offers it.' },
+            { type: 'aside', a: 'giftL', b: 'mirror', side: 'left', msg: 'Gifts should answer from both sides.' },
+            { type: 'aside', a: 'giftR', b: 'mirror', side: 'right', msg: 'Gifts should answer from both sides.' },
+            { type: 'level', a: 'giftL', b: 'giftR', max: 16, msg: 'The exchange is uneven — one gift sits much higher.' },
+            { type: 'between', a: 'handL', b: 'giftL', c: 'mirror', msg: 'An open hand should reach from gift toward the shared measure.' },
+            { type: 'between', a: 'handR', b: 'giftR', c: 'mirror', msg: 'An open hand should reach from gift toward the shared measure.' },
+          ],
+          solution: {
+            figL: { x: 58, y: 100 },
+            figR: { x: 142, y: 100 },
+            mirror: { x: 100, y: 100 },
+            giftL: { x: 48, y: 128 },
+            giftR: { x: 152, y: 128 },
+            handL: { x: 72, y: 118 },
+            handR: { x: 128, y: 118 },
+          },
+        },
+        {
+          id: 'courage',
+          codename: 'Emblem V',
+          revealTitle: 'Courage',
+          riddle: 'Fear is present — yet a steady heart still steps toward what must be faced.',
+          teaching:
+            'Courage is not the absence of the storm. A figure advances with a bright heart while the dark weather stays ahead — and a small companion light follows, so bravery is not lonely recklessness.',
+          hints: [
+            'The storm belongs in front of the one who walks.',
+            'A heart should travel with the walker.',
+            'A small light can follow behind — courage need not walk alone.',
+          ],
+          parts: [
+            {
+              id: 'walker',
+              svg: `<circle cx="0" cy="-14" r="5" fill="#c5a15a"/>
+                    <path d="M0 -8 v18 M-8 0 h10 M8 2 l10 4 M-4 10 l-6 12 M4 10 l8 12" stroke="#c5a15a" stroke-width="3" stroke-linecap="round" fill="none"/>`,
+              r: 18,
+            },
+            {
+              id: 'heart',
+              svg: `<path d="M0 6 C0 6 -12 -2 -12 -10 C-12 -16 -6 -16 0 -10 C6 -16 12 -16 12 -10 C12 -2 0 6 0 6Z" fill="#c45c4a"/>`,
+              r: 14,
+            },
+            {
+              id: 'storm',
+              svg: `<path d="M-20 -4 Q-8 -18 6 -8 Q16 -16 22 -2 Q8 4 -4 0 Q-16 8 -20 -4Z" fill="#5a6a78"/>
+                    <path d="M-2 4 L6 18 L0 16 L8 30" fill="none" stroke="#e2c57a" stroke-width="3" stroke-linecap="round"/>`,
+              r: 22,
+            },
+            {
+              id: 'ground',
+              svg: `<path d="M-40 0 H40" stroke="#8a6a2e" stroke-width="4" stroke-linecap="round"/>
+                    <path d="M-20 6 H30" stroke="#5a4a28" stroke-width="2" opacity="0.7"/>`,
+              r: 28,
+            },
+            {
+              id: 'step',
+              svg: `<ellipse cx="0" cy="0" rx="10" ry="4" fill="none" stroke="#c5a15a" stroke-width="2" stroke-dasharray="3 2"/>`,
+              r: 10,
+            },
+            {
+              id: 'lamp',
+              svg: `<path d="M0 10 V0" stroke="#8a6a2e" stroke-width="2"/>
+                    <path d="M-6 0 L0 -12 L6 0 Z" fill="#e2c57a"/>
+                    <circle cx="0" cy="-4" r="3" fill="#f0b060"/>`,
+              r: 12,
+            },
+            {
+              id: 'banner',
+              svg: `<path d="M-2 16 V-16" stroke="#8a6a2e" stroke-width="2.5"/>
+                    <path d="M0 -14 H16 L12 -6 L16 2 H0 Z" fill="#3d9b6e"/>`,
+              r: 14,
+            },
+          ],
+          rules: [
+            { type: 'below', a: 'ground', b: 'walker', msg: 'The path should lie under the one who walks.' },
+            { type: 'near', a: 'walker', b: 'ground', max: 40, msg: 'The walker has left the ground.' },
+            { type: 'aside', a: 'storm', b: 'walker', side: 'right', msg: 'What must be faced should stand ahead of the walker.' },
+            { type: 'near', a: 'storm', b: 'walker', max: 70, msg: 'The trial is too far to be the next step.' },
+            { type: 'near', a: 'heart', b: 'walker', max: 28, msg: 'The heart should travel with the one who advances.' },
+            { type: 'above', a: 'heart', b: 'ground', msg: 'The heart belongs with the living walker, not buried in the road.' },
+            { type: 'between', a: 'step', b: 'walker', c: 'storm', msg: 'A footprint of intent should lie between walker and storm.' },
+            { type: 'aside', a: 'lamp', b: 'walker', side: 'left', msg: 'A companion light should follow behind, not lead into the storm alone.' },
+            { type: 'near', a: 'lamp', b: 'walker', max: 45, msg: 'The companion light has drifted too far.' },
+            { type: 'near', a: 'banner', b: 'walker', max: 36, msg: 'Courage carries a sign of purpose — keep the banner with the walker.' },
+            { type: 'above', a: 'banner', b: 'ground', msg: 'The banner should rise above the road.' },
+          ],
+          solution: {
+            ground: { x: 100, y: 150 },
+            walker: { x: 78, y: 118 },
+            heart: { x: 68, y: 96 },
+            storm: { x: 132, y: 96 },
+            step: { x: 108, y: 120 },
+            lamp: { x: 48, y: 130 },
+            banner: { x: 92, y: 92 },
+          },
+        },
+        {
+          id: 'sincerity',
+          codename: 'Emblem VI',
+          revealTitle: 'Sincerity',
+          riddle: 'Let word and deed stand in one line under a clear seeing.',
+          teaching:
+            'A spoken sign and a walking path align beneath an open eye: sincerity is when what you say and what you do do not pull apart. A seal of trust rests where they meet.',
+          hints: [
+            'Speech and footsteps should share one direction.',
+            'Clear seeing watches from above.',
+            'A seal of trust belongs where word and deed meet.',
+          ],
+          parts: [
+            {
+              id: 'eye',
+              svg: `<ellipse cx="0" cy="0" rx="18" ry="10" fill="none" stroke="#c5a15a" stroke-width="3"/>
+                    <circle cx="0" cy="0" r="5" fill="#e2c57a"/>
+                    <circle cx="0" cy="0" r="2" fill="#141c18"/>`,
+              r: 16,
+            },
+            {
+              id: 'word',
+              svg: `<path d="M-16 8 Q-16 -12 0 -12 Q16 -12 16 0 Q16 10 4 10 H-4 L-10 16 Z" fill="none" stroke="#c5a15a" stroke-width="3"/>
+                    <path d="M-6 -2 H6 M-4 4 H4" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 18,
+            },
+            {
+              id: 'path',
+              svg: `<path d="M0 -28 V28" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>
+                    <path d="M-8 -12 H8 M-8 4 H8 M-8 18 H8" stroke="#8a6a2e" stroke-width="2"/>`,
+              r: 22,
+            },
+            {
+              id: 'foot',
+              svg: `<ellipse cx="0" cy="2" rx="8" ry="12" fill="#c5a15a"/>
+                    <circle cx="-3" cy="-8" r="3" fill="#e2c57a"/>`,
+              r: 12,
+            },
+            {
+              id: 'seal',
+              svg: `<rect x="-12" y="-12" width="24" height="24" rx="3" fill="none" stroke="#c45c4a" stroke-width="3"/>
+                    <path d="M-6 0 H6 M0 -6 V6" stroke="#c45c4a" stroke-width="2"/>`,
+              r: 14,
+            },
+            {
+              id: 'root',
+              svg: `<path d="M0 -6 V16 M0 8 Q-14 18 -18 28 M0 8 Q14 18 18 28" fill="none" stroke="#8a6a2e" stroke-width="3" stroke-linecap="round"/>`,
+              r: 16,
+            },
+            {
+              id: 'light',
+              svg: `<circle cx="0" cy="0" r="7" fill="#e2c57a" opacity="0.9"/>
+                    <path d="M0 -14 V-10 M0 10 V14 M-14 0 H-10 M10 0 H14" stroke="#c5a15a" stroke-width="2"/>`,
+              r: 12,
+            },
+          ],
+          rules: [
+            { type: 'above', a: 'eye', b: 'word', msg: 'Clear seeing should watch from above speech.' },
+            { type: 'above', a: 'eye', b: 'path', msg: 'Clear seeing should watch from above the deed.' },
+            { type: 'near', a: 'light', b: 'eye', max: 30, msg: 'Light belongs with clear seeing.' },
+            { type: 'aside', a: 'word', b: 'path', side: 'left', msg: 'Word and deed should stand side by side — speech to one side of the path.' },
+            { type: 'near', a: 'word', b: 'path', max: 50, msg: 'Word and deed have drifted too far apart.' },
+            { type: 'level', a: 'word', b: 'path', max: 22, msg: 'Word and deed should share one height of intent.' },
+            { type: 'below', a: 'foot', b: 'path', msg: 'Footsteps should follow under the path of deed.' },
+            { type: 'near', a: 'foot', b: 'path', max: 36, msg: 'The footsteps have left the path.' },
+            { type: 'between', a: 'seal', b: 'word', c: 'path', msg: 'The seal of trust should sit where word and deed meet.' },
+            { type: 'below', a: 'root', b: 'seal', msg: 'Sincerity needs roots under the seal — depth, not display alone.' },
+            { type: 'near', a: 'root', b: 'seal', max: 36, msg: 'The roots are not under the seal.' },
+          ],
+          solution: {
+            eye: { x: 100, y: 48 },
+            light: { x: 122, y: 42 },
+            word: { x: 72, y: 100 },
+            path: { x: 116, y: 108 },
+            foot: { x: 116, y: 138 },
+            seal: { x: 94, y: 112 },
+            root: { x: 94, y: 148 },
+          },
+        },
       ];
 
       const picker = document.getElementById('picker');
@@ -410,7 +636,6 @@
       const metaEl = document.getElementById('meta');
       const stage = document.getElementById('stage');
       const stageWrap = document.getElementById('stageWrap');
-      const tray = document.getElementById('tray');
       const feedback = document.getElementById('feedback');
       const solvedEl = document.getElementById('solved');
       const checkBtn = document.getElementById('checkBtn');
@@ -553,16 +778,6 @@
         }
       }
 
-      function renderTray() {
-        tray.innerHTML = '';
-        for (let i = 0; i < puzzle.parts.length; i++) {
-          const chip = document.createElement('span');
-          chip.className = 'chip';
-          chip.textContent = 'shard';
-          tray.appendChild(chip);
-        }
-      }
-
       function render() {
         titleEl.textContent = solved ? puzzle.revealTitle : puzzle.codename;
         metaEl.textContent = solved
@@ -682,7 +897,6 @@
       function boot() {
         titleEl.textContent = puzzle.codename;
         scatter();
-        renderTray();
         renderPicker();
       }
 
