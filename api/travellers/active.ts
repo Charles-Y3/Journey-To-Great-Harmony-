@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ACTIVE_KEY, getRedis, travellerKey } from '../_lib/redis';
-import { parseZScoredMembers, recordFromHash } from '../_lib/travellers';
+import { ACTIVE_KEY, getRedis, travellerKey } from '../_lib/redis.js';
+import { parseZScoredMembers, recordFromHash } from '../_lib/travellers.js';
 
 const TOP_N = 24;
 

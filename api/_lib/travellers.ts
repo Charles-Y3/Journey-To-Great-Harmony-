@@ -1,5 +1,5 @@
-import { AVATARS, isAllowedAvatar } from '../../src/data/avatars';
-import type { LbCategory } from './redis';
+import { AVATARS, isAllowedAvatar } from '../../src/data/avatars.js';
+import type { LbCategory } from './redis.js';
 
 export { AVATARS, isAllowedAvatar };
 

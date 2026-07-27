@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getRedis, LB_KEYS, type LbCategory, travellerKey } from './_lib/redis';
-import { LB_CATEGORIES, parseZScoredMembers, recordFromHash } from './_lib/travellers';
+import { getRedis, LB_KEYS, type LbCategory, travellerKey } from './_lib/redis.js';
+import { LB_CATEGORIES, parseZScoredMembers, recordFromHash } from './_lib/travellers.js';
 
 const TOP_N = 20;
 

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { ACTIVE_KEY, getRedis, LB_KEYS, travellerKey } from '../_lib/redis';
-import { compassionScore, parseSyncBody, scoreForCategory } from '../_lib/travellers';
+import { ACTIVE_KEY, getRedis, LB_KEYS, travellerKey } from '../_lib/redis.js';
+import { compassionScore, parseSyncBody, scoreForCategory } from '../_lib/travellers.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
