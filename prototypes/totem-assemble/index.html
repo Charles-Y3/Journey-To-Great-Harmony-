@@ -75,9 +75,14 @@
       .draggable { cursor: grab; }
       .draggable.dragging { cursor: grabbing; opacity: 0.92; }
       .actions {
-        display: flex; flex-wrap: wrap; gap: 8px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
         margin: 12px 0 0;
-        align-content: flex-start;
+      }
+      .actions .btn {
+        width: 100%;
+        text-align: center;
       }
       .btn {
         appearance: none; border: none; border-radius: 10px;
@@ -134,8 +139,7 @@
         <div class="actions">
           <button type="button" class="btn btn-primary" id="checkBtn">Contemplate</button>
           <button type="button" class="btn" id="scatterBtn">Scatter</button>
-          <button type="button" class="btn" id="hintBtn">Hint (costs clarity)</button>
-          <button type="button" class="btn" id="answerBtn">Show answer</button>
+          <button type="button" class="btn" id="hintBtn">Hint</button>
         </div>
 
         <p class="feedback" id="feedback"></p>
@@ -671,7 +675,6 @@
       const checkBtn = document.getElementById('checkBtn');
       const scatterBtn = document.getElementById('scatterBtn');
       const hintBtn = document.getElementById('hintBtn');
-      const answerBtn = document.getElementById('answerBtn');
 
       let puzzle = PUZZLES[0];
       /** @type {Record<string, {x:number,y:number}>} */
@@ -826,14 +829,14 @@
         `;
       }
 
-      function revealSolved(fromAnswer) {
+      function revealSolved() {
         solved = true;
         stageWrap.classList.add('solved');
-        setFeedback(fromAnswer ? 'Answer shown.' : 'The relations hold.', 'ok');
+        setFeedback('The relations hold.', 'ok');
         solvedEl.hidden = false;
         solvedEl.innerHTML = `<h3>${puzzle.title}</h3>
           <p>${puzzle.teaching}</p>
-          <p class="muted">${fromAnswer ? 'Shown answer — relational layout for testing.' : 'Prototype — relational check, not socket snapping. No XP.'}</p>`;
+          <p class="muted">Prototype — relational check, not socket snapping. No XP.</p>`;
         render();
       }
 
@@ -845,24 +848,7 @@
             return;
           }
         }
-        revealSolved(false);
-      }
-
-      function showAnswer() {
-        pose = {};
-        for (const p of puzzle.parts) {
-          const s = puzzle.solution[p.id];
-          pose[p.id] = { x: s.x, y: s.y };
-        }
-        // Sanity: if authoring drifts, surface the first failing rule.
-        for (const rule of puzzle.rules) {
-          if (!evalRule(rule)) {
-            setFeedback('Answer layout failed a rule: ' + rule.msg, 'warn');
-            render();
-            return;
-          }
-        }
-        revealSolved(true);
+        revealSolved();
       }
 
       function giveHint() {
@@ -949,7 +935,6 @@
         scatter();
       });
       hintBtn.addEventListener('click', giveHint);
-      answerBtn.addEventListener('click', showAnswer);
 
       boot();
     </script>
