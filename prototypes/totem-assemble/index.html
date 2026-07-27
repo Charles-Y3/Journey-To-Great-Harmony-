@@ -3,275 +3,108 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Totem Assemble — Virtue Glyph prototype</title>
+    <title>Totem Arrange — Advanced glyph prototype</title>
     <style>
       :root {
-        --bg: #1a2420;
-        --panel: #24302a;
-        --ink: #e8efe9;
-        --muted: #9aafa3;
+        --bg: #121916;
+        --panel: #1c2822;
+        --ink: #e7eee8;
+        --muted: #8fa397;
         --accent: #3d9b6e;
-        --accent-dim: #2a6b4c;
-        --ghost: rgba(232, 239, 233, 0.12);
-        --socket: rgba(61, 155, 110, 0.22);
-        --socket-hot: rgba(61, 155, 110, 0.45);
+        --accent-dim: #245a40;
         --piece: #c5a15a;
-        --danger: #c45c4a;
+        --warn: #d4a27f;
         --radius: 14px;
         --font: "Segoe UI", system-ui, sans-serif;
       }
-
-      * {
-        box-sizing: border-box;
-      }
-
+      * { box-sizing: border-box; }
       body {
         margin: 0;
         min-height: 100dvh;
         font-family: var(--font);
         color: var(--ink);
         background:
-          radial-gradient(ellipse at 20% 0%, #2a4036 0%, transparent 50%),
-          radial-gradient(ellipse at 90% 100%, #1e3329 0%, transparent 45%),
+          radial-gradient(ellipse at 10% 0%, #24352d 0%, transparent 42%),
+          radial-gradient(ellipse at 100% 80%, #1a2c24 0%, transparent 40%),
           var(--bg);
       }
-
-      .wrap {
-        max-width: 440px;
-        margin: 0 auto;
-        padding: 20px 16px 48px;
-      }
-
-      header h1 {
-        font-size: 1.15rem;
-        font-weight: 650;
-        margin: 0 0 4px;
-        letter-spacing: 0.02em;
-      }
-
-      header p {
-        margin: 0 0 16px;
-        color: var(--muted);
-        font-size: 0.88rem;
-        line-height: 1.4;
-      }
-
-      .pill-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-bottom: 16px;
-      }
-
+      .wrap { max-width: 460px; margin: 0 auto; padding: 18px 14px 56px; }
+      header h1 { font-size: 1.12rem; margin: 0 0 4px; font-weight: 650; }
+      header p { margin: 0 0 14px; color: var(--muted); font-size: 0.86rem; line-height: 1.45; }
+      .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
       .pill {
-        border: 1px solid #3a4f45;
-        background: var(--panel);
-        color: var(--ink);
-        border-radius: 999px;
-        padding: 8px 14px;
-        font-size: 0.85rem;
-        cursor: pointer;
+        border: 1px solid #354840; background: var(--panel); color: var(--ink);
+        border-radius: 999px; padding: 8px 12px; font-size: 0.82rem; cursor: pointer;
       }
-
-      .pill.active {
-        border-color: var(--accent);
-        background: var(--accent-dim);
-      }
-
+      .pill.active { border-color: var(--accent); background: var(--accent-dim); }
       .card {
-        background: var(--panel);
-        border: 1px solid #354840;
-        border-radius: var(--radius);
-        padding: 16px;
+        background: var(--panel); border: 1px solid #31433a;
+        border-radius: var(--radius); padding: 14px;
       }
-
-      .card h2 {
-        margin: 0 0 6px;
-        font-size: 1.05rem;
-      }
-
-      .hint {
-        color: var(--muted);
-        font-size: 0.82rem;
-        margin: 0 0 14px;
-        line-height: 1.4;
-      }
-
-      .stage {
+      .card h2 { margin: 0 0 4px; font-size: 1rem; }
+      .meta { color: var(--muted); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.4; }
+      .stage-wrap {
         position: relative;
         width: 100%;
         aspect-ratio: 1;
         border-radius: 12px;
-        background: #18221e;
-        border: 1px dashed #3d5348;
+        background: #141c18;
+        border: 1px solid #2c3d34;
         overflow: hidden;
-        touch-action: manipulation;
+        touch-action: none;
+        user-select: none;
       }
-
-      .stage svg {
-        width: 100%;
-        height: 100%;
-        display: block;
+      .stage-wrap.solved { border-color: var(--accent); }
+      .stage-svg { width: 100%; height: 100%; display: block; }
+      .vignette {
+        fill: none; stroke: rgba(232,239,233,0.08); stroke-width: 2;
       }
-
-      .ghost {
-        fill: var(--ghost);
-        stroke: rgba(232, 239, 233, 0.2);
-        stroke-width: 2;
-      }
-
-      .socket {
-        fill: var(--socket);
-        stroke: rgba(61, 155, 110, 0.55);
-        stroke-width: 2;
-        stroke-dasharray: 6 4;
-        cursor: pointer;
-        transition: fill 0.15s;
-      }
-
-      .socket.hot {
-        fill: var(--socket-hot);
-        stroke: var(--accent);
-        stroke-dasharray: none;
-      }
-
-      .socket.filled {
-        fill: transparent;
-        stroke: transparent;
-        pointer-events: none;
-      }
-
-      .placed {
-        pointer-events: none;
-      }
-
+      .draggable { cursor: grab; }
+      .draggable.dragging { cursor: grabbing; opacity: 0.92; }
       .tray {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
-        gap: 10px;
-        margin-top: 14px;
-        min-height: 96px;
+        display: flex; flex-wrap: wrap; gap: 8px;
+        margin-top: 12px; min-height: 44px;
       }
-
-      .piece {
-        appearance: none;
-        border: 2px solid #4a6356;
-        background: #1c2923;
-        border-radius: 12px;
-        padding: 8px 6px 10px;
-        color: var(--ink);
-        cursor: pointer;
-        touch-action: manipulation;
+      .chip {
+        border: 1px solid #456055; background: #16201b; color: var(--muted);
+        border-radius: 999px; padding: 7px 11px; font-size: 0.75rem;
       }
-
-      .piece svg {
-        width: 100%;
-        height: 56px;
-        display: block;
-      }
-
-      .piece span {
-        display: block;
-        margin-top: 6px;
-        font-size: 0.75rem;
-        color: var(--muted);
-        text-align: center;
-      }
-
-      .piece.selected {
-        border-color: var(--accent);
-        box-shadow: 0 0 0 2px rgba(61, 155, 110, 0.35);
-      }
-
-      .piece.shake {
-        animation: shake 0.35s ease;
-      }
-
-      @keyframes shake {
-        0%,
-        100% {
-          transform: translateX(0);
-        }
-        25% {
-          transform: translateX(-5px);
-        }
-        75% {
-          transform: translateX(5px);
-        }
-      }
-
-      .actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 14px;
-      }
-
+      .chip.in-play { opacity: 0.35; }
+      .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
       .btn {
-        appearance: none;
-        border: none;
-        border-radius: 10px;
-        padding: 11px 16px;
-        font-size: 0.92rem;
-        font-weight: 600;
-        cursor: pointer;
-        background: #3a4f45;
-        color: var(--ink);
+        appearance: none; border: none; border-radius: 10px;
+        padding: 10px 14px; font-size: 0.88rem; font-weight: 600;
+        cursor: pointer; background: #354840; color: var(--ink);
       }
-
-      .btn-primary {
-        background: var(--accent);
-        color: #04140c;
+      .btn-primary { background: var(--accent); color: #06140c; }
+      .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+      .feedback {
+        margin-top: 10px; min-height: 1.3em;
+        font-size: 0.84rem; color: var(--muted); line-height: 1.4;
       }
-
-      .btn:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
+      .feedback.warn { color: var(--warn); }
+      .feedback.ok { color: #9fd6b5; }
+      .solved-box {
+        margin-top: 12px; padding: 12px; border-radius: 12px;
+        background: rgba(61,155,110,0.12); border: 1px solid rgba(61,155,110,0.35);
       }
-
-      .solved {
-        margin-top: 14px;
-        padding: 14px;
-        border-radius: 12px;
-        background: rgba(61, 155, 110, 0.12);
-        border: 1px solid rgba(61, 155, 110, 0.35);
-      }
-
-      .solved h3 {
-        margin: 0 0 6px;
-        font-size: 1rem;
-      }
-
-      .solved p {
-        margin: 0 0 8px;
-        font-size: 0.88rem;
-        line-height: 1.45;
-        color: var(--ink);
-      }
-
-      .solved .muted {
-        color: var(--muted);
-        font-size: 0.8rem;
-        margin: 0;
-      }
-
-      .status {
-        margin-top: 10px;
-        min-height: 1.2em;
-        font-size: 0.8rem;
-        color: var(--muted);
-      }
-
-      .status.err {
-        color: #e8a090;
+      .solved-box h3 { margin: 0 0 6px; font-size: 0.95rem; }
+      .solved-box p { margin: 0 0 8px; font-size: 0.86rem; line-height: 1.45; }
+      .solved-box .muted { margin: 0; color: var(--muted); font-size: 0.78rem; }
+      .rules {
+        margin: 12px 0 0; padding: 10px 12px; border-radius: 10px;
+        background: #15201b; color: var(--muted); font-size: 0.78rem; line-height: 1.45;
       }
     </style>
   </head>
   <body>
     <div class="wrap">
       <header>
-        <h1>Totem Assemble</h1>
+        <h1>Totem Arrange</h1>
         <p>
-          One-off prototype for Advanced Virtue Glyphs: restore a picture/totem from named parts (not Chinese character tiles).
+          Harder advanced prototype: no sockets, no labels that spoil the answer.
+          Drag parts freely. Press <strong>Contemplate</strong> when the composition
+          feels right — the puzzle checks <em>relations</em> (what signifies what), not snap targets.
         </p>
       </header>
 
@@ -279,184 +112,346 @@
 
       <div class="card">
         <h2 id="title"></h2>
-        <p class="hint" id="hint"></p>
-        <div class="stage" id="stage" aria-label="Totem board"></div>
-        <div class="tray" id="tray" aria-label="Parts tray"></div>
-        <div class="actions">
-          <button type="button" class="btn btn-primary" id="startBtn">Start</button>
-          <button type="button" class="btn" id="resetBtn" hidden>Shuffle</button>
+        <p class="meta" id="meta"></p>
+
+        <div class="stage-wrap" id="stageWrap">
+          <svg class="stage-svg" id="stage" viewBox="0 0 200 200" aria-label="Arrangement stage"></svg>
         </div>
-        <p class="status" id="status"></p>
-        <div class="solved" id="solved" hidden></div>
+
+        <div class="tray" id="tray"></div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" id="checkBtn">Contemplate</button>
+          <button type="button" class="btn" id="scatterBtn">Scatter</button>
+          <button type="button" class="btn" id="hintBtn">Hint (costs clarity)</button>
+        </div>
+
+        <p class="feedback" id="feedback"></p>
+        <div class="solved-box" id="solved" hidden></div>
+        <p class="rules">
+          Win condition is relational: e.g. “the people must stand inside the ring, with the bowl between them.”
+          A decoy piece can sit on the stage and still fail you if it breaks the meaning — or if a required part is missing from the right relationship.
+        </p>
       </div>
     </div>
 
     <script>
       /**
-       * Each part is an SVG path (or group markup) drawn in a 200×200 viewBox.
-       * Sockets are circular hit targets; placement snaps the part to socket.cx/cy.
+       * Free-arrangement advanced prototype.
+       * Each puzzle: parts (svg + size), optional decoys, and relation rules checked on Contemplate.
+       *
+       * Relations (evaluated in viewBox space using each part's current center):
+       *   inside(a,b)     — center of a within radius of b
+       *   between(a,b,c)  — a lies roughly between b and c
+       *   above(a,b)      — a.y < b.y - margin
+       *   below(a,b)
+       *   near(a,b,d)
+       *   unused(id)      — decoy must NOT be among "meaningful" cluster (or must stay far)
+       *   used(id)        — required on stage (always true if we auto-place all; we keep all on stage)
        */
+
       const PUZZLES = [
         {
           id: 'harmony',
-          title: 'Harmony totem',
-          blurb: 'Shared life inside one circle — not a contest of worth.',
+          codename: 'Emblem I',
+          // Title/meaning hidden until solved
+          revealTitle: 'Harmony',
+          riddle: 'Make a picture of shared life — not victory, not solitude.',
           teaching:
-            'Harmony here is pictured as two figures sharing a bowl under a round “all-under-heaven” ring. The parts only lock when the circle holds the meal and the people together.',
+            'Two figures share a bowl inside one ring: harmony as life held in common, not a contest. The lone blade never belonged in that meaning.',
+          hints: [
+            'Something round should hold the whole scene.',
+            'Nourishment sits between the two who share it.',
+            'A weapon has no place inside that circle.',
+          ],
           parts: [
             {
               id: 'ring',
-              label: 'shared ring',
-              socket: { cx: 100, cy: 100, r: 82, innerR: 52 },
-              svg: `<circle cx="100" cy="100" r="72" fill="none" stroke="#c5a15a" stroke-width="10"/>
-                    <circle cx="100" cy="100" r="58" fill="none" stroke="#c5a15a" stroke-width="3" opacity="0.5"/>`,
+              svg: `<circle cx="0" cy="0" r="36" fill="none" stroke="#c5a15a" stroke-width="7"/>
+                    <circle cx="0" cy="0" r="28" fill="none" stroke="#c5a15a" stroke-width="2" opacity="0.45"/>`,
+              r: 40,
             },
             {
               id: 'bowl',
-              label: 'shared bowl',
-              socket: { cx: 100, cy: 128, r: 36 },
-              svg: `<ellipse cx="100" cy="122" rx="34" ry="12" fill="#c5a15a"/>
-                    <path d="M66 122 Q100 155 134 122" fill="none" stroke="#8a6a2e" stroke-width="4"/>
-                    <ellipse cx="100" cy="118" rx="28" ry="8" fill="#e2c57a"/>`,
+              svg: `<ellipse cx="0" cy="2" rx="16" ry="6" fill="#c5a15a"/>
+                    <path d="M-16 2 Q0 18 16 2" fill="none" stroke="#8a6a2e" stroke-width="3"/>
+                    <ellipse cx="0" cy="0" rx="13" ry="4" fill="#e2c57a"/>`,
+              r: 18,
             },
             {
-              id: 'figures',
-              label: 'two figures',
-              socket: { cx: 100, cy: 72, r: 40 },
-              svg: `<circle cx="78" cy="58" r="10" fill="#c5a15a"/>
-                    <path d="M78 68 v34 M66 78 h24 M68 102 l-8 18 M88 102 l8 18" stroke="#c5a15a" stroke-width="5" stroke-linecap="round" fill="none"/>
-                    <circle cx="122" cy="58" r="10" fill="#c5a15a"/>
-                    <path d="M122 68 v34 M110 78 h24 M112 102 l-8 18 M132 102 l8 18" stroke="#c5a15a" stroke-width="5" stroke-linecap="round" fill="none"/>`,
+              id: 'figL',
+              svg: `<circle cx="0" cy="-14" r="5" fill="#c5a15a"/>
+                    <path d="M0 -9 v16 M-7 -2 h14 M-5 7 l-4 10 M5 7 l4 10" stroke="#c5a15a" stroke-width="3" stroke-linecap="round" fill="none"/>`,
+              r: 16,
+            },
+            {
+              id: 'figR',
+              svg: `<circle cx="0" cy="-14" r="5" fill="#c5a15a"/>
+                    <path d="M0 -9 v16 M-7 -2 h14 M-5 7 l-4 10 M5 7 l4 10" stroke="#c5a15a" stroke-width="3" stroke-linecap="round" fill="none"/>`,
+              r: 16,
+            },
+            {
+              id: 'blade',
+              decoy: true,
+              svg: `<path d="M0 -22 L4 10 L0 26 L-4 10 Z" fill="#c5a15a"/>
+                    <rect x="-8" y="24" width="16" height="6" rx="1" fill="#8a6a2e"/>`,
+              r: 14,
             },
           ],
-          decoys: [
-            {
-              id: 'sword',
-              label: 'lone blade',
-              svg: `<path d="M100 40 L108 120 L100 160 L92 120 Z" fill="#c5a15a"/>
-                    <rect x="88" y="158" width="24" height="10" rx="2" fill="#8a6a2e"/>`,
-            },
+          // All must hold on Contemplate
+          rules: [
+            { type: 'inside', a: 'figL', b: 'ring', msg: 'One figure stands outside the shared circle.' },
+            { type: 'inside', a: 'figR', b: 'ring', msg: 'One figure stands outside the shared circle.' },
+            { type: 'inside', a: 'bowl', b: 'ring', msg: 'The shared meal is outside the circle.' },
+            { type: 'between', a: 'bowl', b: 'figL', c: 'figR', msg: 'The bowl is not held between the two figures.' },
+            { type: 'outside', a: 'blade', b: 'ring', msg: 'A blade inside the circle turns harmony into threat.' },
+            { type: 'apart', a: 'figL', b: 'figR', min: 22, msg: 'The two figures are merged — they should stand as companions, not one body.' },
           ],
         },
         {
           id: 'commons',
-          title: 'Commons totem',
-          blurb: 'An open court — what is held in common, not claimed alone.',
+          codename: 'Emblem II',
+          revealTitle: 'The commons',
+          riddle: 'Arrange an open place people can approach from every side — not a fortress.',
           teaching:
-            'The open gate, the shared hearth, and the four paths only make a commons when they meet in the middle. A closed wall piece will not belong here.',
+            'Four paths meet an open court with a shared hearth. A sealed wall denies the commons: what is held together must remain approachable.',
+          hints: [
+            'Let roads arrive from more than one direction.',
+            'Warmth belongs at the meeting place.',
+            'A blank wall blocks the meaning.',
+          ],
           parts: [
             {
               id: 'court',
-              label: 'open court',
-              socket: { cx: 100, cy: 108, r: 48 },
-              svg: `<rect x="55" y="70" width="90" height="80" rx="6" fill="none" stroke="#c5a15a" stroke-width="6"/>
-                    <rect x="78" y="118" width="44" height="32" fill="#1c2923" stroke="#c5a15a" stroke-width="4"/>`,
+              svg: `<rect x="-28" y="-24" width="56" height="48" rx="4" fill="none" stroke="#c5a15a" stroke-width="4"/>
+                    <rect x="-12" y="4" width="24" height="20" fill="#141c18" stroke="#c5a15a" stroke-width="3"/>`,
+              r: 34,
             },
             {
               id: 'hearth',
-              label: 'shared hearth',
-              socket: { cx: 100, cy: 100, r: 28 },
-              svg: `<circle cx="100" cy="100" r="18" fill="#e07a45"/>
-                    <path d="M100 78 Q110 95 100 112 Q90 95 100 78" fill="#f0b060"/>
-                    <path d="M88 120 h24" stroke="#c5a15a" stroke-width="5" stroke-linecap="round"/>`,
+              svg: `<circle cx="0" cy="0" r="10" fill="#e07a45"/>
+                    <path d="M0 -12 Q6 -2 0 10 Q-6 -2 0 -12" fill="#f0b060"/>`,
+              r: 14,
             },
             {
-              id: 'paths',
-              label: 'four paths',
-              socket: { cx: 100, cy: 100, r: 95, innerR: 55 },
-              svg: `<path d="M100 20 V55 M100 145 V180 M20 100 H55 M145 100 H180" stroke="#c5a15a" stroke-width="8" stroke-linecap="round"/>
-                    <circle cx="100" cy="100" r="8" fill="#c5a15a"/>`,
+              id: 'pathN',
+              svg: `<path d="M0 -8 V-28" stroke="#c5a15a" stroke-width="6" stroke-linecap="round"/>`,
+              r: 12,
             },
-          ],
-          decoys: [
+            {
+              id: 'pathE',
+              svg: `<path d="M8 0 H28" stroke="#c5a15a" stroke-width="6" stroke-linecap="round"/>`,
+              r: 12,
+            },
+            {
+              id: 'pathW',
+              svg: `<path d="M-8 0 H-28" stroke="#c5a15a" stroke-width="6" stroke-linecap="round"/>`,
+              r: 12,
+            },
             {
               id: 'wall',
-              label: 'closed wall',
-              svg: `<rect x="40" y="70" width="120" height="60" fill="#c5a15a"/>
-                    <rect x="55" y="82" width="18" height="18" fill="#1c2923"/>
-                    <rect x="91" y="82" width="18" height="18" fill="#1c2923"/>
-                    <rect x="127" y="82" width="18" height="18" fill="#1c2923"/>`,
+              decoy: true,
+              svg: `<rect x="-30" y="-16" width="60" height="32" fill="#c5a15a"/>
+                    <rect x="-20" y="-8" width="10" height="10" fill="#141c18"/>
+                    <rect x="-5" y="-8" width="10" height="10" fill="#141c18"/>
+                    <rect x="10" y="-8" width="10" height="10" fill="#141c18"/>`,
+              r: 28,
             },
+          ],
+          rules: [
+            { type: 'inside', a: 'hearth', b: 'court', msg: 'The hearth is not in the open court.' },
+            { type: 'near', a: 'pathN', b: 'court', max: 55, msg: 'A path does not reach the court.' },
+            { type: 'near', a: 'pathE', b: 'court', max: 55, msg: 'A path does not reach the court.' },
+            { type: 'near', a: 'pathW', b: 'court', max: 55, msg: 'A path does not reach the court.' },
+            { type: 'above', a: 'pathN', b: 'court', msg: 'The north path should approach from above the court.' },
+            { type: 'aside', a: 'pathE', b: 'court', side: 'right', msg: 'An east path should sit to the right of the court.' },
+            { type: 'aside', a: 'pathW', b: 'court', side: 'left', msg: 'A west path should sit to the left of the court.' },
+            { type: 'far', a: 'wall', b: 'court', min: 50, msg: 'The sealed wall is crowding the commons — set it aside.' },
           ],
         },
         {
           id: 'mean',
-          title: 'Centered mean',
-          blurb: 'Balance on a still point — neither tip wins.',
+          codename: 'Emblem III',
+          revealTitle: 'The centered mean',
+          riddle: 'Neither side should win. Find a still point that holds two equal weights.',
           teaching:
-            'The beam, the fulcrum, and the twin weights only rest when the center holds. A single heavy weight alone cannot complete the emblem.',
+            'Twin weights rest on one beam over a fulcrum: the Mean as balance, not a crown above others. Hierarchy tips the emblem; centeredness steadies it.',
+          hints: [
+            'Something must support from below.',
+            'Two similar weights should answer each other across a line.',
+            'A crown wants height and dominance — that is not this virtue.',
+          ],
           parts: [
             {
               id: 'beam',
-              label: 'balance beam',
-              socket: { cx: 100, cy: 90, r: 55 },
-              svg: `<rect x="28" y="84" width="144" height="12" rx="4" fill="#c5a15a"/>`,
+              svg: `<rect x="-48" y="-4" width="96" height="8" rx="2" fill="#c5a15a"/>`,
+              r: 50,
             },
             {
               id: 'fulcrum',
-              label: 'still center',
-              socket: { cx: 100, cy: 120, r: 32 },
-              svg: `<path d="M100 96 L124 150 H76 Z" fill="#c5a15a"/>
-                    <circle cx="100" cy="88" r="8" fill="#e2c57a"/>`,
+              svg: `<path d="M0 -6 L14 28 H-14 Z" fill="#c5a15a"/>
+                    <circle cx="0" cy="-8" r="5" fill="#e2c57a"/>`,
+              r: 20,
             },
             {
-              id: 'weights',
-              label: 'twin weights',
-              socket: { cx: 100, cy: 70, r: 70 },
-              svg: `<circle cx="40" cy="70" r="16" fill="#c5a15a"/>
-                    <circle cx="160" cy="70" r="16" fill="#c5a15a"/>
-                    <path d="M40 86 V100 M160 86 V100" stroke="#8a6a2e" stroke-width="4"/>`,
+              id: 'wL',
+              svg: `<circle cx="0" cy="0" r="11" fill="#c5a15a"/>`,
+              r: 12,
             },
-          ],
-          decoys: [
+            {
+              id: 'wR',
+              svg: `<circle cx="0" cy="0" r="11" fill="#c5a15a"/>`,
+              r: 12,
+            },
             {
               id: 'crown',
-              label: 'high crown',
-              svg: `<path d="M50 120 L70 70 L100 100 L130 70 L150 120 Z" fill="#c5a15a"/>
-                    <rect x="50" y="118" width="100" height="14" fill="#8a6a2e"/>`,
+              decoy: true,
+              svg: `<path d="M-22 10 L-12 -14 L0 4 L12 -14 L22 10 Z" fill="#c5a15a"/>
+                    <rect x="-22" y="8" width="44" height="8" fill="#8a6a2e"/>`,
+              r: 22,
             },
+          ],
+          rules: [
+            { type: 'below', a: 'fulcrum', b: 'beam', msg: 'The support should sit under the beam.' },
+            { type: 'near', a: 'fulcrum', b: 'beam', max: 36, msg: 'The fulcrum is too far from the beam.' },
+            { type: 'near', a: 'wL', b: 'beam', max: 40, msg: 'A weight is not resting with the beam.' },
+            { type: 'near', a: 'wR', b: 'beam', max: 40, msg: 'A weight is not resting with the beam.' },
+            { type: 'aside', a: 'wL', b: 'fulcrum', side: 'left', msg: 'Weights should answer each other across the center.' },
+            { type: 'aside', a: 'wR', b: 'fulcrum', side: 'right', msg: 'Weights should answer each other across the center.' },
+            { type: 'level', a: 'wL', b: 'wR', max: 18, msg: 'The weights are uneven — one side is winning.' },
+            { type: 'far', a: 'crown', b: 'beam', min: 45, msg: 'A crown above the balance turns the Mean into rank.' },
           ],
         },
       ];
 
       const picker = document.getElementById('picker');
       const titleEl = document.getElementById('title');
-      const hintEl = document.getElementById('hint');
-      const stageEl = document.getElementById('stage');
-      const trayEl = document.getElementById('tray');
-      const startBtn = document.getElementById('startBtn');
-      const resetBtn = document.getElementById('resetBtn');
-      const statusEl = document.getElementById('status');
+      const metaEl = document.getElementById('meta');
+      const stage = document.getElementById('stage');
+      const stageWrap = document.getElementById('stageWrap');
+      const tray = document.getElementById('tray');
+      const feedback = document.getElementById('feedback');
       const solvedEl = document.getElementById('solved');
+      const checkBtn = document.getElementById('checkBtn');
+      const scatterBtn = document.getElementById('scatterBtn');
+      const hintBtn = document.getElementById('hintBtn');
 
       let puzzle = PUZZLES[0];
-      let started = false;
-      let selectedId = null;
-      /** @type {Record<string, string>} socketId -> partId */
-      let placed = {};
-      /** @type {string[]} part ids still in tray (correct + decoys) */
-      let trayIds = [];
-
-      function shuffle(arr) {
-        const a = [...arr];
-        for (let i = a.length - 1; i > 0; i--) {
-          const j = Math.floor(Math.random() * (i + 1));
-          [a[i], a[j]] = [a[j], a[i]];
-        }
-        return a;
-      }
-
-      function allParts() {
-        return [...puzzle.parts, ...(puzzle.decoys || [])];
-      }
+      /** @type {Record<string, {x:number,y:number}>} */
+      let pose = {};
+      let hintLevel = 0;
+      let solved = false;
+      let dragId = null;
+      let dragOffset = { x: 0, y: 0 };
 
       function partById(id) {
-        return allParts().find((p) => p.id === id);
+        return puzzle.parts.find((p) => p.id === id);
       }
 
-      function setStatus(msg, err = false) {
-        statusEl.textContent = msg || '';
-        statusEl.classList.toggle('err', err);
+      function centerOf(id) {
+        return pose[id];
+      }
+
+      function dist(a, b) {
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
+      function evalRule(rule) {
+        const A = centerOf(rule.a);
+        const B = centerOf(rule.b);
+        const C = rule.c ? centerOf(rule.c) : null;
+        const pA = partById(rule.a);
+        const pB = partById(rule.b);
+
+        switch (rule.type) {
+          case 'inside': {
+            // a inside b's radius (with a little padding)
+            return dist(A, B) <= (pB.r - pA.r * 0.25);
+          }
+          case 'outside': {
+            return dist(A, B) >= pB.r + pA.r * 0.2;
+          }
+          case 'near': {
+            return dist(A, B) <= rule.max;
+          }
+          case 'far': {
+            return dist(A, B) >= rule.min;
+          }
+          case 'apart': {
+            return dist(A, B) >= rule.min;
+          }
+          case 'above': {
+            return A.y <= B.y - 10;
+          }
+          case 'below': {
+            return A.y >= B.y + 8;
+          }
+          case 'aside': {
+            if (rule.side === 'left') return A.x <= B.x - 12;
+            return A.x >= B.x + 12;
+          }
+          case 'level': {
+            return Math.abs(A.y - B.y) <= rule.max;
+          }
+          case 'between': {
+            // bowl roughly between two figures: projection on segment + closeness to segment
+            const vx = C.x - B.x;
+            const vy = C.y - B.y;
+            const len2 = vx * vx + vy * vy || 1;
+            const t = ((A.x - B.x) * vx + (A.y - B.y) * vy) / len2;
+            if (t < 0.2 || t > 0.8) return false;
+            const px = B.x + t * vx;
+            const py = B.y + t * vy;
+            return Math.hypot(A.x - px, A.y - py) <= 28;
+          }
+          default:
+            return true;
+        }
+      }
+
+      function setFeedback(text, kind = '') {
+        feedback.textContent = text;
+        feedback.className = 'feedback' + (kind ? ' ' + kind : '');
+      }
+
+      function scatter() {
+        solved = false;
+        stageWrap.classList.remove('solved');
+        solvedEl.hidden = true;
+        const margin = 28;
+        for (const p of puzzle.parts) {
+          pose[p.id] = {
+            x: margin + Math.random() * (200 - margin * 2),
+            y: margin + Math.random() * (200 - margin * 2),
+          };
+        }
+        // Mild separation so pieces don't stack on load
+        for (let pass = 0; pass < 8; pass++) {
+          for (const a of puzzle.parts) {
+            for (const b of puzzle.parts) {
+              if (a.id >= b.id) continue;
+              const pa = pose[a.id];
+              const pb = pose[b.id];
+              const d = dist(pa, pb);
+              const min = (a.r + b.r) * 0.55;
+              if (d < min && d > 0.01) {
+                const push = (min - d) / 2;
+                const ux = (pa.x - pb.x) / d;
+                const uy = (pa.y - pb.y) / d;
+                pa.x = clamp(pa.x + ux * push);
+                pa.y = clamp(pa.y + uy * push);
+                pb.x = clamp(pb.x - ux * push);
+                pb.y = clamp(pb.y - uy * push);
+              }
+            }
+          }
+        }
+        render();
+        setFeedback('Arrange the shards until the meaning holds, then Contemplate.');
+      }
+
+      function clamp(v) {
+        return Math.max(18, Math.min(182, v));
       }
 
       function renderPicker() {
@@ -465,205 +460,141 @@
           const b = document.createElement('button');
           b.type = 'button';
           b.className = 'pill' + (p.id === puzzle.id ? ' active' : '');
-          b.textContent = p.title;
+          b.textContent = p.codename;
           b.addEventListener('click', () => {
             puzzle = p;
-            bootPuzzle();
+            hintLevel = 0;
+            boot();
             renderPicker();
           });
           picker.appendChild(b);
         }
       }
 
-      function ghostMarkup() {
-        // Faint full assembly for preview / underlay
-        return puzzle.parts
-          .map(
-            (p) =>
-              `<g class="ghost-part" opacity="0.22" transform="translate(0 0)">${p.svg}</g>`,
-          )
-          .join('');
+      function renderTray() {
+        tray.innerHTML = '';
+        for (const p of puzzle.parts) {
+          const chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.textContent = p.decoy ? 'shard · ?' : 'shard';
+          tray.appendChild(chip);
+        }
       }
 
-      /** Prefer the smallest empty socket under the point (so outer rings don't steal taps). */
-      function socketAt(x, y) {
-        const hits = puzzle.parts
-          .filter((p) => !placed[p.id])
+      function render() {
+        titleEl.textContent = solved ? puzzle.revealTitle : puzzle.codename;
+        metaEl.textContent = solved
+          ? 'Meaning restored.'
+          : puzzle.riddle + (hintLevel ? `  ·  hint ${hintLevel}/${puzzle.hints.length}` : '');
+
+        const partsSvg = puzzle.parts
           .map((p) => {
-            const dx = x - p.socket.cx;
-            const dy = y - p.socket.cy;
-            const dist = Math.hypot(dx, dy);
-            const inner = p.socket.innerR ?? 0;
-            const inRing = dist <= p.socket.r && dist >= inner;
-            return { id: p.id, r: p.socket.r, dist, inRing };
+            const { x, y } = pose[p.id];
+            return `<g class="draggable" data-id="${p.id}" transform="translate(${x} ${y})">${p.svg}</g>`;
           })
-          .filter((h) => h.inRing)
-          .sort((a, b) => a.r - b.r);
-        return hits[0]?.id ?? null;
+          .join('');
+
+        stage.innerHTML = `
+          <circle class="vignette" cx="100" cy="100" r="88"/>
+          ${partsSvg}
+        `;
       }
 
-      function svgPointFromEvent(event) {
-        const svg = stageEl.querySelector('svg');
-        if (!svg) return null;
-        const pt = svg.createSVGPoint();
+      function contemplate() {
+        if (solved) return;
+        for (const rule of puzzle.rules) {
+          if (!evalRule(rule)) {
+            setFeedback(rule.msg, 'warn');
+            return;
+          }
+        }
+        solved = true;
+        stageWrap.classList.add('solved');
+        setFeedback('The relations hold.', 'ok');
+        solvedEl.hidden = false;
+        solvedEl.innerHTML = `<h3>${puzzle.revealTitle}</h3>
+          <p>${puzzle.teaching}</p>
+          <p class="muted">Prototype — relational check, not socket snapping. No XP.</p>`;
+        render();
+      }
+
+      function giveHint() {
+        if (solved) return;
+        if (hintLevel >= puzzle.hints.length) {
+          setFeedback('No further hints — only arranging will tell you.', 'warn');
+          return;
+        }
+        setFeedback(puzzle.hints[hintLevel], 'warn');
+        hintLevel += 1;
+        metaEl.textContent = puzzle.riddle + `  ·  hint ${hintLevel}/${puzzle.hints.length}`;
+      }
+
+      function clientToSvg(event) {
+        const pt = stage.createSVGPoint();
         pt.x = event.clientX;
         pt.y = event.clientY;
-        const ctm = svg.getScreenCTM();
+        const ctm = stage.getScreenCTM();
         if (!ctm) return null;
         const local = pt.matrixTransform(ctm.inverse());
         return { x: local.x, y: local.y };
       }
 
-      function renderStage() {
-        // Draw large sockets first, small on top — visual only; hit-test uses socketAt().
-        const socketParts = [...puzzle.parts].sort((a, b) => b.socket.r - a.socket.r);
-        const sockets = socketParts
-          .map((p) => {
-            const filled = Boolean(placed[p.id]);
-            const hot = started && selectedId && !filled;
-            return `<circle
-              class="socket${filled ? ' filled' : ''}${hot ? ' hot' : ''}"
-              data-socket="${p.id}"
-              cx="${p.socket.cx}" cy="${p.socket.cy}" r="${p.socket.r}"
-            />`;
-          })
-          .join('');
-
-        const placedSvg = puzzle.parts
-          .filter((p) => placed[p.id])
-          .map((p) => {
-            const part = partById(placed[p.id]);
-            return `<g class="placed" data-placed="${p.id}">${part.svg}</g>`;
-          })
-          .join('');
-
-        const showGhost = !started || Object.keys(placed).length < puzzle.parts.length;
-
-        stageEl.innerHTML = `<svg viewBox="0 0 200 200" role="img" aria-label="${puzzle.title}">
-          ${showGhost ? `<g class="ghost-underlay">${ghostMarkup()}</g>` : ''}
-          ${started ? sockets : ''}
-          ${started ? placedSvg : ghostMarkup().replace(/opacity="0.22"/g, 'opacity="1"')}
-        </svg>`;
-
-        if (started) {
-          const svg = stageEl.querySelector('svg');
-          svg.addEventListener('click', (event) => {
-            const local = svgPointFromEvent(event);
-            if (!local) return;
-            const id = socketAt(local.x, local.y);
-            if (id) onSocket(id);
-            else if (selectedId) setStatus('Tap a glowing socket.', true);
-          });
+      function hitTest(x, y) {
+        // topmost part whose radius contains point
+        for (let i = puzzle.parts.length - 1; i >= 0; i--) {
+          const p = puzzle.parts[i];
+          const c = pose[p.id];
+          if (Math.hypot(x - c.x, y - c.y) <= p.r + 4) return p.id;
         }
+        return null;
       }
 
-      function renderTray() {
-        trayEl.innerHTML = '';
-        if (!started) return;
-
-        for (const id of trayIds) {
-          const part = partById(id);
-          const btn = document.createElement('button');
-          btn.type = 'button';
-          btn.className = 'piece' + (selectedId === id ? ' selected' : '');
-          btn.dataset.part = id;
-          btn.innerHTML = `<svg viewBox="0 0 200 200">${part.svg}</svg><span>${part.label}</span>`;
-          btn.addEventListener('click', () => onSelectPart(id, btn));
-          trayEl.appendChild(btn);
-        }
+      function onPointerDown(event) {
+        if (solved) return;
+        const local = clientToSvg(event);
+        if (!local) return;
+        const id = hitTest(local.x, local.y);
+        if (!id) return;
+        dragId = id;
+        dragOffset = { x: local.x - pose[id].x, y: local.y - pose[id].y };
+        stageWrap.setPointerCapture(event.pointerId);
+        event.preventDefault();
       }
 
-      function onSelectPart(id, btn) {
-        if (!started) return;
-        if (selectedId === id) {
-          selectedId = null;
-          setStatus('Select a part, then a glowing socket.');
-        } else {
-          selectedId = id;
-          setStatus(`Selected “${partById(id).label}” — tap a socket.`);
-        }
+      function onPointerMove(event) {
+        if (!dragId) return;
+        const local = clientToSvg(event);
+        if (!local) return;
+        pose[dragId] = {
+          x: clamp(local.x - dragOffset.x),
+          y: clamp(local.y - dragOffset.y),
+        };
+        render();
+      }
+
+      function onPointerUp() {
+        dragId = null;
+      }
+
+      function boot() {
+        titleEl.textContent = puzzle.codename;
+        scatter();
         renderTray();
-        renderStage();
+        renderPicker();
       }
 
-      function onSocket(socketId) {
-        if (!started || !selectedId) {
-          setStatus('Select a part from the tray first.', true);
-          return;
-        }
-        if (placed[socketId]) return;
+      stageWrap.addEventListener('pointerdown', onPointerDown);
+      stageWrap.addEventListener('pointermove', onPointerMove);
+      stageWrap.addEventListener('pointerup', onPointerUp);
+      stageWrap.addEventListener('pointercancel', onPointerUp);
+      checkBtn.addEventListener('click', contemplate);
+      scatterBtn.addEventListener('click', () => {
+        hintLevel = 0;
+        scatter();
+      });
+      hintBtn.addEventListener('click', giveHint);
 
-        const correct = selectedId === socketId;
-        if (!correct) {
-          const btn = trayEl.querySelector(`[data-part="${selectedId}"]`);
-          if (btn) {
-            btn.classList.remove('shake');
-            void btn.offsetWidth;
-            btn.classList.add('shake');
-          }
-          setStatus('That part does not belong there.', true);
-          return;
-        }
-
-        placed[socketId] = selectedId;
-        trayIds = trayIds.filter((id) => id !== selectedId);
-        selectedId = null;
-        setStatus('Locked in.');
-        renderTray();
-        renderStage();
-        checkSolved();
-      }
-
-      function checkSolved() {
-        if (puzzle.parts.every((p) => placed[p.id] === p.id)) {
-          solvedEl.hidden = false;
-          solvedEl.innerHTML = `<h3>Totem restored</h3>
-            <p>${puzzle.teaching}</p>
-            <p class="muted">Prototype only — no XP, no save.</p>`;
-          setStatus('Complete.');
-          // Reveal full emblem without dashed sockets
-          started = true;
-          renderStage();
-          // Re-draw final without sockets: force full opacity assembly
-          stageEl.innerHTML = `<svg viewBox="0 0 200 200">${puzzle.parts.map((p) => p.svg).join('')}</svg>`;
-        }
-      }
-
-      function start() {
-        placed = {};
-        selectedId = null;
-        trayIds = shuffle(allParts().map((p) => p.id));
-        started = true;
-        solvedEl.hidden = true;
-        startBtn.hidden = true;
-        resetBtn.hidden = false;
-        hintEl.textContent =
-          'Tap a part, then tap a glowing socket. Wrong parts shake and stay in the tray (including one decoy).';
-        setStatus('Select a part, then a glowing socket.');
-        renderStage();
-        renderTray();
-      }
-
-      function bootPuzzle() {
-        started = false;
-        placed = {};
-        selectedId = null;
-        trayIds = [];
-        titleEl.textContent = puzzle.title;
-        hintEl.textContent = puzzle.blurb + ' Tap Start to shatter the totem into parts.';
-        startBtn.hidden = false;
-        resetBtn.hidden = true;
-        solvedEl.hidden = true;
-        setStatus('');
-        renderStage();
-        renderTray();
-      }
-
-      startBtn.addEventListener('click', start);
-      resetBtn.addEventListener('click', start);
-
-      renderPicker();
-      bootPuzzle();
+      boot();
     </script>
   </body>
 </html>
