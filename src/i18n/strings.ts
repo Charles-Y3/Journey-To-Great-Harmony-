@@ -613,20 +613,28 @@ export const UI = {
     'That file does not look like a valid journey backup.',
     '这个文件看起来不是有效的旅程备份。',
   ),
-  settingsInstallTitle: localized('Install on your phone', '安装到手机'),
+  settingsInstallTitle: localized('Install this journey', '安装这段旅程'),
   settingsInstallDesc: localized(
-    'Add this journey to your home screen for offline use. Tap Install — your browser will handle the rest when it can.',
-    '把这段旅程加到主屏幕，以便离线使用。点击「安装」— 浏览器会在支持时为你完成安装。',
+    'Add it to your home screen (or Dock) for offline use and a quieter focus.',
+    '把它加到主屏幕（或程序坞），以便离线使用，也更安静专注。',
   ),
   settingsInstallBtn: localized('Install app', '安装应用'),
   settingsInstallDone: localized('Installed on this device', '已安装到此设备'),
-  settingsInstallIosHint: localized(
-    'On iPhone / iPad: tap Share, then “Add to Home Screen”.',
-    '在 iPhone / iPad：点击「分享」，再选择「添加到主屏幕」。',
+  settingsInstallIosSteps: localized(
+    'On iPhone or iPad: open this page in Safari, tap the Share button, then choose “Add to Home Screen”. Open it from your home screen like an app.',
+    '在 iPhone 或 iPad：用 Safari 打开本页，点击「分享」，再选择「添加到主屏幕」。之后可从主屏幕像应用一样打开。',
   ),
-  settingsInstallFallbackHint: localized(
-    'Your browser did not show an install prompt. Try Chrome or Edge on Android, or use the browser menu → Install app.',
-    '浏览器未弹出安装提示。请在 Android 上使用 Chrome 或 Edge，或打开浏览器菜单 → 安装应用。',
+  settingsInstallAndroidSteps: localized(
+    'On Android: open the browser menu (⋮), then tap “Install app” or “Add to Home screen”. Chrome and Edge work best.',
+    '在 Android：打开浏览器菜单（⋮），再点「安装应用」或「添加到主屏幕」。Chrome 与 Edge 效果最好。',
+  ),
+  settingsInstallDesktopSteps: localized(
+    'On a computer: open your browser menu and choose “Install app” or “Install”. In Safari on Mac, use File → Add to Dock (or Share → Add to Dock).',
+    '在电脑上：打开浏览器菜单，选择「安装应用」或「安装」。Mac 上的 Safari 可用「文件」→「添加到程序坞」（或「分享」→「添加到程序坞」）。',
+  ),
+  settingsInstallOrMenu: localized(
+    'Or use your browser’s install / Add to Home Screen option in the menu.',
+    '也可在浏览器菜单中选择「安装」或「添加到主屏幕」。',
   ),
   seasonalVirtueTitle: localized('Virtue of the season', '当季德行'),
   yearlyReviewTitle: localized('Yearly harmony review', '年度和谐回顾'),

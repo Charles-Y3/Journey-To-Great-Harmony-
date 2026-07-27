@@ -24,6 +24,13 @@ import { RANKS, rankForXp, nextRankForXp, rankIndexForXp, todayKey } from './eng
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
 import { applyPwaUpdate, subscribePwaNeedRefresh } from './engine/pwaUpdate';
+import {
+  getDeferredInstallPrompt,
+  installGuideKind,
+  isStandaloneDisplay,
+  promptPwaInstall,
+  subscribePwaInstall,
+} from './engine/pwaInstall';
 import { ProgressBar, CelebrationOverlay, Modal } from './components/ui';
 import LanguageGate from './features/onboarding/LanguageGate';
 import NameGate from './features/onboarding/NameGate';
@@ -948,65 +955,30 @@ function UpdateBanner() {
   );
 }
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-};
-
-function isIosDevice(): boolean {
-  const ua = navigator.userAgent;
-  const iOS = /iPad|iPhone|iPod/.test(ua);
-  const iPadOs = navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
-  return iOS || iPadOs;
-}
-
-function isStandaloneDisplay(): boolean {
-  return (
-    window.matchMedia('(display-mode: standalone)').matches ||
-    // iOS Safari
-    Boolean((navigator as Navigator & { standalone?: boolean }).standalone)
-  );
-}
-
 function InstallSection() {
   const { t } = useT();
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
-  const [installed, setInstalled] = useState(isStandaloneDisplay());
-  const [iosHint, setIosHint] = useState(false);
-  const [fallbackHint, setFallbackHint] = useState(false);
+  const [canPrompt, setCanPrompt] = useState(() => getDeferredInstallPrompt() !== null);
+  const [installed, setInstalled] = useState(isStandaloneDisplay);
+  const guide = installGuideKind();
+  const guideKey =
+    guide === 'ios'
+      ? 'settingsInstallIosSteps'
+      : guide === 'android'
+        ? 'settingsInstallAndroidSteps'
+        : 'settingsInstallDesktopSteps';
 
   useEffect(() => {
-    const onBip = (e: Event) => {
-      e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
-    };
-    const onInstalled = () => {
-      setInstalled(true);
-      setDeferred(null);
-    };
-    window.addEventListener('beforeinstallprompt', onBip);
-    window.addEventListener('appinstalled', onInstalled);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onBip);
-      window.removeEventListener('appinstalled', onInstalled);
-    };
+    return subscribePwaInstall(() => {
+      setCanPrompt(getDeferredInstallPrompt() !== null);
+      setInstalled(isStandaloneDisplay());
+    });
   }, []);
 
   async function install() {
-    setIosHint(false);
-    setFallbackHint(false);
     if (installed) return;
-    if (deferred) {
-      await deferred.prompt();
-      await deferred.userChoice;
-      setDeferred(null);
-      return;
-    }
-    if (isIosDevice()) {
-      setIosHint(true);
-      return;
-    }
-    setFallbackHint(true);
+    const outcome = await promptPwaInstall();
+    if (outcome === 'accepted') setInstalled(true);
+    setCanPrompt(getDeferredInstallPrompt() !== null);
   }
 
   return (
@@ -1016,12 +988,23 @@ function InstallSection() {
       {installed ? (
         <p className="pill">{t('settingsInstallDone')}</p>
       ) : (
-        <button className="btn btn-primary" onClick={() => void install()}>
-          {t('settingsInstallBtn')}
-        </button>
+        <>
+          {canPrompt ? (
+            <>
+              <button type="button" className="btn btn-primary" onClick={() => void install()}>
+                {t('settingsInstallBtn')}
+              </button>
+              <p className="small muted" style={{ marginTop: 8 }}>
+                {t('settingsInstallOrMenu')}
+              </p>
+            </>
+          ) : (
+            <p className="small muted" style={{ marginTop: 4 }}>
+              {t(guideKey)}
+            </p>
+          )}
+        </>
       )}
-      {iosHint && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsInstallIosHint')}</p>}
-      {fallbackHint && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsInstallFallbackHint')}</p>}
     </div>
   );
 }
