@@ -134,8 +134,7 @@
       const PUZZLES = [
         {
           id: 'harmony',
-          codename: 'Emblem I',
-          revealTitle: 'Harmony',
+          title: 'Harmony',
           riddle: 'Make a picture of shared life under one sky — companions, meal, and shelter together.',
           teaching:
             'Two figures share a bowl and a resting mat inside one ring, under a small sun: harmony as life held in common — circle, nourishment, rest, and light belonging together.',
@@ -214,8 +213,7 @@
         },
         {
           id: 'commons',
-          codename: 'Emblem II',
-          revealTitle: 'The commons',
+          title: 'Commons',
           riddle: 'Arrange an open meeting-place people can approach from every side.',
           teaching:
             'Four paths meet an open court: hearth at the center, a well for shared water, a gate of welcome, a tree for shade. The commons is approachable life — not a sealed fortress.',
@@ -309,8 +307,7 @@
         },
         {
           id: 'mean',
-          codename: 'Emblem III',
-          revealTitle: 'The centered mean',
+          title: 'Mean',
           riddle: 'Neither side should win. Build a still balance that holds equal weights.',
           teaching:
             'Twin weights hang from one beam over a fulcrum, with a plumb line marking the center and a base that steadies the whole: the Mean as even measure — not a crown, not a tip.',
@@ -394,8 +391,7 @@
         },
         {
           id: 'reciprocity',
-          codename: 'Emblem IV',
-          revealTitle: 'Reciprocity',
+          title: 'Reciprocity',
           riddle: 'What you would not suffer, do not place upon another — arrange a fair exchange.',
           teaching:
             'Two figures face each other across a shared mirror of measure: what leaves one hand returns in kind. Reciprocity is not scorekeeping — it is refusing to deal to others what you would refuse yourself.',
@@ -474,8 +470,7 @@
         },
         {
           id: 'courage',
-          codename: 'Emblem V',
-          revealTitle: 'Courage',
+          title: 'Courage',
           riddle: 'Fear is present — yet a steady heart still steps toward what must be faced.',
           teaching:
             'Courage is not the absence of the storm. A figure advances with a bright heart while the dark weather stays ahead — and a small companion light follows, so bravery is not lonely recklessness.',
@@ -552,8 +547,7 @@
         },
         {
           id: 'sincerity',
-          codename: 'Emblem VI',
-          revealTitle: 'Sincerity',
+          title: 'Sincerity',
           riddle: 'Let word and deed stand in one line under a clear seeing.',
           teaching:
             'A spoken sign and a walking path align beneath an open eye: sincerity is when what you say and what you do do not pull apart. A seal of trust rests where they meet.',
@@ -767,7 +761,7 @@
           const b = document.createElement('button');
           b.type = 'button';
           b.className = 'pill' + (p.id === puzzle.id ? ' active' : '');
-          b.textContent = p.codename;
+          b.textContent = p.title;
           b.addEventListener('click', () => {
             puzzle = p;
             hintLevel = 0;
@@ -779,7 +773,7 @@
       }
 
       function render() {
-        titleEl.textContent = solved ? puzzle.revealTitle : puzzle.codename;
+        titleEl.textContent = puzzle.title;
         metaEl.textContent = solved
           ? 'Meaning restored.'
           : puzzle.riddle + (hintLevel ? `  ·  hint ${hintLevel}/${puzzle.hints.length}` : '');
@@ -802,7 +796,7 @@
         stageWrap.classList.add('solved');
         setFeedback(fromAnswer ? 'Answer shown.' : 'The relations hold.', 'ok');
         solvedEl.hidden = false;
-        solvedEl.innerHTML = `<h3>${puzzle.revealTitle}</h3>
+        solvedEl.innerHTML = `<h3>${puzzle.title}</h3>
           <p>${puzzle.teaching}</p>
           <p class="muted">${fromAnswer ? 'Shown answer — relational layout for testing.' : 'Prototype — relational check, not socket snapping. No XP.'}</p>`;
         render();
@@ -895,7 +889,7 @@
       }
 
       function boot() {
-        titleEl.textContent = puzzle.codename;
+        titleEl.textContent = puzzle.title;
         scatter();
         renderPicker();
       }
