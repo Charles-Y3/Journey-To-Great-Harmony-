@@ -330,3 +330,8 @@ export function isIntermediateGlyph(g: VirtueGlyph): g is IntermediateGlyph {
 export function beginnerTierCleared(completedGlyphs: readonly string[]): boolean {
   return BEGINNER_GLYPHS.every((g) => completedGlyphs.includes(g.id));
 }
+
+/** Advanced unlocks only after every intermediate glyph has been cleared once. */
+export function intermediateTierCleared(completedGlyphs: readonly string[]): boolean {
+  return INTERMEDIATE_GLYPHS.every((g) => completedGlyphs.includes(g.id));
+}

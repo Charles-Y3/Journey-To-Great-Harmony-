@@ -3,6 +3,7 @@ import {
   BEGINNER_GLYPHS,
   INTERMEDIATE_GLYPHS,
   beginnerTierCleared,
+  intermediateTierCleared,
   isBeginnerGlyph,
   isIntermediateGlyph,
   type BeginnerGlyph,
@@ -528,46 +529,91 @@ export default function Glyphs() {
   const { t } = useT();
   const completedGlyphs = useJourney((s) => s.completedGlyphs ?? []);
   const [open, setOpen] = useState<VirtueGlyph | null>(null);
+  const [tier, setTier] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const intermediateOpen = beginnerTierCleared(completedGlyphs);
+  const advancedOpen = intermediateTierCleared(completedGlyphs);
+
+  const tiers: { id: 'beginner' | 'intermediate' | 'advanced'; labelKey: 'glyphsTierBeginnerTab' | 'glyphsTierIntermediateTab' | 'glyphsTierAdvancedTab' }[] = [
+    { id: 'beginner', labelKey: 'glyphsTierBeginnerTab' },
+    { id: 'intermediate', labelKey: 'glyphsTierIntermediateTab' },
+    { id: 'advanced', labelKey: 'glyphsTierAdvancedTab' },
+  ];
 
   return (
     <div>
       <PageHeader emoji="🧩" title={t('glyphsTitle')} subtitle={t('glyphsSubtitle')} />
 
-      <section className="glyph-tier">
-        <h2 className="glyph-tier-title">{t('glyphsTierBeginner')}</h2>
-        <p className="small muted glyph-tier-blurb">{t('glyphsTierBeginnerBlurb')}</p>
-        <div className="glyph-list">
-          {BEGINNER_GLYPHS.map((g) => (
-            <GlyphCard
-              key={g.id}
-              glyph={g}
-              done={completedGlyphs.includes(g.id)}
-              onPlay={() => setOpen(g)}
-            />
-          ))}
-        </div>
-      </section>
+      <div className="tab-row glyph-tier-tabs" role="tablist" aria-label={t('glyphsTitle')}>
+        {tiers.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={tier === tab.id}
+            className={`btn tab-btn${tier === tab.id ? ' active' : ''}`}
+            onClick={() => setTier(tab.id)}
+          >
+            {t(tab.labelKey)}
+          </button>
+        ))}
+      </div>
 
-      <section className={`glyph-tier${intermediateOpen ? '' : ' glyph-tier-locked'}`}>
-        <h2 className="glyph-tier-title">{t('glyphsTierIntermediate')}</h2>
-        <p className="small muted glyph-tier-blurb">
-          {intermediateOpen ? t('glyphsTierIntermediateBlurb') : t('glyphsTierLocked')}
-        </p>
-        <div className="glyph-list">
-          {INTERMEDIATE_GLYPHS.map((g) => (
-            <GlyphCard
-              key={g.id}
-              glyph={g}
-              done={completedGlyphs.includes(g.id)}
-              locked={!intermediateOpen}
-              onPlay={() => {
-                if (intermediateOpen) setOpen(g);
-              }}
-            />
-          ))}
-        </div>
-      </section>
+      {tier === 'beginner' && (
+        <section className="glyph-tier">
+          <h2 className="glyph-tier-title">{t('glyphsTierBeginner')}</h2>
+          <p className="small muted glyph-tier-blurb">{t('glyphsTierBeginnerBlurb')}</p>
+          <div className="glyph-list">
+            {BEGINNER_GLYPHS.map((g) => (
+              <GlyphCard
+                key={g.id}
+                glyph={g}
+                done={completedGlyphs.includes(g.id)}
+                onPlay={() => setOpen(g)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {tier === 'intermediate' && (
+        <section className={`glyph-tier${intermediateOpen ? '' : ' glyph-tier-locked'}`}>
+          <h2 className="glyph-tier-title">{t('glyphsTierIntermediate')}</h2>
+          <p className="small muted glyph-tier-blurb">
+            {intermediateOpen ? t('glyphsTierIntermediateBlurb') : t('glyphsTierLocked')}
+          </p>
+          <div className="glyph-list">
+            {INTERMEDIATE_GLYPHS.map((g) => (
+              <GlyphCard
+                key={g.id}
+                glyph={g}
+                done={completedGlyphs.includes(g.id)}
+                locked={!intermediateOpen}
+                onPlay={() => {
+                  if (intermediateOpen) setOpen(g);
+                }}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {tier === 'advanced' && (
+        <section className={`glyph-tier${advancedOpen ? '' : ' glyph-tier-locked'}`}>
+          <h2 className="glyph-tier-title">{t('glyphsTierAdvanced')}</h2>
+          <p className="small muted glyph-tier-blurb">
+            {advancedOpen ? t('glyphsTierAdvancedBlurb') : t('glyphsTierAdvancedLocked')}
+          </p>
+          <div className="glyph-advanced-preview" aria-hidden={false}>
+            <div className="glyph-advanced-preview-emoji">🪷</div>
+            <div>
+              <h3>{t('glyphsTierAdvancedPreviewTitle')}</h3>
+              <p className="small muted" style={{ margin: 0 }}>
+                {t('glyphsTierAdvancedPreviewDesc')}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {open && <GlyphModal glyph={open} onClose={() => setOpen(null)} />}
     </div>

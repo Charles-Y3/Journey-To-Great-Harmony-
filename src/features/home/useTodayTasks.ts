@@ -16,14 +16,24 @@ export interface TodayTask {
   desc: string;
   to: string;
   cta: string;
-  /** Secondary midday extras shown under “Also today”. */
+  /** Secondary extras under “Also today” — not required for full harmony. */
   secondary?: boolean;
+}
+
+export interface TodayTasksResult {
+  tasks: TodayTask[];
+  /** All tasks including secondary. */
+  doneCount: number;
+  /** Core day: intention + learn + challenge + heart + evening. */
+  coreDoneCount: number;
+  coreTotal: number;
+  coreComplete: boolean;
 }
 
 // Shared by Today.tsx (the full page) and App.tsx's welcome-back popup, so
 // the "what's left today" checklist is computed once and can never drift
 // between the two.
-export function useTodayTasks(): { tasks: TodayTask[]; doneCount: number } {
+export function useTodayTasks(): TodayTasksResult {
   const state = useJourney();
   const today = useToday();
   const { t, L, locale } = useT();
@@ -98,6 +108,14 @@ export function useTodayTasks(): { tasks: TodayTask[]; doneCount: number } {
       cta: t('ctaHeart'),
     },
     {
+      done: !!rec.reflection,
+      emoji: '🪞',
+      title: t('taskEveningTitle'),
+      desc: rec.reflection ? t('taskEveningDone') : t('taskEveningDesc'),
+      to: '/practice',
+      cta: t('ctaReflect'),
+    },
+    {
       done: stillWatersDone,
       emoji: '💧',
       title: t('taskStillWatersTitle'),
@@ -124,15 +142,17 @@ export function useTodayTasks(): { tasks: TodayTask[]; doneCount: number } {
       cta: t('ctaEncourage'),
       secondary: true,
     },
-    {
-      done: !!rec.reflection,
-      emoji: '🪞',
-      title: t('taskEveningTitle'),
-      desc: rec.reflection ? t('taskEveningDone') : t('taskEveningDesc'),
-      to: '/practice',
-      cta: t('ctaReflect'),
-    },
   ];
 
-  return { tasks, doneCount: tasks.filter((tk) => tk.done).length };
+  const coreTasks = tasks.filter((tk) => !tk.secondary);
+  const coreDoneCount = coreTasks.filter((tk) => tk.done).length;
+  const coreTotal = coreTasks.length;
+
+  return {
+    tasks,
+    doneCount: tasks.filter((tk) => tk.done).length,
+    coreDoneCount,
+    coreTotal,
+    coreComplete: coreTotal > 0 && coreDoneCount === coreTotal,
+  };
 }

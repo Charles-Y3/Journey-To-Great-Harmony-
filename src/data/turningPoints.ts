@@ -130,8 +130,8 @@ const FOUNDATION_TURNING_POINTS: TurningPoint[] = [
       '佛陀说：凡夫遭遇不幸，如同中了一箭；而后又因悲伤与怨怼，再中一箭 — 这第二支箭，却是自己射出的。',
     ),
     reflectionQuestion: localized(
-      'Which of your own arrows was self-inflicted, after the first one had already landed?',
-      '在你自己的经历里，哪一支箭，是在第一支箭落地之后，自己射向自己的？',
+      'After the first hard blow landed, where did you add a second blow of your own — grief, rage, or replay?',
+      '第一支箭落下之后，你在何处又给了自己第二支 — 悲伤、愤怒，或反复回想？',
     ),
   },
   {
@@ -153,7 +153,7 @@ const FOUNDATION_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'monk-carried-woman',
-    emoji: '🌊',
+    emoji: '🚶',
     tradition: localized('Zen story', '禅宗故事'),
     setting: localized(
       'Two travelling monks, one senior and easy-going, one young and strict about the rules, came to a river where a woman stood unable to cross. The elder lifted her onto his back, carried her over, and set her down.',
@@ -181,8 +181,8 @@ const FOUNDATION_TURNING_POINTS: TurningPoint[] = [
       '他不知道：是庄周做梦变成了蝴蝶，还是蝴蝶做梦变成了庄周？他说，庄周与蝴蝶之间，必定是有分别的 — 这，就叫做「物化」。',
     ),
     reflectionQuestion: localized(
-      'If waking does not settle which was the dream — what then?',
-      '若醒来仍无法断定哪一段才是梦 — 那又如何？',
+      'Between the dream and the waking — what feels most real to you right now, and why?',
+      '在梦与醒之间 — 此刻对你而言什么最真实，为什么？',
     ),
   },
 ];

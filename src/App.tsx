@@ -45,6 +45,7 @@ import Community from './features/community/Community';
 import Collection from './features/collection/Collection';
 import Glyphs from './features/glyphs/Glyphs';
 import TurningPoints from './features/turningPoints/TurningPoints';
+import { useTurningPoints } from './state/turningPointStore';
 
 const SIDEBAR_NAV = [
   { to: '/', emoji: '🌅', key: 'navToday' as const },
@@ -436,6 +437,46 @@ const APP_TOUR_CLUSTERS: { emoji: string; titleKey: UiKey; descKey: UiKey }[] = 
   { emoji: '🎴', titleKey: 'appTourClusterTogetherTitle', descKey: 'appTourClusterTogetherDesc' },
 ];
 
+function FirstDayGuideModal({ onClose }: { onClose: () => void }) {
+  const { t } = useT();
+
+  const steps: { to: string; emoji: string; titleKey: UiKey; descKey: UiKey }[] = [
+    { to: '/practice', emoji: '🌅', titleKey: 'firstDayGuidePractice', descKey: 'firstDayGuidePracticeDesc' },
+    { to: '/turning-points', emoji: '💧', titleKey: 'firstDayGuideStillWaters', descKey: 'firstDayGuideStillWatersDesc' },
+    { to: '/knowledge', emoji: '📖', titleKey: 'firstDayGuideLearn', descKey: 'firstDayGuideLearnDesc' },
+  ];
+
+  function finish() {
+    onClose();
+  }
+
+  return (
+    <Modal onClose={finish}>
+      <h2>{t('firstDayGuideTitle')}</h2>
+      <p className="small muted">{t('firstDayGuideIntro')}</p>
+      <div className="first-day-guide-links">
+        {steps.map((s) => (
+          <Link
+            key={s.to}
+            className="first-day-guide-link"
+            to={s.to}
+            onClick={finish}
+          >
+            <span className="first-day-guide-emoji">{s.emoji}</span>
+            <span>
+              <strong>{t(s.titleKey)}</strong>
+              <span className="small muted" style={{ display: 'block' }}>{t(s.descKey)}</span>
+            </span>
+          </Link>
+        ))}
+      </div>
+      <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
+        {t('firstDayGuideContinue')}
+      </button>
+    </Modal>
+  );
+}
+
 function AppTourModal({ onClose }: { onClose: () => void }) {
   const { t } = useT();
   const navigate = useNavigate();
@@ -562,6 +603,7 @@ function ReminderSection() {
       <p className="small muted" style={{ marginTop: 8 }}>
         {t('settingsReminderFootnote')}
       </p>
+      <p className="small muted why-this-line">{t('whyCalendarReadd')}</p>
     </div>
   );
 }
@@ -616,7 +658,7 @@ function MusicSection() {
   }
 
   return (
-    <div className="card">
+    <div className="card" id="settings-music">
       <h3>{t('settingsMusicTitle')}</h3>
       <p className="small muted">{t('settingsMusicDesc')}</p>
       <select
@@ -659,7 +701,8 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
   const streak = useJourney((s) => s.streakCurrent);
   const xp = useJourney((s) => s.xp);
   const rank = rankForXp(xp);
-  const { tasks, doneCount } = useTodayTasks();
+  const { tasks, coreComplete } = useTodayTasks();
+  const coreTasks = tasks.filter((tk) => !tk.secondary);
 
   function finish() {
     navigate('/', { replace: true });
@@ -673,7 +716,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
         {rank.emoji} {L(rank.name)} · 🔥 {streak} {t('statStreak')}
       </p>
       <h4>{t('welcomeBackTasksHeading')}</h4>
-      {tasks.map((tk) => (
+      {coreTasks.map((tk) => (
         <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
           <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
           <div>
@@ -681,7 +724,7 @@ function WelcomeModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
       ))}
-      {doneCount === tasks.length && <p className="pill" style={{ marginTop: 10 }}>{t('todayFullHarmony')}</p>}
+      {coreComplete && <p className="pill" style={{ marginTop: 10 }}>{t('todayFullHarmony')}</p>}
       <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
         {t('welcomeBackContinue')}
       </button>
@@ -822,13 +865,25 @@ function SettingsModal({
   const reset = useJourney((s) => s.resetJourney);
   const resetOnboardingUi = useUi((s) => s.resetOnboardingUi);
   const [confirming, setConfirming] = useState(false);
-  const [tab, setTab] = useState<SettingsTabId>(focusSection === 'reminders' ? 'journey' : 'you');
+  const initialTab: SettingsTabId =
+    focusSection === 'install' ? 'device' : focusSection === 'reminders' || focusSection === 'music' ? 'journey' : 'you';
+  const [tab, setTab] = useState<SettingsTabId>(initialTab);
 
   useEffect(() => {
-    if (focusSection !== 'reminders') return;
-    setTab('journey');
+    if (!focusSection) return;
+    if (focusSection === 'install') setTab('device');
+    else if (focusSection === 'reminders' || focusSection === 'music') setTab('journey');
+    const anchor =
+      focusSection === 'reminders'
+        ? 'settings-reminders'
+        : focusSection === 'music'
+          ? 'settings-music'
+          : focusSection === 'install'
+            ? 'settings-install'
+            : null;
+    if (!anchor) return;
     const id = window.setTimeout(() => {
-      document.getElementById('settings-reminders')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
     return () => window.clearTimeout(id);
   }, [focusSection]);
@@ -982,7 +1037,7 @@ function InstallSection() {
   }
 
   return (
-    <div className="card">
+    <div className="card" id="settings-install">
       <h3>{t('settingsInstallTitle')}</h3>
       <p className="small muted">{t('settingsInstallDesc')}</p>
       {installed ? (
@@ -1021,10 +1076,18 @@ export default function App() {
   const setLastWelcomeSeenDay = useUi((s) => s.setLastWelcomeSeenDay);
   const seenPacingIntro = useUi((s) => s.seenPacingIntro);
   const setSeenPacingIntro = useUi((s) => s.setSeenPacingIntro);
+  const seenFirstDayGuide = useUi((s) => s.seenFirstDayGuide);
+  const setSeenFirstDayGuide = useUi((s) => s.setSeenFirstDayGuide);
   const seenAppTour = useUi((s) => s.seenAppTour);
   const setSeenAppTour = useUi((s) => s.setSeenAppTour);
   const lastSeenChangelogVersion = useUi((s) => s.lastSeenChangelogVersion);
   const setLastSeenChangelogVersion = useUi((s) => s.setLastSeenChangelogVersion);
+  const dayRec = useJourney((s) => s.days[today] ?? {});
+  const flippedDays = useTurningPoints((s) => s.flippedDays);
+  const firstDaySuccess =
+    !!dayRec.intention ||
+    flippedDays.includes(today) ||
+    (dayRec.lessons ?? 0) + (dayRec.timelineStudies ?? 0) > 0;
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [settingsFocus, setSettingsFocus] = useState<string | null>(null);
@@ -1034,6 +1097,7 @@ export default function App() {
   const [showHarmonyInfo, setShowHarmonyInfo] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const [showPacing, setShowPacing] = useState(false);
+  const [showFirstDay, setShowFirstDay] = useState(false);
   const [showTour, setShowTour] = useState(false);
   const [showWhatsNew, setShowWhatsNew] = useState(false);
 
@@ -1078,13 +1142,26 @@ export default function App() {
     }
   }, [hasChosenLocale, hasSetName, seenPacingIntro]);
 
-  // Shows once right after the pacing intro (for new users) or on next open
-  // for anyone who already saw the pacing intro before this tour existed.
+  // After pacing: first-day guide (skip for users who already finished the old tour).
   useEffect(() => {
-    if (hasChosenLocale && hasSetName && seenPacingIntro && !seenAppTour) {
+    if (hasChosenLocale && hasSetName && seenPacingIntro && !seenFirstDayGuide && !seenAppTour) {
+      setShowFirstDay(true);
+    }
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenFirstDayGuide, seenAppTour]);
+
+  // Feature tour only after first-day guide and at least one first success.
+  useEffect(() => {
+    if (
+      hasChosenLocale &&
+      hasSetName &&
+      seenPacingIntro &&
+      seenFirstDayGuide &&
+      !seenAppTour &&
+      firstDaySuccess
+    ) {
       setShowTour(true);
     }
-  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenAppTour]);
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenFirstDayGuide, seenAppTour, firstDaySuccess]);
 
   // Only for genuinely returning users: seenPacingIntro is already true
   // (from before this flag existed) but lastSeenChangelogVersion was never
@@ -1192,7 +1269,7 @@ export default function App() {
 
       {/* Hide celebrations under onboarding modals so a primary CTA click
           cannot fall through onto a "Visit Collection" link underneath. */}
-      {!showPacing && !showTour && !showWhatsNew && !showWelcome && <CelebrationOverlay />}
+      {!showPacing && !showFirstDay && !showTour && !showWhatsNew && !showWelcome && <CelebrationOverlay />}
       {showSettings && (
         <SettingsModal
           focusSection={settingsFocus}
@@ -1216,7 +1293,15 @@ export default function App() {
           }}
         />
       )}
-      {showTour && !showPacing && (
+      {showFirstDay && !showPacing && (
+        <FirstDayGuideModal
+          onClose={() => {
+            setSeenFirstDayGuide(true);
+            setShowFirstDay(false);
+          }}
+        />
+      )}
+      {showTour && !showPacing && !showFirstDay && (
         <AppTourModal
           onClose={() => {
             setSeenAppTour(true);
@@ -1224,7 +1309,7 @@ export default function App() {
           }}
         />
       )}
-      {showWhatsNew && !showPacing && !showTour && (
+      {showWhatsNew && !showPacing && !showFirstDay && !showTour && (
         <WhatsNewModal
           sinceVersion={lastSeenChangelogVersion ?? 0}
           onClose={() => {
@@ -1233,7 +1318,9 @@ export default function App() {
           }}
         />
       )}
-      {showWelcome && !showPacing && !showTour && !showWhatsNew && <WelcomeModal onClose={() => setShowWelcome(false)} />}
+      {showWelcome && !showPacing && !showFirstDay && !showTour && !showWhatsNew && (
+        <WelcomeModal onClose={() => setShowWelcome(false)} />
+      )}
     </div>
   );
 }

@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 11,
+    date: '2026-07-28',
+    highlights: [
+      localized(
+        '🌅 A friendlier day: a clearer core checklist, Keep exploring shortcuts, setup deep-links, encourage-first Companions, a guided first day, time-aware Practice, and short “why this?” hints.',
+        '🌅 一天更友好：核心清单更清晰、「继续探索」快捷入口、设置深链、「同修」先鼓励、引导式第一天、按时辰排序的修习，以及简短的「为什么这样」提示。',
+      ),
+      localized(
+        '💧 Still Waters prompt and copy polish; Glyphs Beginner / Intermediate / Advanced tabs with Advanced unlock preview.',
+        '💧「静水」提问与文案打磨；「字图」分初级 / 进阶 / 高阶页签，高阶未解锁时可预览。',
+      ),
+    ],
+  },
+  {
     version: 10,
     date: '2026-07-27',
     highlights: [

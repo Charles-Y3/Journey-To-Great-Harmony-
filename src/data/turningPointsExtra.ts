@@ -33,8 +33,8 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
       '他还在远处，父亲就跑去拥抱他，吩咐摆宴 — 不等「我配不配」的话讲完。',
     ),
     reflectionQuestion: localized(
-      'Where might love be waiting farther up the road than your shame allows you to walk?',
-      '爱或许在路上比你的羞愧允许你走到的更远之处等着 — 在哪里？',
+      'Where might love already be coming toward you — farther along the road than shame lets you walk?',
+      '爱或许已在路上向你走来 — 比羞愧允许你走到的地方更远。那是哪里？',
     ),
   },
   {
@@ -84,8 +84,8 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
       '生，亦我所欲也；义，亦我所欲也。二者不可得兼，舍生而取义者也。',
     ),
     reflectionQuestion: localized(
-      'What “fish” are you keeping that quietly costs you the “bear’s paw”?',
-      '你守着的哪条「鱼」，正悄悄代价着「熊掌」？',
+      'What lesser good are you clinging to that quietly costs you the greater one?',
+      '你紧抓着的次要之好，正悄悄让你失去哪件更重要的？',
     ),
   },
   {
@@ -93,8 +93,8 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '💧',
     tradition: localized('Daodejing, Chapter 8', '《道德经》第八章'),
     setting: localized(
-      'The Dao De Jing praises water: it benefits the ten thousand things and does not contend; it dwells in places others disdain.',
-      '《道德经》称赞水：善利万物而不争，处众人之所恶。',
+      'A student asked why the soft never seems to win. The teacher pointed to a stream cutting through rock: water benefits the ten thousand things and does not contend; it dwells in places others disdain.',
+      '学生问为何柔弱似乎从不取胜。老师指向一条切开岩石的溪流：水善利万物而不争，处众人之所恶。',
     ),
     resolution: localized(
       'Therefore it is close to the Way — soft, low, and useful precisely where force refuses to go.',
@@ -107,7 +107,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'socrates-hemlock',
-    emoji: '🏺',
+    emoji: '☠️',
     tradition: localized('Plato — Crito & Phaedo', '柏拉图 — 《克里托》《斐多》'),
     setting: localized(
       'Socrates’ friends arranged an escape from prison before his death sentence. Crito urged him to flee for his children’s sake and for justice wrongly applied.',
@@ -124,7 +124,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'plato-cave',
-    emoji: '🕯️',
+    emoji: '🔦',
     tradition: localized('Plato — Republic, Book VII', '柏拉图 — 《理想国》第七卷'),
     setting: localized(
       'Prisoners chained in a cave saw only shadows on the wall and took them for the whole of reality. One was freed and dragged upward toward the sun.',
@@ -144,11 +144,11 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '🚪',
     tradition: localized('Rumi — The Guest House', '鲁米 — 《客栈》'),
     setting: localized(
-      'Rumi likened this being human to a guest house: every morning a new arrival — joy, meanness, a dark thought — comes to the door.',
-      '鲁米把为人比作客栈：每日清晨都有新客到来 — 喜悦、卑劣、阴暗的念头 — 敲你的门。',
+      'Rumi imagined the human heart as a guest house. Every morning a new arrival knocks — joy, meanness, a dark thought.',
+      '鲁米把人心想成客栈。每日清晨都有新客敲门 — 喜悦、卑劣、阴暗的念头。',
     ),
     resolution: localized(
-      'He urged: welcome them all. Even if a crowd of sorrows sweeps your house empty, still, treat each guest honourably — they may be clearing you for some new delight.',
+      'He urged: welcome them all. Even if a crowd of sorrows sweeps your house empty, treat each guest honourably — they may be clearing you for some new delight.',
       '他劝道：一律欢迎。即便忧愁之众扫空你的屋子，仍要礼遇每位客人 — 他们或许正为某种新的喜悦腾出空间。',
     ),
     reflectionQuestion: localized(
@@ -212,8 +212,8 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '🌊',
     tradition: localized('Analects 9.17', '《论语·子罕》'),
     setting: localized(
-      'Standing by a river, Confucius said: “It passes on just like this — not ceasing day or night.”',
-      '子在川上曰：「逝者如斯夫，不舍昼夜。」',
+      'Standing by a river with his disciples, Confucius watched the current and said: “It passes on just like this — not ceasing day or night.”',
+      '孔子与弟子立于川上，望着流水说：「逝者如斯夫，不舍昼夜。」',
     ),
     resolution: localized(
       'He offered no further commentary — only the image of time and life flowing without pause.',
@@ -229,8 +229,8 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '🪞',
     tradition: localized('Analects 1.4', '《论语·学而》'),
     setting: localized(
-      'Zengzi said: each day I examine myself on three counts —',
-      '曾子曰：吾日三省吾身 —',
+      'Zengzi told his companions he examined himself every day. Before sleep he asked three questions of his own conduct:',
+      '曾子对同伴说，他每日自省。入睡前，他以三个问题检视自己的言行：',
     ),
     resolution: localized(
       'In acting for others, have I been disloyal? In dealings with friends, have I been untrustworthy? Have I failed to practise what was transmitted to me?',
@@ -314,12 +314,12 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '🌌',
     tradition: localized('Kant — Critique of Practical Reason', '康德 — 《实践理性批判》'),
     setting: localized(
-      'Kant wrote that two things fill the mind with ever new admiration: the starry sky above him, and the moral law within him.',
-      '康德写道：有两样东西使心灵充满常新的赞叹与敬畏：我头上的星空，与我心中的道德法则。',
+      'Kant paused under the night sky and wrote that two things fill the mind with ever new admiration and awe:',
+      '康德在夜空下停步，写道：有两样东西使心灵充满常新的赞叹与敬畏：',
     ),
     resolution: localized(
-      'One points outward to a vast order; the other inward to a duty that does not shrink because no one is watching.',
-      '一个指向外在的浩瀚秩序；一个指向内在的义务 — 并不因无人看见而缩小。',
+      'The starry sky above him, and the moral law within him — one pointing outward to a vast order, the other inward to a duty that does not shrink because no one is watching.',
+      '我头上的星空，与我心中的道德法则 — 一个指向外在的浩瀚秩序；一个指向内在的义务，并不因无人看见而缩小。',
     ),
     reflectionQuestion: localized(
       'When no one is watching, which law do you still consult?',
@@ -328,7 +328,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'epictetus-two-handles',
-    emoji: '🫖',
+    emoji: '✊',
     tradition: localized('Epictetus — Enchiridion', '爱比克泰德 — 《手册》'),
     setting: localized(
       'Epictetus said everything has two handles: one by which it can be carried, and one by which it cannot.',
@@ -345,11 +345,11 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'marcus-obstacle',
-    emoji: '🪨',
+    emoji: '🔥',
     tradition: localized('Marcus Aurelius — Meditations', '马可·奥勒留 — 《沉思录》'),
     setting: localized(
-      'Marcus wrote that the mind turns every obstacle into material for practice — as fire turns what is thrown into it into flame and brightness.',
-      '马可写道：心灵把每个障碍化为练习的材料 — 如火把投进来的东西化为光焰。',
+      'Facing yet another setback, Marcus wrote that the mind can turn every obstacle into material for practice — as fire turns what is thrown into it into flame and brightness.',
+      '面对又一次挫败，马可写道：心灵可以把每个障碍化为练习的材料 — 如火把投进来的东西化为光焰。',
     ),
     resolution: localized(
       'What stands in the way becomes the way.',
@@ -362,15 +362,15 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'hillel-rooftop',
-    emoji: '🏠',
+    emoji: '📜',
     tradition: localized('Pirkei Avot / Talmudic tradition', '《先贤篇》/ 塔木德传统'),
     setting: localized(
-      'Hillel taught: If I am not for myself, who will be for me? If I am only for myself, what am I? And if not now, when?',
-      '希勒尔教导：我不为己，谁人为我？若只为己，我是什么？若非此时，更待何时？',
+      'A student asked Hillel for the whole of the teaching in brief. Hillel answered with three questions held in one breath:',
+      '学生请希勒尔把全部教导简要说出。希勒尔以一口气里的三个问题作答：',
     ),
     resolution: localized(
-      'Three questions — self-respect, responsibility to others, and urgency — held in one breath.',
-      '三个问题 — 自尊、对他人的责任、与紧迫 — 含在一口气里。',
+      'If I am not for myself, who will be for me? If I am only for myself, what am I? And if not now, when?',
+      '我不为己，谁人为我？若只为己，我是什么？若非此时，更待何时？',
     ),
     reflectionQuestion: localized(
       'Which of Hillel’s three questions are you dodging this week?',
@@ -414,18 +414,18 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   {
     id: 'chinese-broken-mirror',
     emoji: '🪞',
-    tradition: localized('Chinese proverb / folklore', '中国谚语 / 传说'),
+    tradition: localized('Chinese proverb — broken mirror', '中国谚语 — 破镜难圆'),
     setting: localized(
-      'It is said a broken mirror cannot be made whole again — a warning spoken when trust has been shattered.',
-      '人说破镜难圆 — 在信任破碎时被人提起的告诫。',
+      'When a marriage or a deep trust had shattered beyond repair, people said: a broken mirror cannot be made round again.',
+      '当婚姻或深切的信任碎到难以修补，人们说：破镜难圆。',
     ),
     resolution: localized(
-      'Yet some still gather the pieces, not to pretend unbrokenness, but to see clearly what cutting edges remain.',
-      '仍有人拾起碎片，不是假装未曾破碎，而是看清还剩哪些锋刃。',
+      'The proverb does not promise a perfect join. It names the loss honestly — some breaks change the shape forever.',
+      '这句谚语并不承诺完美复原。它诚实地说出损失 — 有些破裂，会永远改变形状。',
     ),
     reflectionQuestion: localized(
-      'What are you trying to polish as if it were never cracked?',
-      '你正把什么当作从未裂过，而用力擦亮？',
+      'What break are you still pretending never happened?',
+      '你仍在假装从未发生的裂痕是哪一道？',
     ),
   },
   {
@@ -464,7 +464,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'thich-tea',
-    emoji: '☕',
+    emoji: '🍃',
     tradition: localized('Thich Nhat Hanh — teaching on tea', '一行禅师 — 茶的教导'),
     setting: localized(
       'Thich Nhat Hanh invited people to drink a cup of tea with full attention — not while planning the next hour.',
@@ -501,8 +501,8 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '🫂',
     tradition: localized('Southern African proverb — Ubuntu', '南部非洲谚语 — Ubuntu'),
     setting: localized(
-      'A traveller asked what ubuntu means. An elder answered with a scene: when you feast, the village’s children eat; when you suffer, hands appear.',
-      '旅人问 ubuntu 是什么意思。长者以一幅景象作答：你设宴时，村里的孩子也吃；你受苦时，手会出现。',
+      'In the spirit of ubuntu, belonging is pictured this way: when you feast, the village’s children eat; when you suffer, hands appear.',
+      '在 ubuntu 的精神里，归属被这样描绘：你设宴时，村里的孩子也吃；你受苦时，手会出现。',
     ),
     resolution: localized(
       '“I am because we are” — a person is a person through other people.',
@@ -535,21 +535,21 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '🏘️',
     tradition: localized('Analects 4.25', '《论语·里仁》'),
     setting: localized(
-      'Confucius said: Virtue is not left to stand alone. He who practises it will have neighbours.',
-      '子曰：德不孤，必有邻。',
+      'Someone worried that practising virtue would leave them alone. Confucius answered briefly:',
+      '有人担心践行德行会孤单。孔子答得很短：',
     ),
     resolution: localized(
-      'The line trusts that sincere character quietly gathers company — without advertising for it.',
-      '这句话信任：真诚的品格会安静地聚来邻人 — 而无需自我广告。',
+      'Virtue is not left to stand alone. He who practises it will have neighbours.',
+      '德不孤，必有邻。',
     ),
     reflectionQuestion: localized(
-      'Are you lonely for lack of virtue’s neighbours — or for lack of practising where they could find you?',
-      '你的寂寞，是缺少德之邻，还是缺少在他们找得到你的地方去践行？',
+      'Are you lonely because virtue has no neighbours — or because you are not practising where they could find you?',
+      '你寂寞，是因为德行没有邻人，还是你没有在他们找得到你的地方去践行？',
     ),
   },
   {
     id: 'buddha-raft',
-    emoji: '🛶',
+    emoji: '🪵',
     tradition: localized('Buddhist parable — the raft', '佛教譬喻 — 筏喻'),
     setting: localized(
       'The Buddha likened his teaching to a raft built to cross a dangerous river. Once on the far shore, would a wise person hoist the raft onto their head and carry it onward?',
@@ -566,15 +566,15 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'laozi-know-enough',
-    emoji: '🔕',
+    emoji: '🧘',
     tradition: localized('Daodejing, Chapter 33 / 56 (themes)', '《道德经》第三十三 / 五十六章（主旨）'),
     setting: localized(
-      'Those who know do not boast; those who boast do not know. Knowing others is intelligence; knowing yourself is true clarity.',
-      '知者不言，言者不知。知人者智，自知者明。',
+      'A boastful official asked what true strength looked like. The answer came in quiet lines from the Way:',
+      '一位爱自夸的官员问何为真正的力量。回答来自道的安静句子：',
     ),
     resolution: localized(
-      'Mastery of others is force; mastery of yourself is strength. Contentment is wealth.',
-      '胜人者有力，自胜者强。知足者富。',
+      'Those who know do not boast; knowing yourself is clarity. Mastery of others is force; mastery of yourself is strength. Contentment is wealth.',
+      '知者不言，言者不知。知人者智，自知者明。胜人者有力，自胜者强。知足者富。',
     ),
     reflectionQuestion: localized(
       'Where are you still trying to win against someone instead of mastering yourself?',
@@ -634,11 +634,11 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'confucius-rectify-names',
-    emoji: '📛',
+    emoji: '📝',
     tradition: localized('Analects 13.3', '《论语·子路》'),
     setting: localized(
-      'Asked what he would do first in governing, Confucius said: rectify names — let words mean what they ought.',
-      '问为政何先，子曰：必也正名乎。',
+      'Asked what he would do first if given charge of a state, Confucius did not name armies or taxes. He said: first, rectify names — let words mean what they ought.',
+      '问若为政何先，孔子不提兵税。子曰：必也正名乎 — 让用词合乎其所当指。',
     ),
     resolution: localized(
       'If names are not correct, language will not be in accordance with the truth of things — and affairs cannot be carried to success.',
@@ -671,12 +671,12 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
     emoji: '⚖️',
     tradition: localized('Epictetus — dichotomy of control', '爱比克泰德 — 控制的二分'),
     setting: localized(
-      'Epictetus divided things into what is up to us — judgment, aim, refusal — and what is not: body, property, reputation, office.',
-      '爱比克泰德把事物分为我们能力所及 — 判断、志向、拒绝 — 与非我们所及：身体、财产、名声、职位。',
+      'A student fretted over reputation and illness. Epictetus drew a line through life:',
+      '学生为名声与病痛焦虑。爱比克泰德在人生中划下一道线：',
     ),
     resolution: localized(
-      'Freedom, he said, is wanting things to happen as they do — and putting effort only where choice lives.',
-      '他说自由是愿事物如其所是地发生 — 并把力气只用在选择所在之处。',
+      'Up to us: judgment, aim, refusal. Not up to us: body, property, reputation, office. Freedom is putting effort only where choice lives.',
+      '我们能力所及：判断、志向、拒绝。非我们所及：身体、财产、名声、职位。自由是把力气只用在选择所在之处。',
     ),
     reflectionQuestion: localized(
       'What are you gripping that was never in the “up to you” column?',

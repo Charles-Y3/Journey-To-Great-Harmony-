@@ -166,46 +166,6 @@ export default function Community() {
       )}
 
       <div className="card">
-        <h3>{t('leaderboardsTitle')}</h3>
-        <div className="tab-row leaderboard-tab-row">
-          {CATEGORIES.map((c) => (
-            <button key={c.id} className={category === c.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setCategory(c.id)}>
-              {c.emoji} {t(c.nameKey)}
-            </button>
-          ))}
-        </div>
-        <p className="small muted">{t(activeCategory.descKey)}</p>
-        <p className="small muted">{t('leaderboardsNearbyNote')}</p>
-        {rows.map((row, i) => {
-          const hasCollision = collisionIds.has(row.id);
-          const tag = hasCollision ? travellerTag(row.id) : null;
-          return (
-            <div
-              key={row.id}
-              className={row.me ? 'leader-row me' : 'leader-row'}
-              title={tag ? `${row.name} · ${tag}` : undefined}
-              onClick={tag ? () => revealTag(row.id) : undefined}
-              style={tag ? { cursor: 'pointer' } : undefined}
-            >
-              <span className="leader-pos">{i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</span>
-              <AvatarGlyph emoji={row.emoji} ringed={hasCollision} className="leader-emoji" />
-              <span className="leader-info">
-                <span className="leader-name">
-                  {row.name}
-                  {tag && revealedId === row.id && <span className="leader-tag">{tag}</span>}
-                </span>
-                <span className="leader-rank small muted">{row.rankLabel}</span>
-              </span>
-              <span className="leader-score">{row.score}</span>
-            </div>
-          );
-        })}
-        <p className="small muted" style={{ marginTop: 8 }}>
-          {t('leaderboardsFooter')}
-        </p>
-      </div>
-
-      <div className="card">
         <h3>{t('sendEncouragementTitle')}</h3>
         <p className="small muted">{t('sendEncouragementDesc')}</p>
         {peers.map((p) => {
@@ -214,8 +174,8 @@ export default function Community() {
             <div key={p.peer.id} className="leader-row">
               <span className="leader-emoji">{agedPeerEmoji(p.peer.emoji, ageYears)}</span>
               <span className="leader-info">
+                <div className="small">“{L(p.peer.motto)}”</div>
                 <strong>{L(p.peer.name)}</strong> <span className="pill pill-tier">{t(TIER_KEY[p.peer.tier])}</span>
-                <div className="small muted">“{L(p.peer.motto)}”</div>
                 {ageYears > 0 && (
                   <div className="small muted">
                     {ageYears} {t('companionYearsLabel')}
@@ -239,6 +199,46 @@ export default function Community() {
             </div>
           );
         })}
+      </div>
+
+      <div className="card">
+        <h3>{t('leaderboardsTitle')}</h3>
+        <div className="tab-row leaderboard-tab-row">
+          {CATEGORIES.map((c) => (
+            <button key={c.id} className={category === c.id ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setCategory(c.id)}>
+              {c.emoji} {t(c.nameKey)}
+            </button>
+          ))}
+        </div>
+        <p className="small muted">{t(activeCategory.descKey)}</p>
+        <p className="small muted">{t('leaderboardsNearbyNote')}</p>
+        {rows.map((row, i) => {
+          const hasCollision = collisionIds.has(row.id);
+          const tag = hasCollision ? travellerTag(row.id) : null;
+          return (
+            <div
+              key={row.id}
+              className={row.me ? 'leader-row me' : 'leader-row'}
+              title={tag ? `${row.name} · ${tag}` : undefined}
+              onClick={tag ? () => revealTag(row.id) : undefined}
+              style={tag ? { cursor: 'pointer' } : undefined}
+            >
+              <span className="leader-pos">{i + 1}</span>
+              <AvatarGlyph emoji={row.emoji} ringed={hasCollision} className="leader-emoji" />
+              <span className="leader-info">
+                <span className="leader-name">
+                  {row.name}
+                  {tag && revealedId === row.id && <span className="leader-tag">{tag}</span>}
+                </span>
+                <span className="leader-rank small muted">{row.rankLabel}</span>
+              </span>
+              <span className="leader-score leader-score-quiet">{row.score}</span>
+            </div>
+          );
+        })}
+        <p className="small muted" style={{ marginTop: 8 }}>
+          {t('leaderboardsFooter')}
+        </p>
       </div>
     </div>
   );

@@ -132,6 +132,7 @@ function ChapterBody({
               <button className="btn" style={{ marginTop: 4 }} onClick={retry}>
                 {t('quizTryAgain')}
               </button>
+              <p className="small muted why-this-line">{t('whyQuizRetry')}</p>
             </>
           )}
           {correct && (

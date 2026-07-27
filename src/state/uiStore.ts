@@ -8,7 +8,10 @@ interface UiState {
   /** One-time pacing intro after the name gate. */
   seenPacingIntro: boolean;
   setSeenPacingIntro: (seen: boolean) => void;
-  /** One-time guided tour shown right after the pacing intro. */
+  /** One-time first-day guide after pacing (before the feature tour). */
+  seenFirstDayGuide: boolean;
+  setSeenFirstDayGuide: (seen: boolean) => void;
+  /** One-time guided tour shown after the first-day guide + first success. */
   seenAppTour: boolean;
   setSeenAppTour: (seen: boolean) => void;
   /** ISO week key (YYYY-Www) of the last weekly harmony review shown. */
@@ -50,6 +53,8 @@ export const useUi = create<UiState>()(
       setLastWelcomeSeenDay: (day) => set({ lastWelcomeSeenDay: day }),
       seenPacingIntro: false,
       setSeenPacingIntro: (seen) => set({ seenPacingIntro: seen }),
+      seenFirstDayGuide: false,
+      setSeenFirstDayGuide: (seen) => set({ seenFirstDayGuide: seen }),
       seenAppTour: false,
       setSeenAppTour: (seen) => set({ seenAppTour: seen }),
       lastWeeklyReviewWeek: null,
@@ -70,6 +75,7 @@ export const useUi = create<UiState>()(
         set({
           lastWelcomeSeenDay: null,
           seenPacingIntro: false,
+          seenFirstDayGuide: false,
           seenAppTour: false,
           lastWeeklyReviewWeek: null,
           lastYearlyReviewYear: null,

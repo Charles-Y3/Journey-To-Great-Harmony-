@@ -88,6 +88,7 @@ function LessonView({ lesson, done, onDone, capReached }: { lesson: Lesson; done
               <button className="btn" onClick={retry}>
                 {t('quizTryAgain')}
               </button>
+              <p className="small muted why-this-line">{t('whyQuizRetry')}</p>
             </>
           )}
         </>

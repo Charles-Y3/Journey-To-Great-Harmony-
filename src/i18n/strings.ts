@@ -43,10 +43,27 @@ export const UI = {
     'Slide square tiles to restore each modern character.',
     '滑动方块拼块，还原每一个现代汉字。',
   ),
+  glyphsTierBeginnerTab: localized('Beginner', '入门'),
   glyphsTierIntermediate: localized('Intermediate — Eight Virtues', '进阶 — 八德'),
   glyphsTierIntermediateBlurb: localized(
     'Slide mixed squares and rectangles to restore each Shuowen seal form.',
     '滑动方块与长方形拼块，还原每一个说文小篆字形。',
+  ),
+  glyphsTierIntermediateTab: localized('Intermediate', '进阶'),
+  glyphsTierAdvanced: localized('Advanced — Path totems', '高阶 — 道上图腾'),
+  glyphsTierAdvancedTab: localized('Advanced', '高阶'),
+  glyphsTierAdvancedBlurb: localized(
+    'Arrange symbolic totem pieces by meaning — free placement, relational checks.',
+    '按意义摆放图腾碎片 — 自由放置，关系判定。',
+  ),
+  glyphsTierAdvancedLocked: localized(
+    'Clear every Intermediate glyph first to unlock this tier.',
+    '先解开进阶的每一个字谜，才能解锁这一阶。',
+  ),
+  glyphsTierAdvancedPreviewTitle: localized('Totem arrange', '图腾摆放'),
+  glyphsTierAdvancedPreviewDesc: localized(
+    'Virtues such as Harmony, Community, Balance, Reciprocity, Courage, and Sincerity — restored as pictures, not character tiles. Coming after Intermediate.',
+    '如和谐、共同体、平衡、恕道、勇气与诚意 — 以图像还原，而非汉字图块。完成进阶后开放。',
   ),
   glyphsTierLocked: localized(
     'Clear every Beginner glyph first to unlock this tier.',
@@ -95,7 +112,7 @@ export const UI = {
     'One real story a day, up to the moment of choice. Ponder it, then turn the card.',
     '每天一则真实的故事，停在抉择的那一刻。先静静想一想，再翻开卡牌。',
   ),
-  turningPointsPrompt: localized('What would you have done?', '若是你，会怎么做？'),
+  turningPointsPrompt: localized('What do you think?', '你怎么看？'),
   turningPointsFlipBtn: localized('Turn the card', '翻开卡牌'),
   turningPointsResolutionLabel: localized('What happened', '后来发生的事'),
   turningPointsQuestionLabel: localized('To sit with', '留待细想'),
@@ -133,8 +150,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1.2 — your progress is stored privately in this browser.',
-    '大同之路 v1.2 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.3 — your progress is stored privately in this browser.',
+    '大同之路 v1.3 — 你的进度私密地保存在此浏览器中。',
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(
@@ -187,8 +204,8 @@ export const UI = {
   reminderEveningSummary: localized('Evening reflection time 🪞', '夜间反思时间 🪞'),
   settingsReminderAddBtn: localized('Add to Calendar', '加入日历'),
   settingsReminderFootnote: localized(
-    "This downloads a small calendar file (.ics) that repeats daily. If you change the time above, tap \"Add to Calendar\" again to update it.",
-    '这会下载一个每日重复的日历文件（.ics）。若你更改了上方的时间，请再次点击「加入日历」以更新。',
+    "This downloads a small calendar file (.ics) that repeats daily. Your calendar keeps its own copy — if you change the time above, tap \"Add to Calendar\" again so the reminder matches.",
+    '这会下载一个每日重复的日历文件（.ics）。日历应用保存的是它自己的副本 — 若你更改了上方的时间，请再次点击「加入日历」，提醒才会一致。',
   ),
   reminderNudgeMorning: localized(
     'Want a daily nudge to set your intention? Add a morning reminder in Settings.',
@@ -369,9 +386,12 @@ export const UI = {
   statWisdomXp: localized('wisdom XP', '智慧经验'),
   keepExploringTitle: localized('Keep exploring', '继续探索'),
   keepExploringBody: localized(
-    "Study humanity's story on the Wisdom Timeline, walk the Journey Map, cheer on fellow travellers in the Community, or browse your Collection.",
-    '在智慧时间线上研读人类的故事，走上旅程地图，在社群中为同修加油，或浏览你的收藏。',
+    'Still waters, companions, or a little more learning — whenever you have a quiet moment.',
+    '静水、同行，或再学一点 — 有安静片刻时再来。',
   ),
+  keepExploringStillWaters: localized('Still Waters', '静水'),
+  keepExploringCompanions: localized('Companions', '同行'),
+  keepExploringLearn: localized('Learn', '学习'),
   weeklyEchoTitle: localized('Card of the week', '本周之卡'),
   weeklyEchoSubtitle: localized('A wisdom card from your collection, revisited.', '从你的收藏中，重访一张智慧卡牌。'),
   journeyRecapTitle: localized('My Journey so far', '我的旅程至今'),
@@ -403,7 +423,42 @@ export const UI = {
     '把这段旅程安装到手机主屏幕，便于离线使用，也更安静专注。',
   ),
   setupTipsOpenSettings: localized('Open Settings', '打开设置'),
+  setupTipsRemindersBtn: localized('Reminders', '提醒'),
+  setupTipsMusicBtn: localized('Music', '音乐'),
+  setupTipsInstallBtn: localized('Install', '安装'),
   setupTipsDismiss: localized('Got it', '知道了'),
+
+  whyEveningLock: localized(
+    'Reflection works best after the day has unfolded — not as a morning plan.',
+    '反思最好在一天真正展开之后，而不是当作早晨的计划。',
+  ),
+  whyMinLength: localized(
+    'A few real words help the practice stick — not a checkbox.',
+    '几句真心话更能让修习留下痕迹 — 不只是打个勾。',
+  ),
+  whyCalendarReadd: localized(
+    'Your calendar app keeps its own copy — change the time here, then tap Add to Calendar again.',
+    '日历应用保存的是它自己的副本 — 在这里改时间后，请再点一次「加入日历」。',
+  ),
+  whyQuizRetry: localized(
+    'Wrong answers reshuffle so you learn by finding the right one — not by seeing it revealed.',
+    '答错会重新打乱选项，好让你自己找出正解 — 而不是直接看到答案。',
+  ),
+  practiceExpand: localized('Show', '展开'),
+  practiceCollapse: localized('Hide', '收起'),
+  practiceCollapsedDone: localized('Done for now', '已完成'),
+  firstDayGuideTitle: localized('Your first small steps', '你的最初几步'),
+  firstDayGuideIntro: localized(
+    'Start with one of these — that is enough for today. The rest of the path can wait.',
+    '从其中一件开始就够了 — 今天这样就好，其余的路可以等。',
+  ),
+  firstDayGuidePractice: localized('Morning intention', '晨间心愿'),
+  firstDayGuideStillWaters: localized('Still Waters', '静水'),
+  firstDayGuideLearn: localized('A short lesson', '一小课'),
+  firstDayGuideContinue: localized('Continue', '继续'),
+  firstDayGuidePracticeDesc: localized('Set one honest intention on Practice.', '在「修习」里立下一个真心的心愿。'),
+  firstDayGuideStillWatersDesc: localized('Flip today’s card and sit with it a moment.', '翻开今日的卡片，静静坐一会儿。'),
+  firstDayGuideLearnDesc: localized('Read one short teaching on Learn.', '在「学习」里读一小段教诲。'),
 
   // ── Practice ──────────────────────────────────────────────────────
   practiceTitle: localized('Daily Virtue Practice', '每日德行修习'),
@@ -511,7 +566,8 @@ export const UI = {
   journalFilterEmpty: localized('No entries of this kind yet.', '目前还没有这类记录。'),
   journalMoodLabel: localized('Heart', '心念'),
   journalDateFilterAll: localized('All dates', '所有日期'),
-  journalDateFilterFromPrefix: localized('From', '从'),
+  journalDateFilterFrom: localized('From date', '起始日期'),
+  journalDateFilterClear: localized('Clear', '清除'),
   todayIntentionLabel: localized("Today’s intention", '今日心愿'),
   yesterdayWroteLabel: localized('Yesterday you wrote', '昨日你写下'),
   visitForestBanner: localized('Your forest grew — visit?', '你的森林成长了 — 去看看？'),

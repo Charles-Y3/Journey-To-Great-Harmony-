@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import type { JourneyData } from '../../state/selectors';
@@ -90,6 +90,7 @@ function MorningCard({ today }: { today: string }) {
           )}
           <textarea rows={2} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('intentionPlaceholder')} />
           <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, progressLength(text), TEXT_MIN.intention)}</p>
+          <p className="small muted why-this-line">{t('whyMinLength')}</p>
           {progressLength(text) >= TEXT_MIN.intention && looksLikeNonsense(text) && (
             <p className="small muted">{t('textNonsenseHint')}</p>
           )}
@@ -186,6 +187,7 @@ function ChallengeCard({ today }: { today: string }) {
           <p className="small muted">{t('challengeNoteHint')}</p>
           <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={t('challengeNotePlaceholder')} />
           <p className="small muted" style={{ marginTop: 4 }}>{minLengthHint(locale, progressLength(note), TEXT_MIN.challengeNote)}</p>
+          <p className="small muted why-this-line">{t('whyMinLength')}</p>
           {progressLength(note) >= TEXT_MIN.challengeNote && looksLikeNonsense(note) && (
             <p className="small muted">{t('textNonsenseHint')}</p>
           )}
@@ -371,7 +373,10 @@ function EveningCard({ today }: { today: string }) {
           </p>
         </>
       ) : !eveningOpen ? (
-        <p className="small muted">{t('eveningLockedNote')}</p>
+        <>
+          <p className="small muted">{t('eveningLockedNote')}</p>
+          <p className="small muted why-this-line">{t('whyEveningLock')}</p>
+        </>
       ) : (
         <>
           {rec.intention && (
@@ -409,6 +414,7 @@ function EveningCard({ today }: { today: string }) {
               <label className="small">{t('reflectionQ1')}</label>
               <textarea rows={2} value={learned} onChange={(e) => setLearned(e.target.value)} />
               <p className="small muted" style={{ margin: '4px 0 10px' }}>{minLengthHint(locale, progressLength(learned), TEXT_MIN.reflection)}</p>
+              <p className="small muted why-this-line" style={{ margin: '0 0 10px' }}>{t('whyMinLength')}</p>
               {progressLength(learned) >= TEXT_MIN.reflection && looksLikeNonsense(learned) && (
                 <p className="small muted">{t('textNonsenseHint')}</p>
               )}
@@ -502,14 +508,23 @@ function Journal() {
                 </option>
               ))}
             </select>
-            <select className="journal-filter-select" value={dateFilter} onChange={(e) => setDateFilter(e.target.value)}>
-              <option value="all">{t('journalDateFilterAll')}</option>
-              {allEntries.map(([day]) => (
-                <option key={day} value={day}>
-                  {t('journalDateFilterFromPrefix')} {day}
-                </option>
-              ))}
-            </select>
+            <label className="journal-date-filter">
+              <span className="small muted">{t('journalDateFilterFrom')}</span>
+              <input
+                type="date"
+                className="journal-filter-select journal-date-input"
+                value={dateFilter === 'all' ? '' : dateFilter}
+                min={allEntries.length ? allEntries[allEntries.length - 1]![0] : undefined}
+                max={allEntries.length ? allEntries[0]![0] : undefined}
+                onChange={(e) => setDateFilter(e.target.value || 'all')}
+                aria-label={t('journalDateFilterFrom')}
+              />
+            </label>
+            {dateFilter !== 'all' && (
+              <button type="button" className="btn journal-date-clear" onClick={() => setDateFilter('all')}>
+                {t('journalDateFilterClear')}
+              </button>
+            )}
           </div>
           {entries.length === 0 && <p className="small muted">{t('journalFilterEmpty')}</p>}
           {entries.map(([day, rec]) => {
@@ -597,14 +612,13 @@ function QuietMomentCard() {
 
 function GrowthVisitBanners({ today }: { today: string }) {
   const { t } = useT();
-  const { doneCount, tasks } = useTodayTasks();
+  const { coreComplete } = useTodayTasks();
   const state = useJourney();
   const d = state as unknown as JourneyData;
   const forest = forestInfo(d);
   const world = worldInfo(d, today);
-  const full = doneCount === tasks.length && tasks.length > 0;
 
-  if (!full) return null;
+  if (!coreComplete) return null;
   return (
     <div className="visit-banner-row">
       <Link className="visit-banner" to="/forest">
@@ -617,21 +631,66 @@ function GrowthVisitBanners({ today }: { today: string }) {
   );
 }
 
+function CollapsiblePracticeBlock({
+  collapse,
+  summary,
+  children,
+}: {
+  collapse: boolean;
+  summary: string;
+  children: ReactNode;
+}) {
+  const { t } = useT();
+  const [open, setOpen] = useState(false);
+
+  if (!collapse || open) {
+    return (
+      <div className="practice-block">
+        {collapse && (
+          <button type="button" className="btn practice-collapse-btn" onClick={() => setOpen(false)}>
+            {t('practiceCollapse')}
+          </button>
+        )}
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <div className="card practice-card practice-collapsed">
+      <div className="practice-collapsed-row">
+        <span className="practice-collapsed-summary">
+          <span className="pill">{t('practiceCollapsedDone')}</span> {summary}
+        </span>
+        <button type="button" className="btn" onClick={() => setOpen(true)}>
+          {t('practiceExpand')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Practice() {
   const today = useToday();
   const { t } = useT();
   const location = useLocation();
   const time = practiceTimeOfDay();
-  const { doneCount, tasks } = useTodayTasks();
+  const { coreComplete } = useTodayTasks();
+  const rec = useJourney((s) => s.days[today] ?? {});
   const lastFullHarmonySfxDay = useUi((s) => s.lastFullHarmonySfxDay);
   const setLastFullHarmonySfxDay = useUi((s) => s.setLastFullHarmonySfxDay);
 
+  const morningDone = !!rec.intention;
+  const challengeDone = !!rec.challengeDone;
+  const heartDone = !!rec.mood;
+  const eveningDone = !!rec.reflection;
+
   useEffect(() => {
-    if (doneCount === tasks.length && tasks.length > 0 && lastFullHarmonySfxDay !== today) {
+    if (coreComplete && lastFullHarmonySfxDay !== today) {
       playSfx('harmony');
       setLastFullHarmonySfxDay(today);
     }
-  }, [doneCount, tasks.length, today, lastFullHarmonySfxDay, setLastFullHarmonySfxDay]);
+  }, [coreComplete, today, lastFullHarmonySfxDay, setLastFullHarmonySfxDay]);
 
   useEffect(() => {
     const focus = (location.state as { focus?: string } | null)?.focus;
@@ -640,16 +699,59 @@ export default function Practice() {
     return () => window.clearTimeout(timer);
   }, [location.state]);
 
+  const morningBlock = (
+    <CollapsiblePracticeBlock
+      key="morning"
+      collapse={time !== 'morning' && morningDone}
+      summary={morningDone ? `🌅 ${rec.intention}` : t('morningCardTitle')}
+    >
+      <MorningCard today={today} />
+    </CollapsiblePracticeBlock>
+  );
+  const challengeBlock = (
+    <CollapsiblePracticeBlock
+      key="challenge"
+      collapse={(time === 'evening') && challengeDone}
+      summary={t('taskChallengePrefix')}
+    >
+      <ChallengeCard today={today} />
+    </CollapsiblePracticeBlock>
+  );
+  const heartBlock = (
+    <CollapsiblePracticeBlock
+      key="heart"
+      collapse={(time === 'morning' || time === 'evening') && heartDone}
+      summary={t('heartCardTitle')}
+    >
+      <HeartCheckCard today={today} />
+    </CollapsiblePracticeBlock>
+  );
+  const eveningBlock = (
+    <CollapsiblePracticeBlock
+      key="evening"
+      collapse={time === 'morning' && eveningDone}
+      summary={t('eveningCardTitle')}
+    >
+      <EveningCard today={today} />
+    </CollapsiblePracticeBlock>
+  );
+  const quiet = <QuietMomentCard key="quiet" />;
+
+  let ordered: ReactNode[];
+  if (time === 'morning') {
+    ordered = [morningBlock, challengeBlock, heartBlock, eveningBlock, quiet];
+  } else if (time === 'day') {
+    ordered = [challengeBlock, heartBlock, quiet, morningBlock, eveningBlock];
+  } else {
+    ordered = [eveningBlock, morningBlock, challengeBlock, heartBlock, quiet];
+  }
+
   return (
     <div className="practice-page" data-time={time}>
       <PageHeader emoji="🎯" title={t('practiceTitle')} subtitle={t('practiceSubtitle')} />
       <GrowthVisitBanners today={today} />
-      <MorningCard today={today} />
-      <ChallengeCard today={today} />
-      <HeartCheckCard today={today} />
-      <EveningCard today={today} />
+      {ordered}
       <Journal />
-      <QuietMomentCard />
     </div>
   );
 }

@@ -25,7 +25,7 @@ export default function Today() {
   const stats = statsFromData(d);
   const forest = forestInfo(d);
   const world = worldInfo(d, today);
-  const { tasks, doneCount } = useTodayTasks();
+  const { tasks, coreDoneCount, coreTotal, coreComplete } = useTodayTasks();
   const rec = d.days[today] ?? {};
   const yesterday = addDaysToKey(today, -1);
   const yRec = d.days[yesterday] ?? {};
@@ -50,8 +50,10 @@ export default function Today() {
   const streakAtRisk = new Date().getHours() >= EVENING_OPEN_HOUR && !rec.intention && !rec.challengeDone && !rec.reflection;
   const showStreakNudge = streakAtRisk && dismissedStreakNudgeDay !== today;
 
-  function openSettings() {
-    window.dispatchEvent(new CustomEvent('journey:open-settings'));
+  function openSettings(section?: 'reminders' | 'music' | 'install') {
+    window.dispatchEvent(
+      new CustomEvent('journey:open-settings', { detail: section ? { section } : undefined }),
+    );
   }
 
   // First open of a new ISO week: seed silently once, then show the review.
@@ -113,7 +115,7 @@ export default function Today() {
 
   return (
     <div>
-      <PageHeader emoji="🌅" title={t('todayTitle')} subtitle={todaySubtitle(locale, today, doneCount, tasks.length)} />
+      <PageHeader emoji="🌅" title={t('todayTitle')} subtitle={todaySubtitle(locale, today, coreDoneCount, coreTotal)} />
 
       <div className="quote-card">
         <p className="quote-text">“{L(quote.text)}”</p>
@@ -166,8 +168,14 @@ export default function Today() {
             <li>{t('setupTipInstall')}</li>
           </ul>
           <div className="setup-tips-actions">
-            <button type="button" className="btn btn-primary" onClick={openSettings}>
-              {t('setupTipsOpenSettings')}
+            <button type="button" className="btn btn-primary" onClick={() => openSettings('reminders')}>
+              {t('setupTipsRemindersBtn')}
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => openSettings('music')}>
+              {t('setupTipsMusicBtn')}
+            </button>
+            <button type="button" className="btn btn-primary" onClick={() => openSettings('install')}>
+              {t('setupTipsInstallBtn')}
             </button>
             <button type="button" className="btn" onClick={() => setSeenSetupTips(true)}>
               {t('setupTipsDismiss')}
@@ -211,7 +219,7 @@ export default function Today() {
               )}
             </div>
           ))}
-        {doneCount === tasks.length && (
+        {coreComplete && (
           <>
             <p className="pill" style={{ marginTop: 12 }}>{t('todayFullHarmony')}</p>
             <div className="visit-banner-row" style={{ marginTop: 10 }}>
@@ -264,6 +272,20 @@ export default function Today() {
       <div className="card">
         <h3>{t('keepExploringTitle')}</h3>
         <p className="small muted">{t('keepExploringBody')}</p>
+        <div className="keep-exploring-links">
+          <Link className="keep-exploring-link" to="/turning-points">
+            <span className="keep-exploring-emoji">💧</span>
+            <span>{t('keepExploringStillWaters')}</span>
+          </Link>
+          <Link className="keep-exploring-link" to="/community">
+            <span className="keep-exploring-emoji">🌸</span>
+            <span>{t('keepExploringCompanions')}</span>
+          </Link>
+          <Link className="keep-exploring-link" to="/knowledge">
+            <span className="keep-exploring-emoji">📖</span>
+            <span>{t('keepExploringLearn')}</span>
+          </Link>
+        </div>
       </div>
 
       {showEchoCard && echoCard && <CardModal card={echoCard} onClose={() => setShowEchoCard(false)} />}
