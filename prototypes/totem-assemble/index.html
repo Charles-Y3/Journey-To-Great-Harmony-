@@ -41,8 +41,21 @@
         background: var(--panel); border: 1px solid #31433a;
         border-radius: var(--radius); padding: 14px;
       }
-      .card h2 { margin: 0 0 4px; font-size: 1rem; }
-      .meta { color: var(--muted); font-size: 0.8rem; margin: 0 0 12px; line-height: 1.4; }
+      .card h2 {
+        margin: 0 0 6px;
+        font-size: 1rem;
+        line-height: 1.25;
+        min-height: 1.25em;
+      }
+      /* Fixed slots above/below the stage so hints & messages never shove the board. */
+      .meta {
+        color: var(--muted);
+        font-size: 0.8rem;
+        margin: 0 0 12px;
+        line-height: 1.35;
+        height: 3.9em;
+        overflow: auto;
+      }
       .stage-wrap {
         position: relative;
         width: 100%;
@@ -61,7 +74,12 @@
       }
       .draggable { cursor: grab; }
       .draggable.dragging { cursor: grabbing; opacity: 0.92; }
-      .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .actions {
+        display: flex; flex-wrap: wrap; gap: 8px;
+        margin: 12px 0 0;
+        min-height: 44px;
+        align-content: flex-start;
+      }
       .btn {
         appearance: none; border: none; border-radius: 10px;
         padding: 10px 14px; font-size: 0.88rem; font-weight: 600;
@@ -70,15 +88,23 @@
       .btn-primary { background: var(--accent); color: #06140c; }
       .btn:disabled { opacity: 0.4; cursor: not-allowed; }
       .feedback {
-        margin-top: 10px; min-height: 1.3em;
+        margin: 10px 0 0;
+        height: 4.2em;
+        overflow: auto;
         font-size: 0.84rem; color: var(--muted); line-height: 1.4;
       }
       .feedback.warn { color: var(--warn); }
       .feedback.ok { color: #9fd6b5; }
+      .solved-slot {
+        margin-top: 12px;
+        height: 8.5em;
+        overflow: auto;
+      }
       .solved-box {
-        margin-top: 12px; padding: 12px; border-radius: 12px;
+        padding: 12px; border-radius: 12px;
         background: rgba(61,155,110,0.12); border: 1px solid rgba(61,155,110,0.35);
       }
+      .solved-box[hidden] { display: none; }
       .solved-box h3 { margin: 0 0 6px; font-size: 0.95rem; }
       .solved-box p { margin: 0 0 8px; font-size: 0.86rem; line-height: 1.45; }
       .solved-box .muted { margin: 0; color: var(--muted); font-size: 0.78rem; }
@@ -117,7 +143,9 @@
         </div>
 
         <p class="feedback" id="feedback"></p>
-        <div class="solved-box" id="solved" hidden></div>
+        <div class="solved-slot">
+          <div class="solved-box" id="solved" hidden></div>
+        </div>
         <p class="rules">
           Win condition is relational: every shard belongs in the meaning.
           Arrange freely, then Contemplate — feedback names what relationship is still missing.
@@ -792,9 +820,7 @@
 
       function render() {
         titleEl.textContent = puzzle.title;
-        metaEl.textContent = solved
-          ? 'Meaning restored.'
-          : puzzle.riddle + (hintLevel ? `  ·  hint ${hintLevel}/${puzzle.hints.length}` : '');
+        metaEl.textContent = solved ? 'Meaning restored.' : puzzle.riddle;
 
         const partsSvg = puzzle.parts
           .map((p) => {
@@ -854,9 +880,11 @@
           setFeedback('No further hints — only arranging will tell you.', 'warn');
           return;
         }
-        setFeedback(puzzle.hints[hintLevel], 'warn');
         hintLevel += 1;
-        metaEl.textContent = puzzle.riddle + `  ·  hint ${hintLevel}/${puzzle.hints.length}`;
+        setFeedback(
+          `Hint ${hintLevel}/${puzzle.hints.length}: ${puzzle.hints[hintLevel - 1]}`,
+          'warn',
+        );
       }
 
       function clientToSvg(event) {
