@@ -19,7 +19,7 @@ export interface Rank {
 export const RANKS: Rank[] = [
   {
     id: 'seeker',
-    name: localized('Seeker', '求道者'),
+    name: localized('Seeker', '寻路人'),
     emoji: '🔦',
     minXp: PACING_RANK_MIN_XP.seeker,
     blurb: localized(

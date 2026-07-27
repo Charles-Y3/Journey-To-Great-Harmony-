@@ -127,7 +127,7 @@ export const UI = {
   settingsResetTitle: localized('Reset', '重置'),
   settingsResetDesc: localized(
     'Erase all progress and begin the journey again as a Seeker.',
-    '清除所有进度，以「求道者」的身份重新开始旅程。',
+    '清除所有进度，以「寻路人」的身份重新开始旅程。',
   ),
   settingsResetConfirm: localized('Yes, erase everything', '是的，清除一切'),
   settingsCancel: localized('Cancel', '取消'),
