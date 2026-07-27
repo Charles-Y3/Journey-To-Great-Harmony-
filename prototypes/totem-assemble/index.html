@@ -124,6 +124,7 @@
           <button type="button" class="btn btn-primary" id="checkBtn">Contemplate</button>
           <button type="button" class="btn" id="scatterBtn">Scatter</button>
           <button type="button" class="btn" id="hintBtn">Hint (costs clarity)</button>
+          <button type="button" class="btn" id="answerBtn">Show answer</button>
         </div>
 
         <p class="feedback" id="feedback"></p>
@@ -212,6 +213,15 @@
             { type: 'apart', a: 'figL', b: 'figR', min: 20, msg: 'The two figures are merged — they should stand as companions.' },
             { type: 'level', a: 'figL', b: 'figR', max: 16, msg: 'The companions should meet as equals — one stands much higher.' },
           ],
+          solution: {
+            ring: { x: 100, y: 108 },
+            figL: { x: 78, y: 100 },
+            figR: { x: 122, y: 100 },
+            bowl: { x: 100, y: 112 },
+            mat: { x: 100, y: 132 },
+            steam: { x: 100, y: 92 },
+            sun: { x: 100, y: 72 },
+          },
         },
         {
           id: 'commons',
@@ -296,6 +306,17 @@
             { type: 'near', a: 'tree', b: 'court', max: 58, msg: 'Shade should stand near the meeting place.' },
             { type: 'aside', a: 'tree', b: 'court', side: 'right', msg: 'Let the tree stand beside the court, not blocking its center.' },
           ],
+          solution: {
+            court: { x: 100, y: 100 },
+            hearth: { x: 90, y: 96 },
+            well: { x: 112, y: 104 },
+            pathN: { x: 100, y: 62 },
+            pathS: { x: 100, y: 142 },
+            pathE: { x: 142, y: 100 },
+            pathW: { x: 58, y: 100 },
+            gate: { x: 100, y: 158 },
+            tree: { x: 150, y: 90 },
+          },
         },
         {
           id: 'mean',
@@ -371,6 +392,16 @@
             { type: 'below', a: 'plumb', b: 'beam', msg: 'The plumb should hang down from the beam.' },
             { type: 'near', a: 'plumb', b: 'fulcrum', max: 28, msg: 'The plumb should mark the true center above the fulcrum.' },
           ],
+          solution: {
+            beam: { x: 100, y: 88 },
+            fulcrum: { x: 100, y: 112 },
+            base: { x: 100, y: 138 },
+            wL: { x: 58, y: 108 },
+            wR: { x: 142, y: 108 },
+            cordL: { x: 72, y: 96 },
+            cordR: { x: 128, y: 96 },
+            plumb: { x: 100, y: 108 },
+          },
         },
       ];
 
@@ -385,6 +416,7 @@
       const checkBtn = document.getElementById('checkBtn');
       const scatterBtn = document.getElementById('scatterBtn');
       const hintBtn = document.getElementById('hintBtn');
+      const answerBtn = document.getElementById('answerBtn');
 
       let puzzle = PUZZLES[0];
       /** @type {Record<string, {x:number,y:number}>} */
@@ -550,6 +582,17 @@
         `;
       }
 
+      function revealSolved(fromAnswer) {
+        solved = true;
+        stageWrap.classList.add('solved');
+        setFeedback(fromAnswer ? 'Answer shown.' : 'The relations hold.', 'ok');
+        solvedEl.hidden = false;
+        solvedEl.innerHTML = `<h3>${puzzle.revealTitle}</h3>
+          <p>${puzzle.teaching}</p>
+          <p class="muted">${fromAnswer ? 'Shown answer — relational layout for testing.' : 'Prototype — relational check, not socket snapping. No XP.'}</p>`;
+        render();
+      }
+
       function contemplate() {
         if (solved) return;
         for (const rule of puzzle.rules) {
@@ -558,14 +601,24 @@
             return;
           }
         }
-        solved = true;
-        stageWrap.classList.add('solved');
-        setFeedback('The relations hold.', 'ok');
-        solvedEl.hidden = false;
-        solvedEl.innerHTML = `<h3>${puzzle.revealTitle}</h3>
-          <p>${puzzle.teaching}</p>
-          <p class="muted">Prototype — relational check, not socket snapping. No XP.</p>`;
-        render();
+        revealSolved(false);
+      }
+
+      function showAnswer() {
+        pose = {};
+        for (const p of puzzle.parts) {
+          const s = puzzle.solution[p.id];
+          pose[p.id] = { x: s.x, y: s.y };
+        }
+        // Sanity: if authoring drifts, surface the first failing rule.
+        for (const rule of puzzle.rules) {
+          if (!evalRule(rule)) {
+            setFeedback('Answer layout failed a rule: ' + rule.msg, 'warn');
+            render();
+            return;
+          }
+        }
+        revealSolved(true);
       }
 
       function giveHint() {
@@ -643,6 +696,7 @@
         scatter();
       });
       hintBtn.addEventListener('click', giveHint);
+      answerBtn.addEventListener('click', showAnswer);
 
       boot();
     </script>
