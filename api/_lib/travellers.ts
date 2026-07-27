@@ -1,6 +1,13 @@
 import { AVATARS, isAllowedAvatar } from '../../src/data/avatars.js';
-import { RANKS, rankIndexForXp } from '../../src/engine/progression.js';
 import type { LbCategory } from './redis.js';
+
+// Mirrors PACING_RANK_MIN_XP in src/engine/progression.ts / pacingBudget.ts —
+// duplicated here (not imported) because progression.ts pulls in the app's
+// entire content layer (timeline/knowledgeTree/sages/etc.), none of which use
+// the explicit .js extensions this serverless ESM runtime requires on
+// relative imports; importing it crashed every /api/traveller* route. Keep
+// these 8 numbers in sync if PACING_RANK_MIN_XP ever changes.
+const RANK_MIN_XP = [0, 150, 450, 1000, 2000, 3500, 5500, 8000] as const;
 
 export { AVATARS, isAllowedAvatar };
 
@@ -80,11 +87,14 @@ export function scoreForCategory(rec: Pick<TravellerRecord, 'xp' | 'streak' | 'c
 
 /** XP range spanning the caller's rank tier ±1, for "near my rank" queries. */
 export function rankXpBand(xp: number): { min: number; max: number } {
-  const idx = rankIndexForXp(xp);
+  let idx = 0;
+  for (let i = 0; i < RANK_MIN_XP.length; i++) {
+    if (xp >= RANK_MIN_XP[i]) idx = i;
+  }
   const lo = Math.max(0, idx - 1);
-  const hi = Math.min(RANKS.length - 1, idx + 1);
-  const min = RANKS[lo].minXp;
-  const max = hi + 1 < RANKS.length ? RANKS[hi + 1].minXp - 1 : Number.MAX_SAFE_INTEGER;
+  const hi = Math.min(RANK_MIN_XP.length - 1, idx + 1);
+  const min = RANK_MIN_XP[lo];
+  const max = hi + 1 < RANK_MIN_XP.length ? RANK_MIN_XP[hi + 1] - 1 : Number.MAX_SAFE_INTEGER;
   return { min, max };
 }
 
