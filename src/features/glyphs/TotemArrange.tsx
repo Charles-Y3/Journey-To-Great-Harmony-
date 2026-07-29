@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import type { AdvancedTotem, TotemPose } from '../../data/totems';
 import {
   clampTotem,
@@ -31,17 +31,24 @@ export function TotemArrangeModal({ totem, onClose }: { totem: AdvancedTotem; on
   });
   const dragRef = useRef<{ id: string; ox: number; oy: number } | null>(null);
 
-  const reset = useCallback(() => {
+  function scatterBoard() {
     setPose(scatterTotem(totem.parts));
     setHintLevel(0);
     setSolved(false);
     setWasFirstClear(false);
     setFeedback({ text: t('glyphsTotemScatterPrompt'), kind: '' });
-  }, [totem, t]);
+  }
 
+  // Only re-scatter when the opened totem changes. Do not depend on `t` —
+  // useT() returns a fresh function each render, which would loop forever.
   useEffect(() => {
-    reset();
-  }, [totem.id, reset]);
+    setPose(scatterTotem(totem.parts));
+    setHintLevel(0);
+    setSolved(false);
+    setWasFirstClear(false);
+    setFeedback({ text: t('glyphsTotemScatterPrompt'), kind: '' });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- totem.id gates the reset
+  }, [totem.id]);
 
   function clientToSvg(clientX: number, clientY: number): { x: number; y: number } | null {
     const svg = stageRef.current;
@@ -150,17 +157,7 @@ export function TotemArrangeModal({ totem, onClose }: { totem: AdvancedTotem; on
         <button type="button" className="btn btn-primary" onClick={contemplate} disabled={solved}>
           {t('glyphsTotemContemplate')}
         </button>
-        <button
-          type="button"
-          className="btn"
-          onClick={() => {
-            setHintLevel(0);
-            setPose(scatterTotem(totem.parts));
-            setSolved(false);
-            setWasFirstClear(false);
-            setFeedback({ text: t('glyphsTotemScatterPrompt'), kind: '' });
-          }}
-        >
+        <button type="button" className="btn" onClick={scatterBoard}>
           {t('glyphsTotemScatter')}
         </button>
         <button type="button" className="btn" onClick={giveHint} disabled={solved || hintLevel >= MAX_HINTS}>
