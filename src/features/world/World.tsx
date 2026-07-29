@@ -17,6 +17,7 @@ import { communityFeed, peerStats } from '../../engine/community';
 import { fetchActiveTravellers, type ActiveTraveller } from '../../engine/travellerApi';
 import { walkerCapsForStage } from '../../engine/worldWalkers';
 import { hashString, rankForXp, seededRandom } from '../../engine/progression';
+import { useIsNavRouteUnlocked } from '../../engine/pacing';
 import { findNameCollisions, travellerTag } from '../../engine/travellerTags';
 import { speakGreeting, speakAppText } from '../../engine/speech';
 import { playSfx } from '../../engine/sfx';
@@ -746,6 +747,13 @@ function CivicBuildingModal({
   encouragementCount: number;
 }) {
   const { t, L } = useT();
+  // World itself is wave 2, but its buildings can point at wave-3 features
+  // (Collection, Community) that aren't necessarily unlocked yet just
+  // because World is reachable — check each target independently.
+  const collectionUnlocked = useIsNavRouteUnlocked('/collection');
+  const forestUnlocked = useIsNavRouteUnlocked('/forest');
+  const communityUnlocked = useIsNavRouteUnlocked('/community');
+  const timelineUnlocked = useIsNavRouteUnlocked('/timeline');
   if (!building.built) {
     return (
       <Modal onClose={onClose}>
@@ -784,27 +792,27 @@ function CivicBuildingModal({
           <p className="quote-author">— {L(libraryQuote.title)}</p>
         </>
       );
-      cta = (
+      cta = collectionUnlocked ? (
         <Link className="btn btn-primary" to="/collection" onClick={onClose}>
           {t('navCollection')}
         </Link>
-      );
+      ) : null;
       break;
     case 'garden':
       body = <p>{t('civicTapGarden')}</p>;
-      cta = (
+      cta = forestUnlocked ? (
         <Link className="btn btn-primary" to="/forest" onClick={onClose}>
           {t('navForest')}
         </Link>
-      );
+      ) : null;
       break;
     case 'care':
       body = <p>{t('civicTapCare')}</p>;
-      cta = (
+      cta = communityUnlocked ? (
         <Link className="btn btn-primary" to="/community" onClick={onClose}>
           {t('navCommunity')}
         </Link>
-      );
+      ) : null;
       break;
     case 'bridge':
       body = (
@@ -815,11 +823,11 @@ function CivicBuildingModal({
           </p>
         </>
       );
-      cta = (
+      cta = communityUnlocked ? (
         <Link className="btn btn-primary" to="/community" onClick={onClose}>
           {t('navCommunity')}
         </Link>
-      );
+      ) : null;
       break;
     case 'hall':
       body = (
@@ -836,11 +844,11 @@ function CivicBuildingModal({
           )}
         </>
       );
-      cta = (
+      cta = timelineUnlocked ? (
         <Link className="btn btn-primary" to="/timeline" onClick={onClose}>
           {t('navTimeline')}
         </Link>
-      );
+      ) : null;
       break;
     default:
       body = <p>{L(building.description)}</p>;

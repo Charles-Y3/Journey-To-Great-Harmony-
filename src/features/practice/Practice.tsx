@@ -7,6 +7,7 @@ import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
 import { dailyQuoteIndex, dailyChallenge } from '../../engine/community';
 import { maxChallengeTierForRankIndex, rankIndexForXp, EVENING_OPEN_HOUR } from '../../engine/progression';
+import { useIsNavRouteUnlocked } from '../../engine/pacing';
 import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
@@ -64,7 +65,7 @@ function MorningCard({ today }: { today: string }) {
   ]);
 
   return (
-    <div className="card practice-card">
+    <div className="card practice-card" id="morning-intention">
       <h3>{newYear ? t('newYearRitualTitle') : t('morningCardTitle')}</h3>
       {newYear && <p className="small muted">{t('newYearRitualHint')}</p>}
       <div className="quote-card" style={{ marginBottom: 14 }}>
@@ -140,7 +141,7 @@ function ChallengeCard({ today }: { today: string }) {
   }, []);
 
   return (
-    <div className="card practice-card">
+    <div className="card practice-card" id="virtue-challenge">
       <h3>
         {challenge.emoji} {t('taskChallengePrefix')} <span className="pill pill-gold">{L(challenge.virtue)}</span>
       </h3>
@@ -223,6 +224,10 @@ function HeartCheckCard({ today }: { today: string }) {
   const location = useLocation();
   const { t, L, locale } = useT();
   const saved = rec.mood ? moodById(rec.mood.id) : undefined;
+  // Heart Check is wave 0, but a couple of moods (Heavy/Unclear) suggest
+  // Still Waters, which is wave 1 — don't offer that button before it's
+  // actually reachable.
+  const moodActionUnlocked = useIsNavRouteUnlocked(saved?.actionTo ?? '');
   const [picked, setPicked] = useState<string | null>(saved?.id ?? null);
   const [note, setNote] = useState(rec.mood?.note ?? '');
   const [editing, setEditing] = useState(!saved);
@@ -261,7 +266,7 @@ function HeartCheckCard({ today }: { today: string }) {
           {rec.mood?.note && <p className="small">“{rec.mood.note}”</p>}
           <p className="small muted">{L(saved.response)}</p>
           <div className="glyph-actions" style={{ justifyContent: 'flex-start', marginTop: 10 }}>
-            {saved.actionTo && saved.actionCta && (
+            {saved.actionTo && saved.actionCta && moodActionUnlocked && (
               <button type="button" className="btn btn-primary" onClick={followMoodAction}>
                 {L(saved.actionCta)}
               </button>
@@ -354,7 +359,7 @@ function EveningCard({ today }: { today: string }) {
   }, [eveningOpen, today, lastEveningSfxDay, setLastEveningSfxDay]);
 
   return (
-    <div className="card practice-card">
+    <div className="card practice-card" id="evening-reflection">
       <h3>{t('eveningCardTitle')}</h3>
       {rec.reflection ? (
         <>
@@ -617,16 +622,26 @@ function GrowthVisitBanners({ today }: { today: string }) {
   const d = state as unknown as JourneyData;
   const forest = forestInfo(d);
   const world = worldInfo(d, today);
+  // Finishing every core task (all wave 0) is achievable well before Forest
+  // (wave 1) or World (wave 2) are actually wave-unlocked — check each
+  // independently rather than assuming completing today's practice implies
+  // both are open.
+  const forestUnlocked = useIsNavRouteUnlocked('/forest');
+  const worldUnlocked = useIsNavRouteUnlocked('/world');
 
-  if (!coreComplete) return null;
+  if (!coreComplete || (!forestUnlocked && !worldUnlocked)) return null;
   return (
     <div className="visit-banner-row">
-      <Link className="visit-banner" to="/forest">
-        {forest.stage.emoji} {t('visitForestBanner')}
-      </Link>
-      <Link className="visit-banner" to="/world">
-        {world.stage.emoji} {t('visitWorldBanner')}
-      </Link>
+      {forestUnlocked && (
+        <Link className="visit-banner" to="/forest">
+          {forest.stage.emoji} {t('visitForestBanner')}
+        </Link>
+      )}
+      {worldUnlocked && (
+        <Link className="visit-banner" to="/world">
+          {world.stage.emoji} {t('visitWorldBanner')}
+        </Link>
+      )}
     </div>
   );
 }

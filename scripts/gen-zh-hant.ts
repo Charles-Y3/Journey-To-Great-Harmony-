@@ -15,6 +15,7 @@ import { TOPICS } from '../src/data/knowledgeTree';
 import { CHALLENGES } from '../src/data/challenges';
 import { QUOTES } from '../src/data/quotes';
 import { CARDS } from '../src/data/cards';
+import { ADVISOR_WISDOM } from '../src/data/advisorWisdom';
 import { BADGES } from '../src/data/badges';
 import { REGIONS } from '../src/data/journeyMap';
 import { WORLD_STAGES, BUILDINGS } from '../src/data/world';
@@ -65,6 +66,7 @@ for (const root_ of [
   RANKS,
   FOREST_STAGES,
   UI,
+  ADVISOR_WISDOM,
 ]) {
   collect(root_, found);
 }

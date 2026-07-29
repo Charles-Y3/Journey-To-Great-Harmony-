@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { todayKey } from '../engine/progression';
 
 interface UiState {
   /** Day key (YYYY-MM-DD) the welcome-back popup was last shown, so it only appears once per day. */
@@ -44,6 +45,41 @@ interface UiState {
    */
   lastSeenChangelogVersion: number | null;
   setLastSeenChangelogVersion: (version: number) => void;
+  /** Which owned figure card (id) the user has chosen as their Advisor. */
+  advisorFigureId: string | null;
+  setAdvisorFigureId: (id: string | null) => void;
+  /** One-time "new" badge on the Advisor nav entry, cleared the first time the screen is opened. */
+  seenAdvisorUnlock: boolean;
+  setSeenAdvisorUnlock: (seen: boolean) => void;
+  /** Day key (YYYY-MM-DD) the daily Advisor question was last answered. */
+  lastAdvisorQuestionDay: string | null;
+  /** Topic answered on lastAdvisorQuestionDay, so revisiting shows the same Q&A. */
+  lastAdvisorTopicId: string | null;
+  /**
+   * Streak/harmony values at the moment of answering, frozen into the
+   * legendary reflection prompt so a later stat change can't retroactively
+   * rewrite an already-given answer.
+   */
+  lastAdvisorStreakSnapshot: number | null;
+  lastAdvisorHarmonySnapshot: number | null;
+  answerAdvisorToday: (topicId: string, streak: number, harmony: number) => void;
+  /**
+   * 'gated' reveals nav destinations gradually (see NAV_ITEMS/computeProgressWave
+   * in App.tsx); 'all' shows everything immediately. Chosen once at the end of
+   * PacingIntroModal, changeable anytime in Settings → Journey.
+   */
+  pacingMode: 'gated' | 'all';
+  /** True once the user has made (or been defaulted into) the pacing choice. */
+  pacingModeChosen: boolean;
+  setPacingMode: (mode: 'gated' | 'all') => void;
+  /**
+   * High-water mark of nav "waves" ever unlocked, so switching pacingMode
+   * back to 'gated' after choosing 'all' can never hide something already
+   * shown — it only ratchets up (via the natural progress check in App.tsx,
+   * or straight to the max when the user picks "show everything"), never down.
+   */
+  highestWaveSeen: number;
+  setHighestWaveSeen: (wave: number) => void;
 }
 
 export const useUi = create<UiState>()(
@@ -71,6 +107,26 @@ export const useUi = create<UiState>()(
       setDismissedStreakNudgeDay: (day) => set({ dismissedStreakNudgeDay: day }),
       lastSeenChangelogVersion: null,
       setLastSeenChangelogVersion: (version) => set({ lastSeenChangelogVersion: version }),
+      advisorFigureId: null,
+      setAdvisorFigureId: (id) => set({ advisorFigureId: id }),
+      seenAdvisorUnlock: false,
+      setSeenAdvisorUnlock: (seen) => set({ seenAdvisorUnlock: seen }),
+      lastAdvisorQuestionDay: null,
+      lastAdvisorTopicId: null,
+      lastAdvisorStreakSnapshot: null,
+      lastAdvisorHarmonySnapshot: null,
+      answerAdvisorToday: (topicId, streak, harmony) =>
+        set({
+          lastAdvisorQuestionDay: todayKey(0),
+          lastAdvisorTopicId: topicId,
+          lastAdvisorStreakSnapshot: streak,
+          lastAdvisorHarmonySnapshot: harmony,
+        }),
+      pacingMode: 'gated',
+      pacingModeChosen: false,
+      setPacingMode: (mode) => set({ pacingMode: mode, pacingModeChosen: true }),
+      highestWaveSeen: 0,
+      setHighestWaveSeen: (wave) => set((s) => (wave > s.highestWaveSeen ? { highestWaveSeen: wave } : {})),
       resetOnboardingUi: () =>
         set({
           lastWelcomeSeenDay: null,
@@ -83,6 +139,15 @@ export const useUi = create<UiState>()(
           lastFullHarmonySfxDay: null,
           seenSetupTips: false,
           dismissedStreakNudgeDay: null,
+          advisorFigureId: null,
+          seenAdvisorUnlock: false,
+          lastAdvisorQuestionDay: null,
+          lastAdvisorTopicId: null,
+          lastAdvisorStreakSnapshot: null,
+          lastAdvisorHarmonySnapshot: null,
+          pacingMode: 'gated',
+          pacingModeChosen: false,
+          highestWaveSeen: 0,
         }),
     }),
     { name: 'journey-ui', version: 4 },

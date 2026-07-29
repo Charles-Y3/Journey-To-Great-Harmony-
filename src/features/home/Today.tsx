@@ -14,6 +14,7 @@ import { todaySubtitle } from '../../i18n/strings';
 import { useTodayTasks } from './useTodayTasks';
 import { isoWeekKey, useUi } from '../../state/uiStore';
 import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
+import { useIsNavRouteUnlocked } from '../../engine/pacing';
 
 export default function Today() {
   const state = useJourney();
@@ -26,6 +27,8 @@ export default function Today() {
   const forest = forestInfo(d);
   const world = worldInfo(d, today);
   const { tasks, coreDoneCount, coreTotal, coreComplete } = useTodayTasks();
+  const forestUnlocked = useIsNavRouteUnlocked('/forest');
+  const worldUnlocked = useIsNavRouteUnlocked('/world');
   const rec = d.days[today] ?? {};
   const yesterday = addDaysToKey(today, -1);
   const yRec = d.days[yesterday] ?? {};
@@ -196,39 +199,51 @@ export default function Today() {
                 <div className="task-desc">{tk.desc}</div>
               </div>
               {!tk.done && (
-                <Link className="btn btn-primary task-action" to={tk.to}>
+                <Link
+                  className="btn btn-primary task-action"
+                  to={tk.to}
+                  state={tk.focusId ? { focus: tk.focusId } : undefined}
+                >
                   {tk.cta}
                 </Link>
               )}
             </div>
           ))}
-        <h4 className="today-also-heading">{t('taskAlsoToday')}</h4>
-        {tasks
-          .filter((tk) => tk.secondary)
-          .map((tk) => (
-            <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
-              <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
-              <div>
-                <div className="task-title">{tk.title}</div>
-                <div className="task-desc">{tk.desc}</div>
-              </div>
-              {!tk.done && (
-                <Link className="btn btn-primary task-action" to={tk.to}>
-                  {tk.cta}
-                </Link>
-              )}
-            </div>
-          ))}
-        {coreComplete && (
+        {tasks.some((tk) => tk.secondary) && (
+          <>
+            <h4 className="today-also-heading">{t('taskAlsoToday')}</h4>
+            {tasks
+              .filter((tk) => tk.secondary)
+              .map((tk) => (
+                <div key={tk.title} className={tk.done ? 'task-row task-done' : 'task-row'}>
+                  <span className="task-check">{tk.done ? '✅' : tk.emoji}</span>
+                  <div>
+                    <div className="task-title">{tk.title}</div>
+                    <div className="task-desc">{tk.desc}</div>
+                  </div>
+                  {!tk.done && (
+                    <Link className="btn btn-primary task-action" to={tk.to}>
+                      {tk.cta}
+                    </Link>
+                  )}
+                </div>
+              ))}
+          </>
+        )}
+        {coreComplete && (forestUnlocked || worldUnlocked) && (
           <>
             <p className="pill" style={{ marginTop: 12 }}>{t('todayFullHarmony')}</p>
             <div className="visit-banner-row" style={{ marginTop: 10 }}>
-              <Link className="visit-banner" to="/forest">
-                {forest.stage.emoji} {t('visitForestBanner')}
-              </Link>
-              <Link className="visit-banner" to="/world">
-                {world.stage.emoji} {t('visitWorldBanner')}
-              </Link>
+              {forestUnlocked && (
+                <Link className="visit-banner" to="/forest">
+                  {forest.stage.emoji} {t('visitForestBanner')}
+                </Link>
+              )}
+              {worldUnlocked && (
+                <Link className="visit-banner" to="/world">
+                  {world.stage.emoji} {t('visitWorldBanner')}
+                </Link>
+              )}
             </div>
           </>
         )}
@@ -239,18 +254,22 @@ export default function Today() {
           <div className="stat-value">🔥 {stats.streakCurrent}</div>
           <div className="stat-name">{t('statStreak')}</div>
         </div>
-        <div className="stat-tile">
-          <div className="stat-value">{forest.stage.emoji}</div>
-          <div className="stat-name">
-            {t('statForest')}: {L(forest.stage.name)} <Link to="/forest">{t('statVisit')}</Link>
+        {forestUnlocked && (
+          <div className="stat-tile">
+            <div className="stat-value">{forest.stage.emoji}</div>
+            <div className="stat-name">
+              {t('statForest')}: {L(forest.stage.name)} <Link to="/forest">{t('statVisit')}</Link>
+            </div>
           </div>
-        </div>
-        <div className="stat-tile">
-          <div className="stat-value">{world.stage.emoji}</div>
-          <div className="stat-name">
-            {t('statWorld')}: {L(world.stage.name)} <Link to="/world">{t('statVisit')}</Link>
+        )}
+        {worldUnlocked && (
+          <div className="stat-tile">
+            <div className="stat-value">{world.stage.emoji}</div>
+            <div className="stat-name">
+              {t('statWorld')}: {L(world.stage.name)} <Link to="/world">{t('statVisit')}</Link>
+            </div>
           </div>
-        </div>
+        )}
         <div className="stat-tile">
           <div className="stat-value">{stats.xp}</div>
           <div className="stat-name">{t('statWisdomXp')}</div>

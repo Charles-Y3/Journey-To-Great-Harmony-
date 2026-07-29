@@ -333,6 +333,11 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
   const noteGlyphPractice = useJourney((s) => s.noteGlyphPractice);
   const [started, setStarted] = useState(false);
   const [state, setState] = useState<KlotskiState>(() => previewState(glyph));
+  // Every state since the current shuffle, oldest first, so Undo can step
+  // back one move at a time instead of only offering a full re-shuffle —
+  // this board's puzzle graph can wander into positions that take a while
+  // to untangle, so backing out of a wrong move matters.
+  const [history, setHistory] = useState<KlotskiState[]>([]);
   const [solved, setSolved] = useState(false);
   const [wasFirstClear, setWasFirstClear] = useState(false);
   const [selectedPieceId, setSelectedPieceId] = useState<string | null>(null);
@@ -340,6 +345,7 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
   useEffect(() => {
     setStarted(false);
     setState(previewState(glyph));
+    setHistory([]);
     setSolved(false);
     setWasFirstClear(false);
     setSelectedPieceId(null);
@@ -347,6 +353,7 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
 
   function applyMove(next: KlotskiState) {
     setState(next);
+    setHistory((h) => [...h, next]);
     setSelectedPieceId(null);
     if (isKlotskiSolved(next, glyph)) {
       setSolved(true);
@@ -358,10 +365,20 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
   }
 
   function start() {
-    setState(scrambleKlotski(glyph));
+    const initial = scrambleKlotski(glyph);
+    setState(initial);
+    setHistory([initial]);
     setStarted(true);
     setSolved(false);
     setWasFirstClear(false);
+    setSelectedPieceId(null);
+  }
+
+  function undo() {
+    if (solved || history.length <= 1) return;
+    const nextHistory = history.slice(0, -1);
+    setHistory(nextHistory);
+    setState(nextHistory[nextHistory.length - 1]!);
     setSelectedPieceId(null);
   }
 
@@ -431,6 +448,9 @@ function IntermediateModal({ glyph, onClose }: { glyph: IntermediateGlyph; onClo
             />
           </div>
           <div className="glyph-actions">
+            <button type="button" className="btn" onClick={undo} disabled={history.length <= 1}>
+              {t('glyphsUndoBtn')}
+            </button>
             <button type="button" className="btn" onClick={start}>
               {t('glyphsShuffleBtn')}
             </button>

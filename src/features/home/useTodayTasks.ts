@@ -2,6 +2,7 @@ import { useJourney, useToday } from '../../state/store';
 import { useTurningPoints } from '../../state/turningPointStore';
 import { dailyChallenge } from '../../engine/community';
 import { maxChallengeTierForRankIndex, rankIndexForXp } from '../../engine/progression';
+import { useIsNavRouteUnlocked } from '../../engine/pacing';
 import { useT } from '../../i18n/useT';
 import { learnRemainingToday } from '../../i18n/strings';
 import { ALL_LESSONS } from '../../data/knowledgeTree';
@@ -18,6 +19,8 @@ export interface TodayTask {
   cta: string;
   /** Secondary extras under “Also today” — not required for full harmony. */
   secondary?: boolean;
+  /** Element id on the target page to scroll to (see Practice.tsx's scrollToPracticeFocus). */
+  focusId?: string;
 }
 
 export interface TodayTasksResult {
@@ -54,14 +57,18 @@ export function useTodayTasks(): TodayTasksResult {
   const lessonLeft = Math.max(0, DAILY_LESSON_CAP - lessonsToday);
   const timelineLeft = Math.max(0, DAILY_TIMELINE_CAP - timelineToday);
 
+  // Timeline is wave 2 — finishing every Knowledge lesson (wave 0) doesn't
+  // by itself guarantee Timeline is wave-unlocked, so only redirect the
+  // "Learn" task there once it actually is.
+  const timelineUnlocked = useIsNavRouteUnlocked('/timeline');
   let learnTo = '/knowledge';
   let learnDesc = t('taskLearnDesc');
   let learnCta = t('ctaLearn');
-  if (knowledgeDone && !timelineDone) {
+  if (knowledgeDone && !timelineDone && timelineUnlocked) {
     learnTo = '/timeline';
     learnDesc = t('taskLearnDescTimeline');
     learnCta = t('ctaTimeline');
-  } else if (knowledgeDone && timelineDone) {
+  } else if (knowledgeDone && timelineDone && timelineUnlocked) {
     learnTo = '/timeline';
     learnDesc = t('taskLearnDescAllDone');
     learnCta = t('ctaTimeline');
@@ -74,6 +81,13 @@ export function useTodayTasks(): TodayTasksResult {
   const encouragedToday = Object.values(state.encouragedOn ?? {}).includes(today);
   const stillWatersDone = flippedDays.includes(today);
 
+  // "Consider doing" only ever points at features the wave-pacing system has
+  // actually unlocked — otherwise it invites a tap into a screen the sidebar
+  // itself still shows locked, which reads as broken rather than optional.
+  const turningPointsUnlocked = useIsNavRouteUnlocked('/turning-points');
+  const glyphsUnlocked = useIsNavRouteUnlocked('/glyphs');
+  const communityUnlocked = useIsNavRouteUnlocked('/community');
+
   const tasks: TodayTask[] = [
     {
       done: !!rec.intention,
@@ -82,6 +96,7 @@ export function useTodayTasks(): TodayTasksResult {
       desc: rec.intention ? `“${rec.intention}”` : t('taskMorningDesc'),
       to: '/practice',
       cta: t('ctaBegin'),
+      focusId: 'morning-intention',
     },
     {
       done: knowledgeDone && timelineDone ? true : learnedToday,
@@ -98,6 +113,7 @@ export function useTodayTasks(): TodayTasksResult {
       desc: L(challenge.text),
       to: '/practice',
       cta: t('ctaPractise'),
+      focusId: 'virtue-challenge',
     },
     {
       done: !!rec.mood,
@@ -106,6 +122,7 @@ export function useTodayTasks(): TodayTasksResult {
       desc: mood ? `${mood.emoji} ${L(mood.label)}` : t('taskHeartDesc'),
       to: '/practice',
       cta: t('ctaHeart'),
+      focusId: 'heart-check',
     },
     {
       done: !!rec.reflection,
@@ -114,34 +131,47 @@ export function useTodayTasks(): TodayTasksResult {
       desc: rec.reflection ? t('taskEveningDone') : t('taskEveningDesc'),
       to: '/practice',
       cta: t('ctaReflect'),
+      focusId: 'evening-reflection',
     },
-    {
-      done: stillWatersDone,
-      emoji: '💧',
-      title: t('taskStillWatersTitle'),
-      desc: stillWatersDone ? t('taskStillWatersDone') : t('taskStillWatersDesc'),
-      to: '/turning-points',
-      cta: t('ctaStillWaters'),
-      secondary: true,
-    },
-    {
-      done: !!rec.glyphPractice,
-      emoji: '🧩',
-      title: t('taskGlyphTitle'),
-      desc: rec.glyphPractice ? t('taskGlyphDone') : t('taskGlyphDesc'),
-      to: '/glyphs',
-      cta: t('ctaGlyph'),
-      secondary: true,
-    },
-    {
-      done: encouragedToday,
-      emoji: '🌸',
-      title: t('taskEncourageTitle'),
-      desc: encouragedToday ? t('taskEncourageDone') : t('taskEncourageDesc'),
-      to: '/community',
-      cta: t('ctaEncourage'),
-      secondary: true,
-    },
+    ...(turningPointsUnlocked
+      ? [
+          {
+            done: stillWatersDone,
+            emoji: '💧',
+            title: t('taskStillWatersTitle'),
+            desc: stillWatersDone ? t('taskStillWatersDone') : t('taskStillWatersDesc'),
+            to: '/turning-points',
+            cta: t('ctaStillWaters'),
+            secondary: true,
+          },
+        ]
+      : []),
+    ...(glyphsUnlocked
+      ? [
+          {
+            done: !!rec.glyphPractice,
+            emoji: '🧩',
+            title: t('taskGlyphTitle'),
+            desc: rec.glyphPractice ? t('taskGlyphDone') : t('taskGlyphDesc'),
+            to: '/glyphs',
+            cta: t('ctaGlyph'),
+            secondary: true,
+          },
+        ]
+      : []),
+    ...(communityUnlocked
+      ? [
+          {
+            done: encouragedToday,
+            emoji: '🌸',
+            title: t('taskEncourageTitle'),
+            desc: encouragedToday ? t('taskEncourageDone') : t('taskEncourageDesc'),
+            to: '/community',
+            cta: t('ctaEncourage'),
+            secondary: true,
+          },
+        ]
+      : []),
   ];
 
   const coreTasks = tasks.filter((tk) => !tk.secondary);

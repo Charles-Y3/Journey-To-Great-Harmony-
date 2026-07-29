@@ -21,6 +21,14 @@ import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from './i18n/types';
 import { useT } from './i18n/useT';
 import { xpBarLabel, newItemsAriaLabel, rankXpLabel, welcomeBackTitle, type UiKey } from './i18n/strings';
 import { RANKS, rankForXp, nextRankForXp, rankIndexForXp, todayKey } from './engine/progression';
+import {
+  NAV_ITEMS,
+  MAX_NAV_WAVE,
+  computeProgressWave,
+  navItemState,
+  isNavRouteUnlocked,
+  useEffectiveWave,
+} from './engine/pacing';
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
 import { isJunkName } from './engine/textQuality';
 import { applyPwaUpdate, subscribePwaNeedRefresh } from './engine/pwaUpdate';
@@ -45,43 +53,26 @@ import Community from './features/community/Community';
 import Collection from './features/collection/Collection';
 import Glyphs from './features/glyphs/Glyphs';
 import TurningPoints from './features/turningPoints/TurningPoints';
+import Advisor from './features/advisor/Advisor';
 import { useTurningPoints } from './state/turningPointStore';
 
-const SIDEBAR_NAV = [
-  { to: '/', emoji: '🌅', key: 'navToday' as const },
-  { to: '/practice', emoji: '🎯', key: 'navPractice' as const },
-  { to: '/knowledge', emoji: '🌳', key: 'navKnowledge' as const },
-  { to: '/timeline', emoji: '⏳', key: 'navTimeline' as const },
-  { to: '/forest', emoji: '🌲', key: 'navForest' as const },
-  { to: '/map', emoji: '🗺️', key: 'navMap' as const },
-  { to: '/world', emoji: '🌏', key: 'navWorld' as const },
-  { to: '/community', emoji: '👥', key: 'navCommunity' as const },
-  { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
-  { to: '/glyphs', emoji: '🧩', key: 'navGlyphs' as const },
-  { to: '/turning-points', emoji: '💧', key: 'navTurningPoints' as const },
-];
-
-// Mobile bottom nav: daily loop + living places; the rest lives behind "More".
-const BOTTOM_NAV = [
-  { to: '/', emoji: '🌅', key: 'navToday' as const },
-  { to: '/practice', emoji: '🎯', key: 'navPractice' as const },
-  { to: '/knowledge', emoji: '🌳', key: 'navKnowledge' as const },
-  { to: '/forest', emoji: '🌲', key: 'navForest' as const },
-  { to: '/world', emoji: '🌏', key: 'navWorld' as const },
-];
-
-const MORE_ITEMS = [
-  { to: '/timeline', emoji: '⏳', key: 'navTimeline' as const },
-  { to: '/map', emoji: '🗺️', key: 'navMap' as const },
-  { to: '/community', emoji: '👥', key: 'navCommunity' as const },
-  { to: '/collection', emoji: '🎴', key: 'navCollection' as const },
-  { to: '/glyphs', emoji: '🧩', key: 'navGlyphs' as const },
-  { to: '/turning-points', emoji: '💧', key: 'navTurningPoints' as const },
-];
+const ADVISOR_ITEM = { to: '/advisor', emoji: '🧭', key: 'navAdvisor' as const };
 
 /** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
 function useNewCollectionCount(): number {
   return useJourney((s) => Math.max(0, s.unlockedCards.length + s.unlockedBadges.length - s.seenCollectionCount));
+}
+
+/** True once the user owns at least one figure-category wisdom card. */
+function useAdvisorUnlocked(): boolean {
+  return useJourney((s) => s.unlockedCards.some((id) => CARDS.find((c) => c.id === id)?.category === 'figure'));
+}
+
+/** 1 the first time the Advisor becomes available and hasn't been opened yet, else 0. */
+function useAdvisorBadgeCount(): number {
+  const unlocked = useAdvisorUnlocked();
+  const seen = useUi((s) => s.seenAdvisorUnlock);
+  return unlocked && !seen ? 1 : 0;
 }
 
 function NavBadge({ count }: { count: number }) {
@@ -97,38 +88,90 @@ function NavBadge({ count }: { count: number }) {
 function SidebarNavLinks() {
   const { t } = useT();
   const newCollectionCount = useNewCollectionCount();
+  const advisorUnlocked = useAdvisorUnlocked();
+  const advisorBadgeCount = useAdvisorBadgeCount();
+  const effectiveWave = useEffectiveWave();
   return (
     <>
-      {SIDEBAR_NAV.map((item) => (
-        <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+      {NAV_ITEMS.map((item) => {
+        const state = navItemState(item.wave, effectiveWave);
+        if (state === 'hidden') return null;
+        if (state === 'locked') {
+          return (
+            <span key={item.to} className="nav-link nav-link-locked" title={t('navLockedHint')} aria-disabled="true">
+              <span className="nav-emoji">🔒</span>
+              <span className="nav-label">{t(item.key)}</span>
+            </span>
+          );
+        }
+        return (
+          <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
+            <span className="nav-emoji">
+              {item.emoji}
+              {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
+            </span>
+            <span className="nav-label">{t(item.key)}</span>
+          </NavLink>
+        );
+      })}
+      {advisorUnlocked && (
+        <NavLink to={ADVISOR_ITEM.to} end={false} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
           <span className="nav-emoji">
-            {item.emoji}
-            {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
+            {ADVISOR_ITEM.emoji}
+            <NavBadge count={advisorBadgeCount} />
           </span>
-          <span className="nav-label">{t(item.key)}</span>
+          <span className="nav-label">{t(ADVISOR_ITEM.key)}</span>
         </NavLink>
-      ))}
+      )}
     </>
+  );
+}
+
+/** Items shown in "More": everything not in the bottom bar, plus mobile-primary
+ * items not yet unlocked (they graduate into the bottom bar once they are). */
+function useMoreNavItems() {
+  const effectiveWave = useEffectiveWave();
+  return NAV_ITEMS.filter((item) => !item.mobilePrimary || navItemState(item.wave, effectiveWave) !== 'visible').map(
+    (item) => ({ item, state: navItemState(item.wave, effectiveWave) }),
   );
 }
 
 function MoreSheet({ onClose }: { onClose: () => void }) {
   const { t } = useT();
   const newCollectionCount = useNewCollectionCount();
+  const advisorUnlocked = useAdvisorUnlocked();
+  const advisorBadgeCount = useAdvisorBadgeCount();
+  const moreItems = useMoreNavItems().filter(({ state }) => state !== 'hidden');
   return (
     <Modal onClose={onClose}>
       <h2>{t('moreSheetTitle')}</h2>
       <p className="muted">{t('moreSheetSubtitle')}</p>
       <div className="more-sheet-grid">
-        {MORE_ITEMS.map((item) => (
-          <Link key={item.to} to={item.to} className="more-sheet-item" onClick={onClose}>
+        {moreItems.map(({ item, state }) =>
+          state === 'locked' ? (
+            <div key={item.to} className="more-sheet-item more-sheet-item-locked" title={t('navLockedHint')} aria-disabled="true">
+              <span className="more-sheet-emoji">🔒</span>
+              <span>{t(item.key)}</span>
+            </div>
+          ) : (
+            <Link key={item.to} to={item.to} className="more-sheet-item" onClick={onClose}>
+              <span className="more-sheet-emoji">
+                {item.emoji}
+                {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
+              </span>
+              <span>{t(item.key)}</span>
+            </Link>
+          ),
+        )}
+        {advisorUnlocked && (
+          <Link to={ADVISOR_ITEM.to} className="more-sheet-item" onClick={onClose}>
             <span className="more-sheet-emoji">
-              {item.emoji}
-              {item.key === 'navCollection' && <NavBadge count={newCollectionCount} />}
+              {ADVISOR_ITEM.emoji}
+              <NavBadge count={advisorBadgeCount} />
             </span>
-            <span>{t(item.key)}</span>
+            <span>{t(ADVISOR_ITEM.key)}</span>
           </Link>
-        ))}
+        )}
       </div>
     </Modal>
   );
@@ -138,10 +181,13 @@ function BottomNav() {
   const { t } = useT();
   const [showMore, setShowMore] = useState(false);
   const newCollectionCount = useNewCollectionCount();
+  const advisorBadgeCount = useAdvisorBadgeCount();
+  const effectiveWave = useEffectiveWave();
+  const bottomItems = NAV_ITEMS.filter((item) => item.mobilePrimary && navItemState(item.wave, effectiveWave) === 'visible');
   return (
     <>
       <nav className="bottom-nav">
-        {BOTTOM_NAV.map((item) => (
+        {bottomItems.map((item) => (
           <NavLink key={item.to} to={item.to} end={item.to === '/'} className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}>
             <span className="nav-emoji">{item.emoji}</span>
             <span className="nav-label">{t(item.key)}</span>
@@ -150,7 +196,7 @@ function BottomNav() {
         <button type="button" className="nav-link nav-link-more" onClick={() => setShowMore(true)}>
           <span className="nav-emoji">
             ⋯
-            <NavBadge count={newCollectionCount} />
+            <NavBadge count={newCollectionCount + advisorBadgeCount} />
           </span>
           <span className="nav-label">{t('navMore')}</span>
         </button>
@@ -251,6 +297,65 @@ function AvatarSection() {
           if (optedIn) void flushTravellerSync();
         }}
       />
+    </div>
+  );
+}
+
+function PacingModeSection() {
+  const { t } = useT();
+  const pacingMode = useUi((s) => s.pacingMode);
+  const setPacingMode = useUi((s) => s.setPacingMode);
+  const setHighestWaveSeen = useUi((s) => s.setHighestWaveSeen);
+  const [confirmingAll, setConfirmingAll] = useState(false);
+
+  // Choosing "all" ratchets highestWaveSeen to the max permanently (see
+  // uiStore's doc comment) — there's no way back to real gating after that,
+  // so switching to it needs a confirm step, and once it's active there's
+  // nothing left for "Ease me in" to do (it would be a silent no-op), so it
+  // stays disabled rather than looking clickable and doing nothing.
+  const alreadyAll = pacingMode === 'all';
+
+  function confirmAll() {
+    setPacingMode('all');
+    setHighestWaveSeen(MAX_NAV_WAVE);
+    setConfirmingAll(false);
+  }
+
+  return (
+    <div className="card">
+      <h3>{t('settingsPacingTitle')}</h3>
+      <p className="small muted">{t('settingsPacingDesc')}</p>
+      <div className="tab-row">
+        <button
+          type="button"
+          className={pacingMode === 'gated' ? 'btn tab-btn active' : 'btn tab-btn'}
+          disabled={alreadyAll}
+          title={alreadyAll ? t('pacingEaseInDisabledHint') : undefined}
+          onClick={() => setPacingMode('gated')}
+        >
+          {t('pacingModeEaseIn')}
+        </button>
+        <button
+          type="button"
+          className={alreadyAll ? 'btn tab-btn active' : 'btn tab-btn'}
+          onClick={() => {
+            if (!alreadyAll) setConfirmingAll(true);
+          }}
+        >
+          {t('pacingModeShowAll')}
+        </button>
+      </div>
+      {confirmingAll && (
+        <div className="card" style={{ borderColor: 'var(--seal)', marginTop: 10, marginBottom: 0 }}>
+          <p className="small" style={{ marginTop: 0 }}>{t('pacingConfirmAllBody')}</p>
+          <button type="button" className="btn btn-primary" style={{ marginRight: 8 }} onClick={confirmAll}>
+            {t('pacingConfirmAllYes')}
+          </button>
+          <button type="button" className="btn" onClick={() => setConfirmingAll(false)}>
+            {t('settingsCancel')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -410,22 +515,38 @@ function DisclaimerSection() {
 function PacingIntroModal({ onClose }: { onClose: () => void }) {
   const { t } = useT();
   const navigate = useNavigate();
+  const setPacingMode = useUi((s) => s.setPacingMode);
+  const setHighestWaveSeen = useUi((s) => s.setHighestWaveSeen);
 
-  function finish() {
+  function finish(mode: 'gated' | 'all') {
+    setPacingMode(mode);
+    if (mode === 'all') setHighestWaveSeen(MAX_NAV_WAVE);
     navigate('/', { replace: true });
     onClose();
   }
 
   return (
-    <Modal onClose={finish}>
+    <Modal onClose={() => finish('gated')}>
       <h2>{t('pacingIntroTitle')}</h2>
       <p>{t('pacingIntroBody1')}</p>
       <p>{t('pacingIntroBody2')}</p>
       <p>{t('pacingIntroBody3')}</p>
       <p>{t('pacingIntroBody4')}</p>
-      <button type="button" className="btn btn-primary" style={{ marginTop: 16 }} onClick={finish}>
-        {t('pacingIntroContinue')}
+      <p className="small muted" style={{ marginTop: 14, marginBottom: 6 }}>
+        {t('pacingIntroChoiceLabel')}
+      </p>
+      <button type="button" className="btn btn-primary" style={{ width: '100%', marginBottom: 8 }} onClick={() => finish('gated')}>
+        {t('pacingModeEaseIn')}
       </button>
+      <p className="small muted" style={{ marginTop: 0, marginBottom: 10 }}>
+        {t('pacingModeEaseInDesc')}
+      </p>
+      <button type="button" className="btn" style={{ width: '100%' }} onClick={() => finish('all')}>
+        {t('pacingModeShowAll')}
+      </button>
+      <p className="small muted" style={{ marginTop: 6, marginBottom: 0 }}>
+        {t('pacingModeShowAllDesc')}
+      </p>
     </Modal>
   );
 }
@@ -439,12 +560,18 @@ const APP_TOUR_CLUSTERS: { emoji: string; titleKey: UiKey; descKey: UiKey }[] = 
 
 function FirstDayGuideModal({ onClose }: { onClose: () => void }) {
   const { t } = useT();
+  const effectiveWave = useEffectiveWave();
 
-  const steps: { to: string; emoji: string; titleKey: UiKey; descKey: UiKey }[] = [
-    { to: '/practice', emoji: '🌅', titleKey: 'firstDayGuidePractice', descKey: 'firstDayGuidePracticeDesc' },
+  // Still Waters is wave 1 — for a gated user this modal fires on day one,
+  // before wave 1 is reached, so offering it here would point at a step the
+  // sidebar itself still shows locked. Filter to whatever's actually usable
+  // right now instead of assuming every step is always available.
+  const allSteps: { to: string; emoji: string; titleKey: UiKey; descKey: UiKey; focus?: string }[] = [
+    { to: '/practice', emoji: '🌅', titleKey: 'firstDayGuidePractice', descKey: 'firstDayGuidePracticeDesc', focus: 'morning-intention' },
     { to: '/turning-points', emoji: '💧', titleKey: 'firstDayGuideStillWaters', descKey: 'firstDayGuideStillWatersDesc' },
     { to: '/knowledge', emoji: '📖', titleKey: 'firstDayGuideLearn', descKey: 'firstDayGuideLearnDesc' },
   ];
+  const steps = allSteps.filter((s) => isNavRouteUnlocked(s.to, effectiveWave));
 
   function finish() {
     onClose();
@@ -460,6 +587,7 @@ function FirstDayGuideModal({ onClose }: { onClose: () => void }) {
             key={s.to}
             className="first-day-guide-link"
             to={s.to}
+            state={s.focus ? { focus: s.focus } : undefined}
             onClick={finish}
           >
             <span className="first-day-guide-emoji">{s.emoji}</span>
@@ -916,6 +1044,7 @@ function SettingsModal({
       )}
       {tab === 'journey' && (
         <>
+          <PacingModeSection />
           <SharedRoadSection />
           <JourneyRecapSection onOpen={onOpenRecap} />
           <ReminderSection />
@@ -1082,6 +1211,11 @@ export default function App() {
   const setSeenAppTour = useUi((s) => s.setSeenAppTour);
   const lastSeenChangelogVersion = useUi((s) => s.lastSeenChangelogVersion);
   const setLastSeenChangelogVersion = useUi((s) => s.setLastSeenChangelogVersion);
+  const pacingModeChosen = useUi((s) => s.pacingModeChosen);
+  const setPacingModeForMigration = useUi((s) => s.setPacingMode);
+  const highestWaveSeen = useUi((s) => s.highestWaveSeen);
+  const setHighestWaveSeen = useUi((s) => s.setHighestWaveSeen);
+  const effectiveWave = useEffectiveWave();
   const dayRec = useJourney((s) => s.days[today] ?? {});
   const flippedDays = useTurningPoints((s) => s.flippedDays);
   const firstDaySuccess =
@@ -1115,6 +1249,26 @@ export default function App() {
     if (next !== profileAvatar) setProfileAvatar(next);
   }, [profileAvatar, journeyXp, setProfileAvatar]);
 
+  // Ratchet the nav "wave" high-water mark up as real progress reaches it —
+  // never down, so switching pacingMode back to 'gated' later can't hide
+  // something the user already reached honestly through play.
+  useEffect(() => {
+    const progressWave = computeProgressWave(rankIndexForXp(xp), firstDaySuccess);
+    if (progressWave > highestWaveSeen) setHighestWaveSeen(progressWave);
+  }, [xp, firstDaySuccess, highestWaveSeen, setHighestWaveSeen]);
+
+  // Genuinely returning users had seenPacingIntro=true before pacingMode
+  // existed, so they'll never see PacingIntroModal's choice — default them
+  // to "show everything" rather than retroactively gating nav they already
+  // use. Brand-new users get the real choice in the modal instead (this
+  // effect no-ops for them since seenPacingIntro starts false).
+  useEffect(() => {
+    if (hasChosenLocale && hasSetName && seenPacingIntro && !pacingModeChosen) {
+      setPacingModeForMigration('all');
+      setHighestWaveSeen(MAX_NAV_WAVE);
+    }
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, pacingModeChosen, setPacingModeForMigration, setHighestWaveSeen]);
+
   // Opted-in travellers: debounce sync when dedication metrics change.
   const syncXp = useJourney((s) => s.xp);
   const syncStreak = useJourney((s) => s.streakCurrent);
@@ -1126,15 +1280,21 @@ export default function App() {
     scheduleTravellerSync();
   }, [syncXp, syncStreak, syncEncouragements, syncHarmony, syncOptedIn]);
 
-  // Once per calendar day (and only past the language/name gates), greet
-  // the user with a quick progress + to-do summary instead of dropping
-  // them straight onto the Today page with no orientation.
+  // Once per calendar day (and only past the language/name gates AND past
+  // pacing intro), greet the user with a quick progress + to-do summary
+  // instead of dropping them straight onto the Today page with no
+  // orientation. Gated on seenPacingIntro so it can't queue itself up
+  // during a brand-new user's very first session — otherwise it fires the
+  // instant hasSetName flips true, sits pending behind Pacing/FirstDayGuide,
+  // and then pops up right after First Small Steps regardless of which
+  // step the user picked, which reads as a non-sequitur ("Welcome back" on
+  // day one) rather than the daily nudge it's meant to be.
   useEffect(() => {
-    if (hasChosenLocale && hasSetName && lastWelcomeSeenDay !== today) {
+    if (hasChosenLocale && hasSetName && seenPacingIntro && lastWelcomeSeenDay !== today) {
       setShowWelcome(true);
       setLastWelcomeSeenDay(today);
     }
-  }, [hasChosenLocale, hasSetName, today, lastWelcomeSeenDay, setLastWelcomeSeenDay]);
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, today, lastWelcomeSeenDay, setLastWelcomeSeenDay]);
 
   useEffect(() => {
     if (hasChosenLocale && hasSetName && !seenPacingIntro) {
@@ -1149,7 +1309,13 @@ export default function App() {
     }
   }, [hasChosenLocale, hasSetName, seenPacingIntro, seenFirstDayGuide, seenAppTour]);
 
-  // Feature tour only after first-day guide and at least one first success.
+  // Feature tour only once every wave it describes (Learning/Living/
+  // Together cover Timeline, World, Map, Community, Collection, Glyphs —
+  // spanning waves 2 and 3) is actually unlocked. Gating this on
+  // firstDaySuccess alone used to fire it the moment wave 1 was reached,
+  // previewing content the sidebar still showed locked. 'all' pacing users
+  // have effectiveWave already maxed, so this behaves the same as before
+  // for them — only 'gated' users now wait for the real thing.
   useEffect(() => {
     if (
       hasChosenLocale &&
@@ -1157,11 +1323,12 @@ export default function App() {
       seenPacingIntro &&
       seenFirstDayGuide &&
       !seenAppTour &&
-      firstDaySuccess
+      firstDaySuccess &&
+      effectiveWave >= MAX_NAV_WAVE
     ) {
       setShowTour(true);
     }
-  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenFirstDayGuide, seenAppTour, firstDaySuccess]);
+  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenFirstDayGuide, seenAppTour, firstDaySuccess, effectiveWave]);
 
   // Only for genuinely returning users: seenPacingIntro is already true
   // (from before this flag existed) but lastSeenChangelogVersion was never
@@ -1259,6 +1426,7 @@ export default function App() {
               <Route path="/collection" element={<Collection />} />
               <Route path="/glyphs" element={<Glyphs />} />
               <Route path="/turning-points" element={<TurningPoints />} />
+              <Route path="/advisor" element={<Advisor />} />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
@@ -1289,6 +1457,10 @@ export default function App() {
           onClose={() => {
             setSeenPacingIntro(true);
             setLastSeenChangelogVersion(LATEST_CHANGELOG_VERSION);
+            // Pre-mark today as "welcome already seen" — day one shouldn't
+            // get a "Welcome back" once First Small Steps/the tour clear,
+            // that greeting starts making sense from the next calendar day.
+            setLastWelcomeSeenDay(today);
             setShowPacing(false);
           }}
         />

@@ -7,7 +7,7 @@ import { CARD_ART } from '../../data/cardArt';
 import type { CardRarity, WisdomCard } from '../../data/types';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
-import { cardsTabLabel, badgesTabLabel, type UiKey } from '../../i18n/strings';
+import { badgesTabLabel, type UiKey } from '../../i18n/strings';
 import { playSfx } from '../../engine/sfx';
 
 const RARITY_KEY: Record<CardRarity, UiKey> = {
@@ -21,6 +21,15 @@ const CATEGORY_KEY: Record<WisdomCard['category'], UiKey> = {
   teaching: 'categoryTeaching',
   virtue: 'categoryVirtue',
   story: 'categoryStory',
+};
+
+/** Fixed top-right corner glyph per category — a signal separate from rarity
+ * (border/glow) and from the card's own centred art (which figure/virtue/etc.). */
+const CATEGORY_ICON: Record<WisdomCard['category'], string> = {
+  figure: '🧑',
+  teaching: '💡',
+  virtue: '💛',
+  story: '📖',
 };
 
 const SPARKLE_SPOTS = [
@@ -40,8 +49,8 @@ export function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => 
     <Modal onClose={onClose} fullscreen className={`modal-rarity-${card.rarity}`} hideCloseButton closeOnContentClick>
       <div className={`card-modal-hero card-modal-hero-${card.rarity}`}>
         {timelinePoint && <span className="card-modal-year">{L(timelinePoint.years)}</span>}
-        <span className="card-modal-icon-badge" aria-hidden="true">
-          {card.emoji}
+        <span className="card-modal-icon-badge" aria-hidden="true" title={t(CATEGORY_KEY[card.category])}>
+          {CATEGORY_ICON[card.category]}
         </span>
         {card.rarity === 'legendary' &&
           SPARKLE_SPOTS.map((s, i) => (
@@ -121,6 +130,11 @@ export default function Collection() {
 
   const visibleCards = rarityFilter === 'all' ? CARDS : CARDS.filter((c) => c.rarity === rarityFilter);
 
+  function rarityFilterCounts(filterId: 'all' | CardRarity): { owned: number; total: number } {
+    const cardsForFilter = filterId === 'all' ? CARDS : CARDS.filter((c) => c.rarity === filterId);
+    return { owned: cardsForFilter.filter((c) => unlockedCards.includes(c.id)).length, total: cardsForFilter.length };
+  }
+
   function openCard(card: WisdomCard) {
     if (!revealedCards.includes(card.id)) {
       setRevealing(card);
@@ -139,7 +153,7 @@ export default function Collection() {
 
       <div className="tab-row">
         <button className={tab === 'cards' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setTab('cards')}>
-          {cardsTabLabel(locale, unlockedCards.length, CARDS.length)}
+          {t('wisdomCardsTab')}
         </button>
         <button className={tab === 'badges' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setTab('badges')}>
           {badgesTabLabel(locale, unlockedBadges.length, BADGES.length)}
@@ -149,21 +163,29 @@ export default function Collection() {
       {tab === 'cards' ? (
         <>
           <div className="tab-row rarity-filter-row">
-            {RARITY_FILTERS.map((f) => (
-              <button
-                key={f.id}
-                className={rarityFilter === f.id ? 'btn tab-btn active' : 'btn tab-btn'}
-                onClick={() => setRarityFilter(f.id)}
-              >
-                {t(f.key)}
-              </button>
-            ))}
+            {RARITY_FILTERS.map((f) => {
+              const { owned, total } = rarityFilterCounts(f.id);
+              return (
+                <button
+                  key={f.id}
+                  className={rarityFilter === f.id ? 'btn tab-btn active' : 'btn tab-btn'}
+                  onClick={() => setRarityFilter(f.id)}
+                >
+                  {t(f.key)} ({owned}/{total})
+                </button>
+              );
+            })}
           </div>
           <div className="card-grid">
             {visibleCards.map((card) => {
               const owned = unlockedCards.includes(card.id);
               return (
                 <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && openCard(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
+                  {owned && (
+                    <span className="wcard-category-badge" aria-hidden="true">
+                      {CATEGORY_ICON[card.category]}
+                    </span>
+                  )}
                   <div className="wcard-emoji">{owned ? card.emoji : '❔'}</div>
                   <strong>{owned ? L(card.title) : t('lockedCardTitle')}</strong>
                   <span className="small muted">{owned ? t(RARITY_KEY[card.rarity]) : L(card.unlockHint)}</span>

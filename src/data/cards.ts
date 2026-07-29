@@ -733,7 +733,7 @@ export const CARDS: WisdomCard[] = [
     id: 'card-life-mencius',
     title: localized('Sprouts and Ox Mountain', '善端与牛山'),
     emoji: '🌱',
-    rarity: 'rare',
+    rarity: 'common',
     category: 'story',
     summary: localized(
       'A life spent telling kings that the people come first — and that goodness withers only when we stop tending it.',
@@ -773,7 +773,7 @@ export const CARDS: WisdomCard[] = [
     id: 'card-life-socrates',
     title: localized('The Cup', '那一杯'),
     emoji: '☠️',
-    rarity: 'rare',
+    rarity: 'common',
     category: 'story',
     summary: localized(
       'A barefoot questioner who wrote nothing — and whose last drink taught Athens that inquiry can outlive a body.',
@@ -793,7 +793,7 @@ export const CARDS: WisdomCard[] = [
     id: 'card-life-ptahhotep',
     title: localized('A Good Name', '美名'),
     emoji: '𓂀',
-    rarity: 'rare',
+    rarity: 'common',
     category: 'story',
     summary: localized(
       'An Old Kingdom vizier who taught that listening is how truth enters a room of power.',
@@ -853,7 +853,7 @@ export const CARDS: WisdomCard[] = [
     id: 'card-life-rumi',
     title: localized('The Field', '那片旷野'),
     emoji: '🌙',
-    rarity: 'rare',
+    rarity: 'common',
     category: 'story',
     summary: localized(
       'A Konya scholar whose friendship and grief opened into poetry of a love that meets beyond right and wrong.',
@@ -873,7 +873,7 @@ export const CARDS: WisdomCard[] = [
     id: 'card-life-kant',
     title: localized('Dare to Know', '敢于求知'),
     emoji: '💡',
-    rarity: 'rare',
+    rarity: 'common',
     category: 'story',
     summary: localized(
       'A Königsberg walker who rarely left town — and still taught the world to treat persons as ends.',
@@ -913,7 +913,7 @@ export const CARDS: WisdomCard[] = [
     id: 'card-life-king',
     title: localized('Only Light', '唯有光明'),
     emoji: '🔔',
-    rarity: 'rare',
+    rarity: 'common',
     category: 'story',
     summary: localized(
       'A pastor who joined love to justice — and kept organising after the cameras left the dream speech.',

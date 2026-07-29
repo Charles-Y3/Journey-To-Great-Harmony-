@@ -7,6 +7,7 @@ import { addDaysToKey } from '../../engine/progression';
 import { PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import type { TurningPoint } from '../../data/turningPoints';
+import { useIsNavRouteUnlocked } from '../../engine/pacing';
 
 const FLIP_MS = 220;
 
@@ -24,6 +25,9 @@ function StoryBody({
   const { t, L } = useT();
   const relatedSage = sageForTurningPoint(point.id);
   const relatedChapter = relatedSage?.chapters.find((c) => c.relatedTurningPointId === point.id);
+  // Still Waters is wave 1; Timeline is wave 2 — don't invite a tap into a
+  // screen the sidebar itself still shows locked.
+  const timelineUnlocked = useIsNavRouteUnlocked('/timeline');
 
   return (
     <div className={flipping ? 'tp-card tp-card-flipping' : 'tp-card'}>
@@ -62,7 +66,7 @@ function StoryBody({
               </p>
               <p>{L(point.reflectionQuestion)}</p>
             </div>
-            {relatedSage && (
+            {relatedSage && timelineUnlocked && (
               <Link
                 to="/timeline"
                 state={{ mode: 'lives', sageId: relatedSage.id, chapterId: relatedChapter?.id }}

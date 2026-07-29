@@ -24,7 +24,9 @@ export const UI = {
   navCollection: localized('Collection', '收藏'),
   navGlyphs: localized('Glyphs', '字谜'),
   navTurningPoints: localized('Still Waters', '静水'),
+  navAdvisor: localized('Advisor', '良师'),
   navMore: localized('More', '更多'),
+  navLockedHint: localized('Unlocks as you progress', '随你的进展逐步解锁'),
 
   moreSheetTitle: localized('More', '更多'),
   moreSheetSubtitle: localized(
@@ -70,9 +72,10 @@ export const UI = {
     '先解开入门的每一个字谜，才能解锁这一阶。',
   ),
   glyphsClearedLabel: localized('Cleared', '已解开'),
-  glyphsPlayBtn: localized('Play', '开始'),
+  glyphsPlayBtn: localized('Begin', '开始'),
   glyphsReplayBtn: localized('Play again', '再玩一次'),
   glyphsShuffleBtn: localized('Shuffle', '打乱'),
+  glyphsUndoBtn: localized('Undo', '撤销'),
   glyphsPreviewHint: localized(
     "This is what you're rebuilding. Tap Start when you're ready to scramble it.",
     '这是你要还原的样子。准备好后，点按「开始」将它打乱。',
@@ -150,8 +153,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1.3 — your progress is stored privately in this browser.',
-    '大同之路 v1.3 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.4 — your progress is stored privately in this browser.',
+    '大同之路 v1.4 — 你的进度私密地保存在此浏览器中。',
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(
@@ -345,7 +348,7 @@ export const UI = {
     '在社群榜上，给一位同修送出一句善意。',
   ),
   taskEncourageDone: localized('Encouragement sent today.', '今天已送出鼓励。'),
-  taskAlsoToday: localized('Optional', '可选'),
+  taskAlsoToday: localized('Consider doing', '可以考虑'),
   taskEveningTitle: localized('Evening reflection', '夜间反思'),
   taskEveningDesc: localized(
     'Look back on the day with honesty and kindness.',
@@ -582,6 +585,31 @@ export const UI = {
     '慢慢走。终点从来不是重点 — 成为能行走的人，才是。',
   ),
   pacingIntroContinue: localized('I understand', '我明白了'),
+  pacingIntroChoiceLabel: localized('How would you like to begin?', '你想如何开始？'),
+  pacingModeEaseIn: localized('Ease me in', '让我慢慢来'),
+  pacingModeEaseInDesc: localized(
+    'New paths will appear here as you go.',
+    '新的路径会随你前行而逐步出现。',
+  ),
+  pacingModeShowAll: localized('Show me everything', '把一切都显示给我'),
+  pacingModeShowAllDesc: localized(
+    "I've done this before — show the whole app now. (This can't be switched back later.)",
+    '我以前用过类似的应用 — 现在就显示整个应用。（之后无法切换回来。）',
+  ),
+  settingsPacingTitle: localized('Pacing', '节奏'),
+  settingsPacingDesc: localized(
+    'Choose whether new paths in the sidebar and More unlock gradually, or everything stays visible.',
+    '选择侧边栏与「更多」中的新路径是逐步解锁，还是始终全部可见。',
+  ),
+  pacingConfirmAllBody: localized(
+    "This can't be undone — once everything is unlocked, switching back to \"Ease me in\" won't hide anything again.",
+    '此操作无法撤销 — 一旦全部解锁，切换回「让我慢慢来」也不会再隐藏任何内容。',
+  ),
+  pacingConfirmAllYes: localized('Yes, show everything', '是的，全部显示'),
+  pacingEaseInDisabledHint: localized(
+    "You've already chosen to show everything — this can't be switched back.",
+    '你已选择全部显示 — 此设置无法切换回来。',
+  ),
   appTourTitle: localized('A quick look around', '快速导览'),
   appTourIntro: localized(
     'Everything below is already part of your journey — a short map before you begin.',
@@ -933,6 +961,34 @@ export const UI = {
   capstoneModalTitle: localized('Capstone Reflection', '圆满反思'),
   capstonePlaceholder: localized('Write your reflection here…', '在这里写下你的反思…'),
   capstoneDoneLabel: localized('Capstone written ✓', '圆满反思已写下 ✓'),
+
+  // ── Advisor ───────────────────────────────────────────────────────
+  advisorTitle: localized('Your Advisor', '你的良师'),
+  advisorPickSubtitle: localized(
+    'Choose a figure card to be your advisor. You can ask one question a day.',
+    '选择一张人物卡牌，作为你的良师。每天可以提出一个问题。',
+  ),
+  advisorLockedMessage: localized(
+    'Study a figure on the Wisdom Timeline to gain your first advisor.',
+    '在智慧时间线上研读一位人物，即可获得你的第一位良师。',
+  ),
+  advisorChangeCta: localized('Change advisor', '更换良师'),
+  advisorChangeLockedHint: localized(
+    'You can change advisors again tomorrow.',
+    '明日才能更换良师。',
+  ),
+  advisorAskHeading: localized('Ask about…', '请教关于…'),
+  advisorHintText: localized('Pick a topic above to ask today’s question.', '选择上方的主题，提出今日的问题。'),
+  advisorComeBackTomorrow: localized(
+    'Today’s question is used — come back tomorrow for another.',
+    '今日的提问已用完，明日再来。',
+  ),
+  advisorTopicPatience: localized('Patience', '耐心'),
+  advisorTopicAnger: localized('Anger', '怒气'),
+  advisorTopicLoss: localized('Loss', '失落'),
+  advisorTopicPurpose: localized('Purpose', '志向'),
+  advisorTopicRelationships: localized('Relationships', '人际'),
+  advisorTopicDoubt: localized('Doubt', '疑惑'),
 } satisfies Record<string, Localized<string>>;
 
 export type UiKey = keyof typeof UI;
@@ -1149,10 +1205,6 @@ export function encouragementBanner(locale: Locale, names: string[]): string {
     return `🌸 ${list} ${names.length === 1 ? 'has' : 'have'} sent you encouragement for your kindness yesterday!`;
   }
   return locale === 'zh-Hans' ? `🌸 ${list} 因为你昨日的善举，为你送来了鼓励！` : `🌸 ${list} 因為你昨日的善舉，為你送來了鼓勵！`;
-}
-
-export function cardsTabLabel(locale: Locale, owned: number, total: number): string {
-  return `${t('wisdomCardsTab', locale)} (${owned}/${total})`;
 }
 
 export function badgesTabLabel(locale: Locale, owned: number, total: number): string {

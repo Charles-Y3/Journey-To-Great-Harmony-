@@ -10,6 +10,24 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 12,
+    date: '2026-07-29',
+    highlights: [
+      localized(
+        '🧭 New: Advisor (良师). Choose an owned figure card as your guide and ask one question a day — rarer figures answer with more depth.',
+        '🧭 新功能：良师。选择一张已拥有的人物卡牌作为你的向导，每天可以请教一个问题 — 稀有度越高的人物，指引越深。',
+      ),
+      localized(
+        '🌊 A gentler start: new paths (Forest, World, Timeline, Companions, Collection, Glyphs) now open gradually as you progress — or choose "Show me everything" in Settings → Journey to see it all at once.',
+        '🌊 更温和的开始：森林、世界、时间线、同修、收藏、字谜等新路径，会随你的进展逐步开放 — 也可在「设置 → 旅程」中选择「全部显示」，一次看到全部。',
+      ),
+      localized(
+        '🎴 Collection rebalanced with more common cards and a category icon on every card; Virtue Glyph shuffles are fairer and now support Undo.',
+        '🎴 收藏牌组重新调配，普通卡牌更多，每张卡牌都标有类别图标；德行拼图的洗牌更公平，并支持撤销。',
+      ),
+    ],
+  },
+  {
     version: 11,
     date: '2026-07-28',
     highlights: [

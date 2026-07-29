@@ -4,6 +4,7 @@ import { useJourney } from '../state/store';
 import { useT } from '../i18n/useT';
 import { continueBtn, minLengthHint, capstoneSubmitBtn, type UiKey } from '../i18n/strings';
 import { XP_FOR } from '../engine/progression';
+import { useIsNavRouteUnlocked } from '../engine/pacing';
 import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../engine/textQuality';
 import { playSfx } from '../engine/sfx';
 
@@ -96,10 +97,17 @@ export function CelebrationOverlay() {
   useEffect(() => {
     if (headId && headMajor) playSfx('celebrate');
   }, [headId, headMajor]);
+  // Growth/card celebrations can fire from a wave-0 or wave-1 action (e.g.
+  // finishing a Knowledge lesson bumps forest growth or unlocks a card)
+  // well before the page they'd send you to — Forest, World, Collection —
+  // is itself wave-unlocked. Called before the early return below so hook
+  // order stays stable regardless of whether a celebration is queued.
+  const ctaUnlocked = useIsNavRouteUnlocked(celebrations[0]?.ctaTo ?? '');
 
   if (celebrations.length === 0) return null;
   const c = celebrations[0];
   const major = !!c.major;
+  const showCta = !!c.ctaTo && ctaUnlocked;
 
   return (
     <div className="modal-backdrop celebrate-backdrop" onClick={dismiss}>
@@ -116,12 +124,12 @@ export function CelebrationOverlay() {
         <h2>{c.title}</h2>
         {c.subtitle && <p className="celebrate-sub">{c.subtitle}</p>}
         <div className="celebrate-actions">
-          {c.ctaTo && (
-            <Link className="btn btn-primary" to={c.ctaTo} onClick={dismiss}>
-              {t(ctaLabelKey(c.ctaTo))}
+          {showCta && (
+            <Link className="btn btn-primary" to={c.ctaTo!} onClick={dismiss}>
+              {t(ctaLabelKey(c.ctaTo!))}
             </Link>
           )}
-          <button className={c.ctaTo ? 'btn' : 'btn btn-primary'} onClick={dismiss}>
+          <button className={showCta ? 'btn' : 'btn btn-primary'} onClick={dismiss}>
             {continueBtn(locale, celebrations.length - 1)}
           </button>
         </div>

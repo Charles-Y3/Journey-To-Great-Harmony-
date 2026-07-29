@@ -295,6 +295,17 @@ a {
   font-weight: 600;
 }
 
+/* Next-wave preview: a visible, named goal rather than a mystery — dimmed
+   and inert, not a clickable link. */
+.nav-link-locked {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.nav-link-locked:hover {
+  background: none;
+}
+
 .nav-emoji {
   position: relative;
   display: inline-block;
@@ -592,6 +603,15 @@ a {
 
 .more-sheet-item:hover {
   background: var(--jade-soft);
+}
+
+.more-sheet-item-locked {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.more-sheet-item-locked:hover {
+  background: var(--surface-2);
 }
 
 .more-sheet-emoji {
@@ -2475,6 +2495,7 @@ button.stage-step:disabled {
    more special, not just tagged with a different word. */
 .wcard,
 .badge-tile {
+  position: relative;
   border-radius: var(--radius);
   border: 1px solid var(--line);
   background: var(--surface);
@@ -2486,6 +2507,18 @@ button.stage-step:disabled {
   align-items: center;
   justify-content: center;
   gap: 6px;
+}
+
+/* Category badge (figure/teaching/virtue/story) — separate signal from the
+   rarity border/glow and the card's own centred art: what kind of card
+   this is, fixed in the same corner across every tile regardless of rarity. */
+.wcard-category-badge {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.85;
 }
 
 .wcard {
@@ -2595,6 +2628,53 @@ button.stage-step:disabled {
 
 .badge-tile .wcard-emoji {
   font-size: 1.9rem;
+}
+
+/* ── Advisor ───────────────────────────────────────────────────────── */
+.advisor-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.advisor-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 14px;
+}
+
+.advisor-response-panel {
+  border: 2px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  margin-top: 14px;
+  background: var(--surface-2);
+}
+
+.advisor-response-panel.rare {
+  border-color: var(--amethyst);
+}
+
+.advisor-response-panel.legendary {
+  border-color: var(--gold);
+}
+
+.advisor-quote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.05rem;
+  margin: 0 0 10px;
+}
+
+.advisor-reflection {
+  background: var(--gold-soft);
+  border-left: 3px solid var(--gold);
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 10px 0 0;
+  font-size: 0.93rem;
 }
 
 /* ── Feed ──────────────────────────────────────────────────────────── */

@@ -151,38 +151,95 @@ export function tryTapPiece(
   return null;
 }
 
+function stateKey(state: KlotskiState, glyph: IntermediateGlyph): string {
+  return glyph.pieces.map((p) => `${p.id}:${state[p.id]!.r},${state[p.id]!.c}`).join('|');
+}
+
+function allMoves(state: KlotskiState, glyph: IntermediateGlyph): { id: string; dir: Dir }[] {
+  const out: { id: string; dir: Dir }[] = [];
+  for (const p of glyph.pieces) {
+    for (const dir of movableDirs(state, glyph, p.id)) out.push({ id: p.id, dir });
+  }
+  return out;
+}
+
 /**
- * Scramble by performing legal one-cell slides from the solved state.
+ * Random walk of legal slides from the solved state that never revisits a
+ * state already seen earlier in this same walk. Plain random walks on this
+ * board (only 2 empty cells among 20) have a small branching factor and
+ * readily double back on themselves within a handful of moves, handing back
+ * an almost-solved board; refusing to revisit forces every step to make
+ * genuine progress instead.
  */
-export function scrambleKlotski(glyph: IntermediateGlyph, moves = 80): KlotskiState {
+function selfAvoidingWalk(glyph: IntermediateGlyph, targetMoves: number): KlotskiState {
   let state = previewState(glyph);
-  let prevKey = '';
-  for (let i = 0; i < moves; i++) {
-    const options: { id: string; dir: Dir }[] = [];
-    for (const p of glyph.pieces) {
-      for (const dir of movableDirs(state, glyph, p.id)) {
-        const key = `${p.id}:${dir}`;
-        if (key === prevKey) continue;
-        // Avoid immediate undo of the last move.
-        const undo =
-          dir === 'up'
-            ? 'down'
-            : dir === 'down'
-              ? 'up'
-              : dir === 'left'
-                ? 'right'
-                : 'left';
-        if (prevKey === `${p.id}:${undo}`) continue;
-        options.push({ id: p.id, dir });
+  const visited = new Set([stateKey(state, glyph)]);
+  let taken = 0;
+  // Generous attempt budget: a self-avoiding walk can dead-end (every
+  // reachable neighbour already visited) before reaching targetMoves.
+  for (let i = 0; i < targetMoves * 6 && taken < targetMoves; i++) {
+    const moves = allMoves(state, glyph);
+    for (let j = moves.length - 1; j > 0; j--) {
+      const k = Math.floor(Math.random() * (j + 1));
+      [moves[j], moves[k]] = [moves[k]!, moves[j]!];
+    }
+    let advanced = false;
+    for (const m of moves) {
+      const next = tryMove(state, glyph, m.id, m.dir);
+      if (!next) continue;
+      const key = stateKey(next, glyph);
+      if (visited.has(key)) continue;
+      state = next;
+      visited.add(key);
+      taken++;
+      advanced = true;
+      break;
+    }
+    if (!advanced) break;
+  }
+  return state;
+}
+
+/** Shallow bounded search: can `state` reach solved within `capDepth` moves? */
+function solvableWithin(state: KlotskiState, glyph: IntermediateGlyph, capDepth: number): boolean {
+  if (isSolved(state, glyph)) return true;
+  let frontier = [state];
+  const seen = new Set([stateKey(state, glyph)]);
+  for (let d = 0; d < capDepth; d++) {
+    const next: KlotskiState[] = [];
+    for (const s of frontier) {
+      for (const m of allMoves(s, glyph)) {
+        const n = tryMove(s, glyph, m.id, m.dir);
+        if (!n) continue;
+        const key = stateKey(n, glyph);
+        if (seen.has(key)) continue;
+        if (isSolved(n, glyph)) return true;
+        seen.add(key);
+        next.push(n);
       }
     }
-    if (options.length === 0) break;
-    const pick = options[Math.floor(Math.random() * options.length)]!;
-    const next = tryMove(state, glyph, pick.id, pick.dir);
-    if (!next) continue;
-    state = next;
-    prevKey = `${pick.id}:${pick.dir}`;
+    frontier = next;
+    if (frontier.length === 0) break;
   }
-  if (isSolved(state, glyph)) return scrambleKlotski(glyph, moves + 16);
-  return state;
+  return false;
+}
+
+/**
+ * Scramble by a self-avoiding walk of legal slides from the solved state,
+ * retrying if the result is still trivially close to solved (a cheap
+ * shallow search, not a full solve) so Shuffle can't hand back an
+ * almost-finished board. Always solvable by construction — every step is a
+ * legal, reversible slide — and self-avoidance keeps the walk from wasting
+ * moves doubling back, which is what let a plain random walk wander into
+ * pathologically deep, hard-to-escape states.
+ */
+export function scrambleKlotski(glyph: IntermediateGlyph, targetMoves = 30): KlotskiState {
+  const REJECT_IF_SOLVABLE_WITHIN = 8;
+  const MAX_ATTEMPTS = 20;
+  let candidate = previewState(glyph);
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+    candidate = selfAvoidingWalk(glyph, targetMoves);
+    if (!solvableWithin(candidate, glyph, REJECT_IF_SOLVABLE_WITHIN)) return candidate;
+  }
+  return candidate;
 }

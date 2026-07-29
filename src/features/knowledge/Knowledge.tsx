@@ -27,6 +27,7 @@ import {
   type UiKey,
 } from '../../i18n/strings';
 import { shuffledIndices } from '../../engine/quiz';
+import { useIsNavRouteUnlocked } from '../../engine/pacing';
 
 const QUIZ_NUDGE_KEYS = ['quizNudgeReread', 'quizNudgeBreathe', 'quizNudgeLookAgain'] as const;
 
@@ -122,6 +123,9 @@ function TopicModal({ topic, onClose, capReached }: { topic: Topic; onClose: () 
   const completeLesson = useJourney((s) => s.completeLesson);
   const [openLesson, setOpenLesson] = useState<Lesson | null>(null);
   const { t, L, locale } = useT();
+  // Knowledge is wave 0 (available from day one); Timeline is wave 2 — this
+  // sage cross-link shouldn't invite a tap into a screen still locked.
+  const timelineUnlocked = useIsNavRouteUnlocked('/timeline');
 
   return (
     <Modal onClose={onClose} wide>
@@ -145,7 +149,7 @@ function TopicModal({ topic, onClose, capReached }: { topic: Topic; onClose: () 
           <p className="muted">{L(topic.intro)}</p>
           {(() => {
             const relatedSage = sageForTopic(topic.id);
-            if (!relatedSage) return null;
+            if (!relatedSage || !timelineUnlocked) return null;
             return (
               <Link
                 to="/timeline"
