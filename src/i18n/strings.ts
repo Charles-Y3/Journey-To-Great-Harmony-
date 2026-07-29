@@ -37,8 +37,8 @@ export const UI = {
   // ── Virtue Glyph sliding puzzles ──────────────────────────────────
   glyphsTitle: localized('Virtue Glyphs', '德行之字'),
   glyphsSubtitle: localized(
-    'Bonus logic puzzles: restore virtue characters — modern slides, then Shuowen seal Klotski.',
-    '额外的逻辑谜题：还原德行汉字 — 先是现代方块滑动，再是说文小篆华容道。',
+    'Bonus logic puzzles: restore virtue characters — modern slides, seal Klotski, then path totems.',
+    '额外的逻辑谜题：还原德行汉字 — 现代方块、说文小篆华容道，再到道上图腾。',
   ),
   glyphsTierBeginner: localized('Beginner — Five Constants', '入门 — 五常'),
   glyphsTierBeginnerBlurb: localized(
@@ -55,18 +55,29 @@ export const UI = {
   glyphsTierAdvanced: localized('Advanced — Path totems', '高阶 — 道上图腾'),
   glyphsTierAdvancedTab: localized('Advanced', '高阶'),
   glyphsTierAdvancedBlurb: localized(
-    'Arrange symbolic totem pieces by meaning — free placement, relational checks.',
-    '按意义摆放图腾碎片 — 自由放置，关系判定。',
+    'Arrange symbolic totem pieces by meaning — free placement, then Contemplate.',
+    '按意义摆放图腾碎片 — 自由放置，再点「静观」。',
   ),
   glyphsTierAdvancedLocked: localized(
     'Clear every Intermediate glyph first to unlock this tier.',
     '先解开进阶的每一个字谜，才能解锁这一阶。',
   ),
-  glyphsTierAdvancedPreviewTitle: localized('Totem arrange', '图腾摆放'),
-  glyphsTierAdvancedPreviewDesc: localized(
-    'Virtues such as Harmony, Community, Balance, Reciprocity, Courage, and Sincerity — restored as pictures, not character tiles. Coming after Intermediate.',
-    '如和谐、共同体、平衡、恕道、勇气与诚意 — 以图像还原，而非汉字图块。完成进阶后开放。',
+  glyphsTotemLabel: localized('Totem', '图腾'),
+  glyphsTotemContemplate: localized('Contemplate', '静观'),
+  glyphsTotemScatter: localized('Scatter', '打散'),
+  glyphsTotemHint: localized('Hint', '提示'),
+  glyphsTotemScatterPrompt: localized(
+    'Arrange the shards until the meaning holds, then Contemplate.',
+    '摆好碎片，直到意义成立，再点「静观」。',
   ),
+  glyphsTotemRelationsHold: localized('The relations hold.', '关系已成立。'),
+  glyphsTotemMeaningRestored: localized('Meaning restored.', '意义已还原。'),
+  glyphsTotemSolvedTitle: localized('Totem restored', '图腾已还原'),
+  glyphsTotemRulesNote: localized(
+    'Win by relation: every shard belongs in the meaning. Arrange freely, then Contemplate — feedback names what is still missing.',
+    '以关系取胜：每一片都属意义之中。自由摆放，再点「静观」— 反馈会指出仍缺什么。',
+  ),
+  glyphsTotemHintLine: localized('Hint {n}/{total}: {text}', '提示 {n}/{total}：{text}'),
   glyphsTierLocked: localized(
     'Clear every Beginner glyph first to unlock this tier.',
     '先解开入门的每一个字谜，才能解锁这一阶。',

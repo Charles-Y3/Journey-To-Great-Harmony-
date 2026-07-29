@@ -10,6 +10,7 @@ import {
   type IntermediateGlyph,
   type VirtueGlyph,
 } from '../../data/glyphs';
+import { ADVANCED_TOTEMS, type AdvancedTotem } from '../../data/totems';
 import { scrambleBoard, fullBoard, trySlide, isSolved, type GlyphBoard } from '../../engine/glyphPuzzle';
 import {
   previewState,
@@ -29,6 +30,7 @@ import { useJourney } from '../../state/store';
 import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { playSfx } from '../../engine/sfx';
+import { TotemArrangeModal } from './TotemArrange';
 
 // Not every Chinese character spreads its ink evenly across its bounding
 // square (e.g. 仁's right-hand 二 sits only in the vertical middle), so a
@@ -545,10 +547,47 @@ function GlyphCard({
   );
 }
 
+function TotemCard({
+  totem,
+  done,
+  locked = false,
+  onPlay,
+}: {
+  totem: AdvancedTotem;
+  done: boolean;
+  locked?: boolean;
+  onPlay: () => void;
+}) {
+  const { t, L } = useT();
+  return (
+    <div
+      className={
+        locked ? 'card glyph-card locked' : done ? 'card glyph-card cleared' : 'card glyph-card'
+      }
+    >
+      <div className="glyph-card-char glyph-card-totem" aria-hidden="true">
+        {totem.emoji}
+      </div>
+      <div className="glyph-card-body">
+        <strong>{L(totem.title)}</strong>
+        <p className="small muted">{L(totem.meaning)}</p>
+        <p className="small muted">
+          {t('glyphsTotemLabel')}
+          {done ? ` · ${t('glyphsClearedLabel')}` : ''}
+        </p>
+        <button type="button" className="btn btn-primary" onClick={onPlay} disabled={locked}>
+          {done ? t('glyphsReplayBtn') : t('glyphsPlayBtn')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function Glyphs() {
   const { t } = useT();
   const completedGlyphs = useJourney((s) => s.completedGlyphs ?? []);
   const [open, setOpen] = useState<VirtueGlyph | null>(null);
+  const [openTotem, setOpenTotem] = useState<AdvancedTotem | null>(null);
   const [tier, setTier] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const intermediateOpen = beginnerTierCleared(completedGlyphs);
   const advancedOpen = intermediateTierCleared(completedGlyphs);
@@ -623,19 +662,24 @@ export default function Glyphs() {
           <p className="small muted glyph-tier-blurb">
             {advancedOpen ? t('glyphsTierAdvancedBlurb') : t('glyphsTierAdvancedLocked')}
           </p>
-          <div className="glyph-advanced-preview" aria-hidden={false}>
-            <div className="glyph-advanced-preview-emoji">🪷</div>
-            <div>
-              <h3>{t('glyphsTierAdvancedPreviewTitle')}</h3>
-              <p className="small muted" style={{ margin: 0 }}>
-                {t('glyphsTierAdvancedPreviewDesc')}
-              </p>
-            </div>
+          <div className="glyph-list">
+            {ADVANCED_TOTEMS.map((totem) => (
+              <TotemCard
+                key={totem.id}
+                totem={totem}
+                done={completedGlyphs.includes(totem.id)}
+                locked={!advancedOpen}
+                onPlay={() => {
+                  if (advancedOpen) setOpenTotem(totem);
+                }}
+              />
+            ))}
           </div>
         </section>
       )}
 
       {open && <GlyphModal glyph={open} onClose={() => setOpen(null)} />}
+      {openTotem && <TotemArrangeModal totem={openTotem} onClose={() => setOpenTotem(null)} />}
     </div>
   );
 }

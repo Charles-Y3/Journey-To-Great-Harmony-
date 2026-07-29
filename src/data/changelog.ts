@@ -10,6 +10,16 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 13,
+    date: '2026-07-29',
+    highlights: [
+      localized(
+        '🪷 Advanced Glyphs: Totem Arrange is live — six relational puzzles (Harmony, Community, Balance, Reciprocity, Courage, Sincerity), unlocked after clearing Intermediate.',
+        '🪷 高阶字谜：「图腾摆放」已上线 — 六则关系谜题（和谐、共同体、平衡、恕道、勇气、诚意），完成进阶后解锁。',
+      ),
+    ],
+  },
+  {
     version: 12,
     date: '2026-07-29',
     highlights: [
