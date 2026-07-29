@@ -1,6 +1,8 @@
 import type { WisdomCard, Stats, CardRarity } from './types';
 import { localized } from '../i18n/types';
 import { ALL_POINTS } from './timeline';
+import { BEGINNER_GLYPHS, INTERMEDIATE_GLYPHS } from './glyphs';
+import { ADVANCED_TOTEMS } from './totems';
 
 export const CARDS: WisdomCard[] = [
   // ── Figures & teachings (from the Wisdom Timeline) ──────────────────
@@ -929,6 +931,71 @@ export const CARDS: WisdomCard[] = [
       '金恩公开归功于甘地的方法 — 真理之力跨海进入美国的斗争。',
     ),
   },
+
+  // ── Virtue Glyphs · tier milestones ─────────────────────────────────
+  {
+    id: 'card-glyph-constants',
+    title: localized('Five Constants', '五常'),
+    accent: '常',
+    emoji: '常',
+    rarity: 'common',
+    category: 'virtue',
+    summary: localized(
+      'Benevolence, righteousness, propriety, wisdom, and trustworthiness — restored one sliding character at a time.',
+      '仁、义、礼、智、信 — 一块一块滑动拼回的常道。',
+    ),
+    quote: localized(
+      'Virtue is not a single act, but a form patiently recovered.',
+      '德行不是一蹴而就，而是耐心还原的形。',
+    ),
+    unlockHint: localized('Clear every Beginner Virtue Glyph.', '解开入门阶的每一个德行之字。'),
+    didYouKnow: localized(
+      'The Five Constants (wuchang) became a classic Confucian shorthand for the habits that hold a person and a community upright — not five slogans, but five practiced shapes of character.',
+      '「五常」是儒家对立身与立群之习的经典概括 — 不是五句口号，而是五种被练习出来的品格形状。',
+    ),
+  },
+  {
+    id: 'card-glyph-baode',
+    title: localized('Eight Virtues', '八德'),
+    accent: '德',
+    emoji: '☰',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Seal forms of filial piety, brotherhood, loyalty, trust, propriety, righteousness, integrity, and sense of shame — slid back into place.',
+      '孝、悌、忠、信、礼、义、廉、耻的小篆 — 一格一格滑回原位。',
+    ),
+    quote: localized(
+      'What is carved in seal script was meant to last — so was the virtue it named.',
+      '小篆所刻，本为持久 — 它所命名的德行亦然。',
+    ),
+    unlockHint: localized('Clear every Intermediate Virtue Glyph.', '解开进阶阶的每一个德行之字。'),
+    didYouKnow: localized(
+      'The Eight Virtues (baode) were taught as a civic and household ethic: character that can be trusted in private rooms and public office alike.',
+      '「八德」被教作家国共修的伦理：既能在私室立身，也能在公职取信。',
+    ),
+  },
+  {
+    id: 'card-glyph-totems',
+    title: localized('Virtue Totems', '德行图腾'),
+    accent: '图',
+    emoji: '🪵',
+    rarity: 'legendary',
+    category: 'virtue',
+    summary: localized(
+      'Harmony, community, balance, reciprocity, courage, and sincerity — arranged as living pictures, not tiles.',
+      '和谐、共同体、平衡、恕道、勇气与诚意 — 摆成有生命的画面，而非拼块。',
+    ),
+    quote: localized(
+      'When the relations hold, the meaning stands.',
+      '关系既立，意义自成。',
+    ),
+    unlockHint: localized('Clear every Advanced Virtue Totem.', '解开高阶的每一个德行图腾。'),
+    didYouKnow: localized(
+      'These totems ask you to rebuild a virtue as a scene of relations — who stands with whom, what belongs at the center, what must face what — the same questions living ethics still asks.',
+      '这些图腾要你把一种德行重建为一幅关系之景 — 谁与谁同在、什么居于中央、什么必须面对什么 — 正是活的伦理仍在追问的事。',
+    ),
+  },
 ];
 
 // Timeline-linked wisdom cards (see TimelinePoint.cardId) get harder to
@@ -952,6 +1019,9 @@ export const SPECIAL_CARD_RULES: { cardId: string; check: (s: Stats) => boolean 
   // in state/selectors.ts) — card-datong above is the wave-3 reward.
   { cardId: 'card-horizon', check: (s) => s.timelinePoints >= ALL_POINTS.length },
   { cardId: 'card-second-walk', check: (s) => s.timelinePointsLevel2 >= ALL_POINTS.length },
+  { cardId: 'card-glyph-constants', check: (s) => s.glyphsBeginnerCleared >= BEGINNER_GLYPHS.length },
+  { cardId: 'card-glyph-baode', check: (s) => s.glyphsIntermediateCleared >= INTERMEDIATE_GLYPHS.length },
+  { cardId: 'card-glyph-totems', check: (s) => s.glyphsAdvancedCleared >= ADVANCED_TOTEMS.length },
 ];
 
 export function cardById(id: string): WisdomCard | undefined {

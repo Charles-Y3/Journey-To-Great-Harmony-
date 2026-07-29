@@ -2538,6 +2538,25 @@ button.stage-step:disabled {
 
 .wcard-emoji {
   font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.6rem;
+}
+
+.wcard-art,
+.card-reveal-art {
+  display: block;
+  width: 3.2rem;
+  height: 3.2rem;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.card-reveal-art {
+  width: 5.5rem;
+  height: 5.5rem;
+  margin: 0 auto;
 }
 
 .wcard.common {
@@ -2765,6 +2784,16 @@ button.stage-step:disabled {
 
 .glyph-card-totem {
   font-size: 2.2rem;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.totem-thumb-svg,
+.totem-emblem-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  color: var(--ink-soft);
 }
 
 .totem-riddle {

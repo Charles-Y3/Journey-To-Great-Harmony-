@@ -13,6 +13,8 @@ import { communityHarmony } from '../engine/community';
 import { WORLD_STAGES, BUILDINGS } from '../data/world';
 import { REGIONS } from '../data/journeyMap';
 import { CARDS } from '../data/cards';
+import { BEGINNER_GLYPHS, INTERMEDIATE_GLYPHS } from '../data/glyphs';
+import { ADVANCED_TOTEMS } from '../data/totems';
 
 // The persisted data shape the selectors read (defined by the store).
 export interface JourneyData {
@@ -174,6 +176,7 @@ export function statsFromData(d: JourneyData): Stats {
     if (rec.intention) intentions++;
     if (rec.challengeDone || rec.reflection || rec.intention || rec.lessons) daysActive++;
   }
+  const cleared = d.completedGlyphs ?? [];
   return {
     xp: d.xp,
     lessons: d.completedLessons.length,
@@ -191,6 +194,9 @@ export function statsFromData(d: JourneyData): Stats {
     regionsCompleted: d.completedRegions.length,
     daysActive,
     quizCorrect: d.quizCorrect,
+    glyphsBeginnerCleared: BEGINNER_GLYPHS.filter((g) => cleared.includes(g.id)).length,
+    glyphsIntermediateCleared: INTERMEDIATE_GLYPHS.filter((g) => cleared.includes(g.id)).length,
+    glyphsAdvancedCleared: ADVANCED_TOTEMS.filter((g) => cleared.includes(g.id)).length,
   };
 }
 

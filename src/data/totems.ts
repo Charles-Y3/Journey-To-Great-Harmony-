@@ -1,4 +1,5 @@
 import { localized, type Localized } from '../i18n/types';
+import { beginnerTierCleared, intermediateTierCleared } from './glyphs';
 
 export type TotemRuleType =
   | 'inside'
@@ -44,6 +45,8 @@ export interface AdvancedTotem {
   hints: [Localized<string>, Localized<string>];
   parts: TotemPart[];
   rules: TotemRule[];
+  /** Solved arrangement — used for list thumbnails (same geometry as the puzzle). */
+  solution: TotemPose;
 }
 
 export const ADVANCED_TOTEMS: AdvancedTotem[] = [
@@ -201,6 +204,15 @@ export const ADVANCED_TOTEMS: AdvancedTotem[] = [
         ),
       },
     ],
+    solution: {
+      ring: { x: 100, y: 108 },
+      figL: { x: 78, y: 100 },
+      figR: { x: 122, y: 100 },
+      bowl: { x: 100, y: 112 },
+      mat: { x: 100, y: 132 },
+      steam: { x: 100, y: 92 },
+      sun: { x: 100, y: 72 },
+    },
   },
   {
     id: 'totem-community',
@@ -428,6 +440,18 @@ export const ADVANCED_TOTEMS: AdvancedTotem[] = [
         msg: localized('Western footprints should lead toward a seat.', '西方足迹应引向一席。'),
       },
     ],
+    solution: {
+      table: { x: 100, y: 108 },
+      bowl: { x: 100, y: 112 },
+      lamp: { x: 100, y: 96 },
+      seatN: { x: 100, y: 62 },
+      seatS: { x: 100, y: 154 },
+      seatE: { x: 152, y: 110 },
+      seatW: { x: 48, y: 110 },
+      printsN: { x: 100, y: 36 },
+      printsE: { x: 176, y: 110 },
+      printsW: { x: 24, y: 110 },
+    },
   },
   {
     id: 'totem-balance',
@@ -598,6 +622,16 @@ export const ADVANCED_TOTEMS: AdvancedTotem[] = [
         ),
       },
     ],
+    solution: {
+      beam: { x: 100, y: 88 },
+      fulcrum: { x: 100, y: 112 },
+      base: { x: 100, y: 138 },
+      wL: { x: 58, y: 108 },
+      wR: { x: 142, y: 108 },
+      cordL: { x: 72, y: 96 },
+      cordR: { x: 128, y: 96 },
+      plumb: { x: 100, y: 108 },
+    },
   },
   {
     id: 'totem-reciprocity',
@@ -758,6 +792,15 @@ export const ADVANCED_TOTEMS: AdvancedTotem[] = [
         ),
       },
     ],
+    solution: {
+      figL: { x: 58, y: 100 },
+      figR: { x: 142, y: 100 },
+      mirror: { x: 100, y: 100 },
+      giftL: { x: 48, y: 128 },
+      giftR: { x: 152, y: 128 },
+      handL: { x: 72, y: 118 },
+      handR: { x: 128, y: 118 },
+    },
   },
   {
     id: 'totem-courage',
@@ -913,6 +956,15 @@ export const ADVANCED_TOTEMS: AdvancedTotem[] = [
         msg: localized('The banner should rise above the road.', '旗帜应在道路之上飘扬。'),
       },
     ],
+    solution: {
+      ground: { x: 100, y: 150 },
+      walker: { x: 78, y: 118 },
+      heart: { x: 68, y: 96 },
+      storm: { x: 132, y: 96 },
+      step: { x: 108, y: 120 },
+      lamp: { x: 48, y: 130 },
+      banner: { x: 92, y: 92 },
+    },
   },
   {
     id: 'totem-sincerity',
@@ -1065,9 +1117,30 @@ export const ADVANCED_TOTEMS: AdvancedTotem[] = [
         msg: localized('The roots are not under the seal.', '根未在印之下。'),
       },
     ],
+    solution: {
+      eye: { x: 100, y: 48 },
+      light: { x: 122, y: 42 },
+      word: { x: 72, y: 100 },
+      path: { x: 116, y: 108 },
+      foot: { x: 116, y: 138 },
+      seal: { x: 94, y: 112 },
+      root: { x: 94, y: 148 },
+    },
   },
 ];
 
 export function advancedTotemById(id: string): AdvancedTotem | undefined {
   return ADVANCED_TOTEMS.find((t) => t.id === id);
+}
+
+export function advancedTierCleared(completedGlyphs: readonly string[]): boolean {
+  return ADVANCED_TOTEMS.every((t) => completedGlyphs.includes(t.id));
+}
+
+export function allVirtueGlyphsCleared(completedGlyphs: readonly string[]): boolean {
+  return (
+    beginnerTierCleared(completedGlyphs) &&
+    intermediateTierCleared(completedGlyphs) &&
+    advancedTierCleared(completedGlyphs)
+  );
 }

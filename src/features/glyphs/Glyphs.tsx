@@ -10,7 +10,7 @@ import {
   type IntermediateGlyph,
   type VirtueGlyph,
 } from '../../data/glyphs';
-import { ADVANCED_TOTEMS, type AdvancedTotem } from '../../data/totems';
+import { ADVANCED_TOTEMS, allVirtueGlyphsCleared, type AdvancedTotem } from '../../data/totems';
 import { scrambleBoard, fullBoard, trySlide, isSolved, type GlyphBoard } from '../../engine/glyphPuzzle';
 import {
   previewState,
@@ -31,6 +31,7 @@ import { Modal, PageHeader } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { playSfx } from '../../engine/sfx';
 import { TotemArrangeModal } from './TotemArrange';
+import { TotemEmblem } from './TotemEmblems';
 
 // Not every Chinese character spreads its ink evenly across its bounding
 // square (e.g. 仁's right-hand 二 sits only in the vertical middle), so a
@@ -566,7 +567,7 @@ function TotemCard({
       }
     >
       <div className="glyph-card-char glyph-card-totem" aria-hidden="true">
-        {totem.emoji}
+        <TotemEmblem totemId={totem.id} />
       </div>
       <div className="glyph-card-body">
         <strong>{L(totem.title)}</strong>
@@ -591,6 +592,7 @@ export default function Glyphs() {
   const [tier, setTier] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const intermediateOpen = beginnerTierCleared(completedGlyphs);
   const advancedOpen = intermediateTierCleared(completedGlyphs);
+  const allCleared = allVirtueGlyphsCleared(completedGlyphs);
 
   const tiers: { id: 'beginner' | 'intermediate' | 'advanced'; labelKey: 'glyphsTierBeginnerTab' | 'glyphsTierIntermediateTab' | 'glyphsTierAdvancedTab' }[] = [
     { id: 'beginner', labelKey: 'glyphsTierBeginnerTab' },
@@ -601,6 +603,7 @@ export default function Glyphs() {
   return (
     <div>
       <PageHeader emoji="🧩" title={t('glyphsTitle')} subtitle={t('glyphsSubtitle')} />
+      {allCleared && <p className="pill" style={{ marginBottom: 12 }}>{t('glyphsAllCompleteNote')}</p>}
 
       <div className="tab-row glyph-tier-tabs" role="tablist" aria-label={t('glyphsTitle')}>
         {tiers.map((tab) => (

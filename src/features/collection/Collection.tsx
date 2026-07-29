@@ -81,6 +81,7 @@ export function CardModal({ card, onClose }: { card: WisdomCard; onClose: () => 
 
 function CardReveal({ card, onDone }: { card: WisdomCard; onDone: () => void }) {
   const { t, L } = useT();
+  const Art = CARD_ART[card.id];
   useEffect(() => {
     playSfx(card.rarity === 'legendary' ? 'celebrate' : 'chime');
     const timer = window.setTimeout(onDone, card.rarity === 'legendary' ? 1600 : 1100);
@@ -93,7 +94,15 @@ function CardReveal({ card, onDone }: { card: WisdomCard; onDone: () => void }) 
     <div className="modal-backdrop celebrate-backdrop" onClick={onDone}>
       <div className={`card-reveal card-reveal-${card.rarity}`} onClick={(e) => e.stopPropagation()}>
         <div className="card-reveal-inner">
-          <div className="card-reveal-emoji">{card.emoji}</div>
+          <div className="card-reveal-emoji">
+            {Art ? (
+              <span className="card-reveal-art">
+                <Art />
+              </span>
+            ) : (
+              card.emoji
+            )}
+          </div>
           <h2>{L(card.title)}</h2>
           <p className="small muted">{t(RARITY_KEY[card.rarity])}</p>
           <button className="btn btn-primary" onClick={onDone}>
@@ -179,6 +188,7 @@ export default function Collection() {
           <div className="card-grid">
             {visibleCards.map((card) => {
               const owned = unlockedCards.includes(card.id);
+              const Art = CARD_ART[card.id];
               return (
                 <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && openCard(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
                   {owned && (
@@ -186,7 +196,9 @@ export default function Collection() {
                       {CATEGORY_ICON[card.category]}
                     </span>
                   )}
-                  <div className="wcard-emoji">{owned ? card.emoji : '❔'}</div>
+                  <div className="wcard-emoji">
+                    {owned ? (Art ? <span className="wcard-art"><Art /></span> : card.emoji) : '❔'}
+                  </div>
                   <strong>{owned ? L(card.title) : t('lockedCardTitle')}</strong>
                   <span className="small muted">{owned ? t(RARITY_KEY[card.rarity]) : L(card.unlockHint)}</span>
                 </div>

@@ -34,6 +34,7 @@ import { TOPICS } from '../data/knowledgeTree';
 import { SAGES, chapterById, isSageLifeComplete } from '../data/sages';
 import { REGIONS } from '../data/journeyMap';
 import { glyphById } from '../data/glyphs';
+import { advancedTotemById } from '../data/totems';
 import { moodById } from '../data/moods';
 import { isMeaningful, TEXT_MIN } from '../engine/textQuality';
 import { useLocale } from './localeStore';
@@ -589,7 +590,8 @@ export const useJourney = create<JourneyState>()(
           const state = get();
           if ((state.completedGlyphs ?? []).includes(glyphId)) return false;
           const glyph = glyphById(glyphId);
-          if (!glyph) return false;
+          const totem = glyph ? null : advancedTotemById(glyphId);
+          if (!glyph && !totem) return false;
           apply((draft, today) => {
             if (!draft.completedGlyphs) draft.completedGlyphs = [];
             if (draft.completedGlyphs.includes(glyphId)) return;
@@ -599,11 +601,13 @@ export const useJourney = create<JourneyState>()(
             dayRec(draft, today).glyphPractice = true;
             markActive(draft, today);
             const locale = useLocale.getState().locale;
+            const title = glyph ? L(glyph.title, locale) : L(totem!.title, locale);
+            const face = glyph ? glyph.character : totem!.emoji;
             return [
               celebration(
                 'glyph',
-                glyph.character,
-                glyphClearedTitle(locale, L(glyph.title, locale)),
+                face,
+                glyphClearedTitle(locale, title),
                 glyphClearedSubtitle(locale, XP_FOR.glyph, HARMONY_FOR.glyph),
                 { ctaTo: '/glyphs' },
               ),

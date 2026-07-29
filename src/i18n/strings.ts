@@ -37,8 +37,8 @@ export const UI = {
   // ── Virtue Glyph sliding puzzles ──────────────────────────────────
   glyphsTitle: localized('Virtue Glyphs', '德行之字'),
   glyphsSubtitle: localized(
-    'Bonus logic puzzles: restore virtue characters — modern slides, seal Klotski, then path totems.',
-    '额外的逻辑谜题：还原德行汉字 — 现代方块、说文小篆华容道，再到道上图腾。',
+    'Bonus logic puzzles: restore virtue characters — modern slides, seal Klotski, then Virtue Totems.',
+    '额外的逻辑谜题：还原德行汉字 — 现代方块、说文小篆华容道，再到德行图腾。',
   ),
   glyphsTierBeginner: localized('Beginner — Five Constants', '入门 — 五常'),
   glyphsTierBeginnerBlurb: localized(
@@ -52,7 +52,7 @@ export const UI = {
     '滑动方块与长方形拼块，还原每一个说文小篆字形。',
   ),
   glyphsTierIntermediateTab: localized('Intermediate', '进阶'),
-  glyphsTierAdvanced: localized('Advanced — Path totems', '高阶 — 道上图腾'),
+  glyphsTierAdvanced: localized('Advanced — Virtue Totems', '高阶 — 德行图腾'),
   glyphsTierAdvancedTab: localized('Advanced', '高阶'),
   glyphsTierAdvancedBlurb: localized(
     'Arrange symbolic totem pieces by meaning — free placement, then Contemplate.',
@@ -61,6 +61,10 @@ export const UI = {
   glyphsTierAdvancedLocked: localized(
     'Clear every Intermediate glyph first to unlock this tier.',
     '先解开进阶的每一个字谜，才能解锁这一阶。',
+  ),
+  glyphsAllCompleteNote: localized(
+    'Virtue Glyphs complete — replay anytime for practice.',
+    '德行之字已全部解开 — 随时可再练习。',
   ),
   glyphsTotemLabel: localized('Totem', '图腾'),
   glyphsTotemContemplate: localized('Contemplate', '静观'),
@@ -351,6 +355,10 @@ export const UI = {
   taskGlyphDesc: localized(
     'Restore a character puzzle — modern slides or seal Klotski.',
     '还原一个字谜 — 现代方块滑动或小篆华容道。',
+  ),
+  taskGlyphReplayDesc: localized(
+    'Replay a glyph anytime — first clears are done; practice still counts today.',
+    '随时再玩一字谜 — 首次解开已完成；今日练习仍算。',
   ),
   taskGlyphDone: localized('You practised a glyph today.', '你今天练习过字谜。'),
   taskEncourageTitle: localized('Encourage a friend', '鼓励一位朋友'),

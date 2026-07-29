@@ -9,6 +9,7 @@ import { ALL_LESSONS } from '../../data/knowledgeTree';
 import { ALL_POINTS } from '../../data/timeline';
 import { DAILY_LESSON_CAP, DAILY_TIMELINE_CAP } from '../../state/selectors';
 import { moodById } from '../../data/moods';
+import { allVirtueGlyphsCleared } from '../../data/totems';
 
 export interface TodayTask {
   done: boolean;
@@ -152,7 +153,11 @@ export function useTodayTasks(): TodayTasksResult {
             done: !!rec.glyphPractice,
             emoji: '🧩',
             title: t('taskGlyphTitle'),
-            desc: rec.glyphPractice ? t('taskGlyphDone') : t('taskGlyphDesc'),
+            desc: rec.glyphPractice
+              ? t('taskGlyphDone')
+              : allVirtueGlyphsCleared(state.completedGlyphs ?? [])
+                ? t('taskGlyphReplayDesc')
+                : t('taskGlyphDesc'),
             to: '/glyphs',
             cta: t('ctaGlyph'),
             secondary: true,

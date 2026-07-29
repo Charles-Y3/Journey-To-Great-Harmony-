@@ -233,6 +233,160 @@ export function DatongArt() {
   );
 }
 
+/** Wuxing five-element line marks — for the Five Constants glyph milestone card. */
+export function GlyphConstantsArt() {
+  // Positions around a pentagon: Wood, Fire, Earth, Metal, Water (clockwise from top).
+  const spots = [
+    { x: 100, y: 36, kind: 'wood' as const },
+    { x: 156, y: 76, kind: 'fire' as const },
+    { x: 134, y: 148, kind: 'earth' as const },
+    { x: 66, y: 148, kind: 'metal' as const },
+    { x: 44, y: 76, kind: 'water' as const },
+  ];
+  return (
+    <Frame>
+      <circle cx="100" cy="100" r="78" fill="none" stroke="var(--line)" strokeWidth="2" />
+      {spots.map((s, i) => {
+        const n = spots[(i + 1) % spots.length]!;
+        return (
+          <path
+            key={`arc-${i}`}
+            d={`M${s.x} ${s.y} Q100 100 ${n.x} ${n.y}`}
+            fill="none"
+            stroke="var(--ink)"
+            strokeWidth="2"
+            opacity="0.35"
+          />
+        );
+      })}
+      {spots.map((s) => (
+        <g key={s.kind} transform={`translate(${s.x} ${s.y})`}>
+          {s.kind === 'wood' && (
+            <g stroke="#5a8f5a" strokeWidth="3.2" strokeLinecap="round">
+              <path d="M-9 -12 V12" />
+              <path d="M-3 -12 V12" />
+              <path d="M3 -12 V12" />
+              <path d="M9 -12 V12" />
+            </g>
+          )}
+          {s.kind === 'fire' && (
+            <g stroke="#b55a45" strokeWidth="3.2" strokeLinecap="round" fill="none">
+              <path d="M-9 12 Q-12 0 -9 -12" />
+              <path d="M-3 12 Q0 0 -3 -12" />
+              <path d="M3 12 Q0 0 3 -12" />
+              <path d="M9 12 Q12 0 9 -12" />
+            </g>
+          )}
+          {s.kind === 'earth' && (
+            <g stroke="var(--ink)" strokeWidth="3" strokeLinecap="round" fill="none">
+              <path d="M-14 -9 L-7 -4 L0 -9 L7 -4 L14 -9" />
+              <path d="M-14 -3 L-7 2 L0 -3 L7 2 L14 -3" />
+              <path d="M-14 3 L-7 8 L0 3 L7 8 L14 3" />
+              <path d="M-14 9 L-7 14 L0 9 L7 14 L14 9" />
+            </g>
+          )}
+          {s.kind === 'metal' && (
+            <g stroke="var(--gold)" strokeWidth="3.2" strokeLinecap="round">
+              <path d="M-14 -9 H14" />
+              <path d="M-14 -3 H14" />
+              <path d="M-14 3 H14" />
+              <path d="M-14 9 H14" />
+            </g>
+          )}
+          {s.kind === 'water' && (
+            <g stroke="#4a7a9a" strokeWidth="3.2" strokeLinecap="round" fill="none">
+              <path d="M-14 -9 Q-7 -14 0 -9 Q7 -4 14 -9" />
+              <path d="M-14 -3 Q-7 -8 0 -3 Q7 2 14 -3" />
+              <path d="M-14 3 Q-7 -2 0 3 Q7 8 14 3" />
+              <path d="M-14 9 Q-7 4 0 9 Q7 14 14 9" />
+            </g>
+          )}
+        </g>
+      ))}
+    </Frame>
+  );
+}
+
+/** Bagua / trigram ring — for the Eight Virtues glyph milestone card. */
+export function GlyphBaodeArt() {
+  // Classic eight trigrams as 3-line stacks (yang = solid, yin = broken).
+  const trigrams: [boolean, boolean, boolean][] = [
+    [true, true, true], // 乾
+    [true, true, false], // 兑
+    [true, false, true], // 离
+    [true, false, false], // 震
+    [false, true, true], // 巽
+    [false, true, false], // 坎
+    [false, false, true], // 艮
+    [false, false, false], // 坤
+  ];
+  return (
+    <Frame>
+      <circle cx="100" cy="100" r="78" fill="none" stroke="var(--jade)" strokeWidth="2.5" opacity="0.55" />
+      <circle cx="100" cy="100" r="22" fill="var(--jade)" opacity="0.2" />
+      <circle cx="100" cy="100" r="10" fill="var(--ink)" />
+      <path d="M100 90 A10 10 0 0 1 100 110" fill="var(--surface)" />
+      {trigrams.map((lines, i) => {
+        const angle = (i / 8) * Math.PI * 2 - Math.PI / 2;
+        const cx = 100 + Math.cos(angle) * 52;
+        const cy = 100 + Math.sin(angle) * 52;
+        const deg = (angle * 180) / Math.PI + 90;
+        return (
+          <g key={i} transform={`translate(${cx} ${cy}) rotate(${deg})`}>
+            {lines.map((yang, row) => {
+              const y = -10 + row * 10;
+              if (yang) {
+                return <rect key={row} x={-14} y={y} width={28} height={5} rx={1} fill="var(--ink)" />;
+              }
+              return (
+                <g key={row} fill="var(--ink)">
+                  <rect x={-14} y={y} width={11} height={5} rx={1} />
+                  <rect x={3} y={y} width={11} height={5} rx={1} />
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
+    </Frame>
+  );
+}
+
+/** Stacked ceremonial totem pole — for the Virtue Totems legendary card. */
+export function GlyphTotemsArt() {
+  return (
+    <Frame>
+      {/* pole */}
+      <rect x="94" y="28" width="12" height="148" rx="2" fill="var(--ink)" opacity="0.85" />
+      {/* top crest — sun / wing */}
+      <path d="M100 22 L118 42 H82 Z" fill="var(--gold)" />
+      <circle cx="100" cy="38" r="7" fill="var(--gold)" />
+      {/* face 1 — ringed harmony */}
+      <ellipse cx="100" cy="62" rx="28" ry="18" fill="var(--jade)" opacity="0.85" />
+      <circle cx="90" cy="60" r="3.5" fill="var(--surface)" />
+      <circle cx="110" cy="60" r="3.5" fill="var(--surface)" />
+      <path d="M92 70 Q100 76 108 70" fill="none" stroke="var(--surface)" strokeWidth="2.5" />
+      {/* face 2 — winged community */}
+      <path d="M100 88 L132 108 H68 Z" fill="var(--ink)" />
+      <path d="M68 108 Q52 100 48 88 Q62 96 72 100" fill="var(--gold)" opacity="0.9" />
+      <path d="M132 108 Q148 100 152 88 Q138 96 128 100" fill="var(--gold)" opacity="0.9" />
+      <circle cx="92" cy="102" r="3" fill="var(--surface)" />
+      <circle cx="108" cy="102" r="3" fill="var(--surface)" />
+      {/* face 3 — balance beam */}
+      <rect x="70" y="118" width="60" height="22" rx="4" fill="var(--jade-deep)" opacity="0.9" />
+      <rect x="78" y="124" width="18" height="10" rx="2" fill="var(--gold)" />
+      <rect x="104" y="124" width="18" height="10" rx="2" fill="var(--gold)" />
+      {/* face 4 — base creature */}
+      <path d="M70 150 H130 L120 176 H80 Z" fill="var(--ink)" />
+      <circle cx="88" cy="160" r="4" fill="var(--gold)" />
+      <circle cx="112" cy="160" r="4" fill="var(--gold)" />
+      <path d="M90 168 H110" stroke="var(--gold)" strokeWidth="2.5" strokeLinecap="round" />
+      {/* pedestal */}
+      <rect x="62" y="176" width="76" height="10" rx="2" fill="var(--gold)" opacity="0.75" />
+    </Frame>
+  );
+}
+
 export const CARD_ART: Record<string, () => JSX.Element> = {
   'card-maat': MaatArt,
   'card-socrates': SocratesArt,
@@ -246,4 +400,7 @@ export const CARD_ART: Record<string, () => JSX.Element> = {
   'card-kant': KantArt,
   'card-gandhi': GandhiKingArt,
   'card-datong': DatongArt,
+  'card-glyph-constants': GlyphConstantsArt,
+  'card-glyph-baode': GlyphBaodeArt,
+  'card-glyph-totems': GlyphTotemsArt,
 };

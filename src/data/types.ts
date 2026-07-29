@@ -158,6 +158,12 @@ export interface Stats {
   regionsCompleted: number;
   daysActive: number;
   quizCorrect: number;
+  /** Cleared beginner Virtue Glyphs (of BEGINNER_GLYPHS.length). */
+  glyphsBeginnerCleared: number;
+  /** Cleared intermediate Virtue Glyphs. */
+  glyphsIntermediateCleared: number;
+  /** Cleared advanced Virtue Totems. */
+  glyphsAdvancedCleared: number;
 }
 
 export interface Badge {
