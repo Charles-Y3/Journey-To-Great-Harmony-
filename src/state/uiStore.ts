@@ -51,6 +51,18 @@ interface UiState {
   /** One-time "new" badge on the Advisor nav entry, cleared the first time the screen is opened. */
   seenAdvisorUnlock: boolean;
   setSeenAdvisorUnlock: (seen: boolean) => void;
+  /** One-shot Today banner pointing at Advisor after first figure card. */
+  seenAdvisorDiscoverBanner: boolean;
+  setSeenAdvisorDiscoverBanner: (seen: boolean) => void;
+  /** One-shot Today banner about World travellers. */
+  seenWorldTravellersBanner: boolean;
+  setSeenWorldTravellersBanner: (seen: boolean) => void;
+  /** One-shot quiet return welcome after absence. */
+  seenQuietReturnBanner: boolean;
+  setSeenQuietReturnBanner: (seen: boolean) => void;
+  /** One-shot shared-road Settings nudge. */
+  seenSharedRoadNudge: boolean;
+  setSeenSharedRoadNudge: (seen: boolean) => void;
   /** Day key (YYYY-MM-DD) the daily Advisor question was last answered. */
   lastAdvisorQuestionDay: string | null;
   /** Topic answered on lastAdvisorQuestionDay, so revisiting shows the same Q&A. */
@@ -111,6 +123,14 @@ export const useUi = create<UiState>()(
       setAdvisorFigureId: (id) => set({ advisorFigureId: id }),
       seenAdvisorUnlock: false,
       setSeenAdvisorUnlock: (seen) => set({ seenAdvisorUnlock: seen }),
+      seenAdvisorDiscoverBanner: false,
+      setSeenAdvisorDiscoverBanner: (seen) => set({ seenAdvisorDiscoverBanner: seen }),
+      seenWorldTravellersBanner: false,
+      setSeenWorldTravellersBanner: (seen) => set({ seenWorldTravellersBanner: seen }),
+      seenQuietReturnBanner: false,
+      setSeenQuietReturnBanner: (seen) => set({ seenQuietReturnBanner: seen }),
+      seenSharedRoadNudge: false,
+      setSeenSharedRoadNudge: (seen) => set({ seenSharedRoadNudge: seen }),
       lastAdvisorQuestionDay: null,
       lastAdvisorTopicId: null,
       lastAdvisorStreakSnapshot: null,
@@ -141,6 +161,10 @@ export const useUi = create<UiState>()(
           dismissedStreakNudgeDay: null,
           advisorFigureId: null,
           seenAdvisorUnlock: false,
+          seenAdvisorDiscoverBanner: false,
+          seenWorldTravellersBanner: false,
+          seenQuietReturnBanner: false,
+          seenSharedRoadNudge: false,
           lastAdvisorQuestionDay: null,
           lastAdvisorTopicId: null,
           lastAdvisorStreakSnapshot: null,

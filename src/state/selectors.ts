@@ -54,6 +54,8 @@ export interface JourneyData {
   startDay: string;
   dayOffset: number;
   seenCollectionCount: number;
+  /** How many badges the user has acknowledged on the Collection badges tab. */
+  seenBadgeCount: number;
   /** Longer written reflections required to fully "master" a timeline era or knowledge branch, keyed by era/branch id. */
   capstones: Record<string, { text: string; day: string }>;
   /** Card ids that have already played their first-open reveal animation. */
@@ -67,9 +69,12 @@ export interface JourneyData {
   sageChapters: Record<string, true>;
 }
 
-/** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
+/** Unrevealed owned cards + badges not yet viewed on the badges tab. */
 export function newCollectionCount(d: JourneyData): number {
-  return Math.max(0, d.unlockedCards.length + d.unlockedBadges.length - d.seenCollectionCount);
+  const revealed = d.revealedCards ?? [];
+  const unrevealed = d.unlockedCards.filter((id) => !revealed.includes(id)).length;
+  const badgeUnseen = Math.max(0, d.unlockedBadges.length - (d.seenBadgeCount ?? 0));
+  return unrevealed + badgeUnseen;
 }
 
 export function isTopicCompleted(completedLessons: string[], topic: Topic): boolean {

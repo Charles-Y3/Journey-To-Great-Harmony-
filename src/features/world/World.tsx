@@ -24,6 +24,7 @@ import { playSfx } from '../../engine/sfx';
 import { AvatarGlyph, Modal, PageHeader, ProgressBar } from '../../components/ui';
 import { useT } from '../../i18n/useT';
 import { worldProgressLabel, buildingLockedNote } from '../../i18n/strings';
+import { useUi } from '../../state/uiStore';
 
 type LocalizeFn = <T>(v: Localized<T>) => T;
 
@@ -422,6 +423,7 @@ export default function World() {
   const feed = communityFeed(state.startDay, today);
   const peers = peerStats(state.startDay, today, state.xp);
   const { t, L, locale } = useT();
+  const setSeenWorldTravellersBanner = useUi((s) => s.setSeenWorldTravellersBanner);
   const myName = useProfile((s) => s.name);
   const myAvatar = useProfile((s) => s.avatar);
   const myTravellerId = useTraveller((s) => s.travellerId);
@@ -439,6 +441,10 @@ export default function World() {
   const highlightTimeoutRef = useRef<number | null>(null);
   const peerBubble = useBubble(2800);
   const buildingBubble = useBubble(4200);
+
+  useEffect(() => {
+    setSeenWorldTravellersBanner(true);
+  }, [setSeenWorldTravellersBanner]);
 
   useEffect(() => {
     let cancelled = false;

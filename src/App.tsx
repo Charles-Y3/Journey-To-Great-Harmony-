@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { useJourney, useToday, JOURNEY_EXPORT_VERSION, exportJourneyData } from './state/store';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from './state/selectors';
 import { CARDS } from './data/cards';
@@ -54,13 +54,17 @@ import Collection from './features/collection/Collection';
 import Glyphs from './features/glyphs/Glyphs';
 import TurningPoints from './features/turningPoints/TurningPoints';
 import Advisor from './features/advisor/Advisor';
-import { useTurningPoints } from './state/turningPointStore';
 
 const ADVISOR_ITEM = { to: '/advisor', emoji: '🧭', key: 'navAdvisor' as const };
 
-/** How many unlocked cards/badges the user hasn't opened the Collection tab to see yet. */
+/** How many unlocked cards haven't been flipped + badges not viewed on the badges tab. */
 function useNewCollectionCount(): number {
-  return useJourney((s) => Math.max(0, s.unlockedCards.length + s.unlockedBadges.length - s.seenCollectionCount));
+  return useJourney((s) => {
+    const revealed = s.revealedCards ?? [];
+    const unrevealed = s.unlockedCards.filter((id) => !revealed.includes(id)).length;
+    const badgeUnseen = Math.max(0, s.unlockedBadges.length - (s.seenBadgeCount ?? 0));
+    return unrevealed + badgeUnseen;
+  });
 }
 
 /** True once the user owns at least one figure-category wisdom card. */
@@ -1217,11 +1221,11 @@ export default function App() {
   const setHighestWaveSeen = useUi((s) => s.setHighestWaveSeen);
   const effectiveWave = useEffectiveWave();
   const dayRec = useJourney((s) => s.days[today] ?? {});
-  const flippedDays = useTurningPoints((s) => s.flippedDays);
+  const location = useLocation();
+  // Still Waters flip must NOT count as firstDaySuccess — with "show everything"
+  // pacing it used to fire the feature tour mid-reveal and steal the page.
   const firstDaySuccess =
-    !!dayRec.intention ||
-    flippedDays.includes(today) ||
-    (dayRec.lessons ?? 0) + (dayRec.timelineStudies ?? 0) > 0;
+    !!dayRec.intention || (dayRec.lessons ?? 0) + (dayRec.timelineStudies ?? 0) > 0;
   const { t, L, locale } = useT();
   const [showSettings, setShowSettings] = useState(false);
   const [settingsFocus, setSettingsFocus] = useState<string | null>(null);
@@ -1316,7 +1320,9 @@ export default function App() {
   // previewing content the sidebar still showed locked. 'all' pacing users
   // have effectiveWave already maxed, so this behaves the same as before
   // for them — only 'gated' users now wait for the real thing.
+  // Also skip while on Still Waters so a mid-story overlay never interrupts.
   useEffect(() => {
+    if (location.pathname === '/turning-points') return;
     if (
       hasChosenLocale &&
       hasSetName &&
@@ -1328,7 +1334,16 @@ export default function App() {
     ) {
       setShowTour(true);
     }
-  }, [hasChosenLocale, hasSetName, seenPacingIntro, seenFirstDayGuide, seenAppTour, firstDaySuccess, effectiveWave]);
+  }, [
+    hasChosenLocale,
+    hasSetName,
+    seenPacingIntro,
+    seenFirstDayGuide,
+    seenAppTour,
+    firstDaySuccess,
+    effectiveWave,
+    location.pathname,
+  ]);
 
   // Only for genuinely returning users: seenPacingIntro is already true
   // (from before this flag existed) but lastSeenChangelogVersion was never

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useJourney, useToday } from '../../state/store';
 import { QUOTES } from '../../data/quotes';
 import { CHALLENGES } from '../../data/challenges';
+import { CARDS } from '../../data/cards';
 import { dailyQuoteIndex } from '../../engine/community';
 import { addDaysToKey, hashString } from '../../engine/progression';
 import { statsFromData, forestInfo, worldInfo, weeklyEchoCard, type JourneyData } from '../../state/selectors';
@@ -15,6 +16,15 @@ import { useTodayTasks } from './useTodayTasks';
 import { isoWeekKey, useUi } from '../../state/uiStore';
 import { isGregorianNewYearWindow, isLunarNewYearWindow, seasonalVirtueForDay } from '../../data/seasons';
 import { useIsNavRouteUnlocked } from '../../engine/pacing';
+import { useTraveller } from '../../state/travellerStore';
+
+function daysBetween(earlier: string, later: string): number {
+  const [y1, m1, d1] = earlier.split('-').map(Number);
+  const [y2, m2, d2] = later.split('-').map(Number);
+  const a = Date.UTC(y1, m1 - 1, d1);
+  const b = Date.UTC(y2, m2 - 1, d2);
+  return Math.round((b - a) / 86_400_000);
+}
 
 export default function Today() {
   const state = useJourney();
@@ -47,8 +57,26 @@ export default function Today() {
   const setSeenSetupTips = useUi((s) => s.setSeenSetupTips);
   const dismissedStreakNudgeDay = useUi((s) => s.dismissedStreakNudgeDay);
   const setDismissedStreakNudgeDay = useUi((s) => s.setDismissedStreakNudgeDay);
+  const seenAdvisorDiscoverBanner = useUi((s) => s.seenAdvisorDiscoverBanner);
+  const setSeenAdvisorDiscoverBanner = useUi((s) => s.setSeenAdvisorDiscoverBanner);
+  const seenWorldTravellersBanner = useUi((s) => s.seenWorldTravellersBanner);
+  const setSeenWorldTravellersBanner = useUi((s) => s.setSeenWorldTravellersBanner);
+  const seenQuietReturnBanner = useUi((s) => s.seenQuietReturnBanner);
+  const setSeenQuietReturnBanner = useUi((s) => s.setSeenQuietReturnBanner);
+  const seenSharedRoadNudge = useUi((s) => s.seenSharedRoadNudge);
+  const setSeenSharedRoadNudge = useUi((s) => s.setSeenSharedRoadNudge);
+  const optedIn = useTraveller((s) => s.optedIn);
   const [showWeekly, setShowWeekly] = useState(false);
   const [showYearly, setShowYearly] = useState(false);
+
+  const hasFigureCard = d.unlockedCards.some((id) => CARDS.find((c) => c.id === id)?.category === 'figure');
+  const showAdvisorDiscover = hasFigureCard && !seenAdvisorDiscoverBanner;
+  const showWorldTravellers = worldUnlocked && !seenWorldTravellersBanner;
+  const showQuietReturn =
+    !seenQuietReturnBanner &&
+    !!d.lastActiveDay &&
+    daysBetween(d.lastActiveDay, today) >= 3;
+  const showSharedRoadNudge = !seenSharedRoadNudge && !optedIn && stats.daysActive >= 5;
 
   const streakAtRisk = new Date().getHours() >= EVENING_OPEN_HOUR && !rec.intention && !rec.challengeDone && !rec.reflection;
   const showStreakNudge = streakAtRisk && dismissedStreakNudgeDay !== today;
@@ -119,6 +147,69 @@ export default function Today() {
   return (
     <div>
       <PageHeader emoji="🌅" title={t('todayTitle')} subtitle={todaySubtitle(locale, today, coreDoneCount, coreTotal)} />
+
+      {showQuietReturn && (
+        <div className="card visit-banner-row" style={{ display: 'block', marginBottom: 12 }}>
+          <p style={{ margin: '0 0 8px' }}>{t('quietReturnBanner')}</p>
+          <div className="setup-tips-actions">
+            <Link className="btn btn-primary" to="/turning-points" onClick={() => setSeenQuietReturnBanner(true)}>
+              {t('quietReturnCta')}
+            </Link>
+            <button type="button" className="btn" onClick={() => setSeenQuietReturnBanner(true)}>
+              {t('dismissBanner')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showAdvisorDiscover && (
+        <div className="card visit-banner-row" style={{ display: 'block', marginBottom: 12 }}>
+          <p style={{ margin: '0 0 8px' }}>{t('discoverAdvisorBanner')}</p>
+          <div className="setup-tips-actions">
+            <Link className="btn btn-primary" to="/advisor" onClick={() => setSeenAdvisorDiscoverBanner(true)}>
+              {t('discoverAdvisorCta')}
+            </Link>
+            <button type="button" className="btn" onClick={() => setSeenAdvisorDiscoverBanner(true)}>
+              {t('dismissBanner')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showWorldTravellers && (
+        <div className="card visit-banner-row" style={{ display: 'block', marginBottom: 12 }}>
+          <p style={{ margin: '0 0 8px' }}>{t('discoverWorldTravellersBanner')}</p>
+          <div className="setup-tips-actions">
+            <Link className="btn btn-primary" to="/world" onClick={() => setSeenWorldTravellersBanner(true)}>
+              {t('discoverWorldTravellersCta')}
+            </Link>
+            <button type="button" className="btn" onClick={() => setSeenWorldTravellersBanner(true)}>
+              {t('dismissBanner')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showSharedRoadNudge && (
+        <div className="card visit-banner-row" style={{ display: 'block', marginBottom: 12 }}>
+          <p style={{ margin: '0 0 8px' }}>{t('sharedRoadNudgeBanner')}</p>
+          <div className="setup-tips-actions">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => {
+                setSeenSharedRoadNudge(true);
+                openSettings();
+              }}
+            >
+              {t('sharedRoadNudgeCta')}
+            </button>
+            <button type="button" className="btn" onClick={() => setSeenSharedRoadNudge(true)}>
+              {t('dismissBanner')}
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="quote-card">
         <p className="quote-text">“{L(quote.text)}”</p>

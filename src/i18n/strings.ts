@@ -87,8 +87,9 @@ export const UI = {
     '先解开入门的每一个字谜，才能解锁这一阶。',
   ),
   glyphsClearedLabel: localized('Cleared', '已解开'),
-  glyphsPlayBtn: localized('Begin', '开始'),
-  glyphsReplayBtn: localized('Play again', '再玩一次'),
+  glyphsPlayBtn: localized('Restore', '还原'),
+  glyphsArrangeBtn: localized('Arrange', '排列'),
+  glyphsReplayBtn: localized('Practise again', '再练习'),
   glyphsShuffleBtn: localized('Shuffle', '打乱'),
   glyphsUndoBtn: localized('Undo', '撤销'),
   glyphsPreviewHint: localized(
@@ -168,8 +169,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1.4 — your progress is stored privately in this browser.',
-    '大同之路 v1.4 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.4.1 — your progress is stored privately in this browser.',
+    '大同之路 v1.4.1 — 你的进度私密地保存在此浏览器中。',
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(
@@ -380,7 +381,7 @@ export const UI = {
   ctaReflect: localized('Reflect', '反思'),
   ctaHeart: localized('Check in', '问一问'),
   ctaStillWaters: localized('Sit with it', '静看'),
-  ctaGlyph: localized('Play', '开始'),
+  ctaGlyph: localized('Practise', '练习'),
   ctaEncourage: localized('Encourage', '鼓励'),
   heartCardTitle: localized('Heart check', '心念一问'),
   heartCardIntro: localized(
@@ -407,7 +408,10 @@ export const UI = {
   statVisit: localized('visit', '前往'),
   statWisdomXp: localized('wisdom XP', '智慧经验'),
   weeklyEchoTitle: localized('Card of the week', '本周之卡'),
-  weeklyEchoSubtitle: localized('A wisdom card from your collection, revisited.', '从你的收藏中，重访一张智慧卡牌。'),
+  weeklyEchoSubtitle: localized(
+    'A wisdom card from your collection, revisited — the cards you hold keep speaking back.',
+    '从你的收藏中重访一张智慧卡牌 — 你持有的卡牌，会继续对你说话。',
+  ),
   journeyRecapTitle: localized('My Journey so far', '我的旅程至今'),
   journeyRecapRankLabel: localized('rank', '段位'),
   journeyRecapCardsLabel: localized('wisdom cards', '智慧卡牌'),
@@ -584,8 +588,29 @@ export const UI = {
   journalDateFilterClear: localized('Clear', '清除'),
   todayIntentionLabel: localized("Today’s intention", '今日心愿'),
   yesterdayWroteLabel: localized('Yesterday you wrote', '昨日你写下'),
-  visitForestBanner: localized('Your forest grew — visit?', '你的森林成长了 — 去看看？'),
   visitWorldBanner: localized('The world brightened — see it?', '世界更明亮了 — 去看看？'),
+  discoverAdvisorBanner: localized(
+    'A figure card can guide you as Advisor — one question a day.',
+    '人物卡牌可成为你的良师 — 每天可请教一个问题。',
+  ),
+  discoverAdvisorCta: localized('Meet your Advisor', '会见良师'),
+  discoverWorldTravellersBanner: localized(
+    'Travellers wander the World — tap one to hear a greeting.',
+    '旅人在世界中漫步 — 点按一位，听听问候。',
+  ),
+  discoverWorldTravellersCta: localized('Visit the World', '前往世界'),
+  quietReturnBanner: localized(
+    'Welcome back. Still Waters is a gentle place to begin again — no streak-shame.',
+    '欢迎回来。静水是重新开始的温柔之处 — 不必为断签自责。',
+  ),
+  quietReturnCta: localized('Open Still Waters', '打开静水'),
+  sharedRoadNudgeBanner: localized(
+    'Other travellers can walk beside you if you join the shared road.',
+    '若你加入共行之路，其他旅人可以与你同行。',
+  ),
+  sharedRoadNudgeCta: localized('Open Settings', '打开设置'),
+  dismissBanner: localized('Dismiss', '关闭'),
+  visitForestBanner: localized('Your forest grew — visit?', '你的森林成长了 — 去看看？'),
   pacingIntroTitle: localized('A paced journey', '一段缓行的旅程'),
   pacingIntroBody1: localized(
     'This path is cultivation, not a binge. You can only complete a few lessons and timeline studies each day.',
@@ -641,7 +666,7 @@ export const UI = {
   appTourClusterLivingTitle: localized('A living world', '一个鲜活的世界'),
   appTourClusterLivingDesc: localized('Watch your forest grow, the shared world brighten, and your map unfold.', '看着你的森林成长、共享的世界变得明亮、地图逐渐展开。'),
   appTourClusterTogetherTitle: localized('Together, and collecting', '同修与收藏'),
-  appTourClusterTogetherDesc: localized('Companions to encourage, wisdom cards and badges to gather, and a puzzle to play.', '可鼓励的同修、可收集的智慧卡牌与徽章，还有一个可玩的谜题。'),
+  appTourClusterTogetherDesc: localized('Companions to encourage, wisdom cards and badges to gather, and a glyph to restore.', '可鼓励的同修、可收集的智慧卡牌与徽章，还有可还原的德行之字。'),
   appTourContinue: localized("Let's begin", '开始吧'),
   whatsNewTitle: localized("What's new", '有什么新变化'),
   whatsNewContinue: localized('Continue', '继续'),
@@ -652,6 +677,7 @@ export const UI = {
   mapArrivalTitle: localized('You have arrived', '你已抵达'),
   mapArrivalContinue: localized('Continue', '继续'),
   cardRevealTap: localized('Reveal', '揭开'),
+  cardUnflippedLabel: localized('New', '新'),
   collectionFirstPromise: localized(
     'Locked cards wait for your practice. Complete lessons, timeline studies, and challenges — each unlock is a teaching received.',
     '锁住的卡牌等待你的修习。完成课程、时间线研读与挑战 — 每一次解锁，都是一份领受的教导。',
@@ -988,8 +1014,8 @@ export const UI = {
     '选择一张人物卡牌，作为你的良师。每天可以提出一个问题。',
   ),
   advisorLockedMessage: localized(
-    'Study a figure on the Wisdom Timeline to gain your first advisor.',
-    '在智慧时间线上研读一位人物，即可获得你的第一位良师。',
+    'Begin Ptahhotep’s life on Sage Lives, or study a figure on the Wisdom Timeline, to gain your first advisor.',
+    '在圣哲生平中开始普塔霍特普的生平，或在智慧时间线上研读一位人物，即可获得你的第一位良师。',
   ),
   advisorChangeCta: localized('Change advisor', '更换良师'),
   advisorChangeLockedHint: localized(

@@ -48,6 +48,7 @@ export default function Advisor() {
   const setAdvisorFigureId = useUi((s) => s.setAdvisorFigureId);
   const seenAdvisorUnlock = useUi((s) => s.seenAdvisorUnlock);
   const setSeenAdvisorUnlock = useUi((s) => s.setSeenAdvisorUnlock);
+  const setSeenAdvisorDiscoverBanner = useUi((s) => s.setSeenAdvisorDiscoverBanner);
   const lastAdvisorQuestionDay = useUi((s) => s.lastAdvisorQuestionDay);
   const lastAdvisorTopicId = useUi((s) => s.lastAdvisorTopicId);
   const lastAdvisorStreakSnapshot = useUi((s) => s.lastAdvisorStreakSnapshot);
@@ -55,8 +56,11 @@ export default function Advisor() {
   const answerAdvisorToday = useUi((s) => s.answerAdvisorToday);
 
   useEffect(() => {
-    if (!seenAdvisorUnlock) setSeenAdvisorUnlock(true);
-  }, [seenAdvisorUnlock, setSeenAdvisorUnlock]);
+    if (!seenAdvisorUnlock) {
+      setSeenAdvisorUnlock(true);
+      setSeenAdvisorDiscoverBanner(true);
+    }
+  }, [seenAdvisorUnlock, setSeenAdvisorUnlock, setSeenAdvisorDiscoverBanner]);
 
   const ownedFigureCards = CARDS.filter((c) => c.category === 'figure' && unlockedCards.includes(c.id));
   const advisorCard = advisorFigureId ? ownedFigureCards.find((c) => c.id === advisorFigureId) ?? null : null;

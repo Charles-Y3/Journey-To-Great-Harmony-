@@ -577,7 +577,7 @@ function TotemCard({
           {done ? ` · ${t('glyphsClearedLabel')}` : ''}
         </p>
         <button type="button" className="btn btn-primary" onClick={onPlay} disabled={locked}>
-          {done ? t('glyphsReplayBtn') : t('glyphsPlayBtn')}
+          {done ? t('glyphsReplayBtn') : t('glyphsArrangeBtn')}
         </button>
       </div>
     </div>

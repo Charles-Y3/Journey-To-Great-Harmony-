@@ -124,7 +124,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'plato-cave',
-    emoji: '🔦',
+    emoji: '🕳️',
     tradition: localized('Plato — Republic, Book VII', '柏拉图 — 《理想国》第七卷'),
     setting: localized(
       'Prisoners chained in a cave saw only shadows on the wall and took them for the whole of reality. One was freed and dragged upward toward the sun.',
@@ -226,7 +226,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'analects-three-reflections',
-    emoji: '🪞',
+    emoji: '🌙',
     tradition: localized('Analects 1.4', '《论语·学而》'),
     setting: localized(
       'Zengzi told his companions he examined himself every day. Before sleep he asked three questions of his own conduct:',
@@ -243,7 +243,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'buddha-mustard-seed',
-    emoji: '🌱',
+    emoji: '🌾',
     tradition: localized('Buddhist tale — Kisa Gotami', '佛教故事 — 季沙瞿昙弥'),
     setting: localized(
       'A mother whose child had died came to the Buddha begging for medicine to bring him back. He told her to fetch a mustard seed from a house that had never known death.',
@@ -362,7 +362,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'hillel-rooftop',
-    emoji: '📜',
+    emoji: '💬',
     tradition: localized('Pirkei Avot / Talmudic tradition', '《先贤篇》/ 塔木德传统'),
     setting: localized(
       'A student asked Hillel for the whole of the teaching in brief. Hillel answered with three questions held in one breath:',
@@ -379,7 +379,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'rabbi-two-pockets',
-    emoji: '📿',
+    emoji: '📄',
     tradition: localized('Hasidic teaching — Simcha Bunim', '哈西德教喻 — 辛查·布尼姆'),
     setting: localized(
       'Rabbi Simcha Bunim said everyone should carry two slips of paper, one in each pocket.',
@@ -464,7 +464,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'thich-tea',
-    emoji: '🍃',
+    emoji: '🍵',
     tradition: localized('Thich Nhat Hanh — teaching on tea', '一行禅师 — 茶的教导'),
     setting: localized(
       'Thich Nhat Hanh invited people to drink a cup of tea with full attention — not while planning the next hour.',
@@ -566,7 +566,7 @@ export const EXTRA_TURNING_POINTS: TurningPoint[] = [
   },
   {
     id: 'laozi-know-enough',
-    emoji: '🧘',
+    emoji: '🤫',
     tradition: localized('Daodejing, Chapter 33 / 56 (themes)', '《道德经》第三十三 / 五十六章（主旨）'),
     setting: localized(
       'A boastful official asked what true strength looked like. The answer came in quiet lines from the Way:',

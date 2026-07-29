@@ -674,4 +674,61 @@ export const ADVISOR_WISDOM: Record<string, AdvisorFigureWisdom> = {
       ),
     },
   },
+
+  'card-ptahhotep': {
+    patience: {
+      quote: localized(
+        'A good name is made slowly; haste stains what time would polish.',
+        '美名成于缓慢；急躁玷污时间本可打磨之物。',
+      ),
+      framing: localized(
+        'He treats waiting as craft — speech and reputation are built day by day.',
+        '他视等待为技艺 — 言语与名声，都是日日建成的。',
+      ),
+    },
+    anger: {
+      quote: localized(
+        'Cool the heart before the tongue; heat ruins counsel.',
+        '先凉其心，再动其舌；热气败坏谏言。',
+      ),
+      framing: localized(
+        'Listening first was his remedy for rooms full of power and temper.',
+        '先倾听，是他对充满权力与怒气之室的药方。',
+      ),
+    },
+    loss: {
+      quote: localized('Wealth leaves; a name well kept walks farther.', '财富会离去；守住的美名走得更远。'),
+      framing: localized(
+        'He orients grief toward what still can be tended: character, not haul.',
+        '他把哀伤转向仍可照料之事：品格，而非财物。',
+      ),
+    },
+    purpose: {
+      quote: localized(
+        "Let Ma'at be the measure of your house and your office.",
+        '让玛阿特成为你家庭与职分的尺度。',
+      ),
+      framing: localized(
+        'Purpose, for him, is keeping right order where you already stand.',
+        '对他而言，志向就是在你已站立之处守住正当秩序。',
+      ),
+    },
+    relationships: {
+      quote: localized('Hear the petitioner to the end; then answer.', '听陈情者说到尽头；然后再答。'),
+      framing: localized(
+        'Relationship as patient hearing, not clever reply.',
+        '关系是耐心的倾听，而非机巧的回答。',
+      ),
+    },
+    doubt: {
+      quote: localized(
+        'Take counsel with the ignorant as with the learned.',
+        '对无知者与博学者，皆当虚心求教。',
+      ),
+      framing: localized(
+        'Doubt is answered by wider counsel, not by louder certainty.',
+        '疑惑靠更广的求教来答，而非更大声的笃定。',
+      ),
+    },
+  },
 };

@@ -100,11 +100,10 @@ export default function TurningPoints() {
 
   function flip() {
     setFlipping(true);
-    window.setTimeout(() => {
-      setRevealed(true);
-      markFlipped(today);
-      setFlipping(false);
-    }, FLIP_MS);
+    // Reveal text first, then end the soft pulse — never collapse the card away.
+    setRevealed(true);
+    markFlipped(today);
+    window.setTimeout(() => setFlipping(false), FLIP_MS);
   }
 
   return (

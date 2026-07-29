@@ -1139,17 +1139,15 @@ select:focus {
   box-shadow: var(--shadow);
   margin-bottom: 16px;
   overflow: hidden;
-  transition: transform 0.22s ease;
+  transition: transform 0.22s ease, opacity 0.22s ease;
   transform-origin: center;
 }
 
-/* A brief scaleX(0) mid-transition, swapped for the revealed content right
-   at that point (see the setTimeout in TurningPoints.tsx) — a cheap but
-   convincing "card turning over" illusion without the fragility of a true
-   3D flip (fixed heights, absolutely-positioned faces) on variable-length
-   story text. */
+/* Soft pulse while swapping in the revealed face — avoid scaleX(0), which
+   looked like the card closed / disappeared instead of opening. */
 .tp-card-flipping {
-  transform: scaleX(0);
+  opacity: 0.55;
+  transform: scale(0.985);
 }
 
 .tp-card-hero {
@@ -2521,9 +2519,35 @@ button.stage-step:disabled {
   opacity: 0.85;
 }
 
+.wcard-new-chip {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--gold, #c4a35a);
+  color: var(--surface, #fff);
+  line-height: 1.2;
+}
+
+.wcard.wcard-unflipped {
+  outline: 2px dashed color-mix(in srgb, var(--gold, #c4a35a) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.tab-filter-badge {
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
 .wcard {
   cursor: pointer;
   transition: transform 0.12s ease;
+  position: relative;
 }
 
 .wcard:hover {

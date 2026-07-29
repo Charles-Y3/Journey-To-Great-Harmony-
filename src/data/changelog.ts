@@ -10,6 +10,28 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 14,
+    date: '2026-07-30',
+    highlights: [
+      localized(
+        '🪶 Early Advisor: begin Ptahhotep’s life on Sage Lives to unlock a common figure guide — Ma’at stays the Ages teaching reward.',
+        '🪶 更早的良师：在圣哲生平中开始普塔霍特普的生平，即可解锁普通人物向导 — 玛阿特仍是时代研读的教导奖励。',
+      ),
+      localized(
+        '🎴 Collection: rarity-tab “new” dots, unflipped highlights, and SVG art for every wisdom card; Constancy card at a 21-day streak.',
+        '🎴 收藏：稀有度标签上的「新」标记、未翻开高亮，以及每张智慧卡的 SVG 插画；连续 21 天可获得「恒」卡。',
+      ),
+      localized(
+        '💧 Still Waters flip no longer interrupts with the feature tour; soft reveal instead of a collapsing card.',
+        '💧 静水翻卡不再被功能导览打断；柔和揭示，取代整卡收合。',
+      ),
+      localized(
+        '🌅 Today tips for Advisor, World travellers, quiet return, and the shared road — plus glyph CTAs: Restore / Arrange / Practise.',
+        '🌅 今日提示：良师、世界旅人、归来问候与共行之路 — 字谜按钮改为：还原 / 排列 / 再练习。',
+      ),
+    ],
+  },
+  {
     version: 13,
     date: '2026-07-29',
     highlights: [

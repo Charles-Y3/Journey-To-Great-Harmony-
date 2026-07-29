@@ -121,11 +121,16 @@ const RARITY_FILTERS: { id: 'all' | CardRarity; key: UiKey }[] = [
   { id: 'legendary', key: 'rarityLegendary' },
 ];
 
+function TabBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return <span className="nav-badge tab-filter-badge">{count > 9 ? '9+' : count}</span>;
+}
+
 export default function Collection() {
   const unlockedCards = useJourney((s) => s.unlockedCards);
   const unlockedBadges = useJourney((s) => s.unlockedBadges);
   const revealedCards = useJourney((s) => s.revealedCards ?? []);
-  const markCollectionSeen = useJourney((s) => s.markCollectionSeen);
+  const markBadgesSeen = useJourney((s) => s.markBadgesSeen);
   const markCardRevealed = useJourney((s) => s.markCardRevealed);
   const [open, setOpen] = useState<WisdomCard | null>(null);
   const [revealing, setRevealing] = useState<WisdomCard | null>(null);
@@ -133,11 +138,12 @@ export default function Collection() {
   const [rarityFilter, setRarityFilter] = useState<'all' | CardRarity>('all');
   const { t, L, locale } = useT();
 
-  useEffect(() => {
-    markCollectionSeen();
-  }, [markCollectionSeen, unlockedCards.length, unlockedBadges.length]);
-
   const visibleCards = rarityFilter === 'all' ? CARDS : CARDS.filter((c) => c.rarity === rarityFilter);
+
+  function unrevealedCount(filterId: 'all' | CardRarity): number {
+    const cardsForFilter = filterId === 'all' ? CARDS : CARDS.filter((c) => c.rarity === filterId);
+    return cardsForFilter.filter((c) => unlockedCards.includes(c.id) && !revealedCards.includes(c.id)).length;
+  }
 
   function rarityFilterCounts(filterId: 'all' | CardRarity): { owned: number; total: number } {
     const cardsForFilter = filterId === 'all' ? CARDS : CARDS.filter((c) => c.rarity === filterId);
@@ -152,6 +158,11 @@ export default function Collection() {
     setOpen(card);
   }
 
+  function selectTab(next: 'cards' | 'badges') {
+    setTab(next);
+    if (next === 'badges') markBadgesSeen();
+  }
+
   return (
     <div>
       <PageHeader emoji="🎴" title={t('collectionTitle')} subtitle={t('collectionSubtitle')} />
@@ -161,10 +172,11 @@ export default function Collection() {
       )}
 
       <div className="tab-row">
-        <button className={tab === 'cards' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setTab('cards')}>
+        <button className={tab === 'cards' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTab('cards')}>
           {t('wisdomCardsTab')}
+          <TabBadge count={unrevealedCount('all')} />
         </button>
-        <button className={tab === 'badges' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => setTab('badges')}>
+        <button className={tab === 'badges' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTab('badges')}>
           {badgesTabLabel(locale, unlockedBadges.length, BADGES.length)}
         </button>
       </div>
@@ -174,6 +186,7 @@ export default function Collection() {
           <div className="tab-row rarity-filter-row">
             {RARITY_FILTERS.map((f) => {
               const { owned, total } = rarityFilterCounts(f.id);
+              const unread = unrevealedCount(f.id);
               return (
                 <button
                   key={f.id}
@@ -181,6 +194,7 @@ export default function Collection() {
                   onClick={() => setRarityFilter(f.id)}
                 >
                   {t(f.key)} ({owned}/{total})
+                  <TabBadge count={unread} />
                 </button>
               );
             })}
@@ -188,14 +202,26 @@ export default function Collection() {
           <div className="card-grid">
             {visibleCards.map((card) => {
               const owned = unlockedCards.includes(card.id);
+              const unflipped = owned && !revealedCards.includes(card.id);
               const Art = CARD_ART[card.id];
+              const cls = !owned
+                ? 'wcard locked'
+                : unflipped
+                  ? `wcard ${card.rarity} wcard-unflipped`
+                  : `wcard ${card.rarity}`;
               return (
-                <div key={card.id} className={owned ? `wcard ${card.rarity}` : 'wcard locked'} onClick={() => owned && openCard(card)} title={owned ? L(card.title) : L(card.unlockHint)}>
+                <div
+                  key={card.id}
+                  className={cls}
+                  onClick={() => owned && openCard(card)}
+                  title={owned ? L(card.title) : L(card.unlockHint)}
+                >
                   {owned && (
                     <span className="wcard-category-badge" aria-hidden="true">
                       {CATEGORY_ICON[card.category]}
                     </span>
                   )}
+                  {unflipped && <span className="wcard-new-chip">{t('cardUnflippedLabel')}</span>}
                   <div className="wcard-emoji">
                     {owned ? (Art ? <span className="wcard-art"><Art /></span> : card.emoji) : '❔'}
                   </div>

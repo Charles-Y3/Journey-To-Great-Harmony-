@@ -90,6 +90,7 @@ interface JourneyActions {
   advanceDay: () => void;
   resetJourney: () => void;
   markCollectionSeen: () => void;
+  markBadgesSeen: () => void;
   markCardRevealed: (cardId: string) => void;
   importJourney: (data: JourneyData) => boolean;
 }
@@ -119,6 +120,7 @@ function initialData(): JourneyData {
     startDay: todayKey(0),
     dayOffset: 0,
     seenCollectionCount: 0,
+    seenBadgeCount: 0,
     capstones: {},
     revealedCards: [],
     completedGlyphs: [],
@@ -303,6 +305,22 @@ function collectUnlocks(before: JourneyData, after: JourneyData, today: string):
       );
   }
 
+  // Early Advisor figure: first Ptahhotep Sage Lives chapter (separate from Ma'at Ages reward)
+  if (
+    after.sageChapters?.['ptahhotep-court'] &&
+    !after.unlockedCards.includes('card-ptahhotep')
+  ) {
+    after.unlockedCards.push('card-ptahhotep');
+    const c = cardById('card-ptahhotep');
+    if (c)
+      out.push(
+        celebration('card', c.emoji, wisdomCardTitle(locale, L(c.title, locale)), L(c.summary, locale), {
+          ctaTo: '/advisor',
+          major: false,
+        }),
+      );
+  }
+
   // Special cards
   for (const rule of SPECIAL_CARD_RULES) {
     if (!after.unlockedCards.includes(rule.cardId) && rule.check(stats)) {
@@ -371,6 +389,7 @@ function dataOf(s: JourneyState): JourneyData {
     startDay: s.startDay,
     dayOffset: s.dayOffset,
     seenCollectionCount: s.seenCollectionCount,
+    seenBadgeCount: s.seenBadgeCount ?? 0,
     capstones: s.capstones,
     revealedCards: s.revealedCards ?? [],
     completedGlyphs: s.completedGlyphs ?? [],
@@ -634,6 +653,12 @@ export const useJourney = create<JourneyState>()(
             return total > s.seenCollectionCount ? { seenCollectionCount: total } : {};
           }),
 
+        markBadgesSeen: () =>
+          set((s) => {
+            const n = s.unlockedBadges.length;
+            return n > (s.seenBadgeCount ?? 0) ? { seenBadgeCount: n } : {};
+          }),
+
         markCardRevealed: (cardId) =>
           set((s) => {
             if (s.revealedCards?.includes(cardId)) return {};
@@ -657,6 +682,7 @@ export const useJourney = create<JourneyState>()(
             revealedCards: data.revealedCards ?? [],
             completedGlyphs: data.completedGlyphs ?? [],
             sageChapters: data.sageChapters ?? {},
+            seenBadgeCount: data.seenBadgeCount ?? 0,
           };
           set({ ...next, celebrations: [] });
           return true;
@@ -675,6 +701,7 @@ export const useJourney = create<JourneyState>()(
         if (!p.revealedCards) p.revealedCards = [];
         if (!p.completedGlyphs) p.completedGlyphs = [];
         if (!p.sageChapters) p.sageChapters = {};
+        if ((p as JourneyData).seenBadgeCount == null) (p as JourneyData).seenBadgeCount = 0;
         void fromVersion;
         return p;
       },

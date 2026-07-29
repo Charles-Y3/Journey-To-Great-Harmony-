@@ -636,6 +636,46 @@ export const CARDS: WisdomCard[] = [
     ),
   },
   {
+    id: 'card-constancy',
+    title: localized('Constancy', '恒'),
+    emoji: '🌅',
+    rarity: 'rare',
+    category: 'virtue',
+    summary: localized(
+      'Twenty-one dawns of returning — constancy over intensity, the quiet middle of every lasting habit.',
+      '二十一个黎明的归来 — 恒心重于一时热情，是一切持久习惯安静的中段。',
+    ),
+    quote: localized(
+      'The gentleman is slow to speak, but prompt in action — and he returns to the path each day.',
+      '君子欲讷于言而敏于行 — 且日日归于正道。',
+    ),
+    unlockHint: localized('Reach a 21-day streak.', '达成连续21天的记录。'),
+    didYouKnow: localized(
+      'Across traditions, three weeks often marks the first real settling of a practice — long enough for novelty to fade, short enough that returning still feels like a choice. Constancy is that choice, repeated.',
+      '在众多传统中，三周往往标志着一项修习初次真正安顿 — 长到足以让新鲜感退去，又短到「归来」仍是一种选择。恒，就是那次次重复的选择。',
+    ),
+  },
+  {
+    id: 'card-ptahhotep',
+    title: localized('Ptahhotep', '普塔霍特普'),
+    emoji: '🪶',
+    rarity: 'common',
+    category: 'figure',
+    summary: localized(
+      'An Old Kingdom vizier who taught that listening is how truth enters a room of power — and that a good name outlasts wealth.',
+      '一位古王国宰相，教导倾听是真理进入权力之室的方式 — 美名比财富更长久。',
+    ),
+    quote: localized(
+      'Do not be proud of your knowledge; take counsel with the ignorant as with the learned.',
+      '勿以所知自傲；对无知者与博学者，皆当虚心求教。',
+    ),
+    unlockHint: localized("Begin Ptahhotep's life on Sage Lives.", '在圣哲生平中开始普塔霍特普的生平。'),
+    didYouKnow: localized(
+      "The Maxims of Ptahhotep are among the oldest wisdom books still readable — advice for living Ma'at in daily speech, not only in temples.",
+      '《普塔霍特普箴言》是仍可读的最古老智慧书之一 — 教人在日常言语中践行玛阿特，而非仅在神庙之中。',
+    ),
+  },
+  {
     id: 'card-datong',
     title: localized('Datong — Great Harmony', '大同'),
     emoji: '🌏',
@@ -1012,6 +1052,7 @@ export const RARITY_LEVEL_REQUIRED: Record<CardRarity, number> = {
 // Cards not tied to a specific lesson/timeline completion unlock via these rules.
 export const SPECIAL_CARD_RULES: { cardId: string; check: (s: Stats) => boolean }[] = [
   { cardId: 'card-week', check: (s) => s.streakBest >= 7 },
+  { cardId: 'card-constancy', check: (s) => s.streakBest >= 21 },
   { cardId: 'card-moon', check: (s) => s.streakBest >= 30 },
   { cardId: 'card-datong', check: (s) => s.erasCompleted >= 10 },
   { cardId: 'card-bridge', check: (s) => s.harmonyPoints >= 1500 },
