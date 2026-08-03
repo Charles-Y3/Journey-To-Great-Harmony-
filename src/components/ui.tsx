@@ -2,7 +2,7 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useJourney } from '../state/store';
 import { useT } from '../i18n/useT';
-import { continueBtn, minLengthHint, capstoneSubmitBtn, type UiKey } from '../i18n/strings';
+import { continueBtn, minLengthHint, capstoneSubmitBtn, capstoneWrittenOn, type UiKey } from '../i18n/strings';
 import { XP_FOR } from '../engine/progression';
 import { useIsNavRouteUnlocked } from '../engine/pacing';
 import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../engine/textQuality';
@@ -138,27 +138,48 @@ export function CelebrationOverlay() {
   );
 }
 
-/** Shared modal for writing a longer "capstone" reflection that gates an era or branch-mastery badge. */
+/** Shared modal for writing or reviewing a longer "capstone" reflection that gates an era or branch-mastery badge. */
 export function CapstoneModal({
   name,
   prompt,
   onSubmit,
   onClose,
+  initialText,
+  readOnly,
+  writtenDay,
 }: {
   name: string;
-  prompt: string;
-  onSubmit: (text: string) => void;
+  prompt?: string;
+  onSubmit?: (text: string) => void;
   onClose: () => void;
+  initialText?: string;
+  readOnly?: boolean;
+  writtenDay?: string;
 }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initialText ?? '');
   const { t, locale } = useT();
+
+  if (readOnly) {
+    return (
+      <Modal onClose={onClose}>
+        <h2>
+          {t('capstoneModalTitle')} · {name}
+        </h2>
+        {writtenDay && <p className="small muted">{capstoneWrittenOn(locale, writtenDay)}</p>}
+        <p style={{ whiteSpace: 'pre-wrap' }}>{initialText ?? text}</p>
+        <button className="btn btn-primary" style={{ marginTop: 12 }} onClick={onClose}>
+          {t('capstoneCloseBtn')}
+        </button>
+      </Modal>
+    );
+  }
 
   return (
     <Modal onClose={onClose}>
       <h2>
         {t('capstoneModalTitle')} · {name}
       </h2>
-      <p>{prompt}</p>
+      {prompt && <p>{prompt}</p>}
       <textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} placeholder={t('capstonePlaceholder')} />
       <p className="small muted">{minLengthHint(locale, progressLength(text), TEXT_MIN.capstone)}</p>
       {progressLength(text) >= TEXT_MIN.capstone && looksLikeNonsense(text) && (
@@ -167,7 +188,7 @@ export function CapstoneModal({
       <button
         className="btn btn-primary"
         disabled={meaningfulLength(text) < TEXT_MIN.capstone}
-        onClick={() => onSubmit(text.trim())}
+        onClick={() => onSubmit?.(text.trim())}
       >
         {capstoneSubmitBtn(locale, XP_FOR.capstone)}
       </button>

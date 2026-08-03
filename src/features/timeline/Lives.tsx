@@ -273,6 +273,7 @@ export default function Lives({
   const submitCapstone = useJourney((s) => s.submitCapstone);
   const [open, setOpen] = useState<Sage | null>(null);
   const [capstoneSage, setCapstoneSage] = useState<Sage | null>(null);
+  const [viewCapstone, setViewCapstone] = useState<{ name: string; text: string; day: string } | null>(null);
   const { t, L, locale } = useT();
 
   useEffect(() => {
@@ -316,11 +317,25 @@ export default function Lives({
               {L(sage.years)} · {L(sage.summary)}
             </p>
             {lifeComplete && hasCapstone && (
-              <p style={{ margin: '8px 0 0' }}>
-                <span className="pill">
-                  🏅 {L(sage.badgeTitle)}
-                </span>
-              </p>
+              <>
+                <p style={{ margin: '8px 0 0' }}>
+                  <span className="pill">🏅 {L(sage.badgeTitle)}</span>{' '}
+                  <span className="pill">{t('capstoneDoneLabel')}</span>
+                </p>
+                <button
+                  className="btn"
+                  style={{ marginTop: 8 }}
+                  onClick={() =>
+                    setViewCapstone({
+                      name: L(sage.name),
+                      text: capstones[key].text,
+                      day: capstones[key].day,
+                    })
+                  }
+                >
+                  {t('capstoneViewBtn')}
+                </button>
+              </>
             )}
             {lifeComplete && !hasCapstone && (
               <button className="btn" style={{ marginTop: 8 }} onClick={() => setCapstoneSage(sage)}>
@@ -348,6 +363,15 @@ export default function Lives({
             setCapstoneSage(null);
           }}
           onClose={() => setCapstoneSage(null)}
+        />
+      )}
+      {viewCapstone && (
+        <CapstoneModal
+          name={viewCapstone.name}
+          readOnly
+          initialText={viewCapstone.text}
+          writtenDay={viewCapstone.day}
+          onClose={() => setViewCapstone(null)}
         />
       )}
     </div>

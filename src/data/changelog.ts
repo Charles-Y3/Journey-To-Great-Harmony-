@@ -10,6 +10,24 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 15,
+    date: '2026-08-03',
+    highlights: [
+      localized(
+        '🖋️ Review capstone reflections after writing them on Knowledge, Timeline, and Sage Lives.',
+        '🖋️ 在知识之路、时间线与圣哲生平写下圆满反思后，可再查看。',
+      ),
+      localized(
+        '🎴 Collection rarity tabs show new-card counts that match the Collection badge; Badges tab shows unseen badges.',
+        '🎴 收藏稀有度标签显示新卡数量，与收藏角标一致；徽章标签显示未查看徽章。',
+      ),
+      localized(
+        '🧭 Advisor “Ask about…” is a clear two-by-three grid; Journey Map’s last region unlocks at 5500 XP.',
+        '🧭 良师「请教关于…」改为整齐的两行三列；旅程地图最终区域于 5500 经验解锁。',
+      ),
+    ],
+  },
+  {
     version: 14,
     date: '2026-07-30',
     highlights: [

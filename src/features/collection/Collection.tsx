@@ -130,8 +130,10 @@ export default function Collection() {
   const unlockedCards = useJourney((s) => s.unlockedCards);
   const unlockedBadges = useJourney((s) => s.unlockedBadges);
   const revealedCards = useJourney((s) => s.revealedCards ?? []);
+  const seenBadgeCount = useJourney((s) => s.seenBadgeCount ?? 0);
   const markBadgesSeen = useJourney((s) => s.markBadgesSeen);
   const markCardRevealed = useJourney((s) => s.markCardRevealed);
+  const badgeUnseen = Math.max(0, unlockedBadges.length - seenBadgeCount);
   const [open, setOpen] = useState<WisdomCard | null>(null);
   const [revealing, setRevealing] = useState<WisdomCard | null>(null);
   const [tab, setTab] = useState<'cards' | 'badges'>('cards');
@@ -178,6 +180,7 @@ export default function Collection() {
         </button>
         <button className={tab === 'badges' ? 'btn tab-btn active' : 'btn tab-btn'} onClick={() => selectTab('badges')}>
           {badgesTabLabel(locale, unlockedBadges.length, BADGES.length)}
+          <TabBadge count={badgeUnseen} />
         </button>
       </div>
 

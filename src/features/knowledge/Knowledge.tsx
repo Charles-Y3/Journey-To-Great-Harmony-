@@ -17,6 +17,7 @@ import {
   type JourneyData,
 } from '../../state/selectors';
 import { Modal, CapstoneModal, PageHeader, ProgressBar } from '../../components/ui';
+import { badgeById, branchBadgeId } from '../../data/badges';
 import { useT } from '../../i18n/useT';
 import {
   knowledgeDepthProgressLabel,
@@ -206,6 +207,7 @@ export default function Knowledge() {
   const submitCapstone = useJourney((s) => s.submitCapstone);
   const [open, setOpen] = useState<Topic | null>(null);
   const [capstoneBranch, setCapstoneBranch] = useState<Topic | null>(null);
+  const [viewCapstone, setViewCapstone] = useState<{ name: string; text: string; day: string } | null>(null);
   const { t, L, locale } = useT();
   const today = useToday();
   const data = useJourney() as unknown as JourneyData;
@@ -245,7 +247,10 @@ export default function Knowledge() {
         const leaves = TOPICS.filter((tp) => tp.branch === branch.id && tp.id !== branch.id);
         const depthLeaves = (d: 1 | 2 | 3) => leaves.filter((tp) => topicDepth(tp) === d);
         const mastered = isBranchMastered(completedLessons, branch.id);
-        const hasCapstone = !!capstones[branchCapstoneKey(branch.id)];
+        const capKey = branchCapstoneKey(branch.id);
+        const capstone = capstones[capKey];
+        const hasCapstone = !!capstone;
+        const branchBadge = badgeById(branchBadgeId(branch.id));
         const depth1Done = depthLeaves(1).every((tp) => isTopicCompleted(completedLessons, tp))
           && isTopicCompleted(completedLessons, branchTopic);
         const depth2Done = depthLeaves(2).every((tp) => isTopicCompleted(completedLessons, tp));
@@ -284,6 +289,23 @@ export default function Knowledge() {
                 🖋️ {capstoneEntryBtn(locale, L(branchTopic.name))}
               </button>
             )}
+            {mastered && hasCapstone && (
+              <>
+                <p style={{ margin: '8px 0 0' }}>
+                  {branchBadge && <span className="pill">🏅 {L(branchBadge.title)}</span>}{' '}
+                  <span className="pill">{t('capstoneDoneLabel')}</span>
+                </p>
+                <button
+                  className="btn"
+                  style={{ marginTop: 8 }}
+                  onClick={() =>
+                    setViewCapstone({ name: L(branchTopic.name), text: capstone.text, day: capstone.day })
+                  }
+                >
+                  {t('capstoneViewBtn')}
+                </button>
+              </>
+            )}
           </div>
         );
       })}
@@ -298,6 +320,15 @@ export default function Knowledge() {
             setCapstoneBranch(null);
           }}
           onClose={() => setCapstoneBranch(null)}
+        />
+      )}
+      {viewCapstone && (
+        <CapstoneModal
+          name={viewCapstone.name}
+          readOnly
+          initialText={viewCapstone.text}
+          writtenDay={viewCapstone.day}
+          onClose={() => setViewCapstone(null)}
         />
       )}
     </div>

@@ -66,7 +66,7 @@ export const PACING_MAP_UNLOCK_XP: Record<string, number> = {
   scrolls: 3400,
   horizon: 4600,
   sanctuary: 6200,
-  city: 7500,
+  city: 5500,
 };
 
 export const PACING_WORLD_STAGE_THRESHOLD = {

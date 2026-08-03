@@ -136,7 +136,7 @@ export default function Advisor() {
 
         <div style={{ padding: '16px 20px 20px' }}>
           <h4>{t('advisorAskHeading')}</h4>
-          <div className="tab-row">
+          <div className="tab-row advisor-ask-row">
             {ADVISOR_TOPICS.map((topicId) => {
               const isAnswered = answeredTopic === topicId;
               const disabled = answeredToday && !isAnswered;

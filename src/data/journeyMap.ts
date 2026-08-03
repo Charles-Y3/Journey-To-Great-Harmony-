@@ -177,7 +177,7 @@ export const REGIONS: MapRegion[] = [
     id: 'city',
     name: localized('World of Great Harmony', '大同世界'),
     emoji: '🌏',
-    unlockXp: 5000,
+    unlockXp: 5500,
     tagline: localized('Where the journey becomes a shared world.', '旅程化为共享世界的地方。'),
     story: localized(
       'At last: a world with open gates and no walls. In its squares, the old are cared for, the young are taught, and strangers are greeted as kin — the Great Harmony 大同, not as a dream but as a daily practice. You understand now that this world is not a destination. It is built, everywhere, by people who took the same road you did: learn, cultivate, practise, contribute.',

@@ -261,6 +261,7 @@ function AgesView({
   const submitCapstone = useJourney((s) => s.submitCapstone);
   const [open, setOpen] = useState<TimelinePoint | null>(null);
   const [capstoneEra, setCapstoneEra] = useState<TimelineEra | null>(null);
+  const [viewCapstone, setViewCapstone] = useState<{ name: string; text: string; day: string } | null>(null);
   const { t, L, locale } = useT();
   const masteredEras = fullyMasteredEraIds(timelinePointLevels);
   const totalPoints = TIMELINE.reduce((n, e) => n + e.points.length, 0);
@@ -305,9 +306,25 @@ function AgesView({
               <h3 style={{ marginBottom: 2 }}>{L(era.name)}</h3>
               <div className="era-period">{L(era.period)}</div>
               {eraMastered && capstones[era.id] && (
-                <p style={{ margin: '8px 0 0' }}>
-                  <span className="pill">🏅 {L(era.badgeTitle)}</span>
-                </p>
+                <>
+                  <p style={{ margin: '8px 0 0' }}>
+                    <span className="pill">🏅 {L(era.badgeTitle)}</span>{' '}
+                    <span className="pill">{t('capstoneDoneLabel')}</span>
+                  </p>
+                  <button
+                    className="btn"
+                    style={{ marginTop: 8 }}
+                    onClick={() =>
+                      setViewCapstone({
+                        name: L(era.name),
+                        text: capstones[era.id].text,
+                        day: capstones[era.id].day,
+                      })
+                    }
+                  >
+                    {t('capstoneViewBtn')}
+                  </button>
+                </>
               )}
               {eraMastered && !capstones[era.id] && (
                 <button className="btn" style={{ marginTop: 8 }} onClick={() => setCapstoneEra(era)}>
@@ -349,6 +366,15 @@ function AgesView({
             setCapstoneEra(null);
           }}
           onClose={() => setCapstoneEra(null)}
+        />
+      )}
+      {viewCapstone && (
+        <CapstoneModal
+          name={viewCapstone.name}
+          readOnly
+          initialText={viewCapstone.text}
+          writtenDay={viewCapstone.day}
+          onClose={() => setViewCapstone(null)}
         />
       )}
     </>

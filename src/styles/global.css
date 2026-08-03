@@ -2449,6 +2449,7 @@ button.stage-step:disabled {
 }
 
 .tab-btn {
+  position: relative;
   border-radius: 999px;
   padding: 6px 10px;
   font-size: 0.85rem;
@@ -2456,6 +2457,19 @@ button.stage-step:disabled {
   text-align: center;
   box-sizing: border-box;
   justify-content: center;
+}
+
+/* Advisor "Ask about…" — always two rows of three equal-width chips. */
+.advisor-ask-row {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.advisor-ask-row .tab-btn {
+  white-space: normal;
+  line-height: 1.25;
+  min-height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
 }
 
 /* The four leaderboard categories always show two-per-row, rather than
@@ -2539,9 +2553,15 @@ button.stage-step:disabled {
   outline-offset: 2px;
 }
 
+/* Inline next to tab labels (override .nav-badge absolute positioning). */
 .tab-filter-badge {
+  position: static;
+  display: inline-block;
   margin-left: 4px;
   vertical-align: middle;
+  top: auto;
+  right: auto;
+  box-shadow: none;
 }
 
 .wcard {

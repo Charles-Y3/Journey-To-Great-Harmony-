@@ -169,8 +169,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1.4.1 — your progress is stored privately in this browser.',
-    '大同之路 v1.4.1 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.4.2 — your progress is stored privately in this browser.',
+    '大同之路 v1.4.2 — 你的进度私密地保存在此浏览器中。',
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(
@@ -1006,6 +1006,8 @@ export const UI = {
   capstoneModalTitle: localized('Capstone Reflection', '圆满反思'),
   capstonePlaceholder: localized('Write your reflection here…', '在这里写下你的反思…'),
   capstoneDoneLabel: localized('Capstone written ✓', '圆满反思已写下 ✓'),
+  capstoneViewBtn: localized('View reflection', '查看反思'),
+  capstoneCloseBtn: localized('Close', '关闭'),
 
   // ── Advisor ───────────────────────────────────────────────────────
   advisorTitle: localized('Your Advisor', '你的良师'),
@@ -1338,6 +1340,10 @@ export function capstoneEntryBtn(locale: Locale, name: string): string {
 
 export function capstoneSubmitBtn(locale: Locale, xp: number): string {
   return pick(locale, `Submit capstone reflection (+${xp} XP)`, `提交圆满反思 (+${xp} 经验)`, `提交圓滿反思 (+${xp} 經驗)`);
+}
+
+export function capstoneWrittenOn(locale: Locale, day: string): string {
+  return pick(locale, `Written on ${day}`, `写于 ${day}`, `寫於 ${day}`);
 }
 
 // ── Celebration templates (store.ts) ──────────────────────────────────
