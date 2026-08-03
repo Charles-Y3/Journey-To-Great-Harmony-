@@ -12,3 +12,4 @@ When implementation work is finished (feature, fix, or planned change the user a
 3. Still **do not** force-push, amend pushed commits, skip hooks, or change git config unless the user explicitly requests it.
 4. If commit or push fails, fix the issue and retry; report the failure if blocked (e.g. auth).
 5. Skip empty commits when there is nothing to commit. If already committed but not pushed, push.
+6. For shippable updates, also follow `portal-version-sync` (bump this app’s version, sync `small-steps-to-great-harmony` `apps.ts`, commit and push the portal).
