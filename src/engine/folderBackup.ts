@@ -98,25 +98,52 @@ export async function disableFolderBackup(): Promise<void> {
   await idbDel(HANDLE_KEY);
 }
 
-/** Silent permission re-check; only prompts (via requestPermission) if called within a user gesture. */
-async function getVerifiedHandle(): Promise<FileSystemDirectoryHandle | null> {
+/**
+ * Silent-only permission check — never calls requestPermission, so it can
+ * never surface a native "allow this site to edit files" prompt. Chrome
+ * doesn't keep write permission granted forever (it typically needs
+ * reconfirming once per new page session), so this legitimately returns
+ * null sometimes; callers must accept that as "auto-save didn't happen this
+ * time" rather than trying to force a reconfirmation.
+ */
+async function getVerifiedHandleSilent(): Promise<FileSystemDirectoryHandle | null> {
   const handle = await idbGet<FileSystemDirectoryHandle>(HANDLE_KEY);
   if (!handle) return null;
-  const opts = { mode: 'readwrite' } as const;
-  if ((await handle.queryPermission(opts)) === 'granted') return handle;
+  if ((await handle.queryPermission({ mode: 'readwrite' })) === 'granted') return handle;
+  return null;
+}
+
+/**
+ * Same silent check first, but falls back to requestPermission (which can
+ * show a native prompt) if needed. Only ever call this from inside a real
+ * click handler — never from a background timer/subscription — otherwise
+ * an unrelated action (like earning XP) can appear to trigger a folder
+ * permission popup with no visible cause.
+ */
+async function getVerifiedHandleInteractive(): Promise<FileSystemDirectoryHandle | null> {
+  const silent = await getVerifiedHandleSilent();
+  if (silent) return silent;
+  const handle = await idbGet<FileSystemDirectoryHandle>(HANDLE_KEY);
+  if (!handle) return null;
   try {
-    if ((await handle.requestPermission(opts)) === 'granted') return handle;
+    if ((await handle.requestPermission({ mode: 'readwrite' })) === 'granted') return handle;
   } catch {
     // requestPermission throws outside a user gesture — treat as unavailable for this call.
   }
   return null;
 }
 
-/** Silent, best-effort: writes to the saved folder if auto-save is on and permission still holds; never throws. */
+/**
+ * Silent, best-effort background write: only proceeds if permission is
+ * already granted without asking again; never prompts, never throws. Used
+ * by the debounced store-subscription auto-save (engine/autoSaveWiring.ts)
+ * — if permission has lapsed, this just quietly does nothing until the user
+ * next clicks Export or Choose folder, which are allowed to reconfirm.
+ */
 export async function autoSaveIfEnabled(): Promise<boolean> {
   if (!isFolderBackupSupported() || !isFolderBackupEnabled()) return false;
   try {
-    const handle = await getVerifiedHandle();
+    const handle = await getVerifiedHandleSilent();
     if (!handle) return false;
     await writeBackupToFolder(handle);
     return true;
@@ -125,9 +152,9 @@ export async function autoSaveIfEnabled(): Promise<boolean> {
   }
 }
 
-/** Explicit save-now for the manual Export button when folder mode is on — surfaces failures instead of swallowing them. */
+/** Explicit save-now for the manual Export button when folder mode is on — call only from a click handler; surfaces failures instead of swallowing them. */
 export async function saveToFolderNow(): Promise<void> {
-  const handle = await getVerifiedHandle();
+  const handle = await getVerifiedHandleInteractive();
   if (!handle) throw new Error('Folder access is no longer available');
   await writeBackupToFolder(handle);
 }
