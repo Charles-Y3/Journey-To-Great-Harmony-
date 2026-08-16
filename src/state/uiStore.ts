@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { todayKey } from '../engine/progression';
 
+const BACKUP_NUDGE_SNOOZE_MS = 3 * 24 * 60 * 60 * 1000;
+
 interface UiState {
   /** Day key (YYYY-MM-DD) the welcome-back popup was last shown, so it only appears once per day. */
   lastWelcomeSeenDay: string | null;
@@ -92,6 +94,12 @@ interface UiState {
    */
   highestWaveSeen: number;
   setHighestWaveSeen: (wave: number) => void;
+  /** Day key (YYYY-MM-DD) of the last successful backup export/import, for the stale-backup nudge. */
+  lastExportAt: string | null;
+  setLastExportAt: (day: string) => void;
+  /** Epoch ms until which the active backup nudge banner stays quiet after a dismiss, even if still stale. Does not affect the passive Settings dot. */
+  backupNudgeSnoozeUntil: number | null;
+  snoozeBackupNudge: () => void;
 }
 
 export const useUi = create<UiState>()(
@@ -147,6 +155,10 @@ export const useUi = create<UiState>()(
       setPacingMode: (mode) => set({ pacingMode: mode, pacingModeChosen: true }),
       highestWaveSeen: 0,
       setHighestWaveSeen: (wave) => set((s) => (wave > s.highestWaveSeen ? { highestWaveSeen: wave } : {})),
+      lastExportAt: null,
+      setLastExportAt: (day) => set({ lastExportAt: day }),
+      backupNudgeSnoozeUntil: null,
+      snoozeBackupNudge: () => set({ backupNudgeSnoozeUntil: Date.now() + BACKUP_NUDGE_SNOOZE_MS }),
       resetOnboardingUi: () =>
         set({
           lastWelcomeSeenDay: null,

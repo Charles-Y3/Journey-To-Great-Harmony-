@@ -734,6 +734,31 @@ export const UI = {
     'That file does not look like a valid journey backup.',
     '这个文件看起来不是有效的旅程备份。',
   ),
+  settingsFolderAutoSaveDesc: localized(
+    'On this browser, you can also pick a folder once — after that, your progress saves there automatically, overwriting the same file (no new file each time). Available on desktop Chrome/Edge only.',
+    '在此浏览器中，你也可以先选择一个文件夹 — 之后旅程进度会自动保存到该处，覆盖同一份文件（不会每次新建）。仅限桌面版 Chrome / Edge。',
+  ),
+  settingsFolderAutoSaveChooseBtn: localized('Choose folder…', '选择文件夹…'),
+  settingsFolderAutoSaveOn: localized('Auto-saving to', '自动保存至'),
+  settingsFolderAutoSaveStopBtn: localized('Stop auto-save', '停止自动保存'),
+  settingsFolderAutoSaveError: localized(
+    'Could not access that folder — try again, or use Download backup above instead.',
+    '无法访问该文件夹 — 请重试，或改用上方的「下载备份」。',
+  ),
+  settingsFolderExportFallback: localized(
+    'Folder access is no longer available — downloaded a file instead.',
+    '文件夹已无法访问 — 已改为下载文件。',
+  ),
+  backupStaleAriaLabel: localized(
+    'You have progress since your last backup',
+    '自上次备份以来你已有新进展',
+  ),
+  backupNudgeTitle: localized(
+    'You’ve made progress since your last backup.',
+    '自上次备份以来，你已有新进展。',
+  ),
+  backupNudgeBtn: localized('Back up now', '立即备份'),
+  backupNudgeDismiss: localized('Later', '稍后'),
   settingsInstallTitle: localized('Install this journey', '安装这段旅程'),
   settingsInstallDesc: localized(
     'Add it to your home screen (or Dock) for offline use and a quieter focus.',

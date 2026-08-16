@@ -10,6 +10,20 @@ export interface ChangelogEntry {
 // in state/uiStore.ts, which drives the one-time "What's New" modal in App.tsx.
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: 16,
+    date: '2026-08-16',
+    highlights: [
+      localized(
+        '💾 A quiet dot on Settings appears when you have progress since your last backup — no popup, tap in whenever you like.',
+        '💾 自上次备份以来若有新进展，设置会出现一个小圆点提示 — 不弹窗，随时点开查看即可。',
+      ),
+      localized(
+        '🖋️ After writing an evening reflection, a one-time gentle reminder to back up (if it has been a while) — never more than once per visit.',
+        '🖋️ 写完夜间反思后，若许久未备份，会出现一次温和提醒 — 每次造访最多提示一次。',
+      ),
+    ],
+  },
+  {
     version: 15,
     date: '2026-08-03',
     highlights: [

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { useJourney, useToday, JOURNEY_EXPORT_VERSION, exportJourneyData } from './state/store';
+import { useJourney, useToday, JOURNEY_EXPORT_VERSION } from './state/store';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from './state/selectors';
 import { CARDS } from './data/cards';
 import { BADGES } from './data/badges';
@@ -30,6 +30,15 @@ import {
   useEffectiveWave,
 } from './engine/pacing';
 import { buildReminderIcs, downloadIcs } from './engine/calendarReminder';
+import { exportSmart } from './engine/backup';
+import {
+  isFolderBackupSupported,
+  isFolderBackupEnabled,
+  getFolderBackupName,
+  enableFolderBackup,
+  disableFolderBackup,
+} from './engine/folderBackup';
+import { useBackupStale } from './state/backupStatus';
 import { isJunkName } from './engine/textQuality';
 import { applyPwaUpdate, subscribePwaNeedRefresh } from './engine/pwaUpdate';
 import {
@@ -87,6 +96,11 @@ function NavBadge({ count }: { count: number }) {
       {count > 9 ? '9+' : count}
     </span>
   );
+}
+
+function NavDot({ show, label }: { show: boolean; label: string }) {
+  if (!show) return null;
+  return <span className="nav-dot" aria-label={label} />;
 }
 
 function SidebarNavLinks() {
@@ -441,24 +455,74 @@ function ShareSection() {
   );
 }
 
+function folderNameLabel(prefix: string, name: string | null): string {
+  return name ? `${prefix} “${name}”` : prefix;
+}
+
+/**
+ * All folder-auto-save UI state (enabled/name/busy/error) lives here rather
+ * than split into its own component, because Export/Choose-folder/Stop are
+ * really one shared decision (see engine/backup.ts exportSmart) — splitting
+ * them risked the Export button and the folder controls showing stale state
+ * relative to each other after either one changed things.
+ */
 function BackupSection() {
   const { t } = useT();
   const importJourney = useJourney((s) => s.importJourney);
+  const setLastExportAt = useUi((s) => s.setLastExportAt);
   const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const [folderSupported, setFolderSupported] = useState(false);
+  const [folderEnabled, setFolderEnabled] = useState(false);
+  const [folderName, setFolderName] = useState<string | null>(null);
+  const [folderBusy, setFolderBusy] = useState(false);
+  const [folderError, setFolderError] = useState<'export-fallback' | 'choose-failed' | null>(null);
 
-  function exportBackup() {
-    const payload = {
-      version: JOURNEY_EXPORT_VERSION,
-      exportedAt: todayKey(0),
-      journey: exportJourneyData(),
-    };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `journey-to-great-harmony-backup-${payload.exportedAt}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
+  useEffect(() => {
+    setFolderSupported(isFolderBackupSupported());
+    setFolderEnabled(isFolderBackupEnabled());
+    setFolderName(getFolderBackupName());
+  }, []);
+
+  async function exportBackup() {
+    setFolderBusy(true);
+    setFolderError(null);
+    try {
+      const result = await exportSmart();
+      if (result.mode === 'folder') {
+        setFolderEnabled(true);
+        setFolderName(result.folderName);
+        setLastExportAt(todayKey(0));
+      } else if (result.mode === 'download') {
+        if (result.error) setFolderError('export-fallback');
+        setLastExportAt(todayKey(0));
+      }
+      // 'cancelled' (picker dismissed): nothing happened, leave state as-is.
+    } finally {
+      setFolderBusy(false);
+    }
+  }
+
+  async function chooseFolder() {
+    setFolderBusy(true);
+    setFolderError(null);
+    try {
+      const name = await enableFolderBackup();
+      setFolderEnabled(true);
+      setFolderName(name);
+      setLastExportAt(todayKey(0));
+    } catch (err) {
+      if (!(err instanceof Error && err.name === 'AbortError')) setFolderError('choose-failed');
+    } finally {
+      setFolderBusy(false);
+    }
+  }
+
+  async function stopFolderBackup() {
+    setFolderBusy(true);
+    await disableFolderBackup();
+    setFolderEnabled(false);
+    setFolderName(null);
+    setFolderBusy(false);
   }
 
   function onImportFile(file: File | undefined) {
@@ -473,6 +537,7 @@ function BackupSection() {
         }
         if (!window.confirm(t('settingsImportConfirm'))) return;
         const ok = importJourney(parsed.journey);
+        if (ok) setLastExportAt(todayKey(0));
         setStatus(ok ? 'ok' : 'err');
       } catch {
         setStatus('err');
@@ -485,9 +550,12 @@ function BackupSection() {
     <div className="card">
       <h3>{t('settingsExportTitle')}</h3>
       <p className="small muted">{t('settingsExportDesc')}</p>
-      <button className="btn" style={{ marginRight: 8 }} onClick={exportBackup}>
+      <button className="btn" style={{ marginRight: 8 }} onClick={() => void exportBackup()} disabled={folderBusy}>
         {t('settingsExportBtn')}
       </button>
+      {folderError === 'export-fallback' && (
+        <p className="small muted" style={{ marginTop: 8 }}>{t('settingsFolderExportFallback')}</p>
+      )}
       <label className="btn" style={{ display: 'inline-block', cursor: 'pointer' }}>
         {t('settingsImportBtn')}
         <input
@@ -502,6 +570,24 @@ function BackupSection() {
       </label>
       {status === 'ok' && <p className="small" style={{ marginTop: 8 }}>{t('settingsImportSuccess')}</p>}
       {status === 'err' && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsImportError')}</p>}
+      {folderSupported && (
+        <div className="folder-autosave-row">
+          <p className="small muted">{t('settingsFolderAutoSaveDesc')}</p>
+          {folderEnabled ? (
+            <>
+              <p className="small">{folderNameLabel(t('settingsFolderAutoSaveOn'), folderName)}</p>
+              <button className="btn" onClick={() => void stopFolderBackup()} disabled={folderBusy}>
+                {t('settingsFolderAutoSaveStopBtn')}
+              </button>
+            </>
+          ) : (
+            <button className="btn" onClick={() => void chooseFolder()} disabled={folderBusy}>
+              {t('settingsFolderAutoSaveChooseBtn')}
+            </button>
+          )}
+          {folderError === 'choose-failed' && <p className="small muted">{t('settingsFolderAutoSaveError')}</p>}
+        </div>
+      )}
     </div>
   );
 }
@@ -1227,6 +1313,7 @@ export default function App() {
   const firstDaySuccess =
     !!dayRec.intention || (dayRec.lessons ?? 0) + (dayRec.timelineStudies ?? 0) > 0;
   const { t, L, locale } = useT();
+  const backupStale = useBackupStale();
   const [showSettings, setShowSettings] = useState(false);
   const [settingsFocus, setSettingsFocus] = useState<string | null>(null);
   const [showRankModal, setShowRankModal] = useState(false);
@@ -1391,8 +1478,13 @@ export default function App() {
           <p className="sidebar-tagline">{t('appTagline')}</p>
           <SidebarNavLinks />
           <div className="sidebar-footer">
-            <button className="btn" style={{ width: '100%' }} onClick={() => setShowSettings(true)}>
+            <button
+              className="btn"
+              style={{ width: '100%', position: 'relative' }}
+              onClick={() => setShowSettings(true)}
+            >
               {t('settings')}
+              <NavDot show={backupStale} label={t('backupStaleAriaLabel')} />
             </button>
           </div>
         </aside>
@@ -1419,11 +1511,12 @@ export default function App() {
               </button>
               <button
                 className="btn"
-                style={{ padding: '5px 10px' }}
+                style={{ padding: '5px 10px', position: 'relative' }}
                 onClick={() => setShowSettings(true)}
                 aria-label={t('settings')}
               >
                 ⚙️
+                <NavDot show={backupStale} label={t('backupStaleAriaLabel')} />
               </button>
             </div>
           </div>

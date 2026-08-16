@@ -10,6 +10,7 @@ import { maxChallengeTierForRankIndex, rankIndexForXp, EVENING_OPEN_HOUR } from 
 import { useIsNavRouteUnlocked } from '../../engine/pacing';
 import { meaningfulLength, progressLength, looksLikeNonsense, TEXT_MIN } from '../../engine/textQuality';
 import { PageHeader } from '../../components/ui';
+import { BackupNudgeBanner } from '../../components/BackupNudgeBanner';
 import { useT } from '../../i18n/useT';
 import { yourNoteLabel, journalCount, minLengthHint, challengeTimerBtn, minutesLabel, type UiKey } from '../../i18n/strings';
 import { playSfx } from '../../engine/sfx';
@@ -340,6 +341,7 @@ function EveningCard({ today }: { today: string }) {
   const [improve, setImprove] = useState('');
   const [breathing, setBreathing] = useState(false);
   const [breathDone, setBreathDone] = useState(false);
+  const [justSubmitted, setJustSubmitted] = useState(false);
   const { t, L, locale } = useT();
   const eveningOpen = new Date().getHours() >= EVENING_OPEN_HOUR;
   const mood = rec.mood ? moodById(rec.mood.id) : undefined;
@@ -376,6 +378,7 @@ function EveningCard({ today }: { today: string }) {
           <p className="small">
             <strong>{t('reflectionTomorrowLabel')}:</strong> {rec.reflection.improve}
           </p>
+          {justSubmitted && <BackupNudgeBanner />}
         </>
       ) : !eveningOpen ? (
         <>
@@ -443,6 +446,7 @@ function EveningCard({ today }: { today: string }) {
                 onClick={() => {
                   submitReflection(learned.trim(), virtue.trim(), improve.trim());
                   playSfx('hush');
+                  setJustSubmitted(true);
                 }}
               >
                 {t('reflectionBtn')}
