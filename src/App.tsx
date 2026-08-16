@@ -582,7 +582,9 @@ function BackupSection() {
         </p>
       )}
       {status === 'ok' && folderSupported && !folderEnabled && (
-        <p className="small muted" style={{ marginTop: 4 }}>{t('settingsImportFolderHint')}</p>
+        <p style={{ marginTop: 4, fontWeight: 700, color: 'var(--jade-deep)' }}>
+          {t('settingsImportFolderHint')}
+        </p>
       )}
       {status === 'err' && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsImportError')}</p>}
       {folderSupported && (
