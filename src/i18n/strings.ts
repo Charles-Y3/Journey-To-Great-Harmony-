@@ -280,6 +280,22 @@ export const UI = {
     'You can change this anytime in Settings.',
     '你可以随时在「设置」中更改语言。',
   ),
+  gateImportHint: localized(
+    'Load saved data from a folder — select the folder you previously used for auto-save.',
+    '从文件夹加载已保存的数据——选择您先前用于自动保存的文件夹。',
+  ),
+  gateImportButton: localized('Select folder', '选择文件夹'),
+  gateImportErrorInvalid: localized(
+    "That folder's backup file doesn't look valid.",
+    '该文件夹内的备份文件格式不正确。',
+  ),
+  gateImportErrorNoFile: localized('No backup file found in that folder.', '该文件夹内找不到备份文件。'),
+  gateImportErrorReadFail: localized('Could not read that folder.', '无法读取该文件夹。'),
+  gateImportErrorFile: localized(
+    'That does not look like a valid journey backup.',
+    '这个文件看起来不是有效的旅程备份。',
+  ),
+  gateImportErrorFileRead: localized('Could not read that file.', '无法读取该文件。'),
 
   // ── Name onboarding gate ────────────────────────────────────────────
   youGateTitle: localized('About you', '关于你'),

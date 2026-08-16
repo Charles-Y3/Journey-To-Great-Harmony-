@@ -19,6 +19,7 @@ interface FileSystemWritableFileStream extends WritableStream {
 
 interface FileSystemFileHandle extends FileSystemHandle {
   createWritable(): Promise<FileSystemWritableFileStream>;
+  getFile(): Promise<File>;
 }
 
 interface FileSystemDirectoryHandle extends FileSystemHandle {

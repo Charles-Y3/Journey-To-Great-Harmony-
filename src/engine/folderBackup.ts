@@ -91,6 +91,29 @@ export async function enableFolderBackup(): Promise<string> {
   return dirHandle.name;
 }
 
+// Lets a user pick their existing auto-save folder to import from — one
+// picker does double duty: it reads journey-to-great-harmony-backup.json out
+// of that folder AND grants the same readwrite handle auto-save uses, so
+// choosing the folder once both restores the data and re-enables auto-save
+// to it. Throws NO_BACKUP_FILE if the chosen folder has no backup file in it
+// (the folder handle/enabled flag are only persisted once a real file is found).
+export async function importFromFolder(): Promise<{ backup: unknown; folderName: string }> {
+  if (!isFolderBackupSupported()) throw new Error('File System Access API not supported');
+  const dirHandle = await window.showDirectoryPicker({ id: 'journey-backup', mode: 'readwrite' });
+  let fileHandle: FileSystemFileHandle;
+  try {
+    fileHandle = await dirHandle.getFileHandle(BACKUP_FILENAME);
+  } catch {
+    throw new Error('NO_BACKUP_FILE');
+  }
+  const file = await fileHandle.getFile();
+  const backup: unknown = JSON.parse(await file.text());
+  await idbSet(HANDLE_KEY, dirHandle);
+  localStorage.setItem(ENABLED_KEY, '1');
+  localStorage.setItem(FOLDER_NAME_KEY, dirHandle.name);
+  return { backup, folderName: dirHandle.name };
+}
+
 export async function disableFolderBackup(): Promise<void> {
   localStorage.removeItem(ENABLED_KEY);
   localStorage.removeItem(FOLDER_NAME_KEY);

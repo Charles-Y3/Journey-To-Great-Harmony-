@@ -40,6 +40,7 @@ import { advancedTotemById } from '../data/totems';
 import { moodById } from '../data/moods';
 import { isMeaningful, TEXT_MIN } from '../engine/textQuality';
 import { useLocale } from './localeStore';
+import type { Locale } from '../i18n/types';
 import { L } from '../i18n/L';
 import {
   rankUpTitle,
@@ -732,6 +733,11 @@ export interface BackupPayload {
   journey: JourneyData;
   turningPoints: { flippedDays: string[]; assignments: Record<string, string>; cycleSeen: string[] };
   profile: { name: string | null; hasSetName: boolean; avatar: string };
+  // Only ever read by the language gate's own folder-import path (before a
+  // language has been chosen, so there's nothing established to clobber) —
+  // applyBackupSideStores deliberately leaves it alone so a mid-use Settings
+  // import can't silently flip a returning user's already-chosen language.
+  locale: Locale;
 }
 
 // Pulls in the two stores persisted separately from the main journey store
@@ -749,6 +755,7 @@ export function buildBackupPayload(version: number, journeyData: JourneyData): B
     journey: journeyData,
     turningPoints: { flippedDays: tp.flippedDays, assignments: tp.assignments, cycleSeen: tp.cycleSeen },
     profile: { name: prof.name, hasSetName: prof.hasSetName, avatar: prof.avatar },
+    locale: useLocale.getState().locale,
   };
 }
 
