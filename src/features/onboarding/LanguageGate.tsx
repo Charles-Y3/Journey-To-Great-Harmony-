@@ -1,6 +1,7 @@
 import { useRef, useState, type ChangeEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLocale } from '../../state/localeStore';
+import { useProfile } from '../../state/profileStore';
 import { VISIBLE_LOCALES, LOCALE_LABELS, type Locale } from '../../i18n/types';
 import { t, type UiKey } from '../../i18n/strings';
 import { useJourney, applyBackupSideStores, JOURNEY_EXPORT_VERSION, type BackupPayload } from '../../state/store';
@@ -52,6 +53,11 @@ export default function LanguageGate() {
       return;
     }
     applyBackupSideStores(payload);
+    // applyBackupSideStores only touches profile `if (payload.profile)` —
+    // guard against an older/odd backup file that lacks it: the whole point
+    // of this action is treating this as a returning user, so hasSetName
+    // must end up true regardless of what that one field happened to be.
+    useProfile.setState({ hasSetName: true });
     useLocale.setState({ hasChosen: true, locale: payload.locale ?? useLocale.getState().locale });
     useUi.setState({
       seenPacingIntro: true,
