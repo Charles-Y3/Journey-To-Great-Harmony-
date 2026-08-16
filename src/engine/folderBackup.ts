@@ -133,17 +133,44 @@ async function getVerifiedHandleInteractive(): Promise<FileSystemDirectoryHandle
   return null;
 }
 
+/** Resets naturally on reload — "session" here means "this page load," matching how often Chrome actually needs write access reconfirmed. */
+let autoSaveReauthAttempted = false;
+
 /**
- * Silent, best-effort background write: only proceeds if permission is
- * already granted without asking again; never prompts, never throws. Used
- * by the debounced store-subscription auto-save (engine/autoSaveWiring.ts)
- * — if permission has lapsed, this just quietly does nothing until the user
- * next clicks Export or Choose folder, which are allowed to reconfirm.
+ * Background auto-save's permission check: silent first, as always. If that
+ * fails, allows exactly ONE requestPermission attempt for the whole page
+ * session — not one per autosave trigger — so a lapsed grant gets a single
+ * chance to quietly reconfirm itself rather than a popup chasing every
+ * routine action (XP gain, streak update, ...) for the rest of the session.
+ * Whatever the outcome (granted, denied, or no user gesture available to
+ * even ask), it isn't retried again until the next reload.
+ */
+async function getVerifiedHandleForAutoSave(): Promise<FileSystemDirectoryHandle | null> {
+  const silent = await getVerifiedHandleSilent();
+  if (silent) return silent;
+  if (autoSaveReauthAttempted) return null;
+  autoSaveReauthAttempted = true;
+  const handle = await idbGet<FileSystemDirectoryHandle>(HANDLE_KEY);
+  if (!handle) return null;
+  try {
+    if ((await handle.requestPermission({ mode: 'readwrite' })) === 'granted') return handle;
+  } catch {
+    // requestPermission throws outside a user gesture — nothing to do until the user clicks Export.
+  }
+  return null;
+}
+
+/**
+ * Best-effort background write, used by the debounced store-subscription
+ * auto-save (engine/autoSaveWiring.ts). May show a permission prompt at most
+ * once per page session (see getVerifiedHandleForAutoSave) — never repeatedly.
+ * If that one attempt doesn't succeed, this quietly does nothing for the
+ * rest of the session, until the user next clicks Export or Choose folder.
  */
 export async function autoSaveIfEnabled(): Promise<boolean> {
   if (!isFolderBackupSupported() || !isFolderBackupEnabled()) return false;
   try {
-    const handle = await getVerifiedHandleSilent();
+    const handle = await getVerifiedHandleForAutoSave();
     if (!handle) return false;
     await writeBackupToFolder(handle);
     return true;
