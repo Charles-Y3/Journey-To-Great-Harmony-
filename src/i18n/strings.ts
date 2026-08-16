@@ -730,6 +730,10 @@ export const UI = {
     '用这份备份替换当前的旅程进度？此操作无法撤销。',
   ),
   settingsImportSuccess: localized('Journey restored.', '旅程已恢复。'),
+  settingsImportFolderHint: localized(
+    "If you had folder auto-save on before, you'll need to choose the folder again below — restoring a backup can't recover folder access on its own.",
+    '如果您先前开启了文件夹自动保存，需要在下方重新选择一次文件夹 — 恢复备份本身无法还原文件夹的访问权限。',
+  ),
   settingsImportError: localized(
     'That file does not look like a valid journey backup.',
     '这个文件看起来不是有效的旅程备份。',

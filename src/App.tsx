@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom';
-import { useJourney, useToday, JOURNEY_EXPORT_VERSION } from './state/store';
+import { useJourney, useToday, JOURNEY_EXPORT_VERSION, applyBackupSideStores } from './state/store';
 import { statsFromData, forestInfo, worldInfo, type JourneyData } from './state/selectors';
 import { CARDS } from './data/cards';
 import { BADGES } from './data/badges';
@@ -530,13 +530,21 @@ function BackupSection() {
     const reader = new FileReader();
     reader.onload = () => {
       try {
-        const parsed = JSON.parse(String(reader.result)) as { version?: number; journey?: JourneyData };
+        const parsed = JSON.parse(String(reader.result)) as {
+          version?: number;
+          journey?: JourneyData;
+          turningPoints?: { flippedDays: string[]; assignments: Record<string, string>; cycleSeen: string[] };
+          profile?: { name: string | null; hasSetName: boolean; avatar: string };
+        };
         if (parsed.version !== JOURNEY_EXPORT_VERSION || !parsed.journey) {
           setStatus('err');
           return;
         }
         if (!window.confirm(t('settingsImportConfirm'))) return;
         const ok = importJourney(parsed.journey);
+        // turningPoints/profile are optional — older exports predate them,
+        // so only restore when the file actually has them.
+        if (ok) applyBackupSideStores(parsed);
         if (ok) setLastExportAt(todayKey(0));
         setStatus(ok ? 'ok' : 'err');
       } catch {
@@ -569,6 +577,9 @@ function BackupSection() {
         />
       </label>
       {status === 'ok' && <p className="small" style={{ marginTop: 8 }}>{t('settingsImportSuccess')}</p>}
+      {status === 'ok' && folderSupported && !folderEnabled && (
+        <p className="small muted" style={{ marginTop: 4 }}>{t('settingsImportFolderHint')}</p>
+      )}
       {status === 'err' && <p className="small muted" style={{ marginTop: 8 }}>{t('settingsImportError')}</p>}
       {folderSupported && (
         <div className="folder-autosave-row">

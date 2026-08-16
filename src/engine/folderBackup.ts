@@ -1,5 +1,4 @@
-import { JOURNEY_EXPORT_VERSION, exportJourneyData } from '../state/store';
-import { todayKey } from './progression';
+import { JOURNEY_EXPORT_VERSION, exportJourneyData, buildBackupPayload } from '../state/store';
 
 /**
  * Desktop-only (Chromium/Edge) true auto-save: writes the backup to a fixed
@@ -76,7 +75,7 @@ export function getFolderBackupName(): string | null {
 async function writeBackupToFolder(dirHandle: FileSystemDirectoryHandle): Promise<void> {
   const fileHandle = await dirHandle.getFileHandle(BACKUP_FILENAME, { create: true });
   const writable = await fileHandle.createWritable();
-  const payload = { version: JOURNEY_EXPORT_VERSION, exportedAt: todayKey(0), journey: exportJourneyData() };
+  const payload = buildBackupPayload(JOURNEY_EXPORT_VERSION, exportJourneyData());
   await writable.write(JSON.stringify(payload, null, 2));
   await writable.close();
 }

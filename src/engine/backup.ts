@@ -1,5 +1,4 @@
 import type { JourneyData } from '../state/selectors';
-import { todayKey } from './progression';
 import {
   isFolderBackupEnabled,
   isFolderBackupSupported,
@@ -7,20 +6,19 @@ import {
   enableFolderBackup,
   saveToFolderNow,
 } from './folderBackup';
-import { JOURNEY_EXPORT_VERSION, exportJourneyData } from '../state/store';
+import { JOURNEY_EXPORT_VERSION, exportJourneyData, buildBackupPayload } from '../state/store';
 
 /** Triggers a browser download of a journey backup JSON file, returning the day key it was exported on. */
 export function downloadBackupJson(version: number, journeyData: JourneyData): string {
-  const exportedAt = todayKey(0);
-  const payload = { version, exportedAt, journey: journeyData };
+  const payload = buildBackupPayload(version, journeyData);
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `journey-to-great-harmony-backup-${exportedAt}.json`;
+  a.download = `journey-to-great-harmony-backup-${payload.exportedAt}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  return exportedAt;
+  return payload.exportedAt;
 }
 
 export type ExportSmartResult =

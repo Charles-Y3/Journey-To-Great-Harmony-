@@ -32,6 +32,8 @@ import { SPECIAL_CARD_RULES, cardById, RARITY_LEVEL_REQUIRED } from '../data/car
 import { ALL_POINTS } from '../data/timeline';
 import { TOPICS } from '../data/knowledgeTree';
 import { SAGES, chapterById, isSageLifeComplete } from '../data/sages';
+import { useTurningPoints } from './turningPointStore';
+import { useProfile } from './profileStore';
 import { REGIONS } from '../data/journeyMap';
 import { glyphById } from '../data/glyphs';
 import { advancedTotemById } from '../data/totems';
@@ -722,4 +724,36 @@ export function useToday(): string {
 /** Snapshot of persistable journey progress for backup download. */
 export function exportJourneyData(): JourneyData {
   return dataOf(useJourney.getState());
+}
+
+export interface BackupPayload {
+  version: number;
+  exportedAt: string;
+  journey: JourneyData;
+  turningPoints: { flippedDays: string[]; assignments: Record<string, string>; cycleSeen: string[] };
+  profile: { name: string | null; hasSetName: boolean; avatar: string };
+}
+
+// Pulls in the two stores persisted separately from the main journey store
+// (see turningPointStore.ts / profileStore.ts) — these were previously
+// omitted from every export/import path entirely, silently losing the
+// wisdom-timeline flip history and display name/avatar on any storage
+// clear + restore. Lives here (not engine/backup.ts) so both backup.ts and
+// folderBackup.ts can import it without creating a cycle between them.
+export function buildBackupPayload(version: number, journeyData: JourneyData): BackupPayload {
+  const tp = useTurningPoints.getState();
+  const prof = useProfile.getState();
+  return {
+    version,
+    exportedAt: todayKey(0),
+    journey: journeyData,
+    turningPoints: { flippedDays: tp.flippedDays, assignments: tp.assignments, cycleSeen: tp.cycleSeen },
+    profile: { name: prof.name, hasSetName: prof.hasSetName, avatar: prof.avatar },
+  };
+}
+
+/** Restores the turningPoints/profile side-stores from an imported backup, if present (older exports lack them). */
+export function applyBackupSideStores(payload: Partial<BackupPayload>): void {
+  if (payload.turningPoints) useTurningPoints.setState(payload.turningPoints);
+  if (payload.profile) useProfile.setState(payload.profile);
 }
