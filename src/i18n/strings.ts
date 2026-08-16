@@ -169,8 +169,8 @@ export const UI = {
   settingsCancel: localized('Cancel', '取消'),
   settingsResetBtn: localized('🔄 Reset journey…', '🔄 重置旅程…'),
   settingsFooter: localized(
-    'Journey to Great Harmony v1.4.2 — your progress is stored privately in this browser.',
-    '大同之路 v1.4.2 — 你的进度私密地保存在此浏览器中。',
+    'Journey to Great Harmony v1.4.3 — your progress is stored privately in this browser.',
+    '大同之路 v1.4.3 — 你的进度私密地保存在此浏览器中。',
   ),
   settingsDisclaimerTitle: localized('A note before you begin', '开始之前的一点说明'),
   settingsDisclaimerBody: localized(

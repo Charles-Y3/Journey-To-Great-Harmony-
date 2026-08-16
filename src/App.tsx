@@ -547,7 +547,7 @@ function BackupSection() {
   }
 
   return (
-    <div className="card">
+    <div className="card" id="settings-backup">
       <h3>{t('settingsExportTitle')}</h3>
       <p className="small muted">{t('settingsExportDesc')}</p>
       <button className="btn" style={{ marginRight: 8 }} onClick={() => void exportBackup()} disabled={folderBusy}>
@@ -1084,12 +1084,16 @@ function SettingsModal({
   const resetOnboardingUi = useUi((s) => s.resetOnboardingUi);
   const [confirming, setConfirming] = useState(false);
   const initialTab: SettingsTabId =
-    focusSection === 'install' ? 'device' : focusSection === 'reminders' || focusSection === 'music' ? 'journey' : 'you';
+    focusSection === 'install' || focusSection === 'backup'
+      ? 'device'
+      : focusSection === 'reminders' || focusSection === 'music'
+        ? 'journey'
+        : 'you';
   const [tab, setTab] = useState<SettingsTabId>(initialTab);
 
   useEffect(() => {
     if (!focusSection) return;
-    if (focusSection === 'install') setTab('device');
+    if (focusSection === 'install' || focusSection === 'backup') setTab('device');
     else if (focusSection === 'reminders' || focusSection === 'music') setTab('journey');
     const anchor =
       focusSection === 'reminders'
@@ -1098,7 +1102,9 @@ function SettingsModal({
           ? 'settings-music'
           : focusSection === 'install'
             ? 'settings-install'
-            : null;
+            : focusSection === 'backup'
+              ? 'settings-backup'
+              : null;
     if (!anchor) return;
     const id = window.setTimeout(() => {
       document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -1481,7 +1487,10 @@ export default function App() {
             <button
               className="btn"
               style={{ width: '100%', position: 'relative' }}
-              onClick={() => setShowSettings(true)}
+              onClick={() => {
+                if (backupStale) setSettingsFocus('backup');
+                setShowSettings(true);
+              }}
             >
               {t('settings')}
               <NavDot show={backupStale} label={t('backupStaleAriaLabel')} />
@@ -1512,7 +1521,10 @@ export default function App() {
               <button
                 className="btn"
                 style={{ padding: '5px 10px', position: 'relative' }}
-                onClick={() => setShowSettings(true)}
+                onClick={() => {
+                  if (backupStale) setSettingsFocus('backup');
+                  setShowSettings(true);
+                }}
                 aria-label={t('settings')}
               >
                 ⚙️
